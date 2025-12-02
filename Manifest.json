@@ -1,0 +1,23 @@
+{
+    "name": "Silly Site Dev app",
+    "short_name": "Silly Site",
+    "start_url": "/index.html",
+    "description": "Silly webstie i made.",
+    "display": "standalone",
+    "background_color": "#FFFF00",
+    "theme_color": "#FFFF00",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
