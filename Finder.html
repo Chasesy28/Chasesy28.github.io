@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>OSM Restaurant Finder</title>
+      <!-- Basic PWA/Mobile enhancements -->
+      <meta name="theme-color" content="#4f46e5">
+      <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiT1NNIFJlc3RhdXJhbnQgRmluZGVyIiwic2hvcnRfbmFtZSI6IlJlc3RhdXJhbnQgRmluZGVyIiwiZGVzY3JpcHRpb24iOiJGaW5kIHJlc3RhdXJhbnRzIHVzaW5nIE9wZW5TdHJlZXRNYXAgZGF0YS4iLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y5ZmFmYiIsInRoZW1lX2NvbG9yIjoiIzRmNDZlNSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeSB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzRmNDZlNSI+PHBhdGggZD0iTTEyIDJDOC4xMyAyIDUgNS4xMyA1IDljMCA1LjI1IDcgMTMgNyAxM3M3LTcuNzUgNy0xM2MwLTMuODctMy4xMy03LTctN3ptMCA5LjVjLTEuMzggMC0yLjUtMS4xMi0yLjUtMi41UzEwLjYyIDYuNSAxMiA2LjVzMi41IDEuMTIgMi45IDEuMTIgMi41IDIuNS0xLjEyIDIuNS0yLjUgMi41eiIvPjwvc3ZnPg==","sizes":"any","type":"image/svg+xml"}]}">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <!-- Leaflet.js CSS and JS -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <style>
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+         body {
+         font-family: 'Inter', sans-serif;
+         }
+         /* --- SPINNER STYLES --- */
+         /* Base spinner animation */
+         @keyframes spin {
+         to { transform: rotate(360deg); }
+         }
+         .spinner {
+         border-radius: 50%;
+         width: 20px;
+         height: 20px;
+         animation: spin 1s linear infinite;
+         }
+         /* Spinner for light backgrounds (e.g., gray button) */
+         .spinner-dark {
+         border: 4px solid rgba(0, 0, 0, .1);
+         border-left-color: #4f46e5; /* indigo-600 */
+         }
+         /* Spinner for dark backgrounds (e.g., indigo button) */
+         .spinner-light {
+         border: 4px solid rgba(255, 255, 255, .3);
+         border-left-color: #ffffff;
+         }
+         /* Spinner for the main page loading icon */
+         #loading .spinner-page {
+         border: 4px solid rgba(0, 0, 0, .1);
+         border-left-color: #4f46e5;
+         width: 40px;
+         height: 40px;
+         border-radius: 50%;
+         animation: spin 1s linear infinite;
+         }
+         @media (prefers-color-scheme: dark) {
+         #loading .spinner-page {
+         border-color: rgba(255, 255, 255, .1);
+         border-left-color: #818cf8; /* indigo-400 */
+         }
+         }
+         /* --- END SPINNER STYLES --- */
+         /* Tailwind prose styles for Gemini output */
+         .prose {
+         color: #374151; /* gray-700 */
+         line-height: 1.65;
+         }
+         .prose strong {
+         font-weight: 600;
+         }
+         .prose em {
+         font-style: italic;
+         }
+         .prose h4 {
+         font-size: 1.125rem; /* text-lg */
+         font-weight: 600;
+         margin-top: 1.5em;
+         margin-bottom: 0.5em;
+         color: #374151;
+         }
+         .prose ul {
+         list-style-type: disc;
+         padding-left: 1.5em;
+         margin-top: 1em;
+         }
+         .prose a {
+         color: #4f46e5; /* indigo-600 */
+         text-decoration: none;
+         }
+         .prose a:hover {
+         text-decoration: underline;
+         }
+         /* Footer */
+         .site-footer {
+         padding: 25px 20px;
+         margin-top: 40px;
+         text-align: center;
+         border-top: 1px solid #e5e5e5;
+         background-color: #f9f9f9;
+         }
+         .site-footer p {
+         margin: 0;
+         font-size: 0.9rem;
+         color: #555;
+         font-family: 'Inter', sans-serif;
+         }
+         .site-footer a {
+         color: #007bff;
+         text-decoration: none;
+         font-weight: 600;
+         }
+         .site-footer a:hover {
+         text-decoration: underline;
+         }
+         /* Dark Mode Styles */
+         @media (prefers-color-scheme: dark) {
+         .prose {
+         color: #d1d5db; /* gray-300 */
+         }
+         .prose h4 {
+         color: #f3f4f6; /* gray-100 */
+         }
+         .prose a {
+         color: #818cf8; /* indigo-400 */
+         }
+         .site-footer {
+         background-color: #1f2937; /* gray-800 */
+         border-top-color: #374151; /* gray-700 */
+         }
+         .site-footer p {
+         color: #9ca3af; /* gray-400 */
+         }
+         .site-footer a {
+         color: #60a5fa; /* blue-400 */
+         }
+         }
+         .leaflet-container {
+         z-index: 10;
+         }
+      </style>
+   </head>
+   <body class="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 md:p-8">
+      <!-- Message Modal (not realy needed)-->
+      <div id="messageModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 hidden z-50 transition-opacity duration-300">
+         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center mb-4">
+               <h4 id="modalTitle" class="text-lg font-semibold text-gray-800 dark:text-gray-100">Notification</h4>
+               <button id="closeMessageModal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
+            </div>
+            <p id="modalMessage" class="text-gray-600 dark:text-gray-300"></p>
+         </div>
+      </div>
+      <!-- Back button -->
+      <button onclick="history.back()" class="bg-gray-500 dark:bg-gray-600 text-white text-xs font-medium py-1 px-2 rounded-md shadow-sm hover:bg-gray-600 dark:hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:ring-opacity-75 transition-colors mb-4">Go Back</button>
+      <!-- Restaurant Detail Modal -->
+      <div id="restaurantModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-40 transition-opacity duration-300">
+         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+               <h3 id="modalName" class="text-2xl font-bold text-indigo-700 dark:text-indigo-400">Restaurant Name</h3>
+               <button id="closeRestaurantModal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
+            </div>
+            <!-- Modal Content -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <!-- Left Column: Details -->
+               <div>
+                  <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Details</h4>
+                  <p class="text-sm text-gray-700 dark:text-gray-200 font-medium capitalize mb-2">
+                     <strong>Cuisine:</strong> <span id="modalCuisine"></span>
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                     <strong>Address:</strong> <span id="modalAddress"></span>
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                     <strong>Hours:</strong>
+                     <span id="modalHours" class="block text-xs whitespace-pre-wrap break-words mt-1"></span>
+                  </p>
+                  <div id="modalVibeSection" class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
+                     <button id="modalVibeButton" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium">
+                     ✨ Get Info (via Google)
+                     </button>
+                     <div id="modalVibeResult" class="vibe-result prose prose-sm text-sm mt-2" style="max-width: none;"></div>
+                  </div>
+               </div>
+               <!-- Right Column: Map -->
+               <div>
+                  <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Location</h4>
+                  <div id="modalMap" class="h-64 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                  <p id="modalMapMessage" class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1 hidden">Map data not available for this location.</p>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="max-w-4xl mx-auto">
+         <div class="bg-white dark:bg-gray-800 w-full p-6 md:p-8 rounded-xl shadow-lg">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">Restaurant Finder</h1>
+            <p class="text-gray-600 dark:text-gray-300 mb-6">
+               Use the form to find restaurants via OpenStreetMap data. (Disclaimer: Built to find restaurants in the USA; may not work well in other countries)
+            </p>
+            <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4 mt-6">OSM Search</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+               <div>
+                  <label for="country" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Country</label>
+                  <input type="text" id="country" value="USA" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+               </div>
+               <div>
+                  <label for="state" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">State (optional)</label>
+                  <input type="text" id="state" value="California" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+               </div>
+               <div>
+                  <label for="city" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">City</label>
+                  <input type="text" id="city" value="Mill Valley" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+               </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+               <div>
+                  <label for="cuisine" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Cuisine (optional)</label>
+                  <input type="text" id="cuisine" placeholder="e.g., pizza, sushi" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:placeholder-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+               </div>
+               <div class="flex items-end">
+                  <div class="flex items-center h-full pb-2">
+                     <input id="isOpenNow" type="checkbox" class="h-5 w-5 text-indigo-600 dark:text-indigo-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg focus:ring-indigo-500 dark:focus:ring-indigo-400">
+                     <label for="isOpenNow" class="ml-2 block text-sm font-medium text-gray-800 dark:text-gray-100">Currently Open</label>
+                  </div>
+               </div>
+            </div>
+            <button id="getLocationButton" class="w-full bg-gray-500 dark:bg-gray-600 text-white font-medium py-3 px-5 rounded-lg shadow-md hover:bg-gray-600 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 transition-colors mb-4">
+            Use Current Location
+            </button>
+            <button id="searchButton" class="w-full bg-indigo-600 dark:bg-indigo-500 text-white font-medium py-3 px-5 rounded-lg shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors">
+            Search OpenStreetMap
+            </button>
+         </div>
+         <!-- OSM Results Container -->
+         <div id="osmResultsContainer" class="mt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+               <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2 md:mb-0">OSM Results</h2>
+               <div class="flex items-center space-x-2">
+                  <label for="sortSelect" class="text-sm text-gray-700 dark:text-gray-200">Sort by:</label>
+                  <select id="sortSelect" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+                     <option value="cuisine-asc">Cuisine (A–Z)</option>
+                     <option value="name-asc">Name (A–Z)</option>
+                     <option value="name-desc">Name (Z–A)</option>
+                     <option value="address-asc">Address (A–Z)</option>
+                     <option value="hours-asc">Opening Hours (A–Z)</option>
+                  </select>
+               </div>
+            </div>
+            <div id="message" class="text-center text-gray-500 dark:text-gray-400">
+               Enter your search criteria and click search.
+            </div>
+            <div id="loading" class="hidden flex justify-center items-center my-10">
+               <!-- Updated to use the new spinner-page class -->
+               <div class="spinner-page"></div>
+            </div>
+            <div id="resultsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <!-- Results will be injected here -->
+            </div>
+         </div>
+      </div>
+      <footer class="site-footer">
+         <p>Credits to <a href="https://www.openstreetmap.org/">Open Street Map</a> for their API and helpful community.</p>
+      </footer>
+      <!--SCRIPT TAG -->
+      <script src="./Finder.js"></script>
+   </body>
+</html>
