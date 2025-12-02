@@ -2,7 +2,7 @@
     "name": "Silly Site Dev app",
     "short_name": "Silly Site",
     "start_url": "/index.html",
-    "description": "Silly webstie i made.",
+    "description": "Silly website I made.",
     "display": "standalone",
     "background_color": "#FFFF00",
     "theme_color": "#FFFF00",
