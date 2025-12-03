@@ -3,7 +3,9 @@
    <head>
       <meta charset="utf-8">
       <meta name="robots" content="noindex, nofollow">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
       <!--title-->
       <title>Silly Site!</title>
       <!-- Load external CSS styles -->
@@ -18,6 +20,10 @@
       <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
    </head>
    <body>
+      <!-- Offline Banner -->
+      <div id="offlineBanner" class="offline-banner">
+         ⚠️ You are currently offline. Some features may not be available.
+      </div>
       <div class="rain">
          <!-- Header/ navigation -->
             <header>
@@ -61,6 +67,35 @@
                   .catch(error => {
                      console.error('Service Worker registration failed:', error);
                   });
+            });
+         }
+
+         // Offline/Online detection
+         const offlineBanner = document.getElementById('offlineBanner');
+         
+         function updateOnlineStatus() {
+            if (!navigator.onLine) {
+               offlineBanner.classList.add('show');
+               document.body.classList.add('offline-mode');
+            } else {
+               offlineBanner.classList.remove('show');
+               document.body.classList.remove('offline-mode');
+            }
+         }
+
+         window.addEventListener('online', updateOnlineStatus);
+         window.addEventListener('offline', updateOnlineStatus);
+         
+         // Check initial status
+         updateOnlineStatus();
+
+         // Listen for messages from Service Worker
+         if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+               if (event.data && event.data.type === 'OFFLINE') {
+                  offlineBanner.classList.add('show');
+                  document.body.classList.add('offline-mode');
+               }
             });
          }
       </script>
