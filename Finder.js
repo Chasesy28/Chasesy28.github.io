@@ -267,7 +267,7 @@
          modalName.textContent = data.name;
          modalCuisine.textContent = data.cuisine.replace(/_/g, ' ');
          modalAddress.textContent = data.address;
-         modalHours.textContent = data.openingHours;
+         modalHours.textContent = data.openingHours || 'Not specified';
 
          // --- Favorites Button Setup ---
          const favBtn = document.getElementById('modalFavoriteBtn');

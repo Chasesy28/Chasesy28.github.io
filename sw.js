@@ -110,16 +110,3 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
-
-// ---
-// EVENT: message
-// Handle messages from the main thread for favorites management
-// ---
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'GET_FAVORITES') {
-    // Respond with favorites from the client's localStorage (handled in main thread)
-    if (event.source) {
-      event.source.postMessage({ type: 'FAVORITES_DATA' });
-    }
-  }
-});
