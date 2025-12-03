@@ -1,5 +1,5 @@
 # Security Policy
-Non yet
+Non yet added, will do later
 ## Supported Versions
 
 Use this section to tell people about which versions of your project are

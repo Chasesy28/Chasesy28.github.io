@@ -92,6 +92,7 @@ self.addEventListener('fetch', (event) => {
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache);
+                console.log(`[Service Worker] Caching new resource: ${event.request.url}`);
               });
             
             // 2b. Return the response from the network
