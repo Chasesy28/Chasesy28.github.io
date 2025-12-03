@@ -24,8 +24,8 @@
  function saveFavorites() {
      try {
          localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-         // Also save to cookie for backup
-         document.cookie = `${FAVORITES_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(favorites))};path=/;max-age=31536000`;
+         // Also save to cookie for backup with security flags
+         document.cookie = `${FAVORITES_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(favorites))};path=/;max-age=31536000;SameSite=Strict`;
      } catch (e) {
          console.error('Error saving favorites:', e);
      }
@@ -577,7 +577,7 @@
          }
 
          if (typeof L === 'undefined') {
-             messageOutput.textContent = 'Map library failed to load.';
+             messageOutput.textContent = 'Unable to load map. Please check your internet connection and refresh the page.';
              messageOutput.classList.remove('hidden');
              return;
          }
@@ -646,6 +646,10 @@
      function handleMapPopupClick(e) {
          if (e.target && e.target.classList.contains('map-popup-details-btn')) {
              const id = parseInt(e.target.dataset.restaurantId, 10);
+             if (isNaN(id)) {
+                 console.error('Invalid restaurant ID in map popup');
+                 return;
+             }
              const data = lastResults.find(r => r.id === id) || favorites.find(f => f.id === id);
              if (data) {
                  showRestaurantModal(data);
