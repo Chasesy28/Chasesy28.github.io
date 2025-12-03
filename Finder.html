@@ -2,11 +2,14 @@
 <html lang="en">
    <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <title>OSM Restaurant Finder</title>
       <!-- Basic PWA/Mobile enhancements -->
       <meta name="theme-color" content="#4f46e5">
-      <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiT1NNIFJlc3RhdXJhbnQgRmluZGVyIiwic2hvcnRfbmFtZSI6IlJlc3RhdXJhbnQgRmluZGVyIiwiZGVzY3JpcHRpb24iOiJGaW5kIHJlc3RhdXJhbnRzIHVzaW5nIE9wZW5TdHJlZXRNYXAgZGF0YS4iLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI2Y5ZmFmYiIsInRoZW1lX2NvbG9yIjoiIzRmNDZlNSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeSB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzRmNDZlNSI+PHBhdGggZD0iTTEyIDJDOC4xMyAyIDUgNS4xMyA1IDljMCA1LjI1IDcgMTMgNyAxM3M3LTcuNzUgNy0xM2MwLTMuODctMy4xMy03LTctN3ptMCA5LjVjLTEuMzggMC0yLjUtMS4xMi0yLjUtMi41UzEwLjYyIDYuNSAxMiA2LjVzMi41IDEuMTIgMi45IDEuMTIgMi41IDIuNS0xLjEyIDIuNS0yLjUgMi41eiIvPjwvc3ZnPg==","sizes":"any","type":"image/svg+xml"}]}">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
+      <link rel="manifest" href="/manifest.json">
+      <link rel="icon" href="/icons/icon-192x192.png">
       <script src="https://cdn.tailwindcss.com"></script>
       <!-- Leaflet.js CSS and JS -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -15,6 +18,26 @@
          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
          body {
          font-family: 'Inter', sans-serif;
+         }
+         /* --- OFFLINE BANNER STYLES --- */
+         .offline-banner {
+           position: fixed;
+           top: 0;
+           left: 0;
+           right: 0;
+           background-color: #ef4444;
+           color: white;
+           padding: 12px 16px;
+           text-align: center;
+           z-index: 9999;
+           display: none;
+           font-weight: 500;
+         }
+         .offline-banner.show {
+           display: block;
+         }
+         body.offline-mode {
+           padding-top: 50px;
          }
          /* --- SPINNER STYLES --- */
          /* Base spinner animation */
@@ -130,9 +153,69 @@
          .leaflet-container {
          z-index: 10;
          }
+         /* --- MAP VIEW STYLES --- */
+         #mapView {
+           height: 500px;
+           width: 100%;
+           border-radius: 0.75rem;
+           display: none;
+         }
+         #mapView.active {
+           display: block;
+         }
+         /* --- FAVORITE BUTTON STYLES --- */
+         .favorite-btn {
+           background: none;
+           border: none;
+           cursor: pointer;
+           font-size: 1.25rem;
+           padding: 4px;
+           transition: transform 0.2s;
+         }
+         .favorite-btn:hover {
+           transform: scale(1.2);
+         }
+         .favorite-btn.favorited {
+           color: #f59e0b;
+         }
+         /* --- MOBILE RESPONSIVE STYLES --- */
+         @media (max-width: 768px) {
+           body {
+             padding: 8px !important;
+           }
+           .max-w-4xl {
+             padding: 0 8px;
+           }
+           h1 {
+             font-size: 1.5rem !important;
+           }
+           h2 {
+             font-size: 1.25rem !important;
+           }
+           .grid-cols-1.md\\:grid-cols-3 {
+             gap: 8px !important;
+           }
+           .grid-cols-1.md\\:grid-cols-2 {
+             grid-template-columns: 1fr !important;
+           }
+           #mapView {
+             height: 350px;
+           }
+           .view-toggle-container {
+             flex-direction: column;
+             gap: 8px;
+           }
+           .view-toggle-container button {
+             width: 100%;
+           }
+         }
       </style>
    </head>
    <body class="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 md:p-8">
+      <!-- Offline Banner -->
+      <div id="offlineBanner" class="offline-banner">
+         ⚠️ You are currently offline. Some features may not be available.
+      </div>
       <!-- Message Modal (not realy needed)-->
       <div id="messageModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 hidden z-50 transition-opacity duration-300">
          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300">
@@ -150,7 +233,10 @@
          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]">
             <!-- Modal Header -->
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-               <h3 id="modalName" class="text-2xl font-bold text-indigo-700 dark:text-indigo-400">Restaurant Name</h3>
+               <div class="flex items-center gap-2">
+                  <h3 id="modalName" class="text-2xl font-bold text-indigo-700 dark:text-indigo-400">Restaurant Name</h3>
+                  <button id="modalFavoriteBtn" class="favorite-btn" title="Add to favorites">☆</button>
+               </div>
                <button id="closeRestaurantModal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
             </div>
             <!-- Modal Content -->
@@ -180,6 +266,9 @@
                   <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Location</h4>
                   <div id="modalMap" class="h-64 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
                   <p id="modalMapMessage" class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1 hidden">Map data not available for this location.</p>
+                  <button id="modalDirectionsBtn" class="w-full mt-3 bg-green-600 dark:bg-green-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-colors hidden">
+                     🧭 Get Directions
+                  </button>
                </div>
             </div>
          </div>
@@ -226,17 +315,38 @@
          </div>
          <!-- OSM Results Container -->
          <div id="osmResultsContainer" class="mt-8">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-               <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2 md:mb-0">OSM Results</h2>
-               <div class="flex items-center space-x-2">
-                  <label for="sortSelect" class="text-sm text-gray-700 dark:text-gray-200">Sort by:</label>
-                  <select id="sortSelect" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                     <option value="cuisine-asc">Cuisine (A–Z)</option>
-                     <option value="name-asc">Name (A–Z)</option>
-                     <option value="name-desc">Name (Z–A)</option>
-                     <option value="address-asc">Address (A–Z)</option>
-                     <option value="hours-asc">Opening Hours (A–Z)</option>
-                  </select>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+               <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200">OSM Results</h2>
+               <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
+                  <!-- View Toggle -->
+                  <div class="view-toggle-container flex gap-2">
+                     <button id="listViewBtn" class="bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors">
+                        📋 List
+                     </button>
+                     <button id="mapViewBtn" class="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">
+                        🗺️ Map
+                     </button>
+                     <button id="favoritesViewBtn" class="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors">
+                        ⭐ Favorites
+                     </button>
+                  </div>
+                  <!-- Filter and Sort -->
+                  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full md:w-auto">
+                     <div class="flex items-center">
+                        <input id="hideUnnamed" type="checkbox" class="h-4 w-4 text-indigo-600 dark:text-indigo-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded focus:ring-indigo-500 dark:focus:ring-indigo-400" checked>
+                        <label for="hideUnnamed" class="ml-2 text-sm text-gray-700 dark:text-gray-200">Hide Unnamed</label>
+                     </div>
+                     <div class="flex items-center gap-2">
+                        <label for="sortSelect" class="text-sm text-gray-700 dark:text-gray-200">Sort:</label>
+                        <select id="sortSelect" class="border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
+                           <option value="cuisine-asc">Cuisine (A–Z)</option>
+                           <option value="name-asc">Name (A–Z)</option>
+                           <option value="name-desc">Name (Z–A)</option>
+                           <option value="address-asc">Address (A–Z)</option>
+                           <option value="hours-asc">Opening Hours (A–Z)</option>
+                        </select>
+                     </div>
+                  </div>
                </div>
             </div>
             <div id="message" class="text-center text-gray-500 dark:text-gray-400">
@@ -246,6 +356,8 @@
                <!-- Updated to use the new spinner-page class -->
                <div class="spinner-page"></div>
             </div>
+            <!-- Map View Container -->
+            <div id="mapView" class="mb-4"></div>
             <div id="resultsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                <!-- Results will be injected here -->
             </div>
@@ -254,6 +366,50 @@
       <footer class="site-footer">
          <p>Credits to <a href="https://www.openstreetmap.org/">Open Street Map</a> for their API and helpful community.</p>
       </footer>
+      <!-- Service Worker Registration and Offline Detection -->
+      <script>
+         // Register the service worker
+         if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+               navigator.serviceWorker.register('/sw.js')
+                  .then(registration => {
+                     console.log('Service Worker registered with scope:', registration.scope);
+                  })
+                  .catch(error => {
+                     console.error('Service Worker registration failed:', error);
+                  });
+            });
+         }
+
+         // Offline/Online detection
+         const offlineBanner = document.getElementById('offlineBanner');
+         
+         function updateOnlineStatus() {
+            if (!navigator.onLine) {
+               offlineBanner.classList.add('show');
+               document.body.classList.add('offline-mode');
+            } else {
+               offlineBanner.classList.remove('show');
+               document.body.classList.remove('offline-mode');
+            }
+         }
+
+         window.addEventListener('online', updateOnlineStatus);
+         window.addEventListener('offline', updateOnlineStatus);
+         
+         // Check initial status
+         updateOnlineStatus();
+
+         // Listen for messages from Service Worker
+         if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+               if (event.data && event.data.type === 'OFFLINE') {
+                  offlineBanner.classList.add('show');
+                  document.body.classList.add('offline-mode');
+               }
+            });
+         }
+      </script>
       <!--SCRIPT TAG -->
       <script src="./Finder.js"></script>
    </body>

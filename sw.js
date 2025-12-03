@@ -1,12 +1,14 @@
 // Service Worker
 
-const CACHE_NAME = 'silly-site-cache-v1';
+const CACHE_NAME = 'silly-site-cache-v2';
 
 // 1. file caching
 // (These are the "core" files for your app to work offline)
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
+  '/Finder.html',
+  '/Finder.js',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
@@ -52,6 +54,9 @@ self.addEventListener('activate', (event) => {
           .filter((name) => name !== CACHE_NAME) // Find all caches that are NOT our new one
           .map((name) => caches.delete(name))    // Delete them
       );
+    }).then(() => {
+      // Claim all clients immediately
+      return self.clients.claim();
     })
   );
 });
@@ -95,6 +100,12 @@ self.addEventListener('fetch', (event) => {
           .catch((error) => {
             // 3. If the network fails (e.g., offline)
             console.log('[Service Worker] Fetch failed: Internet Failed to connect:', error);
+            // Notify clients about offline status
+            self.clients.matchAll().then(clients => {
+              clients.forEach(client => {
+                client.postMessage({ type: 'OFFLINE', url: event.request.url });
+              });
+            });
           });
       })
   );

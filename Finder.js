@@ -1,7 +1,85 @@
  // Global state
  let lastResults = [];
  let detailMap = null; // Holds the Leaflet map instance
+ let overviewMap = null; // Holds the overview map for all results
+ let currentView = 'list'; // 'list', 'map', or 'favorites'
+ let favorites = []; // Array of favorite restaurant IDs
+ let modalAbortController = null; // AbortController for modal event listeners
  const GEMINI_API_KEY = ""; // Leave empty (would be filled by codespace when run in one)
+ const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
+
+ // --- Favorites Management ---
+ function loadFavorites() {
+     try {
+         const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
+         if (stored) {
+             favorites = JSON.parse(stored);
+         }
+     } catch (e) {
+         console.error('Error loading favorites:', e);
+         favorites = [];
+     }
+ }
+
+ function saveFavorites() {
+     try {
+         localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+         // Also save to cookie for backup with security flags
+         document.cookie = `${FAVORITES_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(favorites))};path=/;max-age=31536000;SameSite=Strict`;
+     } catch (e) {
+         console.error('Error saving favorites:', e);
+     }
+ }
+
+ function isFavorite(id) {
+     return favorites.some(f => f.id === id);
+ }
+
+ function addToFavorites(data) {
+     if (!isFavorite(data.id)) {
+         favorites.push({
+             id: data.id,
+             name: data.name,
+             cuisine: data.cuisine,
+             address: data.address,
+             openingHours: data.openingHours,
+             lat: data.lat,
+             lon: data.lon
+         });
+         saveFavorites();
+     }
+ }
+
+ function removeFromFavorites(id) {
+     favorites = favorites.filter(f => f.id !== id);
+     saveFavorites();
+ }
+
+ function toggleFavorite(data) {
+     if (isFavorite(data.id)) {
+         removeFromFavorites(data.id);
+         return false;
+     } else {
+         addToFavorites(data);
+         return true;
+     }
+ }
+
+ // --- Directions ---
+ function openDirections(lat, lon, name) {
+     // Try to detect platform and open appropriate maps app
+     const destination = encodeURIComponent(`${lat},${lon}`);
+     const destName = encodeURIComponent(name || 'Destination');
+     
+     // Universal Google Maps URL that works on mobile and desktop
+     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&destination_place_id=&travelmode=driving`;
+     
+     // Open in a new window/tab
+     window.open(googleMapsUrl, '_blank');
+ }
+
+ // Load favorites on script load
+ loadFavorites();
 
  // DOM Elements
  const sortSelect = document.getElementById('sortSelect');
@@ -30,6 +108,13 @@
  const modalHours = document.getElementById('modalHours');
  const modalMap = document.getElementById('modalMap');
  const modalMapMessage = document.getElementById('modalMapMessage');
+
+ // New DOM Elements
+ const listViewBtn = document.getElementById('listViewBtn');
+ const mapViewBtn = document.getElementById('mapViewBtn');
+ const favoritesViewBtn = document.getElementById('favoritesViewBtn');
+ const mapView = document.getElementById('mapView');
+ const hideUnnamedCheckbox = document.getElementById('hideUnnamed');
 
 
  /**
@@ -172,10 +257,58 @@
 
      // --- Restaurant Modal Logic ---
      function showRestaurantModal(data) {
+         // Abort any previous modal event listeners
+         if (modalAbortController) {
+             modalAbortController.abort();
+         }
+         modalAbortController = new AbortController();
+         const signal = modalAbortController.signal;
+
          modalName.textContent = data.name;
          modalCuisine.textContent = data.cuisine.replace(/_/g, ' ');
          modalAddress.textContent = data.address;
-         modalHours.textContent = data.openingHours;
+         modalHours.textContent = data.openingHours || 'Not specified';
+
+         // --- Favorites Button Setup ---
+         const favBtn = document.getElementById('modalFavoriteBtn');
+         if (isFavorite(data.id)) {
+             favBtn.textContent = '★';
+             favBtn.classList.add('favorited');
+             favBtn.title = 'Remove from favorites';
+         } else {
+             favBtn.textContent = '☆';
+             favBtn.classList.remove('favorited');
+             favBtn.title = 'Add to favorites';
+         }
+
+         favBtn.addEventListener('click', (e) => {
+             e.stopPropagation();
+             const isFav = toggleFavorite(data);
+             if (isFav) {
+                 favBtn.textContent = '★';
+                 favBtn.classList.add('favorited');
+                 favBtn.title = 'Remove from favorites';
+             } else {
+                 favBtn.textContent = '☆';
+                 favBtn.classList.remove('favorited');
+                 favBtn.title = 'Add to favorites';
+             }
+             // Refresh display if on favorites view
+             if (currentView === 'favorites') {
+                 displayFavorites();
+             }
+         }, { signal });
+
+         // --- Directions Button Setup ---
+         const dirBtn = document.getElementById('modalDirectionsBtn');
+         if (data.lat && data.lon) {
+             dirBtn.classList.remove('hidden');
+             dirBtn.addEventListener('click', () => {
+                 openDirections(data.lat, data.lon, data.name);
+             }, { signal });
+         } else {
+             dirBtn.classList.add('hidden');
+         }
 
          const modalVibeButton = document.getElementById('modalVibeButton');
          const modalVibeResult = document.getElementById('modalVibeResult');
@@ -185,14 +318,10 @@
          modalVibeResult.style.display = 'none';
          modalVibeButton.style.display = 'block';
          setButtonLoading(modalVibeButton, false); // Reset button
-         modalVibeButton.dataset.originalText = "✨ Get Info (via Google)"; // Reset text
+         modalVibeButton.textContent = "✨ Get Info (via Google)";
 
-         // Clone button to remove old listeners and add a new one
-         const newVibeButton = modalVibeButton.cloneNode(true);
-         modalVibeButton.parentNode.replaceChild(newVibeButton, modalVibeButton);
-
-         newVibeButton.addEventListener('click', async () => {
-             setButtonLoading(newVibeButton, true, "Getting Info...", "dark");
+         modalVibeButton.addEventListener('click', async () => {
+             setButtonLoading(modalVibeButton, true, "Getting Info...", "dark");
              try {
                  const {
                      text,
@@ -207,15 +336,15 @@
                  }
                  modalVibeResult.innerHTML = html;
                  modalVibeResult.style.display = 'block';
-                 newVibeButton.style.display = 'none'; // Hide button on success
+                 modalVibeButton.style.display = 'none'; // Hide button on success
 
              } catch (error) {
                  console.error("Gemini Vibe Error:", error);
-                 setButtonLoading(newVibeButton, false); // Reset button on error
+                 setButtonLoading(modalVibeButton, false); // Reset button on error
                  modalVibeResult.innerHTML = `<p class="text-red-500 dark:text-red-400 text-xs">Error: ${error.message}</p>`;
                  modalVibeResult.style.display = 'block';
              }
-         });
+         }, { signal });
 
 
          if (detailMap) {
@@ -397,10 +526,176 @@
      });
 
      sortSelect.addEventListener('change', () => {
-         if (lastResults.length > 0) {
+         if (currentView === 'favorites') {
+             displayFavorites();
+         } else if (lastResults.length > 0) {
              displayResults(lastResults); // Re-sort and display
          }
      });
+
+     // --- View Toggle Logic ---
+     function setActiveView(view) {
+         currentView = view;
+         
+         // Update button styles
+         const buttons = [listViewBtn, mapViewBtn, favoritesViewBtn];
+         buttons.forEach(btn => {
+             btn.classList.remove('bg-indigo-600', 'dark:bg-indigo-500', 'text-white');
+             btn.classList.add('bg-gray-300', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200');
+         });
+
+         if (view === 'list') {
+             listViewBtn.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200');
+             listViewBtn.classList.add('bg-indigo-600', 'dark:bg-indigo-500', 'text-white');
+             mapView.classList.remove('active');
+             resultsList.classList.remove('hidden');
+             displayResults(lastResults);
+         } else if (view === 'map') {
+             mapViewBtn.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200');
+             mapViewBtn.classList.add('bg-indigo-600', 'dark:bg-indigo-500', 'text-white');
+             resultsList.classList.add('hidden');
+             mapView.classList.add('active');
+             displayMapView(lastResults);
+         } else if (view === 'favorites') {
+             favoritesViewBtn.classList.remove('bg-gray-300', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200');
+             favoritesViewBtn.classList.add('bg-indigo-600', 'dark:bg-indigo-500', 'text-white');
+             mapView.classList.remove('active');
+             resultsList.classList.remove('hidden');
+             displayFavorites();
+         }
+     }
+
+     listViewBtn.addEventListener('click', () => setActiveView('list'));
+     mapViewBtn.addEventListener('click', () => setActiveView('map'));
+     favoritesViewBtn.addEventListener('click', () => setActiveView('favorites'));
+
+     // --- Map View Logic ---
+     function displayMapView(results) {
+         if (overviewMap) {
+             overviewMap.remove();
+             overviewMap = null;
+         }
+
+         if (typeof L === 'undefined') {
+             messageOutput.textContent = 'Unable to load map. Please check your internet connection and refresh the page.';
+             messageOutput.classList.remove('hidden');
+             return;
+         }
+
+         const filteredResults = getFilteredResults(results);
+
+         if (filteredResults.length === 0) {
+             messageOutput.textContent = 'No results with location data to display on map.';
+             messageOutput.classList.remove('hidden');
+             return;
+         }
+
+         // Filter results with valid coordinates
+         const mappableResults = filteredResults.filter(r => r.lat && r.lon);
+
+         if (mappableResults.length === 0) {
+             messageOutput.textContent = 'No results with location data to display on map.';
+             messageOutput.classList.remove('hidden');
+             return;
+         }
+
+         messageOutput.textContent = `Showing ${mappableResults.length} location(s) on map.`;
+         messageOutput.classList.remove('hidden');
+
+         // Calculate center of all points
+         const avgLat = mappableResults.reduce((sum, r) => sum + r.lat, 0) / mappableResults.length;
+         const avgLon = mappableResults.reduce((sum, r) => sum + r.lon, 0) / mappableResults.length;
+
+         overviewMap = L.map('mapView').setView([avgLat, avgLon], 13);
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+         }).addTo(overviewMap);
+
+         // Add markers for all results
+         const markers = [];
+         mappableResults.forEach(data => {
+             const marker = L.marker([data.lat, data.lon])
+                 .addTo(overviewMap)
+                 .bindPopup(`
+                     <strong>${data.name}</strong><br>
+                     <em>${data.cuisine.replace(/_/g, ' ')}</em><br>
+                     ${data.address}<br>
+                     <button class="map-popup-details-btn" data-restaurant-id="${data.id}" style="color: #4f46e5; cursor: pointer; border: none; background: none; text-decoration: underline;">View Details</button>
+                 `);
+             markers.push(marker);
+         });
+
+         // Event delegation for popup buttons
+         mapView.addEventListener('click', handleMapPopupClick);
+
+         // Fit map to show all markers
+         if (markers.length > 1) {
+             const group = L.featureGroup(markers);
+             overviewMap.fitBounds(group.getBounds().pad(0.1));
+         }
+
+         // Invalidate size after a brief delay to ensure proper rendering
+         setTimeout(() => {
+             if (overviewMap) {
+                 overviewMap.invalidateSize();
+             }
+         }, 100);
+     }
+
+     // Event handler for map popup buttons using event delegation
+     function handleMapPopupClick(e) {
+         if (e.target && e.target.classList.contains('map-popup-details-btn')) {
+             const id = parseInt(e.target.dataset.restaurantId, 10);
+             if (isNaN(id)) {
+                 console.error('Invalid restaurant ID in map popup');
+                 return;
+             }
+             const data = lastResults.find(r => r.id === id) || favorites.find(f => f.id === id);
+             if (data) {
+                 showRestaurantModal(data);
+             }
+         }
+     }
+
+     // --- Favorites View Logic ---
+     function displayFavorites() {
+         resultsList.innerHTML = '';
+         mapView.classList.remove('active');
+
+         if (favorites.length === 0) {
+             messageOutput.textContent = 'No favorites saved yet. Click the star on a restaurant to add it to your favorites.';
+             messageOutput.classList.remove('hidden');
+             return;
+         }
+
+         messageOutput.textContent = `You have ${favorites.length} favorite(s).`;
+         messageOutput.classList.remove('hidden');
+
+         const sortedFavorites = sortResults([...favorites], sortSelect.value);
+
+         sortedFavorites.forEach(data => {
+             const card = createResultCard(data, true);
+             resultsList.appendChild(card);
+         });
+     }
+
+     // --- Hide Unnamed Filter ---
+     hideUnnamedCheckbox.addEventListener('change', () => {
+         if (currentView === 'favorites') {
+             displayFavorites();
+         } else if (currentView === 'map') {
+             displayMapView(lastResults);
+         } else {
+             displayResults(lastResults);
+         }
+     });
+
+     function getFilteredResults(results) {
+         if (hideUnnamedCheckbox.checked) {
+             return results.filter(r => r.name && r.name !== 'Unnamed Restaurant');
+         }
+         return results;
+     }
 
      async function searchOSM() {
          setButtonLoading(searchButton, true, "Searching...", "light");
@@ -538,58 +833,116 @@
      }
 
      /**
+      * Creates a result card element
+      * @param {object} data - The restaurant data
+      * @param {boolean} showFavoriteIndicator - Whether to show a favorite indicator
+      * @returns {HTMLElement} The card element
+      */
+     function createResultCard(data, showFavoriteIndicator = false) {
+         const card = document.createElement('div');
+         card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow';
+
+         const openStatus = data.isOpen === true ? '<span class="text-xs font-medium text-green-600 dark:text-green-400">Open</span>' :
+             data.isOpen === false ? '<span class="text-xs font-medium text-red-600 dark:text-red-400">Closed</span>' :
+             '<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Hours Unknown</span>';
+
+         const favoriteIndicator = showFavoriteIndicator ? '<span class="text-yellow-500 mr-2">★</span>' : '';
+         const isFav = isFavorite(data.id);
+         const favButton = `<button class="favorite-btn ${isFav ? 'favorited' : ''}" title="${isFav ? 'Remove from favorites' : 'Add to favorites'}">${isFav ? '★' : '☆'}</button>`;
+
+         card.innerHTML = `
+                     <div>
+                         <div class="flex justify-between items-center mb-2">
+                             <div class="flex items-center">
+                                 ${favoriteIndicator}
+                                 <h3 class="text-lg font-semibold text-indigo-700 dark:text-indigo-400">${data.name}</h3>
+                             </div>
+                             <div class="flex items-center gap-2">
+                                 ${favButton}
+                                 ${openStatus}
+                             </div>
+                         </div>
+                         <p class="text-sm text-gray-700 dark:text-gray-200 font-medium capitalize">
+                             <strong>Cuisine:</strong> ${data.cuisine.replace(/_/g, ' ')}
+                         </p>
+                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                             <strong>Address:</strong> ${data.address}
+                         </p>
+                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                             <strong>Hours:</strong> 
+                             <span class="text-xs truncate block whitespace-nowrap overflow-hidden">
+                                 ${data.openingHours || 'Not specified'}
+                             </span>
+                         </p>
+                         ${data.lat && data.lon ? `
+                         <button class="directions-btn mt-2 text-xs text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 font-medium">
+                             🧭 Get Directions
+                         </button>
+                         ` : ''}
+                     </div>
+                 `;
+
+         // Add click listener for favorite button
+         const favBtnEl = card.querySelector('.favorite-btn');
+         favBtnEl.addEventListener('click', (e) => {
+             e.stopPropagation();
+             const nowFav = toggleFavorite(data);
+             favBtnEl.textContent = nowFav ? '★' : '☆';
+             favBtnEl.classList.toggle('favorited', nowFav);
+             favBtnEl.title = nowFav ? 'Remove from favorites' : 'Add to favorites';
+             // Refresh favorites view if needed
+             if (currentView === 'favorites') {
+                 displayFavorites();
+             }
+         });
+
+         // Add click listener for directions button
+         const dirBtn = card.querySelector('.directions-btn');
+         if (dirBtn) {
+             dirBtn.addEventListener('click', (e) => {
+                 e.stopPropagation();
+                 openDirections(data.lat, data.lon, data.name);
+             });
+         }
+
+         // Add click listener to show detail modal
+         card.addEventListener('click', () => {
+             showRestaurantModal(data);
+         });
+
+         return card;
+     }
+
+     /**
       * Renders the results to the list.
       * @param {Array<object>} results - The array of processed restaurant objects.
       */
      function displayResults(results) {
          setPageLoading(false); // Hide spinner
          resultsList.innerHTML = '';
+         mapView.classList.remove('active');
 
-         if (results.length === 0) {
+         // Apply filter
+         const filteredResults = getFilteredResults(results);
+
+         if (filteredResults.length === 0) {
              messageOutput.textContent = "No results found matching your criteria.";
              messageOutput.classList.remove('hidden');
              return;
          }
 
-         messageOutput.textContent = `Found ${results.length} result(s).`;
+         const hiddenCount = results.length - filteredResults.length;
+         let message = `Found ${filteredResults.length} result(s).`;
+         if (hiddenCount > 0) {
+             message += ` (${hiddenCount} unnamed locations hidden)`;
+         }
+         messageOutput.textContent = message;
          messageOutput.classList.remove('hidden');
 
-         const sortedResults = sortResults(results, sortSelect.value);
+         const sortedResults = sortResults([...filteredResults], sortSelect.value);
 
          sortedResults.forEach(data => {
-             const card = document.createElement('div');
-             card.className = 'bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow';
-
-             const openStatus = data.isOpen === true ? '<span class="text-xs font-medium text-green-600 dark:text-green-400">Open</span>' :
-                 data.isOpen === false ? '<span class="text-xs font-medium text-red-600 dark:text-red-400">Closed</span>' :
-                 '<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Hours Unknown</span>';
-
-             card.innerHTML = `
-                         <div>
-                             <div class="flex justify-between items-center mb-2">
-                                 <h3 class="text-lg font-semibold text-indigo-700 dark:text-indigo-400">${data.name}</h3>
-                                 ${openStatus}
-                             </div>
-                             <p class="text-sm text-gray-700 dark:text-gray-200 font-medium capitalize">
-                                 <strong>Cuisine:</strong> ${data.cuisine.replace(/_/g, ' ')}
-                             </p>
-                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                 <strong>Address:</strong> ${data.address}
-                             </p>
-                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                 <strong>Hours:</strong> 
-                                 <span class="text-xs truncate block whitespace-nowrap overflow-hidden">
-                                     ${data.openingHours}
-                                 </span>
-                             </p>
-                         </div>
-                     `;
-
-             // Add click listener to show detail modal
-             card.addEventListener('click', () => {
-                 showRestaurantModal(data);
-             });
-
+             const card = createResultCard(data);
              resultsList.appendChild(card);
          });
      }
@@ -608,20 +961,20 @@
 
              switch (key) {
                  case 'name':
-                     valA = a.name.toLowerCase();
-                     valB = b.name.toLowerCase();
+                     valA = (a.name || '').toLowerCase();
+                     valB = (b.name || '').toLowerCase();
                      break;
                  case 'cuisine':
-                     valA = a.cuisine.toLowerCase();
-                     valB = b.cuisine.toLowerCase();
+                     valA = (a.cuisine || '').toLowerCase();
+                     valB = (b.cuisine || '').toLowerCase();
                      break;
                  case 'address':
-                     valA = a.address.toLowerCase();
-                     valB = b.address.toLowerCase();
+                     valA = (a.address || '').toLowerCase();
+                     valB = (b.address || '').toLowerCase();
                      break;
                  case 'hours':
-                     valA = a.openingHours.toLowerCase();
-                     valB = b.openingHours.toLowerCase();
+                     valA = (a.openingHours || '').toLowerCase();
+                     valB = (b.openingHours || '').toLowerCase();
                      break;
                  default:
                      return 0;
