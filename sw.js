@@ -118,6 +118,8 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'GET_FAVORITES') {
     // Respond with favorites from the client's localStorage (handled in main thread)
-    event.ports[0].postMessage({ type: 'FAVORITES_DATA' });
+    if (event.source) {
+      event.source.postMessage({ type: 'FAVORITES_DATA' });
+    }
   }
 });

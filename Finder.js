@@ -4,6 +4,7 @@
  let overviewMap = null; // Holds the overview map for all results
  let currentView = 'list'; // 'list', 'map', or 'favorites'
  let favorites = []; // Array of favorite restaurant IDs
+ let modalAbortController = null; // AbortController for modal event listeners
  const GEMINI_API_KEY = ""; // Leave empty (would be filled by codespace when run in one)
  const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
 
@@ -114,8 +115,6 @@
  const favoritesViewBtn = document.getElementById('favoritesViewBtn');
  const mapView = document.getElementById('mapView');
  const hideUnnamedCheckbox = document.getElementById('hideUnnamed');
- const modalDirectionsBtn = document.getElementById('modalDirectionsBtn');
- const modalFavoriteBtn = document.getElementById('modalFavoriteBtn');
 
 
  /**
@@ -258,58 +257,57 @@
 
      // --- Restaurant Modal Logic ---
      function showRestaurantModal(data) {
+         // Abort any previous modal event listeners
+         if (modalAbortController) {
+             modalAbortController.abort();
+         }
+         modalAbortController = new AbortController();
+         const signal = modalAbortController.signal;
+
          modalName.textContent = data.name;
          modalCuisine.textContent = data.cuisine.replace(/_/g, ' ');
          modalAddress.textContent = data.address;
          modalHours.textContent = data.openingHours;
 
          // --- Favorites Button Setup ---
-         const updateFavoriteButton = () => {
-             if (isFavorite(data.id)) {
-                 modalFavoriteBtn.textContent = '★';
-                 modalFavoriteBtn.classList.add('favorited');
-                 modalFavoriteBtn.title = 'Remove from favorites';
-             } else {
-                 modalFavoriteBtn.textContent = '☆';
-                 modalFavoriteBtn.classList.remove('favorited');
-                 modalFavoriteBtn.title = 'Add to favorites';
-             }
-         };
-         updateFavoriteButton();
+         const favBtn = document.getElementById('modalFavoriteBtn');
+         if (isFavorite(data.id)) {
+             favBtn.textContent = '★';
+             favBtn.classList.add('favorited');
+             favBtn.title = 'Remove from favorites';
+         } else {
+             favBtn.textContent = '☆';
+             favBtn.classList.remove('favorited');
+             favBtn.title = 'Add to favorites';
+         }
 
-         // Clone favorite button to remove old listeners
-         const newFavoriteBtn = modalFavoriteBtn.cloneNode(true);
-         modalFavoriteBtn.parentNode.replaceChild(newFavoriteBtn, modalFavoriteBtn);
-         
-         newFavoriteBtn.addEventListener('click', (e) => {
+         favBtn.addEventListener('click', (e) => {
              e.stopPropagation();
              const isFav = toggleFavorite(data);
              if (isFav) {
-                 newFavoriteBtn.textContent = '★';
-                 newFavoriteBtn.classList.add('favorited');
-                 newFavoriteBtn.title = 'Remove from favorites';
+                 favBtn.textContent = '★';
+                 favBtn.classList.add('favorited');
+                 favBtn.title = 'Remove from favorites';
              } else {
-                 newFavoriteBtn.textContent = '☆';
-                 newFavoriteBtn.classList.remove('favorited');
-                 newFavoriteBtn.title = 'Add to favorites';
+                 favBtn.textContent = '☆';
+                 favBtn.classList.remove('favorited');
+                 favBtn.title = 'Add to favorites';
              }
              // Refresh display if on favorites view
              if (currentView === 'favorites') {
                  displayFavorites();
              }
-         });
+         }, { signal });
 
          // --- Directions Button Setup ---
+         const dirBtn = document.getElementById('modalDirectionsBtn');
          if (data.lat && data.lon) {
-             modalDirectionsBtn.classList.remove('hidden');
-             // Clone to remove old listeners
-             const newDirectionsBtn = modalDirectionsBtn.cloneNode(true);
-             modalDirectionsBtn.parentNode.replaceChild(newDirectionsBtn, modalDirectionsBtn);
-             newDirectionsBtn.addEventListener('click', () => {
+             dirBtn.classList.remove('hidden');
+             dirBtn.addEventListener('click', () => {
                  openDirections(data.lat, data.lon, data.name);
-             });
+             }, { signal });
          } else {
-             modalDirectionsBtn.classList.add('hidden');
+             dirBtn.classList.add('hidden');
          }
 
          const modalVibeButton = document.getElementById('modalVibeButton');
@@ -320,14 +318,10 @@
          modalVibeResult.style.display = 'none';
          modalVibeButton.style.display = 'block';
          setButtonLoading(modalVibeButton, false); // Reset button
-         modalVibeButton.dataset.originalText = "✨ Get Info (via Google)"; // Reset text
+         modalVibeButton.textContent = "✨ Get Info (via Google)";
 
-         // Clone button to remove old listeners and add a new one
-         const newVibeButton = modalVibeButton.cloneNode(true);
-         modalVibeButton.parentNode.replaceChild(newVibeButton, modalVibeButton);
-
-         newVibeButton.addEventListener('click', async () => {
-             setButtonLoading(newVibeButton, true, "Getting Info...", "dark");
+         modalVibeButton.addEventListener('click', async () => {
+             setButtonLoading(modalVibeButton, true, "Getting Info...", "dark");
              try {
                  const {
                      text,
@@ -342,15 +336,15 @@
                  }
                  modalVibeResult.innerHTML = html;
                  modalVibeResult.style.display = 'block';
-                 newVibeButton.style.display = 'none'; // Hide button on success
+                 modalVibeButton.style.display = 'none'; // Hide button on success
 
              } catch (error) {
                  console.error("Gemini Vibe Error:", error);
-                 setButtonLoading(newVibeButton, false); // Reset button on error
+                 setButtonLoading(modalVibeButton, false); // Reset button on error
                  modalVibeResult.innerHTML = `<p class="text-red-500 dark:text-red-400 text-xs">Error: ${error.message}</p>`;
                  modalVibeResult.style.display = 'block';
              }
-         });
+         }, { signal });
 
 
          if (detailMap) {
@@ -626,10 +620,13 @@
                      <strong>${data.name}</strong><br>
                      <em>${data.cuisine.replace(/_/g, ' ')}</em><br>
                      ${data.address}<br>
-                     <button onclick="window.openRestaurantFromMap(${data.id})" style="color: #4f46e5; cursor: pointer; border: none; background: none; text-decoration: underline;">View Details</button>
+                     <button class="map-popup-details-btn" data-restaurant-id="${data.id}" style="color: #4f46e5; cursor: pointer; border: none; background: none; text-decoration: underline;">View Details</button>
                  `);
              markers.push(marker);
          });
+
+         // Event delegation for popup buttons
+         mapView.addEventListener('click', handleMapPopupClick);
 
          // Fit map to show all markers
          if (markers.length > 1) {
@@ -645,13 +642,16 @@
          }, 100);
      }
 
-     // Global function to open restaurant from map popup
-     window.openRestaurantFromMap = function(id) {
-         const data = lastResults.find(r => r.id === id) || favorites.find(f => f.id === id);
-         if (data) {
-             showRestaurantModal(data);
+     // Event handler for map popup buttons using event delegation
+     function handleMapPopupClick(e) {
+         if (e.target && e.target.classList.contains('map-popup-details-btn')) {
+             const id = parseInt(e.target.dataset.restaurantId, 10);
+             const data = lastResults.find(r => r.id === id) || favorites.find(f => f.id === id);
+             if (data) {
+                 showRestaurantModal(data);
+             }
          }
-     };
+     }
 
      // --- Favorites View Logic ---
      function displayFavorites() {
