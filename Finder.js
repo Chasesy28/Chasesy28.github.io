@@ -10,6 +10,19 @@
  let conversationHistory = []; // Store conversation history for chat continuation
  let currentRestaurantContext = null; // Store current restaurant for conversation context
 
+ // --- AI Configuration ---
+ const AI_SYSTEM_MESSAGE = `You are a helpful restaurant information assistant. You provide concise, helpful information about restaurants including reviews, recommendations, menu highlights, and general atmosphere. Keep responses brief but informative (2-3 paragraphs max). If you don't have specific information about a restaurant, provide general guidance based on the cuisine type.`;
+
+ /**
+  * Generates the initial query for a restaurant
+  * @param {object} data - Restaurant data {name, cuisine, address}
+  * @returns {string} The formatted query string
+  */
+ function buildInitialQuery(data) {
+     const cuisineDisplay = data.cuisine.replace(/_/g, ' ');
+     return `Tell me about the restaurant "${data.name}" which serves ${cuisineDisplay} cuisine. Located at: ${data.address}. What's the vibe, what should I order, and any tips for visiting?`;
+ }
+
  // --- Favorites Management ---
  function loadFavorites() {
      try {
@@ -413,7 +426,7 @@
 
              setButtonLoading(modalVibeButton, true, "Asking AI...", "dark");
              
-             const initialQuery = `Tell me about the restaurant "${data.name}" which serves ${data.cuisine.replace(/_/g, ' ')} cuisine. Located at: ${data.address}. What's the vibe, what should I order, and any tips for visiting?`;
+             const initialQuery = buildInitialQuery(data);
              
              try {
                  const response = await sendChatMessage(initialQuery, restaurantContext, true);
@@ -579,7 +592,8 @@
      function updateApiKeyStatus() {
          if (hasApiKey()) {
              const key = getApiKey();
-             const maskedKey = key.substring(0, 7) + '...' + key.substring(key.length - 4);
+             // Only show 3 chars from start and 4 from end for security
+             const maskedKey = key.substring(0, 3) + '...' + key.substring(key.length - 4);
              apiKeyStatus.textContent = `✅ API key configured: ${maskedKey}`;
              apiKeyStatus.classList.remove('text-red-500');
              apiKeyStatus.classList.add('text-green-600', 'dark:text-green-400');
@@ -676,9 +690,6 @@
 
          const apiEndpoint = getApiEndpoint();
 
-         // Build the system message
-         const systemMessage = `You are a helpful restaurant information assistant. You provide concise, helpful information about restaurants including reviews, recommendations, menu highlights, and general atmosphere. Keep responses brief but informative (2-3 paragraphs max). If you don't have specific information about a restaurant, provide general guidance based on the cuisine type.`;
-
          // If this is a new restaurant, clear the conversation history
          if (isInitialQuery || currentRestaurantContext?.name !== restaurantContext.name) {
              conversationHistory = [];
@@ -687,7 +698,7 @@
 
          // Build messages array with conversation history
          const messages = [
-             { role: 'system', content: systemMessage }
+             { role: 'system', content: AI_SYSTEM_MESSAGE }
          ];
 
          // Add conversation history
