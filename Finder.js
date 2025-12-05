@@ -5,8 +5,23 @@
  let currentView = 'list'; // 'list', 'map', or 'favorites'
  let favorites = []; // Array of favorite restaurant IDs
  let modalAbortController = null; // AbortController for modal event listeners
- const GEMINI_API_KEY = ""; // Leave empty (would be filled by codespace when run in one)
  const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
+ const API_KEY_SESSION_KEY = 'copilot_api_key_session'; // Session-only storage for API key
+ let conversationHistory = []; // Store conversation history for chat continuation
+ let currentRestaurantContext = null; // Store current restaurant for conversation context
+
+ // --- AI Configuration ---
+ const AI_SYSTEM_MESSAGE = `You are a helpful restaurant information assistant. You provide concise, helpful information about restaurants including reviews, recommendations, menu highlights, and general atmosphere. Keep responses brief but informative (2-3 paragraphs max). If you don't have specific information about a restaurant, provide general guidance based on the cuisine type.`;
+
+ /**
+  * Generates the initial query for a restaurant
+  * @param {object} data - Restaurant data {name, cuisine, address}
+  * @returns {string} The formatted query string
+  */
+ function buildInitialQuery(data) {
+     const cuisineDisplay = data.cuisine.replace(/_/g, ' ');
+     return `Tell me about the restaurant "${data.name}" which serves ${cuisineDisplay} cuisine. Located at: ${data.address}. What's the vibe, what should I order, and any tips for visiting?`;
+ }
 
  // --- Favorites Management ---
  function loadFavorites() {
@@ -80,6 +95,68 @@
 
  // Load favorites on script load
  loadFavorites();
+
+ // --- API Key Management (Session-only for security) ---
+ /**
+  * Gets the API key from session storage.
+  * The key is only stored in session storage (cleared when browser closes)
+  * and is never persisted to localStorage or cookies for security.
+  * @returns {string|null} The API key or null if not set
+  */
+ function getApiKey() {
+     try {
+         return sessionStorage.getItem(API_KEY_SESSION_KEY);
+     } catch (e) {
+         console.error('Error accessing session storage:', e);
+         return null;
+     }
+ }
+
+ /**
+  * Sets the API key in session storage only.
+  * This ensures the key is cleared when the browser closes.
+  * @param {string} key - The API key to store
+  */
+ function setApiKey(key) {
+     try {
+         if (key && key.trim()) {
+             sessionStorage.setItem(API_KEY_SESSION_KEY, key.trim());
+             return true;
+         }
+         return false;
+     } catch (e) {
+         console.error('Error storing API key:', e);
+         return false;
+     }
+ }
+
+ /**
+  * Clears the API key from session storage.
+  */
+ function clearApiKey() {
+     try {
+         sessionStorage.removeItem(API_KEY_SESSION_KEY);
+     } catch (e) {
+         console.error('Error clearing API key:', e);
+     }
+ }
+
+ /**
+  * Checks if an API key is configured.
+  * @returns {boolean}
+  */
+ function hasApiKey() {
+     const key = getApiKey();
+     return key !== null && key.length > 0;
+ }
+
+ /**
+  * Clears conversation history for a new restaurant context.
+  */
+ function clearConversationHistory() {
+     conversationHistory = [];
+     currentRestaurantContext = null;
+ }
 
  // DOM Elements
  const sortSelect = document.getElementById('sortSelect');
@@ -310,40 +387,118 @@
              dirBtn.classList.add('hidden');
          }
 
+         // --- AI Chat Section Setup ---
          const modalVibeButton = document.getElementById('modalVibeButton');
-         const modalVibeResult = document.getElementById('modalVibeResult');
+         const configureApiBtn = document.getElementById('configureApiBtn');
+         const modalChatMessages = document.getElementById('modalChatMessages');
+         const modalChatInputContainer = document.getElementById('modalChatInputContainer');
+         const modalChatInput = document.getElementById('modalChatInput');
+         const modalChatSendBtn = document.getElementById('modalChatSendBtn');
+         const modalClearChatBtn = document.getElementById('modalClearChatBtn');
 
-         // Reset vibe section
-         modalVibeResult.innerHTML = '';
-         modalVibeResult.style.display = 'none';
+         // Restaurant context for AI
+         const restaurantContext = {
+             name: data.name,
+             cuisine: data.cuisine,
+             address: data.address
+         };
+
+         // Reset chat section
+         modalChatMessages.innerHTML = '';
+         modalChatMessages.style.display = 'none';
+         modalChatInputContainer.style.display = 'none';
          modalVibeButton.style.display = 'block';
-         setButtonLoading(modalVibeButton, false); // Reset button
-         modalVibeButton.textContent = "✨ Get Info (via Google)";
+         setButtonLoading(modalVibeButton, false);
+         modalVibeButton.textContent = "🤖 Ask AI for Info";
 
+         // Configure API button
+         configureApiBtn.addEventListener('click', (e) => {
+             e.stopPropagation();
+             showApiKeyModal();
+         }, { signal });
+
+         // Initial query button
          modalVibeButton.addEventListener('click', async () => {
-             setButtonLoading(modalVibeButton, true, "Getting Info...", "dark");
-             try {
-                 const {
-                     text,
-                     sources
-                 } = await getVibeForModal(data.name, data.cuisine);
+             if (!hasApiKey()) {
+                 showApiKeyModal();
+                 return;
+             }
 
-                 let html = text.replace(/\n/g, '<br>'); // Simple formatting
-                 if (sources.length > 0) {
-                     html += `<h4 class="mt-4 mb-2 font-semibold">Sources:</h4><ul>`;
-                     html += sources.map(s => `<li><a href="${s.uri}" target="_blank" rel="noopener noreferrer">${s.title}</a></li>`).join('');
-                     html += `</ul>`;
-                 }
-                 modalVibeResult.innerHTML = html;
-                 modalVibeResult.style.display = 'block';
-                 modalVibeButton.style.display = 'none'; // Hide button on success
+             setButtonLoading(modalVibeButton, true, "Asking AI...", "dark");
+             
+             const initialQuery = buildInitialQuery(data);
+             
+             try {
+                 const response = await sendChatMessage(initialQuery, restaurantContext, true);
+                 
+                 // Show chat interface
+                 modalChatMessages.style.display = 'block';
+                 modalChatInputContainer.style.display = 'block';
+                 modalVibeButton.style.display = 'none';
+                 
+                 // Render the initial exchange
+                 renderChatMessage('user', `Tell me about ${data.name}`, modalChatMessages);
+                 renderChatMessage('assistant', response, modalChatMessages);
 
              } catch (error) {
-                 console.error("Gemini Vibe Error:", error);
-                 setButtonLoading(modalVibeButton, false); // Reset button on error
-                 modalVibeResult.innerHTML = `<p class="text-red-500 dark:text-red-400 text-xs">Error: ${error.message}</p>`;
-                 modalVibeResult.style.display = 'block';
+                 console.error("AI Chat Error:", error);
+                 setButtonLoading(modalVibeButton, false);
+                 modalChatMessages.innerHTML = `<p class="text-red-500 dark:text-red-400 text-xs">Error: ${error.message}</p>`;
+                 modalChatMessages.style.display = 'block';
              }
+         }, { signal });
+
+         // Send follow-up message
+         async function sendFollowUp() {
+             const message = modalChatInput.value.trim();
+             if (!message) return;
+
+             // Clear input
+             modalChatInput.value = '';
+             
+             // Render user message immediately
+             renderChatMessage('user', message, modalChatMessages);
+             
+             // Show loading state
+             const loadingDiv = document.createElement('div');
+             loadingDiv.className = 'chat-loading text-gray-500 dark:text-gray-400 text-sm';
+             loadingDiv.innerHTML = '<span class="animate-pulse">🤖 Thinking...</span>';
+             modalChatMessages.appendChild(loadingDiv);
+             modalChatMessages.scrollTop = modalChatMessages.scrollHeight;
+
+             try {
+                 const response = await sendChatMessage(message, restaurantContext, false);
+                 
+                 // Remove loading indicator
+                 loadingDiv.remove();
+                 
+                 // Render AI response
+                 renderChatMessage('assistant', response, modalChatMessages);
+
+             } catch (error) {
+                 console.error("AI Chat Error:", error);
+                 loadingDiv.innerHTML = `<span class="text-red-500 dark:text-red-400">Error: ${error.message}</span>`;
+             }
+         }
+
+         modalChatSendBtn.addEventListener('click', sendFollowUp, { signal });
+         
+         modalChatInput.addEventListener('keydown', (e) => {
+             if (e.key === 'Enter') {
+                 e.preventDefault();
+                 sendFollowUp();
+             }
+         }, { signal });
+
+         // Clear conversation
+         modalClearChatBtn.addEventListener('click', () => {
+             clearConversationHistory();
+             modalChatMessages.innerHTML = '';
+             modalChatMessages.style.display = 'none';
+             modalChatInputContainer.style.display = 'none';
+             modalVibeButton.style.display = 'block';
+             setButtonLoading(modalVibeButton, false);
+             modalVibeButton.textContent = "🤖 Ask AI for Info";
          }, { signal });
 
 
@@ -402,114 +557,262 @@
          }
      });
 
-     // --- Gemini API Call Logic ---
+     // --- API Key Modal Logic ---
+     const apiKeyModal = document.getElementById('apiKeyModal');
+     const closeApiKeyModalBtn = document.getElementById('closeApiKeyModal');
+     const apiKeyInput = document.getElementById('apiKeyInput');
+     const apiEndpointInput = document.getElementById('apiEndpointInput');
+     const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+     const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+     const apiKeyStatus = document.getElementById('apiKeyStatus');
 
-     /**
-      * Fetches info from Google Search via the Gemini API. (wont work unless api key provided)
-      * @param {string} name - The restaurant name.
-      * @param {string} cuisine - The cuisine type.
-      * @returns {Promise<{text: string, sources: Array<{uri: string, title: string}>}>}
-      */
-     async function getVibeForModal(name, cuisine) {
-         const systemPrompt = "You are a helpful assistant. Based on the restaurant name and cuisine, provide a 1-2 sentence 'vibe check' or summary. Also, find recent reviews or articles. Provide 1-3 source links if found.";
-         const userQuery = `Find info and recent reviews for a restaurant named "${name}" which serves "${cuisine}" food. What's the vibe?`;
+     function showApiKeyModal() {
+         // Pre-fill with existing values if any
+         const existingKey = getApiKey();
+         const existingEndpoint = getApiEndpoint();
+         apiKeyInput.value = existingKey || '';
+         apiEndpointInput.value = existingEndpoint || '';
+         updateApiKeyStatus();
+         
+         apiKeyModal.classList.remove('hidden');
+         setTimeout(() => {
+             apiKeyModal.style.opacity = '1';
+             apiKeyModal.querySelector('.transform').style.transform = 'scale(1)';
+         }, 10);
+     }
 
-         const payload = {
-             contents: [{
-                 parts: [{
-                     text: userQuery
-                 }]
-             }],
-             tools: [{
-                 "google_search": {}
-             }],
-             systemInstruction: {
-                 parts: [{
-                     text: systemPrompt
-                 }]
-             },
-         };
+     function hideApiKeyModal() {
+         apiKeyModal.style.opacity = '0';
+         apiKeyModal.querySelector('.transform').style.transform = 'scale(0.95)';
+         setTimeout(() => {
+             apiKeyModal.classList.add('hidden');
+         }, 300);
+     }
 
-         return await callGeminiAPI(payload);
+     function updateApiKeyStatus() {
+         if (hasApiKey()) {
+             const key = getApiKey();
+             // Only show 3 chars from start and 4 from end for security
+             const maskedKey = key.substring(0, 3) + '...' + key.substring(key.length - 4);
+             apiKeyStatus.textContent = `✅ API key configured: ${maskedKey}`;
+             apiKeyStatus.classList.remove('text-red-500');
+             apiKeyStatus.classList.add('text-green-600', 'dark:text-green-400');
+         } else {
+             apiKeyStatus.textContent = '❌ No API key configured';
+             apiKeyStatus.classList.remove('text-green-600', 'dark:text-green-400');
+             apiKeyStatus.classList.add('text-red-500');
+         }
+     }
+
+     closeApiKeyModalBtn.addEventListener('click', hideApiKeyModal);
+     apiKeyModal.addEventListener('click', (e) => {
+         if (e.target === apiKeyModal) {
+             hideApiKeyModal();
+         }
+     });
+
+     saveApiKeyBtn.addEventListener('click', () => {
+         const key = apiKeyInput.value.trim();
+         const endpoint = apiEndpointInput.value.trim();
+         
+         if (!key) {
+             apiKeyStatus.textContent = '⚠️ Please enter an API key';
+             apiKeyStatus.classList.add('text-red-500');
+             return;
+         }
+         
+         if (setApiKey(key)) {
+             setApiEndpoint(endpoint);
+             updateApiKeyStatus();
+             setTimeout(() => {
+                 hideApiKeyModal();
+             }, 1000);
+         } else {
+             apiKeyStatus.textContent = '❌ Failed to save API key';
+             apiKeyStatus.classList.add('text-red-500');
+         }
+     });
+
+     clearApiKeyBtn.addEventListener('click', () => {
+         clearApiKey();
+         clearApiEndpoint();
+         apiKeyInput.value = '';
+         apiEndpointInput.value = '';
+         updateApiKeyStatus();
+     });
+
+     // --- OpenAI-Compatible API Call Logic (works with Copilot, OpenAI, etc.) ---
+
+     const API_ENDPOINT_SESSION_KEY = 'copilot_api_endpoint_session';
+     const DEFAULT_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+
+     function getApiEndpoint() {
+         try {
+             return sessionStorage.getItem(API_ENDPOINT_SESSION_KEY) || DEFAULT_API_ENDPOINT;
+         } catch (e) {
+             return DEFAULT_API_ENDPOINT;
+         }
+     }
+
+     function setApiEndpoint(endpoint) {
+         try {
+             if (endpoint && endpoint.trim()) {
+                 sessionStorage.setItem(API_ENDPOINT_SESSION_KEY, endpoint.trim());
+             } else {
+                 sessionStorage.removeItem(API_ENDPOINT_SESSION_KEY);
+             }
+         } catch (e) {
+             console.error('Error storing API endpoint:', e);
+         }
+     }
+
+     function clearApiEndpoint() {
+         try {
+             sessionStorage.removeItem(API_ENDPOINT_SESSION_KEY);
+         } catch (e) {
+             console.error('Error clearing API endpoint:', e);
+         }
      }
 
      /**
-      * Calls the Gemini API with exponential backoff.
-      * @param {object} payload - The payload to send to the API.
-      * @param {number} [maxRetries=5] - Maximum number of retries.
-      * @returns {Promise<{text: string, sources: Array<{uri: string, title: string}>}>} - The API response.
+      * Sends a message to the AI and gets a response.
+      * Supports conversation history for multi-turn chat.
+      * @param {string} userMessage - The user's message
+      * @param {object} restaurantContext - The restaurant context {name, cuisine, address}
+      * @param {boolean} isInitialQuery - Whether this is the first query for this restaurant
+      * @returns {Promise<string>} - The AI's response text
       */
-     async function callGeminiAPI(payload, maxRetries = 5) {
-         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
+     async function sendChatMessage(userMessage, restaurantContext, isInitialQuery = false) {
+         const apiKey = getApiKey();
+         if (!apiKey) {
+             throw new Error('API key not configured. Click "Configure API" to set up your key.');
+         }
+
+         const apiEndpoint = getApiEndpoint();
+
+         // If this is a new restaurant, clear the conversation history
+         if (isInitialQuery || currentRestaurantContext?.name !== restaurantContext.name) {
+             conversationHistory = [];
+             currentRestaurantContext = restaurantContext;
+         }
+
+         // Build messages array with conversation history
+         const messages = [
+             { role: 'system', content: AI_SYSTEM_MESSAGE }
+         ];
+
+         // Add conversation history
+         for (const msg of conversationHistory) {
+             messages.push(msg);
+         }
+
+         // Add the new user message
+         messages.push({ role: 'user', content: userMessage });
+
+         const payload = {
+             model: 'gpt-4o-mini', // Default model, works with most OpenAI-compatible APIs
+             messages: messages,
+             max_tokens: 500,
+             temperature: 0.7
+         };
+
+         const response = await callOpenAICompatibleAPI(apiEndpoint, apiKey, payload);
+         
+         // Store the conversation for follow-up
+         conversationHistory.push({ role: 'user', content: userMessage });
+         conversationHistory.push({ role: 'assistant', content: response });
+
+         return response;
+     }
+
+     /**
+      * Calls an OpenAI-compatible API with exponential backoff.
+      * @param {string} endpoint - The API endpoint URL
+      * @param {string} apiKey - The API key
+      * @param {object} payload - The request payload
+      * @param {number} [maxRetries=3] - Maximum number of retries
+      * @returns {Promise<string>} - The response text
+      */
+     async function callOpenAICompatibleAPI(endpoint, apiKey, payload, maxRetries = 3) {
          let delay = 1000;
 
          for (let i = 0; i < maxRetries; i++) {
              try {
-                 const response = await fetch(apiUrl, {
+                 const response = await fetch(endpoint, {
                      method: 'POST',
                      headers: {
-                         'Content-Type': 'application/json'
+                         'Content-Type': 'application/json',
+                         'Authorization': `Bearer ${apiKey}`
                      },
                      body: JSON.stringify(payload)
                  });
 
-                 if (response.status === 403) {
-                     throw new Error("403 Forbidden: The API key is likely missing, invalid, or restricted.");
+                 if (response.status === 401 || response.status === 403) {
+                     throw new Error('Authentication failed. Please check your API key.');
                  }
 
                  if (response.ok) {
                      const result = await response.json();
 
-                     if (result.promptFeedback && result.promptFeedback.blockReason) {
-                         throw new Error(`Prompt blocked: ${result.promptFeedback.blockReason}`);
-                     }
-
-                     const candidate = result.candidates?.[0];
-
-                     if (candidate?.content?.parts?.[0]?.text) {
-                         const text = candidate.content.parts[0].text;
-                         let sources = [];
-                         const groundingMetadata = candidate.groundingMetadata;
-
-                         if (groundingMetadata && groundingMetadata.groundingAttributions) {
-                             sources = groundingMetadata.groundingAttributions
-                                 .map(attr => ({
-                                     uri: attr.web?.uri,
-                                     title: attr.web?.title,
-                                 }))
-                                 .filter(source => source.uri && source.title);
-                         }
-                         return {
-                             text,
-                             sources
-                         }; // Success!
+                     if (result.choices && result.choices[0] && result.choices[0].message) {
+                         return result.choices[0].message.content;
                      } else {
-                         if (candidate && candidate.finishReason && candidate.finishReason !== 'STOP') {
-                             throw new Error(`Generation finished unexpectedly: ${candidate.finishReason}`);
-                         } else {
-                             throw new Error("Invalid API response: Candidate has no text content.");
-                         }
+                         throw new Error('Invalid API response format.');
                      }
                  } else if (response.status === 429 || response.status >= 500) {
                      // Retryable error
-                     console.warn(`Gemini API error: ${response.status}. Retrying in ${delay / 1000}s...`);
+                     console.warn(`API error: ${response.status}. Retrying in ${delay / 1000}s...`);
                      await new Promise(resolve => setTimeout(resolve, delay));
                      delay *= 2;
                  } else {
                      // Non-retryable error
-                     const errorText = await response.text();
-                     throw new Error(`Gemini API error: ${response.status} - ${response.statusText}. ${errorText}`);
+                     const errorData = await response.json().catch(() => ({}));
+                     const errorMessage = errorData.error?.message || response.statusText;
+                     throw new Error(`API error: ${response.status} - ${errorMessage}`);
                  }
              } catch (error) {
-                 console.error(`Gemini API call attempt ${i+1} failed:`, error.message);
+                 if (error.message.includes('Authentication') || error.message.includes('API key')) {
+                     throw error; // Don't retry auth errors
+                 }
+                 console.error(`API call attempt ${i + 1} failed:`, error.message);
                  if (i === maxRetries - 1) {
-                     throw error; // Re-throw the last error
+                     throw error;
                  }
                  await new Promise(resolve => setTimeout(resolve, delay));
                  delay *= 2;
              }
          }
-         throw new Error("Gemini API call failed after all retries.");
+         throw new Error('API call failed after all retries.');
+     }
+
+     /**
+      * Renders a chat message to the chat container
+      * @param {string} role - 'user' or 'assistant'
+      * @param {string} content - The message content
+      * @param {HTMLElement} container - The container to append to
+      */
+     function renderChatMessage(role, content, container) {
+         const messageDiv = document.createElement('div');
+         messageDiv.className = `chat-message ${role === 'user' ? 'text-right' : ''} mb-3`;
+         
+         const bubble = document.createElement('div');
+         bubble.className = role === 'user' 
+             ? 'inline-block bg-indigo-100 dark:bg-indigo-900/50 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-[85%] text-left'
+             : 'inline-block bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-[85%]';
+         
+         // Simple markdown-like formatting
+         let formattedContent = content
+             .replace(/\n/g, '<br>')
+             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+             .replace(/\*(.*?)\*/g, '<em>$1</em>');
+         
+         bubble.innerHTML = `<span class="text-xs font-semibold ${role === 'user' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'}">${role === 'user' ? 'You' : '🤖 AI'}</span><br>${formattedContent}`;
+         
+         messageDiv.appendChild(bubble);
+         container.appendChild(messageDiv);
+         
+         // Scroll to bottom
+         container.scrollTop = container.scrollHeight;
      }
 
 

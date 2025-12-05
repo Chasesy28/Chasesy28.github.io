@@ -216,7 +216,52 @@
       <div id="offlineBanner" class="offline-banner">
          ⚠️ You are currently offline. Some features may not be available.
       </div>
-      <!-- Message Modal (not realy needed)-->
+      <!-- API Key Configuration Modal -->
+      <div id="apiKeyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50 transition-opacity duration-300">
+         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+               <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">🔐 API Key Setup</h4>
+               <button id="closeApiKeyModal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+               <p class="text-xs text-yellow-800 dark:text-yellow-200">
+                  <strong>⚠️ Security Notice:</strong> Your API key is stored in session storage only and will be cleared when you close the browser. Never share your API key publicly.
+               </p>
+            </div>
+            <div class="mb-4">
+               <label for="apiKeyInput" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  OpenAI-Compatible API Key
+               </label>
+               <input type="password" id="apiKeyInput" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  placeholder="sk-..." autocomplete="off">
+               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Works with OpenAI, Azure OpenAI, or any OpenAI-compatible API endpoint.
+               </p>
+            </div>
+            <div class="mb-4">
+               <label for="apiEndpointInput" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  API Endpoint (optional)
+               </label>
+               <input type="text" id="apiEndpointInput" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  placeholder="https://api.openai.com/v1/chat/completions" autocomplete="off">
+               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Leave empty to use OpenAI default. For GitHub Copilot or custom endpoints, enter the full URL.
+               </p>
+            </div>
+            <div class="flex gap-2">
+               <button id="saveApiKeyBtn" class="flex-1 bg-indigo-600 dark:bg-indigo-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors">
+                  Save Key
+               </button>
+               <button id="clearApiKeyBtn" class="flex-1 bg-red-600 dark:bg-red-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-red-700 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-colors">
+                  Clear Key
+               </button>
+            </div>
+            <p id="apiKeyStatus" class="text-xs text-center mt-3 text-gray-500 dark:text-gray-400"></p>
+         </div>
+      </div>
+      <!-- Message Modal (not really needed)-->
       <div id="messageModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 hidden z-50 transition-opacity duration-300">
          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300">
             <div class="flex justify-between items-center mb-4">
@@ -255,10 +300,30 @@
                      <span id="modalHours" class="block text-xs whitespace-pre-wrap break-words mt-1"></span>
                   </p>
                   <div id="modalVibeSection" class="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4">
-                     <button id="modalVibeButton" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium">
-                     ✨ Get Info (via Google)
-                     </button>
-                     <div id="modalVibeResult" class="vibe-result prose prose-sm text-sm mt-2" style="max-width: none;"></div>
+                     <div class="flex items-center justify-between mb-2">
+                        <button id="modalVibeButton" class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium">
+                        🤖 Ask AI for Info
+                        </button>
+                        <button id="configureApiBtn" class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                        ⚙️ Configure API
+                        </button>
+                     </div>
+                     <!-- Chat Messages Container -->
+                     <div id="modalChatMessages" class="vibe-result prose prose-sm text-sm mt-2 max-h-60 overflow-y-auto" style="max-width: none; display: none;"></div>
+                     <!-- Chat Input for follow-up questions -->
+                     <div id="modalChatInputContainer" class="mt-3" style="display: none;">
+                        <div class="flex gap-2">
+                           <input type="text" id="modalChatInput" 
+                              class="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                              placeholder="Ask a follow-up question...">
+                           <button id="modalChatSendBtn" class="bg-indigo-600 dark:bg-indigo-500 text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors">
+                              Send
+                           </button>
+                        </div>
+                        <button id="modalClearChatBtn" class="text-xs text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 mt-2">
+                           🗑️ Clear conversation
+                        </button>
+                     </div>
                   </div>
                </div>
                <!-- Right Column: Map -->
@@ -364,7 +429,7 @@
          </div>
       </div>
       <footer class="site-footer">
-         <p>Credits to <a href="https://www.openstreetmap.org/">Open Street Map</a> for their API and helpful community.</p>
+         <p>Credits to <a href="https://www.openstreetmap.org/">Open Street Map</a> for their API. AI chat powered by <a href="https://openai.com/">OpenAI</a>-compatible APIs.</p>
       </footer>
       <!-- Service Worker Registration and Offline Detection -->
       <script>
