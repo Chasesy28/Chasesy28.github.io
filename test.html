@@ -74,9 +74,9 @@
             const initRain = () => {
                 const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
                 for (let i = 0; i < initialNumberOfDrops; i++) {
-                  createDrop();
+                  initRain();
                   if(i==initialNumberOfDrops-1){
-                    initRain();
+                    createDrop();
                   }
                 }
             };
