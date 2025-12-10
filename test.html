@@ -16,7 +16,7 @@
     <script>
        document.addEventListener('DOMContentLoaded', function() {
             const rainContainer = document.querySelector('.rain');
-            const dropDensity = -1; // Moved here to be accessible by all functions
+            const dropDensity = 15; // Moved here to be accessible by all functions
 
             // --- Function to create a single drop ---
             const createDrop = () => {
@@ -75,6 +75,9 @@
                 const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
                 for (let i = 0; i < initialNumberOfDrops; i++) {
                   createDrop();
+                  if(i<initialNumberOfDrops-1){
+                    initRain();
+                  }
                 }
             };
 
