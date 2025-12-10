@@ -52,7 +52,6 @@
 
             // --- Function to handle resizing ---
             const handleResize = () => {
-              document.getElementById("test").innerHtml = dropDensity;
               const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
                 const currentDrops = rainContainer.querySelectorAll('.drop');
                 const diff = newNumberOfDrops - currentDrops.length;
@@ -77,7 +76,9 @@
             const initRain = () => {
                 const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
                 for (let i = 0; i < initialNumberOfDrops; i++) {
-                    createDrop();
+                  dropDensity = densityInput.value;
+                  document.getElementById("test").innerHtml = dropDensity;
+                  createDrop();
                 }
             };
 
