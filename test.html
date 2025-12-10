@@ -17,7 +17,7 @@
     <script>
        document.addEventListener('DOMContentLoaded', function() {
             const rainContainer = document.querySelector('.rain');
-            const dropDensity = document.getElementById("density").value; // Moved here to be accessible by all functions
+            var dropDensity = 15; // Moved here to be accessible by all functions
 
             // --- Function to create a single drop ---
             const createDrop = () => {
@@ -51,7 +51,8 @@
 
             // --- Function to handle resizing ---
             const handleResize = () => {
-                const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
+              dropDensity = document.getElementById("density").value;  
+              const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
                 const currentDrops = rainContainer.querySelectorAll('.drop');
                 const diff = newNumberOfDrops - currentDrops.length;
 
