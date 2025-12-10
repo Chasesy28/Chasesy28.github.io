@@ -11,12 +11,13 @@
   <body>
     <div class="rain">
       <p>Hello</p>
+      <input type="number" id="density" value="15"/>
     </div>
     <div class="ground"></div>
     <script>
        document.addEventListener('DOMContentLoaded', function() {
             const rainContainer = document.querySelector('.rain');
-            const dropDensity = 15; // Moved here to be accessible by all functions
+            const dropDensity = document.getElementById("density").value; // Moved here to be accessible by all functions
 
             // --- Function to create a single drop ---
             const createDrop = () => {
