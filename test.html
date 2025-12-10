@@ -10,7 +10,7 @@
   </head>
   <body>
     <div class="rain">
-      <p>Hello</p>
+      <p id="test">Hello</p>
       <input type="number" id="density" value="150"/>
     </div>
     <div class="ground"></div>
@@ -52,6 +52,7 @@
 
             // --- Function to handle resizing ---
             const handleResize = () => {
+              document.getElementById("test").innerHtml = dropDensity;
               const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
                 const currentDrops = rainContainer.querySelectorAll('.drop');
                 const diff = newNumberOfDrops - currentDrops.length;
