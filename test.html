@@ -11,12 +11,13 @@
   <body>
     <div class="rain">
       <p>Hello <br> Hello, this thing here is useful.</p>
+      <input type="range" step="1" min="1" onchange="updateRain()" id="input">
     </div>
     <div class="ground"></div>
     <script>
        document.addEventListener('DOMContentLoaded', function() {
             const rainContainer = document.querySelector('.rain');
-            const dropDensity = 15; // Moved here to be accessible by all functions
+            var dropDensity = 15; // Moved here to be accessible by all functions
 
             // --- Function to create a single drop ---
             const createDrop = () => {
@@ -79,12 +80,13 @@
             };
 
             initRain();
-            initRain();
 
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
-
-            
+            function updateRain(){
+              dropDensity = document.getElementById("input").value;
+              handleResize();
+            }
         });
     </script>
   </body>
