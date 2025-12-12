@@ -84,12 +84,12 @@
 
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
-            function updateRain(){
-              dropDensity = document.getElementById("input").value;
-              document.getElementById("test").innerHtml = document.getElementById("input").value;
-              handleResize();
-            }
         });
+      function updateRain(){
+        dropDensity = document.getElementById("input").value;
+        document.getElementById("test").innerHtml = document.getElementById("input").value;
+        handleResize();
+      }
     </script>
   </body>
 </html>
