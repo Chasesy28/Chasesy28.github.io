@@ -1,13 +1,21 @@
  document.addEventListener('DOMContentLoaded', function() {
             const rainContainer = document.querySelector('.rain');
             const dropDensity = 15; // Moved here to be accessible by all functions
+            
+            // Cache slide elements for better performance
+            let cachedSlides = [];
+            const updateSlideCache = () => {
+                cachedSlides = Array.from(document.querySelectorAll('.swiper-slide'));
+            };
+            
+            // Initial cache and update on swiper changes
+            updateSlideCache();
 
             // --- Function to check if drop hits a slide ---
             const checkSlideCollision = (drop) => {
                 const dropRect = drop.getBoundingClientRect();
-                const slides = document.querySelectorAll('.swiper-slide');
                 
-                for (let slide of slides) {
+                for (let slide of cachedSlides) {
                     const slideRect = slide.getBoundingClientRect();
                     
                     // Check if drop overlaps with slide
@@ -50,18 +58,26 @@
                 drop.style.animationDelay = `${Math.random() * 2}s`;
                 drop.style.animationDuration = `${0.8 + Math.random() * 0.6}s`;
 
-                // Check for collisions during animation
+                // Check for collisions during animation with proper cleanup
                 let lastCheck = 0;
+                let hasCollided = false;
                 const checkInterval = setInterval(() => {
-                    const currentTime = Date.now();
-                    if (currentTime - lastCheck > 50) { // Check every 50ms
-                        lastCheck = currentTime;
-                        checkSlideCollision(drop);
+                    if (!hasCollided) {
+                        const currentTime = Date.now();
+                        if (currentTime - lastCheck > 50) { // Check every 50ms
+                            lastCheck = currentTime;
+                            if (checkSlideCollision(drop)) {
+                                hasCollided = true;
+                            }
+                        }
                     }
                 }, 50);
 
                 // Event Listener for the Ground Splash
                 drop.addEventListener('animationiteration', () => {
+                    // Clear interval when animation loops
+                    clearInterval(checkInterval);
+                    
                     // Create splash on ground
                     const splash = document.createElement('div');
                     splash.classList.add('splash');
@@ -76,6 +92,9 @@
                     splash.addEventListener('animationend', () => {
                         splash.remove();
                     }, { once: true });
+                    
+                    // Reset collision flag for next iteration
+                    hasCollided = false;
                 });
 
                 rainContainer.appendChild(drop);
