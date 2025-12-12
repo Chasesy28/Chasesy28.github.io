@@ -12,11 +12,11 @@
     <div class="rain">
       <p>Hello <br> Hello, this thing here is useful.</p>
       <input type="range" step="1" min="1" onchange="updateRain()" id="input" value="15">
+      <p id="test">15</p>
+      <script>
+        document.getElementById("test").textContent = "Hello";
+      </script>
     </div>
-    <p id="test">15</p>
-    <script>
-      document.getElementById("test").textContent = "Hello";
-    </script>
     <div class="ground"></div>
     <script>
        document.addEventListener('DOMContentLoaded', function() {
@@ -91,7 +91,7 @@
       function updateRain(){
         dropDensity = document.getElementById("input").value;
         testText = document.getElementById("test");
-        testText.innerHtml = "String(dropDensity)";
+        testText.textContent = "String(dropDensity)";
         alert(String(dropDensity));
         handleResize();
       }
