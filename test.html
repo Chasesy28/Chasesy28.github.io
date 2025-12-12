@@ -13,6 +13,9 @@
       <p>Hello <br> Hello, this thing here is useful.</p>
       <p id="test">15</p>
       <input type="range" step="1" min="1" onchange="updateRain()" id="input" value="15">
+      <script>
+        document.getElementById("test").innerHtml = "Hello";
+      </script>
     </div>
     <div class="ground"></div>
     <script>
@@ -84,7 +87,6 @@
 
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
-            document.getElementById("test").innerHtml = "Hello";
         });
       function updateRain(){
         dropDensity = document.getElementById("input").value;
