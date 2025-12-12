@@ -62,31 +62,31 @@
                 drop.style.animationDuration = `${0.8 + Math.random() * 0.6}s`;
 
                 // Check for collisions during animation with proper cleanup
-                let lastCheck = 0;
-                let hasCollided = false;
-                const checkInterval = setInterval(() => {
-                    // Check if drop still exists in DOM
-                    if (!drop.parentElement) {
-                        clearInterval(checkInterval);
-                        return;
-                    }
-                    
-                    if (!hasCollided) {
+                let checkInterval = null;
+                
+                const startCollisionCheck = () => {
+                    let lastCheck = 0;
+                    checkInterval = setInterval(() => {
+                        // Check if drop still exists in DOM
+                        if (!drop.parentElement) {
+                            clearInterval(checkInterval);
+                            checkInterval = null;
+                            return;
+                        }
+                        
                         const currentTime = Date.now();
                         if (currentTime - lastCheck > 50) { // Check every 50ms
                             lastCheck = currentTime;
-                            if (checkSlideCollision(drop)) {
-                                hasCollided = true;
-                            }
+                            checkSlideCollision(drop);
                         }
-                    }
-                }, 50);
+                    }, 50);
+                };
+                
+                // Start initial collision checking
+                startCollisionCheck();
 
                 // Event Listener for the Ground Splash
                 const handleAnimationIteration = () => {
-                    // Clear interval when animation loops
-                    clearInterval(checkInterval);
-                    
                     // Create splash on ground
                     const splash = document.createElement('div');
                     splash.classList.add('splash');
@@ -101,19 +101,16 @@
                     splash.addEventListener('animationend', () => {
                         splash.remove();
                     }, { once: true });
-                    
-                    // Reset collision flag for next iteration
-                    hasCollided = false;
-                    
-                    // Restart interval for next iteration
-                    lastCheck = 0;
                 };
                 
                 drop.addEventListener('animationiteration', handleAnimationIteration);
                 
                 // Register cleanup callback for this drop
                 dropCleanupCallbacks.set(drop, () => {
-                    clearInterval(checkInterval);
+                    if (checkInterval) {
+                        clearInterval(checkInterval);
+                        checkInterval = null;
+                    }
                 });
 
                 rainContainer.appendChild(drop);
