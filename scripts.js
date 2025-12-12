@@ -8,8 +8,8 @@
                 cachedSlides = Array.from(document.querySelectorAll('.swiper-slide'));
             };
             
-            // Initial cache and update on swiper changes
-            updateSlideCache();
+            // Initial cache - will update after swiper is ready
+            setTimeout(updateSlideCache, 100);
 
             // --- Function to check if drop hits a slide ---
             const checkSlideCollision = (drop) => {
@@ -62,6 +62,12 @@
                 let lastCheck = 0;
                 let hasCollided = false;
                 const checkInterval = setInterval(() => {
+                    // Check if drop still exists in DOM
+                    if (!drop.parentElement) {
+                        clearInterval(checkInterval);
+                        return;
+                    }
+                    
                     if (!hasCollided) {
                         const currentTime = Date.now();
                         if (currentTime - lastCheck > 50) { // Check every 50ms
@@ -74,7 +80,7 @@
                 }, 50);
 
                 // Event Listener for the Ground Splash
-                drop.addEventListener('animationiteration', () => {
+                const handleAnimationIteration = () => {
                     // Clear interval when animation loops
                     clearInterval(checkInterval);
                     
@@ -95,7 +101,26 @@
                     
                     // Reset collision flag for next iteration
                     hasCollided = false;
+                    
+                    // Restart interval for next iteration
+                    lastCheck = 0;
+                };
+                
+                drop.addEventListener('animationiteration', handleAnimationIteration);
+                
+                // Clean up if drop is removed
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.removedNodes.forEach((node) => {
+                            if (node === drop) {
+                                clearInterval(checkInterval);
+                                observer.disconnect();
+                            }
+                        });
+                    });
                 });
+                
+                observer.observe(rainContainer, { childList: true });
 
                 rainContainer.appendChild(drop);
             };
