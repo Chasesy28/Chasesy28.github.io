@@ -154,14 +154,15 @@ nav a:hover {
     /* Your drop appearance */
     width: 5px;
     height: 30px;
-    background-color: rgba(149, 57, 0, 0.4);
+    background: linear-gradient(to bottom, rgba(149, 57, 0, 0.2), rgba(149, 57, 0, 0.5));
+    border-radius: 0 0 50% 50%;
     /* Positioning and animation setup */
     position: absolute;
     bottom: 100%;
     /* Starts each drop above the screen */
     pointer-events: none;
     /* Makes drops unclickable */
-    animation: rain-fall linear infinite;
+    animation: rain-fall ease-in infinite;
 }
 
 /* New Splash Element Styling */
@@ -170,14 +171,17 @@ nav a:hover {
     /* bottom and left are now controlled by JavaScript */
     transform: translateX(-50%);
     /* Center the splash on its 'left' coordinate */
-    width: 25px;
+    width: 30px;
     /* Width of the splash */
-    height: 12px;
+    height: 15px;
     /* Height of the splash */
-    border-top: 3px solid rgba(149, 57, 0, 0.5);
+    border-top: 4px solid rgba(149, 57, 0, 0.6);
+    border-left: 2px solid rgba(149, 57, 0, 0.3);
+    border-right: 2px solid rgba(149, 57, 0, 0.3);
     /* Splash color */
     border-radius: 50%;
     /* Makes it a semi-circle */
+    box-shadow: 0 0 8px rgba(149, 57, 0, 0.3);
 }
 
 /* This class is added by JavaScript to trigger the splash */
@@ -191,43 +195,130 @@ nav a:hover {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 15px;
-    background-color: #ffeaa5;
-    /* Using the same light yellow as the title */
+    height: 20px;
+    background: linear-gradient(to bottom, #ffeaa5, #ffe48a);
+    /* Using the same light yellow as the title with gradient */
+    border-top: 2px solid rgba(149, 57, 0, 0.2);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 0;
     /* Sits in front of the rain */
 }
+/* ---- Swiper Slide Styling ---- */
 .swiper-slide {
   width: 40%;
-  border-color: #fcba36; 
+  background-color: #fffaf0;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  /* Important for splash detection */
+  overflow: hidden;
+}
+
+.slide-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  text-align: center;
+}
+
+.project-icon {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slide-content h3 {
   color: #eba518;
+  font-size: 1.8em;
+  margin: 0;
+  text-shadow: 1px 1px 2px rgba(149, 57, 0, 0.2);
+}
+
+.project-description {
+  color: #333;
+  font-size: 1em;
+  line-height: 1.5;
+  margin: 0;
+  padding: 10px 15px;
+  background-color: #ffeaa5;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-width: 90%;
 }
 
 
-/* Animation for the falling raindrops */
+/* Animation for the falling raindrops - more fluid with easing */
 @keyframes rain-fall {
-    to {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
         /* Moves the drop from its starting position to below the screen */
         transform: translateY(98vh);
+        opacity: 0.5;
     }
 }
 
-/* New Animation for the splash effect */
+/* New Animation for the splash effect - more dynamic */
 @keyframes splash {
     0% {
-        transform: translateX(-50%) scale(0);
+        transform: translateX(-50%) scale(0) scaleY(1);
         opacity: 1;
     }
 
-    80% {
-        transform: translateX(-50%) scale(1.4);
+    40% {
+        transform: translateX(-50%) scale(1.2) scaleY(0.8);
         opacity: 1;
+    }
+
+    70% {
+        transform: translateX(-50%) scale(1.6) scaleY(0.6);
+        opacity: 0.8;
     }
 
     100% {
-        transform: translateX(-50%) scale(1.8);
+        transform: translateX(-50%) scale(2) scaleY(0.3);
         opacity: 0;
     }
+}
+
+/* Splash effect for slide impacts */
+@keyframes splash-slide {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.slide-splash {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(149, 57, 0, 0.6), rgba(149, 57, 0, 0));
+    animation: splash-slide 0.4s ease-out forwards;
+    pointer-events: none;
 }
 
 /* --- Mobile Responsive Styles --- */
