@@ -1,58 +1,79 @@
 <!doctype html>
 <html>
-   <head>
-      <meta charset="utf-8">
-      <meta name="robots" content="noindex, nofollow">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-      <meta name="apple-mobile-web-app-capable" content="yes">
-      <meta name="apple-mobile-web-app-status-bar-style" content="default">
-      <!--title-->
-      <title>Silly Site!</title>
-      <!-- Load external CSS styles -->
-      <link rel="stylesheet" href="styles.css">
-      <!-- Load json file -->
-      <link rel="manifest" href="/manifest.json">
-      <!-- Add icon -->
-      <link rel="icon" href="/icons/icon-192x192.png">
-      <!-- adding font -->
-      <link rel="preconnect" href="https://fonts.googleapis.com">
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
-   </head>
-   <body>
-      <!-- Offline Banner -->
-      <div id="offlineBanner" class="offline-banner">
-         ⚠️ You are currently offline. Some features may not be available.
-      </div>
-      <div class="rain">
-         <!-- Header/ navigation -->
-            <header>
-              <div class="site-title cherry-bomb-one-regular">
-                  <a href="/">Silly Site</a>
-              </div>
-              <nav>
-                  <ul class="cherry-bomb-one-regular">
-                      <li><a href="/">Home</a></li>
-                      <li><a href="/Finder.html">SearchOSM APP</a></li>
-                      <li><a href="#about">About</a></li>
-                      <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                  </ul>
-              </nav>
-           </header>
-         <h1 class="cherry-bomb-one-regular">Silly site!</h1>
-         <!-- about section-->
-         <div class="cherry-bomb-one-regular">
-            <h2>About This Page</h2>
-            <p>
-               Welcome to my personal development site! This page serves as a creative playground where I, a programmer, experiment with new ideas and practice my coding skills.
-            </p>
-            <p>
-               Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to interactive features built with JavaScript. It's a space for me to build, break, and rebuild things without the constraints of a formal project.
-            </p>
-            <p>
-               So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for stopping by!
-            </p>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="robots" content="noindex, nofollow">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <meta name="apple-mobile-web-app-capable" content="yes">
+   <meta name="apple-mobile-web-app-status-bar-style" content="default">
+   <!--title-->
+   <title>Silly Site!</title>
+   <!-- Load external CSS styles -->
+   <link rel="stylesheet" href="styles.css">
+   <!-- Load Swiperjs-->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+   <!-- Load json file -->
+   <link rel="manifest" href="/manifest.json">
+   <!-- Add icon -->
+   <link rel="icon" href="/icons/icon-192x192.png">
+   <!-- adding font -->
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+</head>
+
+<body>
+   <!-- Offline Banner -->
+   <div id="offlineBanner" class="offline-banner">
+      ⚠️ You are currently offline. Some features may not be available.
+   </div>
+   <div class="rain">
+      <!-- Header/ navigation -->
+      <header>
+         <div class="site-title cherry-bomb-one-regular">
+            <a href="/">Silly Site</a>
          </div>
+         <nav>
+            <ul class="cherry-bomb-one-regular">
+               <li><a href="/">Home</a></li>
+               <li><a href="/Finder.html">SearchOSM APP</a></li>
+               <li><a href="#about">About</a></li>
+               <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
+                     rel="noopener noreferrer">GitHub</a></li>
+            </ul>
+         </nav>
+      </header>
+      <h1 class="cherry-bomb-one-regular">Silly site!</h1>
+      <!-- about section-->
+      <div class="cherry-bomb-one-regular">
+         <h2>About This Page</h2>
+         <p>
+            Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
+            experiment with new ideas and practice my coding skills.
+         </p>
+         <p>
+            Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
+            interactive features built with JavaScript. It's a space for me to build, break, and rebuild things without
+            the constraints of a formal project.
+         </p>
+         <p>
+            So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
+            stopping by!
+         </p>
+      </div>
+      <div class="swiper">
+         <div class="swiper-wrapper">
+            <div class="swiper-slide">Slide 1</div>
+            <div class="swiper-slide">Slide 2</div>
+            <div class="swiper-slide">Slide 3</div>
+            <!-- Add more swiper-slide divs -->
+         </div>
+         <!-- Optional Pagination -->
+         <div class="swiper-pagination"></div>
+         <!-- Optional Navigation -->
+         <div class="swiper-button-next"></div>
+         <div class="swiper-button-prev"></div>
       </div>
       <div class="ground"></div>
       <!-- Load external JavaScript -->
@@ -72,7 +93,7 @@
 
          // Offline/Online detection
          const offlineBanner = document.getElementById('offlineBanner');
-         
+
          function updateOnlineStatus() {
             if (!navigator.onLine) {
                offlineBanner.classList.add('show');
@@ -85,7 +106,7 @@
 
          window.addEventListener('online', updateOnlineStatus);
          window.addEventListener('offline', updateOnlineStatus);
-         
+
          // Check initial status
          updateOnlineStatus();
 
@@ -98,7 +119,37 @@
                }
             });
          }
+         const swiper = new Swiper('.swiper', {
+            // Basic setup
+            loop: true, // Optional: for looping slides
+            // spaceBetween: 30, // Gap between slides in px
+            // // Key parameter for multiple slides
+            // slidesPerView: 3, // Shows 3 slides at once
+
+
+            breakpoints: {
+               640: {
+                  slidesPerView: 1, // 1 slide on small screens (e.g., < 640px)
+                  spaceBetween: 20,
+               },
+               1024: {
+                  slidesPerView: 3, // 3 slides on large screens (e.g., > 1024px)
+               },
+            },
+
+            // Navigation/Pagination (Optional)
+            navigation: {
+               nextEl: '.swiper-button-next',
+               prevEl: '.swiper-button-prev',
+            },
+            pagination: {
+               el: '.swiper-pagination',
+               clickable: true,
+            },
+         });
       </script>
       <script src="scripts.js"></script>
-   </body>
+      <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+</body>
+
 </html>
