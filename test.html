@@ -86,8 +86,8 @@
             window.addEventListener('resize', handleResize);
         });
       function updateRain(){
-        alert(document.getElementById("input").value);
         dropDensity = document.getElementById("input").value;
+        alert(dropDensity);
         document.getElementById("test").innerHtml = document.getElementById("input").value;
         handleResize();
       }
