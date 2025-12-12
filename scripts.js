@@ -10,6 +10,9 @@
             
             // Initial cache - will update after swiper is ready
             setTimeout(updateSlideCache, 100);
+            
+            // Shared cleanup tracking for drops
+            const dropCleanupCallbacks = new Map();
 
             // --- Function to check if drop hits a slide ---
             const checkSlideCollision = (drop) => {
@@ -108,19 +111,10 @@
                 
                 drop.addEventListener('animationiteration', handleAnimationIteration);
                 
-                // Clean up if drop is removed
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        mutation.removedNodes.forEach((node) => {
-                            if (node === drop) {
-                                clearInterval(checkInterval);
-                                observer.disconnect();
-                            }
-                        });
-                    });
+                // Register cleanup callback for this drop
+                dropCleanupCallbacks.set(drop, () => {
+                    clearInterval(checkInterval);
                 });
-                
-                observer.observe(rainContainer, { childList: true });
 
                 rainContainer.appendChild(drop);
             };
@@ -159,6 +153,20 @@
 
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
+            
+            // Shared MutationObserver for all raindrops
+            const sharedObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    mutation.removedNodes.forEach((node) => {
+                        if (dropCleanupCallbacks.has(node)) {
+                            dropCleanupCallbacks.get(node)();
+                            dropCleanupCallbacks.delete(node);
+                        }
+                    });
+                });
+            });
+            
+            sharedObserver.observe(rainContainer, { childList: true });
 
             
         });
