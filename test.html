@@ -87,8 +87,9 @@
         });
       function updateRain(){
         dropDensity = document.getElementById("input").value;
+        testText = document.getElementById("test")
+        testText.innerHtml = String(dropDensity);
         alert(String(dropDensity));
-        document.getElementById("test").innerHtml = String(dropDensity);
         handleResize();
       }
     </script>
