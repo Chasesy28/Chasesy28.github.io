@@ -11,7 +11,7 @@
   <body>
     <div class="rain">
       <p>Hello <br> Hello, this thing here is useful.</p>
-      <input type="range" min="1" max="10000" onchange="updateRain()" id="input" value="15">
+      <input type="range" min="1" max="1000" id="input" value="15">
       <p id="test">15</p>
     </div>
     <div class="ground"></div>
@@ -82,12 +82,14 @@
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
         });
-        function updateRain(){
-          dropDensity = document.getElementById("input").value;
-          var testText = document.getElementById("test");
-          testText.textContent = String(dropDensity);
-          handleResize();
-        }
+      const input = document.getElementById("input");
+      input.addEventListener("input", updateRain());
+      function updateRain(){
+        dropDensity = input.value;
+        var testText = document.getElementById("test");
+        testText.textContent = String(dropDensity);
+        handleResize();
+      }
     </script>
   </body>
 </html>
