@@ -10,7 +10,6 @@
   </head>
   <body>
     <script>
-       document.addEventListener('DOMContentLoaded', function() {
             const rainContainer = document.querySelector('.rain');
             var dropDensity = 15; // Moved here to be accessible by all functions
 
@@ -78,7 +77,6 @@
 
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
-        });
         function updateRain(){
           dropDensity = document.getElementById("input").value;
           var testText = document.getElementById("test");
