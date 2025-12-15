@@ -19,11 +19,9 @@
     </div>
     <div class="ground"></div>
     <script>
-       document.addEventListener('DOMContentLoaded', function() {
-            const rainContainer = document.querySelector('.rain');
-            var dropDensity = 15; // Moved here to be accessible by all functions
-
-            // --- Function to create a single drop ---
+      const rainContainer = document.querySelector('.rain');
+      var dropDensity = 15; // Moved here to be accessible by all functions
+      // --- Function to create a single drop ---
             const createDrop = () => {
                 const drop = document.createElement('div');
                 drop.classList.add('drop');
@@ -82,9 +80,8 @@
                   createDrop();
                 }
             };
-
+      document.addEventListener('DOMContentLoaded', function() {
             initRain();
-
             // Use the new resize handler
             window.addEventListener('resize', handleResize);
         });
