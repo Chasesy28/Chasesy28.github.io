@@ -11,11 +11,8 @@
   <body>
     <div class="rain">
       <p>Hello <br> Hello, this thing here is useful.</p>
-      <input type="range" step="1" min="1" onchange="updateRain()" id="input" value="15">
+      <input type="range" min="0" onchange="updateRain()" id="input" value="15">
       <p id="test">15</p>
-      <script>
-        document.getElementById("test").textContent = "Hello";
-      </script>
     </div>
     <div class="ground"></div>
     <script>
@@ -89,7 +86,6 @@
           dropDensity = document.getElementById("input").value;
           var testText = document.getElementById("test");
           testText.textContent = String(dropDensity);
-          alert(String(dropDensity));
           handleResize();
         }
     </script>
