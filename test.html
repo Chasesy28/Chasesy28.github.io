@@ -83,13 +83,12 @@
             window.addEventListener('resize', handleResize);
         });
       const input = document.getElementById("input");
-      input.addEventListener("input", updateRain());
-      function updateRain(){
+      const testText = document.getElementById("test");
+      input.addEventListener("input", function() {
         dropDensity = input.value;
-        var testText = document.getElementById("test");
         testText.textContent = String(dropDensity);
         handleResize();
-      }
+      });
     </script>
   </body>
 </html>
