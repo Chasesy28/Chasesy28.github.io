@@ -22,7 +22,7 @@ const URLS_TO_CACHE = [
 // ---
 self.addEventListener('install', (event) => {
   console.log('[Service Worker] Install event');
-  
+
   // Wait until the cache is opened and all core files are added
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -46,7 +46,7 @@ self.addEventListener('install', (event) => {
 // ---
 self.addEventListener('activate', (event) => {
   console.log('[Service Worker] Activate event');
-  
+
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -94,7 +94,7 @@ self.addEventListener('fetch', (event) => {
                 cache.put(event.request, responseToCache);
                 console.log(`[Service Worker] Caching new resource: ${event.request.url}`);
               });
-            
+
             // 2b. Return the response from the network
             return networkResponse;
           })

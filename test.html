@@ -1,139 +1,98 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Test</title>
-    <link rel="icon" href="/icons/icon-192x192.png">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+<head>
+  <title>Test</title>
+  <link rel="icon" href="/icons/icon-192x192.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
 
-  </head>
-  <body>
-    <div class="swiper" style="margin-bottom: 200px;">
-      <!-- Additional required wrapper -->
-      <div class="swiper-wrapper">
-        <!-- Slides -->
-        <div class="swiper-slide">Slide 1</div>
-        <div class="swiper-slide">Slide 2</div>
-        <div class="swiper-slide">Slide 3</div>
-      </div>
-      <!-- If we need pagination -->
-      <div class="swiper-pagination"></div>
+</head>
 
-      <!-- If we need navigation buttons -->
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-button-next"></div>
+<body>
+  <div class="rain">
+    <p>Hello <br> Hello, this thing here is useful.</p>
+    <input type="range" min="1" max="30" step="0.1" id="input" value="15">
+    <p id="test">15</p>
+  </div>
+  <div class="ground"></div>
+  <script>
+    const rainContainer = document.querySelector('.rain');
+    var dropDensity = 15; // Moved here to be accessible by all functions
+    // --- Function to create a single drop ---
+    const createDrop = () => {
+      const drop = document.createElement('div');
+      drop.classList.add('drop');
 
-      <!-- If we need scrollbar -->
-      <div class="swiper-scrollbar"></div>
-    </div>
-    <script>
-      const swiper = new Swiper('.swiper', {
-      // Optional parameters
-      direction: 'vertical',
-      loop: true,
+      // Random horizontal position, delay, and duration
+      drop.style.left = `${Math.random() * 100}vw`;
+      drop.style.animationDelay = `${Math.random() * 2}s`;
+      drop.style.animationDuration = `${0.7 + Math.random() * 0.5}s`;
 
-      // If we need pagination
-      pagination: {
-        el: '.swiper-pagination',
-      },
+      // Event Listener for the Splash
+      drop.addEventListener('animationiteration', () => {
+        const splash = document.createElement('div');
+        splash.classList.add('splash');
+        splash.style.left = drop.style.left;
+        splash.style.bottom = '5px';
+        rainContainer.appendChild(splash);
 
-      // Navigation arrows
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
+        setTimeout(() => {
+          splash.classList.add('splash-animation');
+        }, 10);
 
-      // And if we need scrollbar
-      scrollbar: {
-        el: '.swiper-scrollbar',
-      },
-    });
-    </script>
-    <div class="rain">
-      <p>Hello <br> Hello, this thing here is useful.</p>
-      <input type="range" min="1" max="30" step="0.1" id="input" value="15">
-      <p id="test">15</p>
-    </div>
-    <div class="ground"></div>
-    <script>
-      const rainContainer = document.querySelector('.rain');
-      var dropDensity = 15; // Moved here to be accessible by all functions
-      // --- Function to create a single drop ---
-            const createDrop = () => {
-                const drop = document.createElement('div');
-                drop.classList.add('drop');
-
-                // Random horizontal position, delay, and duration
-                drop.style.left = `${Math.random() * 100}vw`;
-                drop.style.animationDelay = `${Math.random() * 2}s`;
-                drop.style.animationDuration = `${0.7 + Math.random() * 0.5}s`;
-
-                // Event Listener for the Splash
-                drop.addEventListener('animationiteration', () => {
-                    const splash = document.createElement('div');
-                    splash.classList.add('splash');
-                    splash.style.left = drop.style.left;
-                    splash.style.bottom = '5px';
-                    rainContainer.appendChild(splash);
-
-                    setTimeout(() => {
-                        splash.classList.add('splash-animation');
-                    }, 10);
-
-                    splash.addEventListener('animationend', () => {
-                        splash.remove();
-                    }, { once: true });
-                });
-
-                rainContainer.appendChild(drop);
-            };
-
-            // --- Function to handle resizing ---
-            const handleResize = () => {
-              const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
-                const currentDrops = rainContainer.querySelectorAll('.drop');
-                const diff = newNumberOfDrops - currentDrops.length;
-
-                if (diff > 0) {
-                    // If the screen got bigger, add more drops
-                    for (let i = 0; i < diff; i++) {
-                        createDrop();
-                    }
-                } else if (diff < 0) {
-                    // If the screen got smaller, remove some drops
-                    for (let i = 0; i < Math.abs(diff); i++) {
-                        // Remove the last drop to be less noticeable
-                        if (currentDrops[currentDrops.length - 1 - i]) {
-                             currentDrops[currentDrops.length - 1 - i].remove();
-                        }
-                    }
-                }
-            };
-            
-            // --- Initial Setup ---
-            const initRain = () => {
-                const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
-                for (let i = 0; i < initialNumberOfDrops; i++) {
-                  createDrop();
-                }
-            };
-      document.addEventListener('DOMContentLoaded', function() {
-            initRain();
-            // Use the new resize handler
-            window.addEventListener('resize', handleResize);
-        });
-      const input = document.getElementById("input");
-      const testText = document.getElementById("test");
-      input.addEventListener("input", function() {
-        dropDensity = input.value;
-        testText.textContent = String(dropDensity);
-        handleResize();
+        splash.addEventListener('animationend', () => {
+          splash.remove();
+        }, { once: true });
       });
-    </script>
-  </body>
+
+      rainContainer.appendChild(drop);
+    };
+
+    // --- Function to handle resizing ---
+    const handleResize = () => {
+      const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
+      const currentDrops = rainContainer.querySelectorAll('.drop');
+      const diff = newNumberOfDrops - currentDrops.length;
+
+      if (diff > 0) {
+        // If the screen got bigger, add more drops
+        for (let i = 0; i < diff; i++) {
+          createDrop();
+        }
+      } else if (diff < 0) {
+        // If the screen got smaller, remove some drops
+        for (let i = 0; i < Math.abs(diff); i++) {
+          // Remove the last drop to be less noticeable
+          if (currentDrops[currentDrops.length - 1 - i]) {
+            currentDrops[currentDrops.length - 1 - i].remove();
+          }
+        }
+      }
+    };
+
+    // --- Initial Setup ---
+    const initRain = () => {
+      const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
+      for (let i = 0; i < initialNumberOfDrops; i++) {
+        createDrop();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', function () {
+      initRain();
+      // Use the new resize handler
+      window.addEventListener('resize', handleResize);
+    });
+    const input = document.getElementById("input");
+    const testText = document.getElementById("test");
+    input.addEventListener("input", function () {
+      dropDensity = input.value;
+      testText.textContent = String(dropDensity);
+      handleResize();
+    });
+  </script>
+</body>
+
 </html>
