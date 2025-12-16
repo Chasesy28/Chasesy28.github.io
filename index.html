@@ -1,6 +1,5 @@
 <!doctype html>
 <html>
-
 <head>
    <meta charset="utf-8">
    <meta name="robots" content="noindex, nofollow">
@@ -39,8 +38,7 @@
                <li><a href="/">Home</a></li>
                <li><a href="/Finder">SearchOSM APP</a></li>
                <li><a href="#about">About</a></li>
-               <li><a href="/test">Test Site</a>
-               <li>
+               <li><a href="/test">Test Site</a><li>
                <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
                      rel="noopener noreferrer">GitHub</a></li>
             </ul>
@@ -70,32 +68,28 @@
                <div class="slide-content cherry-bomb-one-regular">
                   <img src="/icons/icon-192x192.png" alt="Project 1 Icon" class="project-icon">
                   <h3>Project 1</h3>
-                  <p class="project-description">This is an exciting project showcasing innovative web development
-                     techniques and creative animations.</p>
+                  <p class="project-description">This is an exciting project showcasing innovative web development techniques and creative animations.</p>
                </div>
             </div>
             <div class="swiper-slide">
                <div class="slide-content cherry-bomb-one-regular">
                   <img src="/icons/icon-512x512.png" alt="Project 2 Icon" class="project-icon">
                   <h3>Project 2</h3>
-                  <p class="project-description">A dynamic application demonstrating modern JavaScript frameworks and
-                     responsive design principles.</p>
+                  <p class="project-description">A dynamic application demonstrating modern JavaScript frameworks and responsive design principles.</p>
                </div>
             </div>
             <div class="swiper-slide">
                <div class="slide-content cherry-bomb-one-regular">
                   <img src="/icons/icon-192x192.png" alt="Project 3 Icon" class="project-icon">
                   <h3>Project 3</h3>
-                  <p class="project-description">An interactive experience combining beautiful UI with powerful
-                     functionality for users.</p>
+                  <p class="project-description">An interactive experience combining beautiful UI with powerful functionality for users.</p>
                </div>
             </div>
             <div class="swiper-slide">
                <div class="slide-content cherry-bomb-one-regular">
                   <img src="/icons/icon-512x512.png" alt="Project 4 Icon" class="project-icon">
                   <h3>Project 4</h3>
-                  <p class="project-description">A creative solution that brings together design aesthetics and
-                     technical excellence.</p>
+                  <p class="project-description">A creative solution that brings together design aesthetics and technical excellence.</p>
                </div>
             </div>
          </div>
@@ -142,38 +136,36 @@
          updateOnlineStatus();
 
          // Listen for messages from Service Worker
-         const swiper = new Swiper('.swiper', {
-            loop: true,
-            // Default setting (Mobile first)
-            slidesPerView: 1,
-            spaceBetween: 10,
+const swiper = new Swiper('.swiper', {
+  loop: true,
+  // Default setting (Mobile first)
+  slidesPerView: 1, 
+  spaceBetween: 10,
+  
+  // Responsive breakpoints
+  breakpoints: {
+    640: {
+      slidesPerView: 2,
+      spaceBetween: 20,
+    },
+    1024: {
+      slidesPerView: 3,
+      spaceBetween: 30,
+    },
+  },
 
-            // Responsive breakpoints
-            breakpoints: {
-               640: {
-                  slidesPerView: 2,
-                  spaceBetween: 20,
-               },
-               1024: {
-                  slidesPerView: 3,
-                  spaceBetween: 30,
-               },
-            },
-
-            // Navigation
-            navigation: {
-               nextEl: '.swiper-button-next',
-               prevEl: '.swiper-button-prev',
-            },
-
-            // Pagination
-            pagination: {
-               el: '.swiper-pagination',
-               clickable: true,
-            },
-         });
-,
-         });
+  // Navigation
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
+  
+  // Pagination
+  pagination: {
+    el: '.swiper-pagination',
+    clickable: true,
+  },
+});
       </script>
       <script src="scripts.js"></script>
 </body>
