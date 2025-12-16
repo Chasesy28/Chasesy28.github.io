@@ -101,6 +101,7 @@
       </div>
       <div class="ground"></div>
       <!-- Load external JavaScript -->
+      <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
       <script>
          // Register the service worker
          if ('serviceWorker' in navigator) {
@@ -135,44 +136,39 @@
          updateOnlineStatus();
 
          // Listen for messages from Service Worker
-         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-               if (event.data && event.data.type === 'OFFLINE') {
-                  offlineBanner.classList.add('show');
-                  document.body.classList.add('offline-mode');
-               }
-            });
-         }
-         const swiper = new Swiper('.swiper', {
-            // Basic setup
-            loop: true, // Optional: for looping slides
-            // spaceBetween: 30, // Gap between slides in px
-            // // Key parameter for multiple slides
-            // slidesPerView: 3, // Shows 3 slides at once
+const swiper = new Swiper('.swiper', {
+  loop: true,
+  // Default setting (Mobile first)
+  slidesPerView: 1, 
+  spaceBetween: 10,
+  
+  // Responsive breakpoints
+  breakpoints: {
+    640: {
+      slidesPerView: 2,
+      spaceBetween: 20,
+    },
+    1024: {
+      slidesPerView: 3,
+      spaceBetween: 30,
+    },
+  },
 
-
-            breakpoints: {
-               640: {
-                  slidesPerView: 1, // 1 slide on small screens (e.g., < 640px)
-                  spaceBetween: 2,
-               },
-               1024: {
-                  slidesPerView: 3, // 3 slides on large screens (e.g., > 1024px)
-               },
-            },
-
-            // Navigation/Pagination (Optional)
-            navigation: {
-               nextEl: '.swiper-button-next',
-               prevEl: '.swiper-button-prev',
-            },
-            pagination: {
-               el: '.swiper-pagination',
-               clickable: true,
-            },
+  // Navigation
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
+  
+  // Pagination
+  pagination: {
+    el: '.swiper-pagination',
+    clickable: true,
+  },
+});
+,
          });
       </script>
-      <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
       <script src="scripts.js"></script>
 </body>
 
