@@ -38,7 +38,7 @@
                <li><a href="/">Home</a></li>
                <li><a href="/Finder">SearchOSM APP</a></li>
                <li><a href="#about">About</a></li>
-               <li><a href="/test">Test Site</a><li>
+               <li><a href="/test">Test Site</a></li>
                <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
                      rel="noopener noreferrer">GitHub</a></li>
             </ul>
@@ -136,23 +136,39 @@
          updateOnlineStatus();
 
          // Listen for messages from Service Worker
-const swiper = new Swiper('.swiper', {
-  loop: true,
-  // Default setting (Mobile first)
-  slidesPerView: 1, 
-  spaceBetween: 10,
-  
-  // Responsive breakpoints
-  breakpoints: {
-    640: {
-      slidesPerView: 2,
-      spaceBetween: 20,
-    },
-    1024: {
-      slidesPerView: 3,
-      spaceBetween: 30,
-    },
-  },
+         if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+               if (event.data && event.data.type === 'OFFLINE') {
+                  offlineBanner.classList.add('show');
+                  document.body.classList.add('offline-mode');
+               }
+            });
+         }
+
+         // Initialize Swiper
+         const swiper = new Swiper('.swiper', {
+            loop: true,
+            // Default setting (Mobile first)
+            slidesPerView: 1,
+            spaceBetween: 10,
+
+            // Responsive breakpoints
+            breakpoints: {
+               640: {
+                  slidesPerView: 2,
+                  spaceBetween: 20,
+               },
+               1024: {
+                  slidesPerView: 3,
+                  spaceBetween: 30,
+               },
+            },
+
+            // Navigation
+            navigation: {
+               nextEl: '.swiper-button-next',
+               prevEl: '.swiper-button-prev',
+            },
 
   // Navigation
   navigation: {

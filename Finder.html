@@ -1,5 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <title>OSM Restaurant Finder</title>
+      <!-- Basic PWA/Mobile enhancements -->
+      <meta name="theme-color" content="#4f46e5">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
+      <link rel="manifest" href="/manifest.json">
+      <link rel="icon" href="/icons/icon-192x192.png">
+      <!-- Finder Styles -->
+      <link rel="stylesheet" href="finder-styles.css">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <!-- Leaflet.js CSS and JS -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+   </head>
+   <body class="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 md:p-8">
+      <!-- Offline Banner -->
+      <div id="offlineBanner" class="offline-banner">
+         ⚠️ You are currently offline. Some features may not be available.
+      </div>
+      <!-- API Key Configuration Modal -->
+      <div id="apiKeyModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50 transition-opacity duration-300">
+         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+               <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100">🔐 API Key Setup</h4>
+               <button id="closeApiKeyModal" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+               <p class="text-xs text-yellow-800 dark:text-yellow-200">
+                  <strong>⚠️ Security Notice:</strong> Your API key is stored in session storage only and will be cleared when you close the browser. Never share your API key publicly.
+               </p>
+            </div>
+            <div class="mb-4">
+               <label for="apiKeyInput" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  OpenAI-Compatible API Key
+               </label>
+               <input type="password" id="apiKeyInput" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  placeholder="sk-..." autocomplete="off">
+               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Works with OpenAI, Azure OpenAI, or any OpenAI-compatible API endpoint.
+               </p>
+            </div>
+            <div class="mb-4">
+               <label for="apiEndpointInput" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  API Endpoint (optional)
+               </label>
+               <input type="text" id="apiEndpointInput" 
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  placeholder="https://api.openai.com/v1/chat/completions" autocomplete="off">
+               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Leave empty to use OpenAI default. For GitHub Copilot or custom endpoints, enter the full URL.
+               </p>
+            </div>
+            <div class="flex gap-2">
+               <button id="saveApiKeyBtn" class="flex-1 bg-indigo-600 dark:bg-indigo-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 transition-colors">
+                  Save Key
+               </button>
+               <button id="clearApiKeyBtn" class="flex-1 bg-red-600 dark:bg-red-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-red-700 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75 transition-colors">
+                  Clear Key
+               </button>
+            </div>
+            <p id="apiKeyStatus" class="text-xs text-center mt-3 text-gray-500 dark:text-gray-400"></p>
 
 <head>
    <meta charset="UTF-8">
