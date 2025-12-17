@@ -1,13 +1,45 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const rainContainer = document.querySelector('.rain');
-    const dropDensity = 15; // Moved here to be accessible by all functions
+const rainContainer = document.querySelector('.rain');
+let dropDensity = 15; // Moved here to be accessible by all functions
+const rainSlider = document.getElementById("rainSliderInput");
+const rainSliderValue = document.getElementById("rainSliderValue");
 
+// --- Function to handle resizing ---
+const handleResize = () => {
+    const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
+    const currentDrops = rainContainer.querySelectorAll('.drop');
+    const diff = newNumberOfDrops - currentDrops.length;
+
+    if (diff > 0) {
+        // If the screen got bigger, add more drops
+        for (let i = 0; i < diff; i++) {
+            createDrop();
+        }
+    } else if (diff < 0) {
+        // If the screen got smaller, remove some drops
+        for (let i = 0; i < Math.abs(diff); i++) {
+            // Remove the last drop to be less noticeable
+            if (currentDrops[currentDrops.length - 1 - i]) {
+                currentDrops[currentDrops.length - 1 - i].remove();
+            }
+        }
+    }
+};
+
+// --- Initial Setup ---
+const initRain = () => {
+    const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
+    for (let i = 0; i < initialNumberOfDrops; i++) {
+        createDrop();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function () {
     // Cache slide elements for better performance
     let cachedSlides = [];
     const updateSlideCache = () => {
         cachedSlides = Array.from(document.querySelectorAll('.swiper-slide'));
     };
-//sad
+
     // Initial cache - will update after swiper is ready
     setTimeout(updateSlideCache, 100);
 
@@ -116,36 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
         rainContainer.appendChild(drop);
     };
 
-    // --- Function to handle resizing ---
-    const handleResize = () => {
-        const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
-        const currentDrops = rainContainer.querySelectorAll('.drop');
-        const diff = newNumberOfDrops - currentDrops.length;
-
-        if (diff > 0) {
-            // If the screen got bigger, add more drops
-            for (let i = 0; i < diff; i++) {
-                createDrop();
-            }
-        } else if (diff < 0) {
-            // If the screen got smaller, remove some drops
-            for (let i = 0; i < Math.abs(diff); i++) {
-                // Remove the last drop to be less noticeable
-                if (currentDrops[currentDrops.length - 1 - i]) {
-                    currentDrops[currentDrops.length - 1 - i].remove();
-                }
-            }
-        }
-    };
-
-    // --- Initial Setup ---
-    const initRain = () => {
-        const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
-        for (let i = 0; i < initialNumberOfDrops; i++) {
-            createDrop();
-        }
-    };
-
     initRain();
 
     // Use the new resize handler
@@ -164,7 +166,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     sharedObserver.observe(rainContainer, { childList: true });
-
-
 });
 
+input.addEventListener("input", function () {
+    dropDensity = rainSlider.value;
+    rainSliderValue.textContent = String(dropDensity);
+    handleResize();
+});
