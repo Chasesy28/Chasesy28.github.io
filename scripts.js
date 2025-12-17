@@ -1,7 +1,8 @@
 const rainContainer = document.querySelector('.rain');
-let dropDensity = 15; // Moved here to be accessible by all functions
 const rainSlider = document.getElementById("rainSliderInput");
-const rainSliderValue = document.getElementById("rainSliderValue");
+const rainSliderTextValue = document.getElementById("rainSliderValue");
+let dropDensity = rainSlider.value; // Moved here to be accessible by all functions
+rainSliderTextValue.textContent = String(dropDensity);
 
 // --- Function to handle resizing ---
 const handleResize = () => {
@@ -170,6 +171,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 input.addEventListener("input", function () {
     dropDensity = rainSlider.value;
-    rainSliderValue.textContent = String(dropDensity);
+    rainSliderTextValue.textContent = String(dropDensity);
     handleResize();
 });
