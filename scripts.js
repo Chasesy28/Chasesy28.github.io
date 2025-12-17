@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const updateSlideCache = () => {
         cachedSlides = Array.from(document.querySelectorAll('.swiper-slide'));
     };
-
+//sad
     // Initial cache - will update after swiper is ready
     setTimeout(updateSlideCache, 100);
 
