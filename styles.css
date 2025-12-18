@@ -6,7 +6,7 @@ body {
     /* General layout properties */
     text-align: center;
     margin: 0;
-    overflow: hidden;
+    /*overflow: hidden;*/
     /* Prevents scrollbars from appearing */
 }
 
