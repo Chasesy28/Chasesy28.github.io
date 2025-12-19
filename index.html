@@ -1,238 +1,239 @@
 <!doctype html>
 <html class="light"> <!-- This is the theme -->
 
-<head>
-   <meta charset="utf-8">
-   <meta name="robots" content="noindex, nofollow">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-   <meta name="apple-mobile-web-app-capable" content="yes">
-   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-   <!--title-->
-   <title>Silly Site!</title>
-   <!-- Load external CSS styles -->
-   <link rel="stylesheet" href="styles.css">
-   <!-- Load Swiperjs-->
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
-   <!-- Load json file -->
-   <link rel="manifest" href="/manifest.json">
-   <!-- Add icon -->
-   <link rel="icon" href="/icons/icon-192x192.png">
-   <!-- Tailwind CSS - Using CDN for simplicity. For production, consider using Tailwind CLI to generate optimized CSS -->
-   <script src="https://cdn.tailwindcss.com"></script>
-   <script>
-      tailwind.config = {
-         darkMode: 'class',
-      };
-   </script>
-   <!-- adding font -->
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
-</head>
-
-<body>
-   <!-- Offline Banner -->
-   <div id="offlineBanner" class="offline-banner">
-      ⚠️ You are currently offline. Some features may not be available.
-   </div>
-   <div class="rain">
-      <!-- Header/ navigation -->
-      <header>
-         <div class="site-title cherry-bomb-one-regular">
-            <a href="/">Silly Site</a>
-         </div>
-         <nav>
-            <ul class="cherry-bomb-one-regular">
-               <li><a href="/">Home</a></li>
-               <li><a href="/Finder">SearchOSM APP</a></li>
-               <li><a href="#about">About</a></li>
-               <li><a href="/test">Test Site</a></li>
-               <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
-                     rel="noopener noreferrer">GitHub</a></li>
-               <li>
-                  <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
-                     <span class="sun-icon">☀️</span>
-                     <span class="moon-icon" style="display: none;">🌙</span>
-                  </button>
-               </li>
-            </ul>
-         </nav>
-      </header>
-      <h1 class="cherry-bomb-one-regular">Silly site!</h1>
-      <!-- about section-->
-      <div class="cherry-bomb-one-regular" id="about">
-         <h2>About This Page</h2>
-         <p>
-            Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
-            experiment with new ideas and practice my coding skills.
-         </p>
-         <p>
-            Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
-            interactive features built with JavaScript. It's a space for me to build, break, and rebuild things without
-            the constraints of a formal project.
-         </p>
-         <p>
-            So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
-            stopping by!
-         </p>
-      </div>
-      <div class="swiper">
-         <div class="swiper-wrapper">
-            <div class="swiper-slide">
-               <div class="slide-content cherry-bomb-one-regular">
-                  <img src="/icons/icon-512x512.png" alt="Project 1 Icon" class="project-icon">
-                  <h3>Project 1</h3>
-                  <p class="project-description">This is an exciting project showcasing innovative web development
-                     techniques and creative animations.</p>
-               </div>
-            </div>
-            <div class="swiper-slide">
-               <div class="slide-content cherry-bomb-one-regular">
-                  <img src="/icons/icon-512x512.png" alt="Project 2 Icon" class="project-icon">
-                  <h3>Project 2</h3>
-                  <p class="project-description">A dynamic application demonstrating modern JavaScript frameworks and
-                     responsive design principles.</p>
-               </div>
-            </div>
-            <div class="swiper-slide">
-               <div class="slide-content cherry-bomb-one-regular">
-                  <img src="/icons/icon-192x192.png" alt="Project 3 Icon" class="project-icon">
-                  <h3>Project 3</h3>
-                  <p class="project-description">An interactive experience combining beautiful UI with powerful
-                     functionality for users.</p>
-               </div>
-            </div>
-            <div class="swiper-slide">
-               <div class="slide-content cherry-bomb-one-regular">
-                  <img src="/icons/icon-512x512.png" alt="Project 4 Icon" class="project-icon">
-                  <h3>Project 4</h3>
-                  <p class="project-description">A creative solution that brings together design aesthetics and
-                     technical excellence.</p>
-               </div>
-            </div>
-         </div>
-         <!-- Optional Pagination -->
-         <div class="swiper-pagination"></div>
-         <!-- Optional Navigation -->
-         <div class="swiper-button-next"></div>
-         <div class="swiper-button-prev"></div>
-      </div>
-      <div class="ground"></div>
-      <!-- Load external JavaScript -->
-      <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+   <head>
+      <meta charset="utf-8">
+      <meta name="robots" content="noindex, nofollow">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
+      <!--title-->
+      <title>Silly Site!</title>
+      <!-- Load external CSS styles -->
+      <link rel="stylesheet" href="styles.css">
+      <!-- Load Swiperjs-->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+      <!-- Load json file -->
+      <link rel="manifest" href="/manifest.json">
+      <!-- Add icon -->
+      <link rel="icon" href="/icons/icon-192x192.png">
+      <!-- Tailwind CSS - Using CDN for simplicity. For production, consider using Tailwind CLI to generate optimized CSS -->
+      <script src="https://cdn.tailwindcss.com"></script>
       <script>
-         // Register the service worker
-         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-               navigator.serviceWorker.register('/sw.js')
-                  .then(registration => {
-                     console.log('Service Worker registered with scope:', registration.scope);
-                  })
-                  .catch(error => {
-                     console.error('Service Worker registration failed:', error);
-                  });
-            });
-         }
+         tailwind.config = {
+            darkMode: 'class',
+         };
+      </script>
+      <!-- adding font -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
+   </head>
 
-         // Offline/Online detection
-         const offlineBanner = document.getElementById('offlineBanner');
-
-         function updateOnlineStatus() {
-            if (!navigator.onLine) {
-               offlineBanner.classList.add('show');
-               document.body.classList.add('offline-mode');
-            } else {
-               offlineBanner.classList.remove('show');
-               document.body.classList.remove('offline-mode');
+   <body>
+      <!-- Offline Banner -->
+      <div id="offlineBanner" class="offline-banner">
+         ⚠️ You are currently offline. Some features may not be available.
+      </div>
+      <div class="rain">
+         <!-- Header/ navigation -->
+         <header>
+            <div class="site-title cherry-bomb-one-regular">
+               <a href="/">Silly Site</a>
+            </div>
+            <nav>
+               <ul class="cherry-bomb-one-regular">
+                  <li><a href="/">Home</a></li>
+                  <li><a href="/Finder">SearchOSM APP</a></li>
+                  <li><a href="#about">About</a></li>
+                  <li><a href="/test">Test Site</a></li>
+                  <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
+                        rel="noopener noreferrer">GitHub</a></li>
+                  <li>
+                     <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                        <span class="sun-icon">☀️</span>
+                        <span class="moon-icon" style="display: none;">🌙</span>
+                     </button>
+                  </li>
+               </ul>
+            </nav>
+         </header>
+         <h1 class="cherry-bomb-one-regular">Silly site!</h1>
+         <!-- about section-->
+         <div class="cherry-bomb-one-regular" id="about">
+            <h2>About This Page</h2>
+            <p>
+               Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
+               experiment with new ideas and practice my coding skills.
+            </p>
+            <p>
+               Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
+               interactive features built with JavaScript. It's a space for me to build, break, and rebuild things
+               without
+               the constraints of a formal project.
+            </p>
+            <p>
+               So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
+               stopping by!
+            </p>
+         </div>
+         <div class="swiper">
+            <div class="swiper-wrapper">
+               <div class="swiper-slide">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Project 1 Icon" class="project-icon">
+                     <h3>Project 1</h3>
+                     <p class="project-description">This is an exciting project showcasing innovative web development
+                        techniques and creative animations.</p>
+                  </div>
+               </div>
+               <div class="swiper-slide">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Project 2 Icon" class="project-icon">
+                     <h3>Project 2</h3>
+                     <p class="project-description">A dynamic application demonstrating modern JavaScript frameworks and
+                        responsive design principles.</p>
+                  </div>
+               </div>
+               <div class="swiper-slide">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-192x192.png" alt="Project 3 Icon" class="project-icon">
+                     <h3>Project 3</h3>
+                     <p class="project-description">An interactive experience combining beautiful UI with powerful
+                        functionality for users.</p>
+                  </div>
+               </div>
+               <div class="swiper-slide">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Project 4 Icon" class="project-icon">
+                     <h3>Project 4</h3>
+                     <p class="project-description">A creative solution that brings together design aesthetics and
+                        technical excellence.</p>
+                  </div>
+               </div>
+            </div>
+            <!-- Optional Pagination -->
+            <div class="swiper-pagination"></div>
+            <!-- Optional Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+         </div>
+         <div class="ground"></div>
+         <!-- Load external JavaScript -->
+         <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+         <script>
+            // Register the service worker
+            if ('serviceWorker' in navigator) {
+               window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js')
+                     .then(registration => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                     })
+                     .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                     });
+               });
             }
-         }
 
-         window.addEventListener('online', updateOnlineStatus);
-         window.addEventListener('offline', updateOnlineStatus);
+            // Offline/Online detection
+            const offlineBanner = document.getElementById('offlineBanner');
 
-         // Check initial status
-         updateOnlineStatus();
-
-         // Listen for messages from Service Worker
-         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', (event) => {
-               if (event.data && event.data.type === 'OFFLINE') {
+            function updateOnlineStatus() {
+               if (!navigator.onLine) {
                   offlineBanner.classList.add('show');
                   document.body.classList.add('offline-mode');
+               } else {
+                  offlineBanner.classList.remove('show');
+                  document.body.classList.remove('offline-mode');
+               }
+            }
+
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+
+            // Check initial status
+            updateOnlineStatus();
+
+            // Listen for messages from Service Worker
+            if ('serviceWorker' in navigator) {
+               navigator.serviceWorker.addEventListener('message', (event) => {
+                  if (event.data && event.data.type === 'OFFLINE') {
+                     offlineBanner.classList.add('show');
+                     document.body.classList.add('offline-mode');
+                  }
+               });
+            }
+
+            // Initialize Swiper
+            const swiper = new Swiper('.swiper', {
+               loop: true,
+               // Default setting (Mobile first)
+               slidesPerView: 1,
+               spaceBetween: 10,
+
+               // Responsive breakpoints
+               breakpoints: {
+                  640: {
+                     slidesPerView: 2,
+                     spaceBetween: 20,
+                  },
+                  1024: {
+                     slidesPerView: 3,
+                     spaceBetween: 30,
+                  },
+               },
+
+               // Navigation
+               navigation: {
+                  nextEl: '.swiper-button-next',
+                  prevEl: '.swiper-button-prev',
+               },
+
+               // Pagination
+               pagination: {
+                  el: '.swiper-pagination',
+                  clickable: true,
+               },
+            });
+
+            // Dark Mode Toggle Functionality
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const html = document.documentElement;
+            const sunIcon = document.querySelector('.sun-icon');
+            const moonIcon = document.querySelector('.moon-icon');
+
+            // Check for saved dark mode preference or default to light mode
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            html.classList.remove('light', 'dark');
+            html.classList.add(currentTheme);
+            updateIcons(currentTheme);
+
+            // Toggle dark mode
+            darkModeToggle.addEventListener('click', function () {
+               if (html.classList.contains('dark')) {
+                  html.classList.remove('dark');
+                  html.classList.add('light');
+                  localStorage.setItem('theme', 'light');
+                  updateIcons('light');
+               } else {
+                  html.classList.remove('light');
+                  html.classList.add('dark');
+                  localStorage.setItem('theme', 'dark');
+                  updateIcons('dark');
                }
             });
-         }
 
-         // Initialize Swiper
-         const swiper = new Swiper('.swiper', {
-            loop: true,
-            // Default setting (Mobile first)
-            slidesPerView: 1,
-            spaceBetween: 10,
-
-            // Responsive breakpoints
-            breakpoints: {
-               640: {
-                  slidesPerView: 2,
-                  spaceBetween: 20,
-               },
-               1024: {
-                  slidesPerView: 3,
-                  spaceBetween: 30,
-               },
-            },
-
-            // Navigation
-            navigation: {
-               nextEl: '.swiper-button-next',
-               prevEl: '.swiper-button-prev',
-            },
-
-            // Pagination
-            pagination: {
-               el: '.swiper-pagination',
-               clickable: true,
-            },
-         });
-
-         // Dark Mode Toggle Functionality
-         const darkModeToggle = document.getElementById('darkModeToggle');
-         const html = document.documentElement;
-         const sunIcon = document.querySelector('.sun-icon');
-         const moonIcon = document.querySelector('.moon-icon');
-
-         // Check for saved dark mode preference or default to light mode
-         const currentTheme = localStorage.getItem('theme') || 'light';
-         html.classList.remove('light', 'dark');
-         html.classList.add(currentTheme);
-         updateIcons(currentTheme);
-
-         // Toggle dark mode
-         darkModeToggle.addEventListener('click', function() {
-            if (html.classList.contains('dark')) {
-               html.classList.remove('dark');
-               html.classList.add('light');
-               localStorage.setItem('theme', 'light');
-               updateIcons('light');
-            } else {
-               html.classList.remove('light');
-               html.classList.add('dark');
-               localStorage.setItem('theme', 'dark');
-               updateIcons('dark');
+            function updateIcons(theme) {
+               if (theme === 'dark') {
+                  sunIcon.style.display = 'none';
+                  moonIcon.style.display = 'inline';
+               } else {
+                  sunIcon.style.display = 'inline';
+                  moonIcon.style.display = 'none';
+               }
             }
-         });
-
-         function updateIcons(theme) {
-            if (theme === 'dark') {
-               sunIcon.style.display = 'none';
-               moonIcon.style.display = 'inline';
-            } else {
-               sunIcon.style.display = 'inline';
-               moonIcon.style.display = 'none';
-            }
-         }
-      </script>
-      <script src="scripts.js"></script>
-</body>
+         </script>
+         <script src="scripts.js"></script>
+   </body>
 
 </html>

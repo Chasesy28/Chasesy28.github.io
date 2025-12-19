@@ -158,40 +158,40 @@ function clearConversationHistory() {
     currentRestaurantContext = null;
 }
 
-// DOM Elements
-const sortSelect = document.getElementById('sortSelect');
-const searchButton = document.getElementById('searchButton');
-const cityInput = document.getElementById('city');
-const stateInput = document.getElementById('state');
-const countryInput = document.getElementById('country');
-const cuisineInput = document.getElementById('cuisine');
-const isOpenNowCheckbox = document.getElementById('isOpenNow');
-const resultsList = document.getElementById('resultsList');
-const messageOutput = document.getElementById('message');
-const loadingSpinner = document.getElementById('loading');
-const getLocationButton = document.getElementById('getLocationButton');
-const inputs = [countryInput, stateInput, cityInput, cuisineInput];
+// DOM Elements (declared here; assigned on DOMContentLoaded)
+let sortSelect;
+let searchButton;
+let cityInput;
+let stateInput;
+let countryInput;
+let cuisineInput;
+let isOpenNowCheckbox;
+let resultsList;
+let messageOutput;
+let loadingSpinner;
+let getLocationButton;
+let inputs;
 
-const messageModal = document.getElementById('messageModal');
-const closeMessageModalButton = document.getElementById('closeMessageModal');
-const modalMessage = document.getElementById('modalMessage');
-const modalTitle = document.getElementById('modalTitle');
+let messageModal;
+let closeMessageModalButton;
+let modalMessage;
+let modalTitle;
 
-const restaurantModal = document.getElementById('restaurantModal');
-const closeRestaurantModalButton = document.getElementById('closeRestaurantModal');
-const modalName = document.getElementById('modalName');
-const modalCuisine = document.getElementById('modalCuisine');
-const modalAddress = document.getElementById('modalAddress');
-const modalHours = document.getElementById('modalHours');
-const modalMap = document.getElementById('modalMap');
-const modalMapMessage = document.getElementById('modalMapMessage');
+let restaurantModal;
+let closeRestaurantModalButton;
+let modalName;
+let modalCuisine;
+let modalAddress;
+let modalHours;
+let modalMap;
+let modalMapMessage;
 
 // New DOM Elements
-const listViewBtn = document.getElementById('listViewBtn');
-const mapViewBtn = document.getElementById('mapViewBtn');
-const favoritesViewBtn = document.getElementById('favoritesViewBtn');
-const mapView = document.getElementById('mapView');
-const hideUnnamedCheckbox = document.getElementById('hideUnnamed');
+let listViewBtn;
+let mapViewBtn;
+let favoritesViewBtn;
+let mapView;
+let hideUnnamedCheckbox;
 
 
 /**
@@ -238,6 +238,40 @@ function setPageLoading(isLoading) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Assign DOM elements now that DOM is ready
+    sortSelect = document.getElementById('sortSelect');
+    searchButton = document.getElementById('searchButton');
+    cityInput = document.getElementById('city');
+    stateInput = document.getElementById('state');
+    countryInput = document.getElementById('country');
+    cuisineInput = document.getElementById('cuisine');
+    isOpenNowCheckbox = document.getElementById('isOpenNow');
+    resultsList = document.getElementById('resultsList');
+    messageOutput = document.getElementById('message');
+    loadingSpinner = document.getElementById('loading');
+    getLocationButton = document.getElementById('getLocationButton');
+    inputs = [countryInput, stateInput, cityInput, cuisineInput];
+
+    messageModal = document.getElementById('messageModal');
+    closeMessageModalButton = document.getElementById('closeMessageModal');
+    modalMessage = document.getElementById('modalMessage');
+    modalTitle = document.getElementById('modalTitle');
+
+    restaurantModal = document.getElementById('restaurantModal');
+    closeRestaurantModalButton = document.getElementById('closeRestaurantModal');
+    modalName = document.getElementById('modalName');
+    modalCuisine = document.getElementById('modalCuisine');
+    modalAddress = document.getElementById('modalAddress');
+    modalHours = document.getElementById('modalHours');
+    modalMap = document.getElementById('modalMap');
+    modalMapMessage = document.getElementById('modalMapMessage');
+
+    listViewBtn = document.getElementById('listViewBtn');
+    mapViewBtn = document.getElementById('mapViewBtn');
+    favoritesViewBtn = document.getElementById('favoritesViewBtn');
+    mapView = document.getElementById('mapView');
+    hideUnnamedCheckbox = document.getElementById('hideUnnamed');
 
     // --- Geolocation Logic ---
     getLocationButton.addEventListener('click', getCurrentLocation);
@@ -1097,9 +1131,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Gets the Overpass Area ID from Nominatim.
-     * @param {string} country 
-     * @param {string} state 
-     * @param {string} city 
+     * @param {string} country
+     * @param {string} state
+     * @param {string} city
      * @returns {Promise<string>} Area ID
      */
     async function getAreaId(country, state, city) {
@@ -1172,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', () => {
                              <strong>Address:</strong> ${data.address}
                          </p>
                          <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                             <strong>Hours:</strong> 
+                             <strong>Hours:</strong>
                              <span class="text-xs truncate block whitespace-nowrap overflow-hidden">
                                  ${data.openingHours || 'Not specified'}
                              </span>
@@ -1252,8 +1286,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Sorts the results based on the selected value.
-     * @param {Array<object>} results 
-     * @param {string} sortBy 
+     * @param {Array<object>} results
+     * @param {string} sortBy
      * @returns {Array<object>} Sorted results
      */
     function sortResults(results, sortBy) {

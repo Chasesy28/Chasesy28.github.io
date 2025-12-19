@@ -1,0 +1,25 @@
+{
+  "name": "chasesy28.github.io",
+  "version": "1.0.0",
+  "description": "This project is a basic testing site i use to mess around and test features. 🦄",
+  "main": "Finder.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chasesy28/Chasesy28.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Chasesy28/Chasesy28.github.io/issues"
+  },
+  "homepage": "https://github.com/Chasesy28/Chasesy28.github.io#readme",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "playwright": "^1.57.0"
+  }
+}
