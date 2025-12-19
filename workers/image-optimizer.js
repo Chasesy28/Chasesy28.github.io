@@ -59,7 +59,9 @@ export default {
       
       // Apply image transformations using Cloudflare's image resizing
       // Note: This requires Cloudflare Image Resizing to be enabled on your account
-      const optimizedResponse = await fetch(request.url, {
+      // The transformed image is fetched from the origin, not the worker URL
+      const imageUrl = new URL(request.url);
+      const optimizedResponse = await fetch(imageUrl.toString(), {
         cf: {
           image: options,
         },
