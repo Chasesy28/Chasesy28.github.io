@@ -37,8 +37,8 @@ h1 {
     color: #ffeaa5;
     font-weight: normal;
     /* Sizing, spacing, and effects from the first version */
-    font-size: 3em;
-    margin-top: 2em;
+    font-size: 3em ! important ;
+    margin-top: 2em ! important;
     text-shadow: 2px 2px 4px rgba(149, 57, 0, 0.3);
     /* Ensures the title stays on top of the rain */
     position: relative;
@@ -51,8 +51,8 @@ h2 {
     color: #ffe48a;
     font-weight: normal;
     /* Sizing, spacing, and effects from the first version */
-    font-size: 2em;
-    margin-top: 1em;
+    font-size: 2em ! important;
+    margin-top: 1em ! important;
     text-shadow: 1px 1px 3px rgba(149, 57, 0, 0.3);
     /* Shadow matches your color scheme */
     /* Ensures the title stays on top of the rain */
@@ -89,7 +89,7 @@ header {
 
 /* Style the site title in the header */
 .site-title {
-    font-size: 2rem;
+    font-size: 2rem ! important;
     /* Make it big */
 }
 
