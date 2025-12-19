@@ -4,8 +4,8 @@
     "start_url": "/index.html",
     "description": "Silly website I made.",
     "display": "standalone",
-    "background_color": "#FFFF00",
-    "theme_color": "#FFFF00",
+    "background_color": "#fcba36",
+    "theme_color": "#fcba36",
     "icons": [
         {
             "src": "/icons/icon-192x192.png",
