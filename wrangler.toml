@@ -1,0 +1,32 @@
+name = "silly-site-worker"
+main = "workers/index.js"
+compatibility_date = "2024-12-19"
+
+# Account details (replace with your actual account ID)
+# account_id = "your-account-id-here"
+
+# Workers Site Configuration
+[site]
+bucket = "./"
+
+# Environment Variables
+[env.production]
+name = "silly-site-worker-prod"
+
+[env.staging]
+name = "silly-site-worker-staging"
+
+# Route Configuration (update with your domain)
+# [[route]]
+# pattern = "silly-site.me/*"
+# zone_name = "silly-site.me"
+
+# KV Namespace Bindings (for caching and storage)
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "your-kv-namespace-id"
+
+# R2 Bucket Bindings (for image storage)
+# [[r2_buckets]]
+# binding = "IMAGES"
+# bucket_name = "silly-site-images"

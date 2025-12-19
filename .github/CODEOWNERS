@@ -1,0 +1,9 @@
+# Default code owners for the repository
+# These owners will be requested for review when someone opens a pull request
+
+* @Chasesy28
+
+# Specific ownership for security and configuration files
+/SECURITY.md @Chasesy28
+/.github/ @Chasesy28
+/wrangler.toml @Chasesy28
