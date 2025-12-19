@@ -11,6 +11,105 @@ Something silly
 ![Funny image](https://upload.wikimedia.org/wikipedia/en/7/73/Trollface.png)
 
 
+## ☁️ Cloudflare Integration
+
+This site is optimized for Cloudflare with support for Workers, image optimization, and enhanced security.
+
+### Setting Up Cloudflare Nameservers
+
+1. **Add your domain to Cloudflare:**
+   - Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
+   - Click "Add a Site"
+   - Enter your domain name (e.g., `silly-site.me`)
+   - Choose a plan (Free plan works great!)
+
+2. **Update nameservers:**
+   - Cloudflare will provide you with 2 nameservers (e.g., `ns1.cloudflare.com` and `ns2.cloudflare.com`)
+   - Go to your domain registrar (where you bought your domain)
+   - Replace the existing nameservers with Cloudflare's nameservers
+   - Wait for DNS propagation (can take up to 24 hours)
+
+3. **Configure DNS records:**
+   ```
+   Type: CNAME
+   Name: @
+   Target: chasesy28.github.io
+   Proxy status: Proxied (orange cloud)
+   ```
+
+### Deploying Cloudflare Workers
+
+Workers provide serverless computing at the edge for enhanced performance and security.
+
+1. **Install Wrangler CLI:**
+   ```bash
+   npm install -g wrangler
+   ```
+
+2. **Login to Cloudflare:**
+   ```bash
+   wrangler login
+   ```
+
+3. **Update `wrangler.toml`:**
+   - Add your Cloudflare account ID
+   - Configure your domain routes
+   - Set up KV namespaces if needed
+
+4. **Deploy the main worker:**
+   ```bash
+   wrangler deploy
+   ```
+
+5. **Deploy the image optimizer:**
+   ```bash
+   wrangler deploy workers/image-optimizer.js --name silly-site-image-optimizer
+   ```
+
+### Image Optimization
+
+The image optimizer worker provides:
+- Automatic format conversion (WebP, AVIF)
+- Dynamic resizing with query parameters
+- Quality optimization
+- Aggressive caching for faster load times
+
+**Usage examples:**
+```
+Original: https://your-domain.com/images/photo.jpg
+Optimized: https://your-domain.com/images/photo.jpg?width=800&quality=85
+Auto format: https://your-domain.com/images/photo.jpg?format=auto
+```
+
+### Security Features
+
+Cloudflare Workers add security headers automatically:
+- Content Security Policy (CSP)
+- X-Frame-Options (clickjacking protection)
+- X-Content-Type-Options (MIME sniffing protection)
+- XSS Protection
+- Referrer Policy
+
+### Performance Optimization
+
+- Static assets cached at the edge
+- Smart caching based on content type (HTML: 1h, CSS/JS: 24h, Images: 7d)
+- Compression (Brotli/Gzip) automatically applied
+- HTTP/3 and QUIC support
+
+### Local Development with Workers
+
+```bash
+# Run worker locally
+wrangler dev
+
+# Test with curl
+curl http://localhost:8787 -I
+```
+
+For more details, see the [workers/README.md](./workers/README.md) file.
+
+
 ## 🎨 Reminders for dev
 
 - **Fonts:** Add your favorite from **Google fonts**.  
