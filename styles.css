@@ -1,13 +1,12 @@
 /* ---- Page Setup ---- */
 body {
-    /* Your background color and font choice */
     background-color: #fcba36;
     font-family: "Source Sans Pro", sans-serif;
-    /* General layout properties */
     text-align: center;
     margin: 0;
-    overflow: hidden;
-    /* Prevents scrollbars from appearing */
+    overflow-y: auto; /* Might fix this */
+    /* Changed from hidden */
+    text-rendering: auto;
 }
 
 /* --- OFFLINE BANNER STYLES --- */
