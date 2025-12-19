@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="light">
 
 <head>
    <meta charset="utf-8">
@@ -9,6 +9,13 @@
    <meta name="apple-mobile-web-app-status-bar-style" content="default">
    <!--title-->
    <title>Silly Site!</title>
+   <!-- Tailwind CSS -->
+   <script src="https://cdn.tailwindcss.com"></script>
+   <script>
+      tailwind.config = {
+         darkMode: 'class',
+      }
+   </script>
    <!-- Load external CSS styles -->
    <link rel="stylesheet" href="styles.css">
    <!-- Load Swiperjs-->
@@ -42,6 +49,12 @@
                <li><a href="/test">Test Site</a></li>
                <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
                      rel="noopener noreferrer">GitHub</a></li>
+               <li>
+                  <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                     <span class="sun-icon">☀️</span>
+                     <span class="moon-icon" style="display: none;">🌙</span>
+                  </button>
+               </li>
             </ul>
          </nav>
       </header>
@@ -181,6 +194,43 @@
                clickable: true,
             },
          });
+
+         // Dark Mode Toggle Functionality
+         const darkModeToggle = document.getElementById('darkModeToggle');
+         const html = document.documentElement;
+         const sunIcon = document.querySelector('.sun-icon');
+         const moonIcon = document.querySelector('.moon-icon');
+
+         // Check for saved dark mode preference or default to light mode
+         const currentTheme = localStorage.getItem('theme') || 'light';
+         html.classList.remove('light', 'dark');
+         html.classList.add(currentTheme);
+         updateIcons(currentTheme);
+
+         // Toggle dark mode
+         darkModeToggle.addEventListener('click', function() {
+            if (html.classList.contains('dark')) {
+               html.classList.remove('dark');
+               html.classList.add('light');
+               localStorage.setItem('theme', 'light');
+               updateIcons('light');
+            } else {
+               html.classList.remove('light');
+               html.classList.add('dark');
+               localStorage.setItem('theme', 'dark');
+               updateIcons('dark');
+            }
+         });
+
+         function updateIcons(theme) {
+            if (theme === 'dark') {
+               sunIcon.style.display = 'none';
+               moonIcon.style.display = 'inline';
+            } else {
+               sunIcon.style.display = 'inline';
+               moonIcon.style.display = 'none';
+            }
+         }
       </script>
       <script src="scripts.js"></script>
 </body>
