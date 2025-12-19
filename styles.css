@@ -4,8 +4,7 @@ body {
     font-family: "Source Sans Pro", sans-serif;
     text-align: center;
     margin: 0;
-    overflow-y: auto; /* Might fix this */
-    /* Changed from hidden */
+    overflow-y: auto;
     text-rendering: auto;
 }
 
@@ -41,7 +40,6 @@ h1 {
     font-size: 3em;
     margin-top: 2em;
     text-shadow: 2px 2px 4px rgba(149, 57, 0, 0.3);
-    /* Shadow matches your color scheme */
     /* Ensures the title stays on top of the rain */
     position: relative;
     z-index: 1;
@@ -484,5 +482,5 @@ header,
 h1,
 h2,
 nav a {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.4s ease;
 }
