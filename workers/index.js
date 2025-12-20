@@ -1,7 +1,7 @@
 import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
 const SECURITY_HEADERS = {
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';",
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://nominatim.openstreetmap.org https://overpass-api.de https://tile.openstreetmap.org; worker-src 'self';",
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',
   'X-XSS-Protection': '1; mode=block',
@@ -10,12 +10,12 @@ const SECURITY_HEADERS = {
 };
 
 const CACHE_TIMES = {
-  // Increase HTML cache to 7 days to test stronger caching at edge
-  html: 604800,
-  css: 86400,
-  js: 86400,
-  images: 604800,
-  fonts: 2592000,
+  // Reduce HTML cache time to allow more frequent updates through service worker
+  html: 3600, // 1 hour
+  css: 86400, // 1 day
+  js: 86400, // 1 day
+  images: 604800, // 7 days
+  fonts: 2592000, // 30 days
 };
 
 function getCacheTime(contentType, pathname) {
@@ -29,13 +29,33 @@ function getCacheTime(contentType, pathname) {
 export default {
   async fetch(request, env, ctx) {
     try {
+      const url = new URL(request.url);
+      
+      // Special handling for service worker file - always serve fresh with proper MIME type
+      if (url.pathname === '/sw.js') {
+        const options = {};
+        const assetResponse = await getAssetFromKV({ request }, options);
+        const resp = new Response(assetResponse.body, assetResponse);
+        
+        // Set proper headers for service worker
+        resp.headers.set('Content-Type', 'application/javascript');
+        resp.headers.set('Service-Worker-Allowed', '/');
+        resp.headers.set('Cache-Control', 'public, max-age=0, must-revalidate'); // Always check for updates
+        
+        // Add security headers but with worker-src support
+        Object.entries(SECURITY_HEADERS).forEach(([k, v]) => resp.headers.set(k, v));
+        resp.headers.set('X-Worker', 'silly-site-worker');
+        
+        return resp;
+      }
+
       // Use kv-asset-handler to serve the uploaded Workers Sites assets.
       const options = {
         mapRequestToAsset: (req) => {
-          const url = new URL(req.url);
+          const reqUrl = new URL(req.url);
           // Serve index.html for directory or SPA-style routes
-          if (url.pathname.endsWith('/') || !url.pathname.includes('.')) {
-            return new Request(`${url.origin}/index.html`, req);
+          if (reqUrl.pathname.endsWith('/') || !reqUrl.pathname.includes('.')) {
+            return new Request(`${reqUrl.origin}/index.html`, req);
           }
           return req;
         },
@@ -51,7 +71,7 @@ export default {
       resp.headers.set('X-Worker', 'silly-site-worker');
 
       const contentType = (resp.headers.get('Content-Type') || '').toLowerCase();
-      const cacheTime = getCacheTime(contentType, new URL(request.url).pathname);
+      const cacheTime = getCacheTime(contentType, url.pathname);
       resp.headers.set('Cache-Control', `public, max-age=${cacheTime}`);
 
       return resp;
