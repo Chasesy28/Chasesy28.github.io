@@ -93,11 +93,16 @@ self.addEventListener('fetch', (event) => {
           cache.put(event.request, copy).catch(() => { });
           return networkResp;
         } catch (err) {
-          // Network failed — try to return cached index or root
-          const cached = await caches.match(event.request) || 
-                         await caches.match('/index.html') || 
-                         await caches.match('/');
+          // Network failed — try to return cached content
+          const cached = await caches.match(event.request);
           if (cached) return cached;
+          
+          const cachedIndex = await caches.match('/index.html');
+          if (cachedIndex) return cachedIndex;
+          
+          const cachedRoot = await caches.match('/');
+          if (cachedRoot) return cachedRoot;
+          
           return new Response('<h1>Offline</h1><p>The application is offline.</p>', { status: 503, headers: { 'Content-Type': 'text/html' } });
         }
       }
@@ -124,6 +129,11 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       } catch (networkErr) {
         // Network failed or timed out - try cache
+        // Check if it was a timeout or other network error
+        if (networkErr.name === 'AbortError') {
+          console.log('[Service Worker] Network request timed out, using cache');
+        }
+        
         const cachedResp = await caches.match(event.request);
         if (cachedResp) {
           return cachedResp;

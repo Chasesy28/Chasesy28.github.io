@@ -40,7 +40,7 @@ export default {
         // Set proper headers for service worker
         resp.headers.set('Content-Type', 'application/javascript');
         resp.headers.set('Service-Worker-Allowed', '/');
-        resp.headers.set('Cache-Control', 'public, max-age=0, must-revalidate'); // Always check for updates
+        resp.headers.set('Cache-Control', 'no-cache'); // Always validate with server for updates
         
         // Add security headers but with worker-src support
         Object.entries(SECURITY_HEADERS).forEach(([k, v]) => resp.headers.set(k, v));
