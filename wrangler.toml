@@ -8,6 +8,22 @@ account_id = "d82a8a8eb7c815f16d6fcb5a58f12fd3"
 # Workers Site Configuration
 [site]
 bucket = "./"
+# Exclude files that shouldn't be uploaded to Cloudflare Workers
+exclude = [
+  ".git/**",
+  ".github/**",
+  "node_modules/**",
+  "workers/**",
+  "tools/**",
+  ".vscode/**",
+  "README.md",
+  "SECURITY.md",
+  "LICENSE",
+  "package.json",
+  "package-lock.json",
+  "wrangler.toml",
+  ".gitignore"
+]
 
 # Environment Variables
 [env.production]

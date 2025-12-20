@@ -58,3 +58,8 @@ temp/
 # Logs
 logs/
 *.log
+
+# Test artifacts
+playwright-screenshot.png
+.playwright/
+test-results/
