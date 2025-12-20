@@ -1,14 +1,5 @@
-/**
- * Cloudflare Worker for Silly Site
- * 
- * This worker provides:
- * - Security headers
- * - Image optimization
- * - Caching strategies
- * - Request routing
- */
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 
-// Security headers configuration
 const SECURITY_HEADERS = {
   'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';",
   'X-Content-Type-Options': 'nosniff',
@@ -18,57 +9,63 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
-// Cache configuration
 const CACHE_TIMES = {
-  html: 3600,      // 1 hour
-  css: 86400,      // 24 hours
-  js: 86400,       // 24 hours
-  images: 604800,  // 7 days
-  fonts: 2592000,  // 30 days
+  // Increase HTML cache to 7 days to test stronger caching at edge
+  html: 604800,
+  css: 86400,
+  js: 86400,
+  images: 604800,
+  fonts: 2592000,
 };
 
-async function handleRequest(request) {
-  const url = new URL(request.url);
-  
-  // Fetch the original response
-  let response = await fetch(request);
-  
-  // Create a new response with modified headers
-  response = new Response(response.body, response);
-  
-  // Add security headers
-  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-    response.headers.set(key, value);
-  });
-  
-  // Set cache headers based on content type
-  const contentType = response.headers.get('Content-Type') || '';
-  let cacheTime = CACHE_TIMES.html;
-  
-  if (contentType.includes('text/css')) {
-    cacheTime = CACHE_TIMES.css;
-  } else if (contentType.includes('javascript')) {
-    cacheTime = CACHE_TIMES.js;
-  } else if (contentType.includes('image/')) {
-    cacheTime = CACHE_TIMES.images;
-  } else if (contentType.includes('font/') || url.pathname.match(/\.(woff2?|ttf|otf)$/)) {
-    cacheTime = CACHE_TIMES.fonts;
-  }
-  
-  response.headers.set('Cache-Control', `public, max-age=${cacheTime}`);
-  
-  return response;
+function getCacheTime(contentType, pathname) {
+  if (contentType.includes('text/css')) return CACHE_TIMES.css;
+  if (contentType.includes('javascript')) return CACHE_TIMES.js;
+  if (contentType.includes('image/')) return CACHE_TIMES.images;
+  if (contentType.includes('font/') || pathname.match(/\.(woff2?|ttf|otf)$/)) return CACHE_TIMES.fonts;
+  return CACHE_TIMES.html;
 }
 
 export default {
   async fetch(request, env, ctx) {
     try {
-      return await handleRequest(request);
-    } catch (error) {
-      return new Response(`Error: ${error.message}`, {
-        status: 500,
-        headers: { 'Content-Type': 'text/plain' },
-      });
+      // Use kv-asset-handler to serve the uploaded Workers Sites assets.
+      const options = {
+        mapRequestToAsset: (req) => {
+          const url = new URL(req.url);
+          // Serve index.html for directory or SPA-style routes
+          if (url.pathname.endsWith('/') || !url.pathname.includes('.')) {
+            return new Request(`${url.origin}/index.html`, req);
+          }
+          return req;
+        },
+      };
+
+      const assetResponse = await getAssetFromKV({ request }, options);
+
+      // Clone and add security + cache headers and a worker indicator header
+      const resp = new Response(assetResponse.body, assetResponse);
+      Object.entries(SECURITY_HEADERS).forEach(([k, v]) => resp.headers.set(k, v));
+
+      // Add a header to confirm this Worker handled the request
+      resp.headers.set('X-Worker', 'silly-site-worker');
+
+      const contentType = (resp.headers.get('Content-Type') || '').toLowerCase();
+      const cacheTime = getCacheTime(contentType, new URL(request.url).pathname);
+      resp.headers.set('Cache-Control', `public, max-age=${cacheTime}`);
+
+      return resp;
+    } catch (err) {
+      // Fallback: return a friendly 404 or the index.html for SPA
+      try {
+        const fallback = await getAssetFromKV({ request: new Request(new URL(request.url).origin + '/index.html') });
+        const fr = new Response(fallback.body, fallback);
+        Object.entries(SECURITY_HEADERS).forEach(([k, v]) => fr.headers.set(k, v));
+        fr.headers.set('Cache-Control', `public, max-age=${CACHE_TIMES.html}`);
+        return fr;
+      } catch (e) {
+        return new Response('Not found', { status: 404 });
+      }
     }
   },
 };

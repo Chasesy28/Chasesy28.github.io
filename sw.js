@@ -68,46 +68,52 @@ self.addEventListener('activate', (event) => {
 // and if it can't, it requests it from the network.
 // ---
 self.addEventListener('fetch', (event) => {
-  // We only want to cache GET requests
+  // Only handle GET requests
   if (event.request.method !== 'GET') {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // 1. If we find it in the cache, return the cached response
-        if (response) {
-          console.log(`[Service Worker] Returning from cache: ${event.request.url}`);
-          return response;
+  // Use an async function to make control flow clearer and ensure a Response is always returned
+  event.respondWith((async () => {
+    try {
+      // For navigation requests (page loads), prefer network but fall back to cached index
+      if (event.request.mode === 'navigate') {
+        try {
+          const networkResp = await fetch(event.request);
+          // Update the cache with the latest index (or navigation response)
+          const copy = networkResp.clone();
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(event.request, copy).catch(() => { });
+          return networkResp;
+        } catch (err) {
+          // Network failed — try to return cached index or root
+          const cached = await caches.match('/index.html') || await caches.match('/');
+          if (cached) return cached;
+          return new Response('<h1>Offline</h1><p>The application is offline.</p>', { status: 503, headers: { 'Content-Type': 'text/html' } });
         }
+      }
 
-        // 2. If not in cache, fetch it from the network
-        console.log(`[Service Worker] Fetching from network: ${event.request.url}`);
-        return fetch(event.request)
-          .then((networkResponse) => {
-            // 2a. OPTIONAL: Cache the new response for next time
-            // We need to clone the response because it's a "stream" and can only be used once
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-                console.log(`[Service Worker] Caching new resource: ${event.request.url}`);
-              });
+      // For other GET requests: try cache first, then network, and always return a Response
+      const cachedResp = await caches.match(event.request);
+      if (cachedResp) {
+        return cachedResp;
+      }
 
-            // 2b. Return the response from the network
-            return networkResponse;
-          })
-          .catch((error) => {
-            // 3. If the network fails (e.g., offline)
-            console.log('[Service Worker] Fetch failed: Internet Failed to connect:', error);
-            // Notify clients about offline status
-            self.clients.matchAll().then(clients => {
-              clients.forEach(client => {
-                client.postMessage({ type: 'OFFLINE', url: event.request.url });
-              });
-            });
-          });
-      })
-  );
+      const networkResponse = await fetch(event.request);
+      // Cache the successful network response for future
+      try {
+        const responseToCache = networkResponse.clone();
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(event.request, responseToCache).catch(() => { });
+      } catch (e) {
+        // ignore cache failures
+      }
+      return networkResponse;
+
+    } catch (finalErr) {
+      // As a last resort, return a generic offline response
+      console.error('[Service Worker] Final fetch error:', finalErr);
+      return new Response('Service Unavailable', { status: 503 });
+    }
+  })());
 });

@@ -17,7 +17,8 @@ name = "silly-site-worker-prod"
 name = "silly-site-worker-staging"
 
 # Route Configuration for your domain (use array of inline tables)
-routes = [ { pattern = "silly-site.me/*", zone_name = "silly-site.me" }, { pattern = "www.silly-site.me/*", zone_name = "silly-site.me" } ]
+# Bind Worker to your domains so it serves the uploaded site assets and applies headers/caching.
+routes = [ { pattern = "silly-site.me/*", zone_id = "73fbb56d9b1a45c74519f9abec41fd84" }, { pattern = "www.silly-site.me/*", zone_id = "73fbb56d9b1a45c74519f9abec41fd84" } ]
 
 # KV Namespace Bindings (for caching and storage)
 # [[kv_namespaces]]
