@@ -23,6 +23,6 @@
     "playwright": "^1.57.0"
   },
   "dependencies": {
-    "@cloudflare/kv-asset-handler": "^0.1.3"
+    "@cloudflare/kv-asset-handler": "^0.4.1"
   }
 }
