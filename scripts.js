@@ -1,8 +1,15 @@
+/**
+ * Main script for rain animation and slide interactions
+ * Handles rain drop creation, collision detection with slides, and ground splashes
+ */
 document.addEventListener('DOMContentLoaded', function () {
     const rainContainer = document.querySelector('.rain');
-    const dropDensity = 15; // Moved here to be accessible by all functions
+    const dropDensity = 15; // Controls how many drops appear based on screen width
 
-    // Cache slide elements for better performance
+    /**
+     * Cached array of slide elements for better performance
+     * Updated periodically to account for dynamically added slides
+     */
     let cachedSlides = [];
     const updateSlideCache = () => {
         cachedSlides = Array.from(document.querySelectorAll('.swiper-slide'));
@@ -11,27 +18,42 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial cache - will update after swiper is ready
     setTimeout(updateSlideCache, 100);
 
-    // Shared cleanup tracking for drops
+    /**
+     * Map to track cleanup callbacks for each drop
+     * Used to properly clear intervals when drops are removed from DOM
+     */
     const dropCleanupCallbacks = new Map();
 
-    // --- Function to check if drop hits a slide ---
+    /**
+     * Checks if a raindrop collides with any visible slide
+     * Uses bounding box collision detection (AABB - Axis-Aligned Bounding Box)
+     * @param {HTMLElement} drop - The raindrop element to check for collision
+     * @returns {boolean} True if collision detected, false otherwise
+     */
     const checkSlideCollision = (drop) => {
         const dropRect = drop.getBoundingClientRect();
 
         for (let slide of cachedSlides) {
             const slideRect = slide.getBoundingClientRect();
 
-            // Check if drop overlaps with slide
+            /**
+             * AABB collision detection algorithm
+             * A collision occurs when all four conditions are true:
+             * 1. Drop's left edge is left of slide's right edge
+             * 2. Drop's right edge is right of slide's left edge
+             * 3. Drop's top edge is above slide's bottom edge
+             * 4. Drop's bottom edge is below slide's top edge
+             */
             if (dropRect.left < slideRect.right &&
                 dropRect.right > slideRect.left &&
                 dropRect.top < slideRect.bottom &&
                 dropRect.bottom > slideRect.top) {
 
-                // Create splash on slide
+                // Create splash effect on slide
                 const splash = document.createElement('div');
                 splash.classList.add('slide-splash');
 
-                // Position splash relative to slide
+                // Calculate splash position relative to slide's coordinate system
                 const relativeX = dropRect.left - slideRect.left;
                 const relativeY = dropRect.top - slideRect.top;
 
@@ -40,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 slide.appendChild(splash);
 
-                // Remove splash after animation
+                // Remove splash element after animation completes (400ms)
                 setTimeout(() => {
                     splash.remove();
                 }, 400);
@@ -51,53 +73,69 @@ document.addEventListener('DOMContentLoaded', function () {
         return false;
     };
 
-    // --- Function to create a single drop ---
+    /**
+     * Creates a single raindrop element with random properties
+     * Sets up collision detection and splash effects
+     */
     const createDrop = () => {
         const drop = document.createElement('div');
         drop.classList.add('drop');
 
-        // Random horizontal position, delay, and duration
-        drop.style.left = `${Math.random() * 100}vw`;
-        drop.style.animationDelay = `${Math.random() * 2}s`;
-        drop.style.animationDuration = `${0.8 + Math.random() * 0.6}s`;
+        // Randomize drop properties for natural rain appearance
+        drop.style.left = `${Math.random() * 100}vw`;           // Random horizontal position across screen
+        drop.style.animationDelay = `${Math.random() * 2}s`;    // Stagger start times (0-2 seconds)
+        drop.style.animationDuration = `${0.8 + Math.random() * 0.6}s`; // Vary fall speed (0.8-1.4 seconds)
 
-        // Check for collisions during animation with proper cleanup
+        /**
+         * Interval handle for collision checking
+         * Must be cleared when drop is removed to prevent memory leaks
+         */
         let checkInterval = null;
 
+        /**
+         * Starts periodic collision checking for this drop
+         * Uses throttling to limit checks to every 50ms for performance
+         */
         const startCollisionCheck = () => {
             let lastCheck = 0;
             checkInterval = setInterval(() => {
-                // Check if drop still exists in DOM
+                // Safety check: Stop if drop was removed from DOM
                 if (!drop.parentElement) {
                     clearInterval(checkInterval);
                     checkInterval = null;
                     return;
                 }
 
+                // Throttle collision checks to every 50ms for performance
                 const currentTime = Date.now();
-                if (currentTime - lastCheck > 50) { // Check every 50ms
+                if (currentTime - lastCheck > 50) {
                     lastCheck = currentTime;
                     checkSlideCollision(drop);
                 }
             }, 50);
         };
 
-        // Start initial collision checking
+        // Start collision detection for this drop
         startCollisionCheck();
 
-        // Event Listener for the Ground Splash
+        /**
+         * Handles ground splash effect when drop completes one animation cycle
+         * Called on each 'animationiteration' event (when drop hits ground and restarts)
+         */
         const handleAnimationIteration = () => {
-            // Create splash on ground
+            // Create ground splash element at drop's horizontal position
             const splash = document.createElement('div');
             splash.classList.add('splash');
             splash.style.left = drop.style.left;
             splash.style.bottom = '5px';
             rainContainer.appendChild(splash);
 
+            // Delay adding animation class to trigger CSS transition
             setTimeout(() => {
                 splash.classList.add('splash-animation');
             }, 10);
 
+            // Auto-remove splash when animation completes
             splash.addEventListener('animationend', () => {
                 splash.remove();
             }, { once: true });
@@ -105,7 +143,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         drop.addEventListener('animationiteration', handleAnimationIteration);
 
-        // Register cleanup callback for this drop
+        /**
+         * Register cleanup callback for this drop
+         * Ensures interval is cleared when drop is removed from DOM
+         * Prevents memory leaks from orphaned intervals
+         */
         dropCleanupCallbacks.set(drop, () => {
             if (checkInterval) {
                 clearInterval(checkInterval);
@@ -116,21 +158,24 @@ document.addEventListener('DOMContentLoaded', function () {
         rainContainer.appendChild(drop);
     };
 
-    // --- Function to handle resizing ---
+    /**
+     * Handles window resize by adjusting number of raindrops
+     * Maintains consistent drop density across different screen sizes
+     */
     const handleResize = () => {
         const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
         const currentDrops = rainContainer.querySelectorAll('.drop');
         const diff = newNumberOfDrops - currentDrops.length;
 
         if (diff > 0) {
-            // If the screen got bigger, add more drops
+            // Screen got bigger - add more drops to maintain density
             for (let i = 0; i < diff; i++) {
                 createDrop();
             }
         } else if (diff < 0) {
-            // If the screen got smaller, remove some drops
+            // Screen got smaller - remove excess drops
             for (let i = 0; i < Math.abs(diff); i++) {
-                // Remove the last drop to be less noticeable
+                // Remove from end to minimize visual disruption
                 if (currentDrops[currentDrops.length - 1 - i]) {
                     currentDrops[currentDrops.length - 1 - i].remove();
                 }
@@ -138,7 +183,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // --- Initial Setup ---
+    /**
+     * Initializes the rain animation by creating initial set of drops
+     * Number of drops is proportional to screen width
+     */
     const initRain = () => {
         const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
         for (let i = 0; i < initialNumberOfDrops; i++) {
@@ -146,16 +194,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // Start the rain animation
     initRain();
 
-    // Use the new resize handler
+    // Listen for window resize events to adjust drop count
     window.addEventListener('resize', handleResize);
 
-    // Shared MutationObserver for all raindrops
+    /**
+     * Shared MutationObserver to cleanup intervals when drops are removed
+     * Watches for node removal in rain container and calls cleanup callbacks
+     * This prevents memory leaks from orphaned setInterval calls
+     */
     const sharedObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             mutation.removedNodes.forEach((node) => {
                 if (dropCleanupCallbacks.has(node)) {
+                    // Call the cleanup function for this drop
                     dropCleanupCallbacks.get(node)();
                     dropCleanupCallbacks.delete(node);
                 }
@@ -163,8 +217,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Start observing the rain container for child node removals
     sharedObserver.observe(rainContainer, { childList: true });
-
 
 });
 

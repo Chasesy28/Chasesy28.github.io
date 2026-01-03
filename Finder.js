@@ -1,20 +1,50 @@
-// Global state
-let lastResults = [];
-let detailMap = null; // Holds the Leaflet map instance
-let overviewMap = null; // Holds the overview map for all results
-let currentView = 'list'; // 'list', 'map', or 'favorites'
-let favorites = []; // Array of favorite restaurant IDs
-let modalAbortController = null; // AbortController for modal event listeners
-const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
-const API_KEY_SESSION_KEY = 'copilot_api_key_session'; // Session-only storage for API key
-let conversationHistory = []; // Store conversation history for chat continuation
-let currentRestaurantContext = null; // Store current restaurant for conversation context
+/**
+ * RESTAURANT FINDER APPLICATION (Finder.js)
+ * 
+ * OpenStreetMap-based restaurant search with AI-powered recommendations
+ * 
+ * Features:
+ * - Search restaurants by location and cuisine type
+ * - View results in list or map format
+ * - Save favorites to localStorage
+ * - AI chat integration for restaurant recommendations
+ * - Opening hours parsing and validation
+ * - Offline support through service worker
+ * 
+ * Architecture:
+ * - Uses Nominatim API for geocoding
+ * - Uses Overpass API for restaurant data
+ * - Uses Leaflet.js for interactive maps
+ * - OpenAI-compatible API for AI chat features
+ */
 
-// --- AI Configuration ---
+// ========================================
+// GLOBAL STATE MANAGEMENT
+// ========================================
+
+let lastResults = [];                    // Cached search results for sorting/filtering
+let detailMap = null;                    // Leaflet map instance for restaurant modal
+let overviewMap = null;                  // Leaflet map instance for results overview
+let currentView = 'list';                // Current view mode: 'list', 'map', or 'favorites'
+let favorites = [];                      // Array of saved favorite restaurants
+let modalAbortController = null;         // AbortController for cleanup of modal event listeners
+const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
+const API_KEY_SESSION_KEY = 'copilot_api_key_session';  // Session-only storage for API key (security)
+let conversationHistory = [];            // Chat history for AI conversation continuity
+let currentRestaurantContext = null;     // Current restaurant context for AI chat
+
+// ========================================
+// AI CONFIGURATION
+// ========================================
+
+/**
+ * System message that defines AI assistant behavior
+ * Instructs AI to provide concise restaurant information
+ */
 const AI_SYSTEM_MESSAGE = `You are a helpful restaurant information assistant. You provide concise, helpful information about restaurants including reviews, recommendations, menu highlights, and general atmosphere. Keep responses brief but informative (2-3 paragraphs max). If you don't have specific information about a restaurant, provide general guidance based on the cuisine type.`;
 
 /**
- * Generates the initial query for a restaurant
+ * Generates the initial AI query for a restaurant
  * @param {object} data - Restaurant data {name, cuisine, address}
  * @returns {string} The formatted query string
  */
@@ -23,33 +53,55 @@ function buildInitialQuery(data) {
     return `Tell me about the restaurant "${data.name}" which serves ${cuisineDisplay} cuisine. Located at: ${data.address}. What's the vibe, what should I order, and any tips for visiting?`;
 }
 
-// --- Favorites Management ---
+// ========================================
+// FAVORITES MANAGEMENT
+// ========================================
+
+/**
+ * Loads saved favorites from localStorage
+ * Falls back to empty array if loading fails
+ */
 function loadFavorites() {
     try {
         const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
         if (stored) {
             favorites = JSON.parse(stored);
+            console.log('[Finder] Loaded', favorites.length, 'favorites from storage');
         }
     } catch (e) {
-        console.error('Error loading favorites:', e);
+        console.error('[Finder] Error loading favorites:', e);
         favorites = [];
     }
 }
 
+/**
+ * Saves favorites to localStorage and cookie backup
+ * Cookie backup provides redundancy with security flags
+ */
 function saveFavorites() {
     try {
         localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-        // Also save to cookie for backup with security flags
+        // Also save to cookie for backup with security flags (SameSite prevents CSRF)
         document.cookie = `${FAVORITES_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(favorites))};path=/;max-age=31536000;SameSite=Strict`;
+        console.log('[Finder] Saved', favorites.length, 'favorites to storage');
     } catch (e) {
-        console.error('Error saving favorites:', e);
+        console.error('[Finder] Error saving favorites:', e);
     }
 }
 
+/**
+ * Checks if a restaurant is in favorites
+ * @param {number} id - Restaurant OSM ID
+ * @returns {boolean} True if favorited
+ */
 function isFavorite(id) {
     return favorites.some(f => f.id === id);
 }
 
+/**
+ * Adds restaurant to favorites list
+ * @param {object} data - Restaurant data to save
+ */
 function addToFavorites(data) {
     if (!isFavorite(data.id)) {
         favorites.push({
@@ -62,14 +114,26 @@ function addToFavorites(data) {
             lon: data.lon
         });
         saveFavorites();
+        console.log('[Finder] Added to favorites:', data.name);
     }
 }
 
+/**
+ * Removes restaurant from favorites list
+ * @param {number} id - Restaurant OSM ID to remove
+ */
 function removeFromFavorites(id) {
+    const before = favorites.length;
     favorites = favorites.filter(f => f.id !== id);
     saveFavorites();
+    console.log('[Finder] Removed from favorites, count:', before, '->', favorites.length);
 }
 
+/**
+ * Toggles favorite status of a restaurant
+ * @param {object} data - Restaurant data
+ * @returns {boolean} True if now favorited, false if unfavorited
+ */
 function toggleFavorite(data) {
     if (isFavorite(data.id)) {
         removeFromFavorites(data.id);
@@ -80,69 +144,79 @@ function toggleFavorite(data) {
     }
 }
 
-// --- Directions ---
-function openDirections(lat, lon, name) {
-    // Try to detect platform and open appropriate maps app
-    const destination = encodeURIComponent(`${lat},${lon}`);
-    const destName = encodeURIComponent(name || 'Destination');
+// ========================================
+// DIRECTIONS
+// ========================================
 
+/**
+ * Opens Google Maps directions in new tab
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude  
+ * @param {string} name - Destination name
+ */
+function openDirections(lat, lon, name) {
     // Universal Google Maps URL that works on mobile and desktop
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&destination_place_id=&travelmode=driving`;
-
-    // Open in a new window/tab
+    console.log('[Finder] Opening directions to:', name);
     window.open(googleMapsUrl, '_blank');
 }
 
-// Load favorites on script load
+// Load favorites on script initialization
 loadFavorites();
 
-// --- API Key Management (Session-only for security) ---
+// ========================================
+// API KEY MANAGEMENT (Session-only for security)
+// ========================================
+
 /**
- * Gets the API key from session storage.
+ * Gets the API key from session storage
  * The key is only stored in session storage (cleared when browser closes)
- * and is never persisted to localStorage or cookies for security.
+ * and is never persisted to localStorage or cookies for security
  * @returns {string|null} The API key or null if not set
  */
 function getApiKey() {
     try {
         return sessionStorage.getItem(API_KEY_SESSION_KEY);
     } catch (e) {
-        console.error('Error accessing session storage:', e);
+        console.error('[Finder] Error accessing session storage:', e);
         return null;
     }
 }
 
 /**
- * Sets the API key in session storage only.
- * This ensures the key is cleared when the browser closes.
+ * Sets the API key in session storage only
+ * This ensures the key is cleared when the browser closes
  * @param {string} key - The API key to store
+ * @returns {boolean} True if successful
  */
 function setApiKey(key) {
     try {
         if (key && key.trim()) {
             sessionStorage.setItem(API_KEY_SESSION_KEY, key.trim());
+            console.log('[Finder] API key saved to session storage (will be cleared on browser close)');
             return true;
         }
         return false;
     } catch (e) {
-        console.error('Error storing API key:', e);
+        console.error('[Finder] Error storing API key:', e);
         return false;
     }
 }
 
 /**
- * Clears the API key from session storage.
+ * Clears the API key from session storage
  */
 function clearApiKey() {
     try {
         sessionStorage.removeItem(API_KEY_SESSION_KEY);
+        console.log('[Finder] API key cleared from session storage');
     } catch (e) {
-        console.error('Error clearing API key:', e);
+        console.error('[Finder] Error clearing API key:', e);
     }
 }
 
 /**
- * Checks if an API key is configured.
+ * Checks if an API key is configured
  * @returns {boolean}
  */
 function hasApiKey() {
@@ -151,11 +225,12 @@ function hasApiKey() {
 }
 
 /**
- * Clears conversation history for a new restaurant context.
+ * Clears conversation history for a new restaurant context
  */
 function clearConversationHistory() {
     conversationHistory = [];
     currentRestaurantContext = null;
+    console.log('[Finder] Conversation history cleared');
 }
 
 // DOM Elements (declared here; assigned on DOMContentLoaded)
