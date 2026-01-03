@@ -1441,11 +1441,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /**
          * DATE AND TIME SETUP
-         * Using hardcoded test date: Friday, Nov 14, 2025 at 12:04 PM PST
-         * This allows consistent testing of the parser logic
-         * In production, this would use: new Date()
+         * Use the current system date/time to determine open/closed status.
+         * For deterministic unit tests, this can be replaced with a fixed Date.
          */
-        const now = new Date('2025-11-14T12:04:00-08:00');
+        const now = new Date();
 
         // Day of week mapping (OSM format to JavaScript day index)
         const dayMap = {
