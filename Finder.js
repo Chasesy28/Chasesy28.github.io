@@ -1744,13 +1744,16 @@ document.addEventListener('DOMContentLoaded', () => {
                          * - End time is exclusive    (currentMinutes < endMinutes)
                          *
                          * This means that for "09:00-17:00":
-                         * - 09:00 is considered OPEN (start time is inclusive)
                          * - 14:00 is considered OPEN
-                         * - 17:00 is already CLOSED (end time is exclusive)
+                         * - 17:00 is already CLOSED
                          *
                          * Using an exclusive end time is consistent with common interval
-                         * handling and OSM opening_hours standards, avoids ambiguity
+                         * handling (and standards like OSM opening_hours), avoids ambiguity
                          * at exact boundary times, and keeps the logic simple.
+                         *
+                         * If product requirements ever change and 17:00 should be treated
+                         * as still open, this condition must be updated to use "<=" for
+                         * the end time (and any related boundary logic reviewed).
                          */
                         if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                             isOpen = true;

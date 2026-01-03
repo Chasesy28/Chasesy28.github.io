@@ -43,7 +43,7 @@ const SECURITY_HEADERS = {
  * Optimized balance between freshness and performance
  */
 const CACHE_TIMES = {
-  html: 3600,      // 1 hour - Reduced to allow more frequent updates through service worker
+  html: 600,       // 10 minutes - Reduced to allow more frequent updates through service worker
   css: 86400,      // 1 day - Styles change infrequently
   js: 86400,       // 1 day - Scripts change infrequently
   images: 604800,  // 7 days - Images rarely change
@@ -84,7 +84,7 @@ export default {
        * 3. Service-Worker-Allowed header for scope control
        */
       if (url.pathname === '/sw.js') {
-        console.log('[Worker] Serving service worker file');
+        console.log('[Worker] Attempting to serve service worker file');
         const options = {};
         const assetResponse = await getAssetFromKV({ request }, options);
         const resp = new Response(assetResponse.body, assetResponse);
@@ -98,7 +98,7 @@ export default {
         Object.entries(SECURITY_HEADERS).forEach(([k, v]) => resp.headers.set(k, v));
         resp.headers.set('X-Worker', 'silly-site-worker');
         
-        console.log('[Worker] Service worker served successfully');
+        console.log('[Worker] Service worker response prepared and ready to return');
         return resp;
       }
 
