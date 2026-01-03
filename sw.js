@@ -1,9 +1,15 @@
-// Service Worker
+/**
+ * Service Worker for Silly Site
+ * Implements network-first caching strategy with offline fallback
+ * Works in coordination with Cloudflare edge caching for optimal performance
+ */
 
 const CACHE_NAME = 'silly-site-cache-v3';
 
-// 1. file caching
-// (These are the "core" files for your app to work offline)
+/**
+ * Core application files to cache for offline functionality
+ * These files are essential for the app to work without network connection
+ */
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
@@ -18,136 +24,183 @@ const URLS_TO_CACHE = [
   '/scripts.js'
 ];
 
-// ---
-// EVENT: install
-// This runs when the service worker is first installed.
-// ---
+/**
+ * INSTALL EVENT
+ * Fired when service worker is first installed
+ * Caches all core files needed for offline functionality
+ */
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Install event');
+  console.log('[Service Worker] Install event triggered');
 
-  // Wait until the cache is opened and all core files are added
+  // Wait until cache population completes before finishing install
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[Service Worker] Caching core app shell');
+        console.log('[Service Worker] Caching core app shell files');
         return cache.addAll(URLS_TO_CACHE);
       })
       .then(() => {
-        self.skipWaiting(); // Force the new service worker to activate
+        console.log('[Service Worker] Core files cached successfully');
+        self.skipWaiting(); // Immediately activate new service worker without waiting for old one to finish
       })
       .catch((error) => {
-        console.error('[Service Worker] Cache addAll failed:', error);
+        console.error('[Service Worker] Failed to cache core files:', error);
       })
   );
 });
 
-// ---
-// EVENT: activate
-// This runs when the service worker becomes active.
-// It's a good place to clean up old caches.
-// ---
+/**
+ * ACTIVATE EVENT
+ * Fired when service worker becomes active
+ * Cleans up old cache versions and takes control of all clients
+ */
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activate event');
+  console.log('[Service Worker] Activate event triggered');
 
   event.waitUntil(
     caches.keys().then((cacheNames) => {
+      console.log('[Service Worker] Cleaning up old caches');
       return Promise.all(
         cacheNames
-          .filter((name) => name !== CACHE_NAME) // Find all caches that are NOT our new one
-          .map((name) => caches.delete(name))    // Delete them
+          .filter((name) => name !== CACHE_NAME) // Identify outdated cache versions
+          .map((name) => {
+            console.log('[Service Worker] Deleting old cache:', name);
+            return caches.delete(name);
+          })
       );
     }).then(() => {
-      // Claim all clients immediately
+      console.log('[Service Worker] Taking control of all clients');
+      // Immediately take control of all pages (don't wait for reload)
       return self.clients.claim();
     })
   );
 });
 
-// ---
-// EVENT: fetch
-// This runs every time your app requests a resource (like a page, script, or image).
-// Strategy: Network-first with cache fallback for better coordination with Cloudflare edge caching
-// ---
+/**
+ * FETCH EVENT
+ * Intercepts all network requests from the application
+ * 
+ * CACHING STRATEGY: Network-first with cache fallback
+ * - Navigation requests: Always try network first to get fresh Cloudflare edge content
+ * - Static assets: Try network with 3-second timeout, fall back to cache
+ * - This strategy balances fresh content with offline functionality
+ * - Works in coordination with Cloudflare Workers edge caching
+ */
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
+  // Only handle GET requests (ignore POST, PUT, DELETE, etc.)
   if (event.request.method !== 'GET') {
     return;
   }
 
-  // Skip chrome-extension and other non-http(s) requests
+  // Skip non-HTTP(S) requests (chrome-extension://, file://, etc.)
   const url = new URL(event.request.url);
   if (!url.protocol.startsWith('http')) {
     return;
   }
 
-  // Use an async function to make control flow clearer and ensure a Response is always returned
+  // Handle the request with async logic for better error handling
   event.respondWith((async () => {
     try {
-      // For navigation requests (page loads), always prefer network to get fresh content from Cloudflare
+      /**
+       * NAVIGATION REQUESTS (page loads)
+       * Always prefer network to get fresh content from Cloudflare edge
+       */
       if (event.request.mode === 'navigate') {
         try {
+          console.log('[Service Worker] Fetching navigation request from network:', url.pathname);
           const networkResp = await fetch(event.request);
-          // Update the cache with the latest content from Cloudflare edge
+          
+          // Update cache with fresh content for next offline access
           const copy = networkResp.clone();
           const cache = await caches.open(CACHE_NAME);
-          cache.put(event.request, copy).catch(() => { });
+          cache.put(event.request, copy).catch(() => { 
+            console.log('[Service Worker] Failed to update cache for:', url.pathname);
+          });
+          
           return networkResp;
         } catch (err) {
-          // Network failed — try to return cached content
+          console.log('[Service Worker] Navigation network failed, trying cache for:', url.pathname);
+          
+          // Try exact match first
           const cached = await caches.match(event.request);
-          if (cached) return cached;
+          if (cached) {
+            console.log('[Service Worker] Serving cached navigation:', url.pathname);
+            return cached;
+          }
           
+          // Fall back to index.html for SPA-style routing
           const cachedIndex = await caches.match('/index.html');
-          if (cachedIndex) return cachedIndex;
+          if (cachedIndex) {
+            console.log('[Service Worker] Serving cached index.html as fallback');
+            return cachedIndex;
+          }
           
+          // Last resort: try root
           const cachedRoot = await caches.match('/');
-          if (cachedRoot) return cachedRoot;
+          if (cachedRoot) {
+            console.log('[Service Worker] Serving cached root as fallback');
+            return cachedRoot;
+          }
           
-          return new Response('<h1>Offline</h1><p>The application is offline.</p>', { status: 503, headers: { 'Content-Type': 'text/html' } });
+          // Complete offline with no cache
+          console.log('[Service Worker] No cached fallback available, showing offline page');
+          return new Response('<h1>Offline</h1><p>The application is offline.</p>', { 
+            status: 503, 
+            headers: { 'Content-Type': 'text/html' } 
+          });
         }
       }
 
-      // For static assets: try network first with quick timeout, then fall back to cache
-      // This allows Cloudflare edge updates to reach the browser while still supporting offline
+      /**
+       * STATIC ASSET REQUESTS (CSS, JS, images, etc.)
+       * Try network first with 3-second timeout, then fall back to cache
+       * This allows Cloudflare edge updates while supporting offline
+       */
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         
         const networkResponse = await fetch(event.request, { signal: controller.signal });
         clearTimeout(timeoutId);
         
-        // Cache successful responses from Cloudflare
+        // Cache successful responses for offline access
         if (networkResponse && networkResponse.status === 200) {
           try {
             const responseToCache = networkResponse.clone();
             const cache = await caches.open(CACHE_NAME);
-            cache.put(event.request, responseToCache).catch(() => { });
+            cache.put(event.request, responseToCache).catch(() => { 
+              console.log('[Service Worker] Failed to cache asset:', url.pathname);
+            });
           } catch (e) {
-            // ignore cache failures
+            // Silent cache failure - not critical
           }
         }
         return networkResponse;
       } catch (networkErr) {
         // Network failed or timed out - try cache
-        // Check if it was a timeout or other network error
         if (networkErr.name === 'AbortError') {
-          console.log('[Service Worker] Network request timed out, using cache');
+          console.log('[Service Worker] Network request timed out, using cache for:', url.pathname);
+        } else {
+          console.log('[Service Worker] Network error, using cache for:', url.pathname);
         }
         
         const cachedResp = await caches.match(event.request);
         if (cachedResp) {
+          console.log('[Service Worker] Serving cached asset:', url.pathname);
           return cachedResp;
         }
-        throw networkErr; // Re-throw to be caught by outer catch
+        
+        // Re-throw to outer catch if no cache available
+        throw networkErr;
       }
 
     } catch (finalErr) {
-      // As a last resort, return a generic offline response
-      console.error('[Service Worker] Final fetch error:', finalErr);
+      // Final fallback: try any cached version or return error
+      console.error('[Service Worker] All fetch attempts failed for:', url.pathname, finalErr);
       
-      // Try to serve a cached fallback for failed requests
       const cachedFallback = await caches.match(event.request);
       if (cachedFallback) {
+        console.log('[Service Worker] Serving final cached fallback for:', url.pathname);
         return cachedFallback;
       }
       

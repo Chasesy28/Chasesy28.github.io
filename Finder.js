@@ -1,20 +1,50 @@
-// Global state
-let lastResults = [];
-let detailMap = null; // Holds the Leaflet map instance
-let overviewMap = null; // Holds the overview map for all results
-let currentView = 'list'; // 'list', 'map', or 'favorites'
-let favorites = []; // Array of favorite restaurant IDs
-let modalAbortController = null; // AbortController for modal event listeners
-const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
-const API_KEY_SESSION_KEY = 'copilot_api_key_session'; // Session-only storage for API key
-let conversationHistory = []; // Store conversation history for chat continuation
-let currentRestaurantContext = null; // Store current restaurant for conversation context
+/**
+ * RESTAURANT FINDER APPLICATION (Finder.js)
+ * 
+ * OpenStreetMap-based restaurant search with AI-powered recommendations
+ * 
+ * Features:
+ * - Search restaurants by location and cuisine type
+ * - View results in list or map format
+ * - Save favorites to localStorage
+ * - AI chat integration for restaurant recommendations
+ * - Opening hours parsing and validation
+ * - Offline support through service worker
+ * 
+ * Architecture:
+ * - Uses Nominatim API for geocoding
+ * - Uses Overpass API for restaurant data
+ * - Uses Leaflet.js for interactive maps
+ * - OpenAI-compatible API for AI chat features
+ */
 
-// --- AI Configuration ---
+// ========================================
+// GLOBAL STATE MANAGEMENT
+// ========================================
+
+let lastResults = [];                    // Cached search results for sorting/filtering
+let detailMap = null;                    // Leaflet map instance for restaurant modal
+let overviewMap = null;                  // Leaflet map instance for results overview
+let currentView = 'list';                // Current view mode: 'list', 'map', or 'favorites'
+let favorites = [];                      // Array of saved favorite restaurants
+let modalAbortController = null;         // AbortController for cleanup of modal event listeners
+const FAVORITES_STORAGE_KEY = 'restaurant_favorites';
+const API_KEY_SESSION_KEY = 'copilot_api_key_session';  // Session-only storage for API key (security)
+let conversationHistory = [];            // Chat history for AI conversation continuity
+let currentRestaurantContext = null;     // Current restaurant context for AI chat
+
+// ========================================
+// AI CONFIGURATION
+// ========================================
+
+/**
+ * System message that defines AI assistant behavior
+ * Instructs AI to provide concise restaurant information
+ */
 const AI_SYSTEM_MESSAGE = `You are a helpful restaurant information assistant. You provide concise, helpful information about restaurants including reviews, recommendations, menu highlights, and general atmosphere. Keep responses brief but informative (2-3 paragraphs max). If you don't have specific information about a restaurant, provide general guidance based on the cuisine type.`;
 
 /**
- * Generates the initial query for a restaurant
+ * Generates the initial AI query for a restaurant
  * @param {object} data - Restaurant data {name, cuisine, address}
  * @returns {string} The formatted query string
  */
@@ -23,33 +53,56 @@ function buildInitialQuery(data) {
     return `Tell me about the restaurant "${data.name}" which serves ${cuisineDisplay} cuisine. Located at: ${data.address}. What's the vibe, what should I order, and any tips for visiting?`;
 }
 
-// --- Favorites Management ---
+// ========================================
+// FAVORITES MANAGEMENT
+// ========================================
+
+/**
+ * Loads saved favorites from localStorage
+ * Falls back to empty array if loading fails
+ */
 function loadFavorites() {
     try {
         const stored = localStorage.getItem(FAVORITES_STORAGE_KEY);
         if (stored) {
             favorites = JSON.parse(stored);
+            console.log('[Finder] Loaded', favorites.length, 'favorites from storage');
         }
     } catch (e) {
-        console.error('Error loading favorites:', e);
+        console.error('[Finder] Error loading favorites:', e);
         favorites = [];
     }
 }
 
+/**
+ * Saves favorites to localStorage and cookie backup
+ * Cookie backup provides redundancy with security flags
+ */
 function saveFavorites() {
     try {
         localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-        // Also save to cookie for backup with security flags
+        // Also save to cookie for backup/persistence across localStorage clears
+        // SameSite=Strict prevents CSRF attacks
         document.cookie = `${FAVORITES_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(favorites))};path=/;max-age=31536000;SameSite=Strict`;
+        console.log('[Finder] Saved', favorites.length, 'favorites to storage');
     } catch (e) {
-        console.error('Error saving favorites:', e);
+        console.error('[Finder] Error saving favorites:', e);
     }
 }
 
+/**
+ * Checks if a restaurant is in favorites
+ * @param {number} id - Restaurant OSM ID
+ * @returns {boolean} True if favorited
+ */
 function isFavorite(id) {
     return favorites.some(f => f.id === id);
 }
 
+/**
+ * Adds restaurant to favorites list
+ * @param {object} data - Restaurant data to save
+ */
 function addToFavorites(data) {
     if (!isFavorite(data.id)) {
         favorites.push({
@@ -62,14 +115,26 @@ function addToFavorites(data) {
             lon: data.lon
         });
         saveFavorites();
+        console.log('[Finder] Added to favorites:', data.name);
     }
 }
 
+/**
+ * Removes restaurant from favorites list
+ * @param {number} id - Restaurant OSM ID to remove
+ */
 function removeFromFavorites(id) {
+    const before = favorites.length;
     favorites = favorites.filter(f => f.id !== id);
     saveFavorites();
+    console.log('[Finder] Removed from favorites, count:', before, '->', favorites.length);
 }
 
+/**
+ * Toggles favorite status of a restaurant
+ * @param {object} data - Restaurant data
+ * @returns {boolean} True if now favorited, false if unfavorited
+ */
 function toggleFavorite(data) {
     if (isFavorite(data.id)) {
         removeFromFavorites(data.id);
@@ -80,69 +145,79 @@ function toggleFavorite(data) {
     }
 }
 
-// --- Directions ---
-function openDirections(lat, lon, name) {
-    // Try to detect platform and open appropriate maps app
-    const destination = encodeURIComponent(`${lat},${lon}`);
-    const destName = encodeURIComponent(name || 'Destination');
+// ========================================
+// DIRECTIONS
+// ========================================
 
+/**
+ * Opens Google Maps directions in new tab
+ * @param {number} lat - Latitude
+ * @param {number} lon - Longitude  
+ * @param {string} name - Destination name
+ */
+function openDirections(lat, lon, name) {
     // Universal Google Maps URL that works on mobile and desktop
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&destination_place_id=&travelmode=driving`;
-
-    // Open in a new window/tab
+    console.log('[Finder] Opening directions to:', name);
     window.open(googleMapsUrl, '_blank');
 }
 
-// Load favorites on script load
+// Load favorites on script initialization
 loadFavorites();
 
-// --- API Key Management (Session-only for security) ---
+// ========================================
+// API KEY MANAGEMENT (Session-only for security)
+// ========================================
+
 /**
- * Gets the API key from session storage.
+ * Gets the API key from session storage
  * The key is only stored in session storage (cleared when browser closes)
- * and is never persisted to localStorage or cookies for security.
+ * and is never persisted to localStorage or cookies for security
  * @returns {string|null} The API key or null if not set
  */
 function getApiKey() {
     try {
         return sessionStorage.getItem(API_KEY_SESSION_KEY);
     } catch (e) {
-        console.error('Error accessing session storage:', e);
+        console.error('[Finder] Error accessing session storage:', e);
         return null;
     }
 }
 
 /**
- * Sets the API key in session storage only.
- * This ensures the key is cleared when the browser closes.
+ * Sets the API key in session storage only
+ * This ensures the key is cleared when the browser closes
  * @param {string} key - The API key to store
+ * @returns {boolean} True if successful
  */
 function setApiKey(key) {
     try {
         if (key && key.trim()) {
             sessionStorage.setItem(API_KEY_SESSION_KEY, key.trim());
+            console.log('[Finder] API key saved to session storage (will be cleared on browser close)');
             return true;
         }
         return false;
     } catch (e) {
-        console.error('Error storing API key:', e);
+        console.error('[Finder] Error storing API key:', e);
         return false;
     }
 }
 
 /**
- * Clears the API key from session storage.
+ * Clears the API key from session storage
  */
 function clearApiKey() {
     try {
         sessionStorage.removeItem(API_KEY_SESSION_KEY);
+        console.log('[Finder] API key cleared from session storage');
     } catch (e) {
-        console.error('Error clearing API key:', e);
+        console.error('[Finder] Error clearing API key:', e);
     }
 }
 
 /**
- * Checks if an API key is configured.
+ * Checks if an API key is configured
  * @returns {boolean}
  */
 function hasApiKey() {
@@ -151,11 +226,12 @@ function hasApiKey() {
 }
 
 /**
- * Clears conversation history for a new restaurant context.
+ * Clears conversation history for a new restaurant context
  */
 function clearConversationHistory() {
     conversationHistory = [];
     currentRestaurantContext = null;
+    console.log('[Finder] Conversation history cleared');
 }
 
 // DOM Elements (declared here; assigned on DOMContentLoaded)
@@ -1328,40 +1404,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Checks an OSM opening_hours string against the current time.
-     * @param {string} hoursString - The opening_hours tag value.
-     * @returns {boolean|null} - true (open), false (closed), or null (unknown/unparseable).
+     * COMPLEX OPENING HOURS PARSER
+     * 
+     * Parses OpenStreetMap opening_hours format and determines if a restaurant is currently open
+     * 
+     * OSM opening_hours format is very flexible and complex:
+     * Examples:
+     * - "24/7" = Always open
+     * - "Mo-Fr 09:00-17:00" = Monday to Friday, 9 AM to 5 PM
+     * - "Mo-Fr 09:00-17:00; Sa 10:00-14:00" = Different hours on Saturday
+     * - "Mo,We,Fr 09:00-17:00" = Specific days only
+     * - "20:00-02:00" = Overnight hours (closes after midnight)
+     * - "Dec 25 off" = Closed on specific dates
+     * - "Dec 20-Dec 28 off" = Closed for date ranges
+     * 
+     * The parser handles:
+     * 1. Day ranges (Mo-Fr) and individual days (Mo,We,Fr)
+     * 2. Time ranges including overnight (20:00-02:00)
+     * 3. Multiple semicolon-separated rules
+     * 4. Special date closures (holidays)
+     * 5. "off" and "closed" keywords
+     * 
+     * @param {string} hoursString - The opening_hours tag value from OSM
+     * @returns {boolean|null} - true (open now), false (closed now), or null (cannot determine)
      */
     function checkOpeningHours(hoursString) {
-        if (!hoursString || hoursString === 'Not specified') { // <-- FIXED: Removed the .includes('off') check
-            return null; // Cannot determine
+        // Handle missing or unspecified hours
+        if (!hoursString || hoursString === 'Not specified') {
+            return null; // Cannot determine open/closed status
         }
 
+        // Handle 24/7 - always open
         if (hoursString.toLowerCase() === '24/7') {
-            return true; // Always open
+            console.log('[Finder] Restaurant is 24/7 - always open');
+            return true;
         }
 
-        // --- Date and Time Setup ---
-        // Use the hardcoded time provided: Friday, Nov 14, 2025 at 12:04 PM PST
-        // PST is UTC-8.
-        const now = new Date('2025-11-14T12:04:00-08:00');
+        /**
+         * DATE AND TIME SETUP
+         * Use the current system date/time to determine open/closed status.
+         * For deterministic unit tests, this can be replaced with a fixed Date.
+         */
+        const now = new Date();
 
+        // Day of week mapping (OSM format to JavaScript day index)
         const dayMap = {
-            'Su': 0,
-            'Mo': 1,
-            'Tu': 2,
-            'We': 3,
-            'Th': 4,
-            'Fr': 5,
-            'Sa': 6
+            'Su': 0, 'Mo': 1, 'Tu': 2, 'We': 3, 'Th': 4, 'Fr': 5, 'Sa': 6
         };
         const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-        const currentDayIndex = now.getDay(); // 5 for Friday
-        const currentMinutes = now.getHours() * 60 + now.getMinutes(); // 12 * 60 + 4 = 724
+        const currentDayIndex = now.getDay();                          // 0-6 (0=Sunday)
+        const currentMinutes = now.getHours() * 60 + now.getMinutes(); // Minutes since midnight
 
-        // --- NEW: Date components for holiday check ---
-        const currentMonth = now.getMonth() + 1; // 1-12 (November is 11)
-        const currentDayOfMonth = now.getDate(); // 14
+        // Date components for holiday checking
+        const currentMonth = now.getMonth() + 1;    // 1-12 (JavaScript uses 0-11, so add 1)
+        const currentDayOfMonth = now.getDate();    // 1-31 (JavaScript getDate() already returns 1-31, no conversion needed)
+        
+        // Month name to number mapping for date-based closures
         const monthMap = {
             'Jan': 1,
             'Feb': 2,
@@ -1377,70 +1475,98 @@ document.addEventListener('DOMContentLoaded', () => {
             'Dec': 12
         };
 
-        // Helper function to check if the current day is in a day set (e.g., "Mo-Fr" or "Sa,Su")
+        /**
+         * Helper function to check if current day matches a day specification
+         * 
+         * Handles various day formats:
+         * - Single days: "Mo", "Tu", etc.
+         * - Day ranges: "Mo-Fr" (Monday through Friday)
+         * - Comma-separated: "Mo,We,Fr" (specific days)
+         * - Wraparound ranges: "Sa-Tu" (Saturday through Tuesday, wrapping around week)
+         * 
+         * @param {string} daySet - Day specification string
+         * @returns {boolean} True if current day matches the specification
+         */
         function isDayInSet(daySet) {
-            // Split by comma for multiple sets, e.g., "Mo-Fr,Sa"
+            // Split by comma to handle multiple day specifications
             const dayParts = daySet.split(',');
+            
             for (const part of dayParts) {
                 const rangeMatch = part.trim().match(/^([a-z]{2})-([a-z]{2})$/i);
+                
                 if (rangeMatch) {
-                    // It's a range like "Mo-Fr"
+                    // This is a day range like "Mo-Fr"
                     const startDayIndex = dayMap[rangeMatch[1]];
                     const endDayIndex = dayMap[rangeMatch[2]];
 
                     if (startDayIndex === undefined || endDayIndex === undefined) {
-                        continue; // Malformed day range
+                        continue; // Skip malformed day range
                     }
 
                     if (startDayIndex <= endDayIndex) {
-                        // Standard range, e.g., Mo-Fr (1-5)
+                        // Standard range (e.g., Mo-Fr: 1-5)
                         if (currentDayIndex >= startDayIndex && currentDayIndex <= endDayIndex) {
                             return true;
                         }
                     } else {
-                        // Wraparound range, e.g., Sa-Tu (6-2)
+                        // Wraparound range (e.g., Sa-Tu: 6-2, meaning Sat, Sun, Mon, Tue)
                         if (currentDayIndex >= startDayIndex || currentDayIndex <= endDayIndex) {
                             return true;
                         }
                     }
                 } else {
-                    // It's a single day like "Mo"
+                    // Single day specification (e.g., "Mo")
                     if (dayMap[part.trim()] === currentDayIndex) {
                         return true;
                     }
                 }
             }
-            return false; // Current day not found in this set
+            return false; // Current day doesn't match any specification
         }
 
-        // --- Main Parsing Logic ---
+        /**
+         * MAIN PARSING LOGIC
+         * Process the opening hours string rule by rule
+         */
         try {
-            // Normalize the string: remove extra spaces, fix common issues
+            // Normalize the hours string: remove extra spaces for consistent parsing
             const rules = hoursString
-                .replace(/; /g, ';') // remove space after semicolon
-                .replace(/, /g, ',') // remove space after comma
-                .split(';'); // split rules
+                .replace(/; /g, ';')   // Remove space after semicolons
+                .replace(/, /g, ',')   // Remove space after commas
+                .split(';');           // Split into individual rules
 
-            let isOpen = false; // Assume closed until a rule matches
-            let ruleMatchedToday = false;
+            let isOpen = false;              // Assume closed until we find a matching open rule
+            let ruleMatchedToday = false;    // Track if any rule applied to today
 
-            // Check for explicit "off" or "closed" rules first
+            /**
+             * PHASE 1: Check for explicit closure rules
+             * Process "off" and "closed" keywords first as they take priority
+             * This includes both general closures and date-specific closures
+             */
             for (const rule of rules) {
                 const cleanRule = rule.trim().toLowerCase();
+                
+                // Check for complete closure
                 if (cleanRule === 'off' || cleanRule === 'closed') {
-                    return false; // The entire place is closed
+                    console.log('[Finder] Restaurant is marked as completely closed');
+                    return false;
                 }
 
-                // Check for day-based off rules (e.g., "Mo,Tu off")
+                // Check for day-based closure (e.g., "Mo,Tu off" or "Su closed")
                 const dayRuleMatch = cleanRule.match(/^([a-z\s,-]+) (off|closed)$/i);
                 if (dayRuleMatch) {
                     const daysPart = dayRuleMatch[1].replace(/\s/g, '');
                     if (isDayInSet(daysPart)) {
-                        return false; // Explicitly closed today
+                        console.log('[Finder] Restaurant is closed today per day rule:', rule.trim());
+                        return false;
                     }
                 }
 
-                // Regex: (Month Day)-(Month Day) off, e.g., "Dec 20-Dec 28 off"
+                /**
+                 * Check for date range closures (e.g., "Dec 20-Dec 28 off")
+                 * Used for holiday closures spanning multiple days
+                 * Handles both standard ranges and year-wraparound ranges
+                 */
                 const dateRangeRuleMatch = cleanRule.match(/^([a-z]{3}) (\d{1,2})-([a-z]{3}) (\d{1,2}) (off|closed)$/i);
                 if (dateRangeRuleMatch) {
                     const startMonth = monthMap[dateRangeRuleMatch[1]];
@@ -1449,85 +1575,115 @@ document.addEventListener('DOMContentLoaded', () => {
                     const endDay = parseInt(dateRangeRuleMatch[4]);
 
                     if (startMonth && endMonth) {
-                        // Convert current date and range dates to comparable numbers (e.g., Nov 14 -> 1114)
+                        /**
+                         * Convert dates to comparable numbers (MMDD format)
+                         * Example: Nov 14 -> 1114, Dec 25 -> 1225
+                         * This allows simple numeric comparison
+                         */
                         const currentDateNum = currentMonth * 100 + currentDayOfMonth;
                         const startDateNum = startMonth * 100 + startDay;
                         const endDateNum = endMonth * 100 + endDay;
 
                         if (startDateNum <= endDateNum) {
-                            // Standard range, e.g., Dec 20 - Dec 28
+                            // Standard range (e.g., Dec 20 to Dec 28)
                             if (currentDateNum >= startDateNum && currentDateNum <= endDateNum) {
-                                return false; // Closed for holiday
+                                console.log('[Finder] Restaurant closed for date range:', rule.trim());
+                                return false;
                             }
                         } else {
-                            // Wraparound range, e.g., Dec 20 - Jan 05
+                            // Year wraparound range (e.g., Dec 20 to Jan 5)
                             if (currentDateNum >= startDateNum || currentDateNum <= endDateNum) {
-                                return false; // Closed for holiday
+                                console.log('[Finder] Restaurant closed for wraparound date range:', rule.trim());
+                                return false;
                             }
                         }
                     }
                 }
 
-                // Check for single-date "off" rules ---
-                // e.g., "Dec 25 off"
+                /**
+                 * Check for single date closures (e.g., "Dec 25 off")
+                 * Used for specific holiday closures
+                 */
                 const singleDateRuleMatch = cleanRule.match(/^([a-z]{3}) (\d{1,2}) (off|closed)$/i);
                 if (singleDateRuleMatch) {
                     const month = monthMap[singleDateRuleMatch[1]];
                     const day = parseInt(singleDateRuleMatch[2]);
                     if (month === currentMonth && day === currentDayOfMonth) {
-                        return false; // Closed today
+                        console.log('[Finder] Restaurant closed on specific date:', rule.trim());
+                        return false;
                     }
                 }
             }
 
-            // ---full logic for parsing open times ---
+            /**
+             * PHASE 2: Parse opening time rules
+             * Now that we've ruled out explicit closures, check if there are
+             * any time-based rules that show the restaurant is open now
+             */
             for (const rule of rules) {
                 const cleanRule = rule.trim();
-                // Skip "off" rules since we already processed them
-                if (cleanRule.length === 0 || cleanRule.toLowerCase() === 'off' || cleanRule.toLowerCase() === 'closed') continue;
+                
+                // Skip empty rules and closure rules (already processed)
+                if (cleanRule.length === 0 || 
+                    cleanRule.toLowerCase() === 'off' || 
+                    cleanRule.toLowerCase() === 'closed') {
+                    continue;
+                }
 
-                // Skip date-based rules (like "Dec 25 off") which are *also* skipped here
+                // Skip date-based rules (e.g., "Dec 25 off") - already processed
                 if (cleanRule.match(/^([a-z]{3}) (\d{1,2})/i)) {
                     continue;
                 }
 
-                // Regex to split day(s) from time(s)
+                /**
+                 * Parse day and time components
+                 * Format: "Mo-Fr 09:00-17:00" or just "09:00-17:00" (implies all days)
+                 */
                 const ruleMatch = cleanRule.match(/^([a-z\s,-]+) ([0-9:-\s,]+)$/i);
 
                 let daysPart, timesPart;
 
                 if (ruleMatch) {
-                    daysPart = ruleMatch[1].replace(/\s/g, ''); // Remove spaces
-                    timesPart = ruleMatch[2].replace(/\s/g, ''); // Remove spaces
+                    // Rule has both days and times
+                    daysPart = ruleMatch[1].replace(/\s/g, '');  // Remove spaces from days
+                    timesPart = ruleMatch[2].replace(/\s/g, ''); // Remove spaces from times
                 } else {
-                    // Check for "all day" rule, e.g. "09:00-17:00" or "0900-1700"
+                    // No day specification - check if it's just times (implies all days)
                     const allDayRuleMatch = cleanRule.match(/^([0-9:-\s,]+)$/);
                     if (allDayRuleMatch) {
-                        daysPart = "Mo-Su"; // Implies all days
+                        daysPart = "Mo-Su"; // No day specified = all days
                         timesPart = allDayRuleMatch[1].replace(/\s/g, '');
                     } else {
                         continue; // Cannot parse this rule format
                     }
                 }
 
-                // Check if the rule applies to the current day
+                // Check if this rule applies to current day of week
                 if (!isDayInSet(daysPart)) {
-                    continue; // This rule is not for today
+                    continue; // This rule doesn't apply today
                 }
 
-                ruleMatchedToday = true;
+                ruleMatchedToday = true; // At least one rule applies to today
 
-                // Check the time ranges for today
+                /**
+                 * Parse time ranges
+                 * Can have multiple comma-separated ranges: "09:00-12:00,14:00-18:00"
+                 * This handles restaurants with lunch breaks
+                 */
                 const timeRanges = timesPart.split(',');
                 for (const range of timeRanges) {
 
                     let timeMatch;
                     let startHour, startMin, endHour, endMin;
 
+                    /**
+                     * Parse time format - supports both HH:MM and HHMM formats
+                     * Examples: "09:00-17:00" or "0900-1700"
+                     */
                     if (range.includes(':')) {
-                        // Format is HH:MM-HH:MM (or H:MM-HH:MM)
+                        // Colon format: HH:MM-HH:MM (or H:MM-HH:MM)
                         timeMatch = range.match(/^(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})$/);
-                        if (!timeMatch) continue; // Malformed colon format
+                        if (!timeMatch) continue; // Skip malformed time
 
                         startHour = parseInt(timeMatch[1]);
                         startMin = parseInt(timeMatch[2]);
@@ -1535,9 +1691,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         endMin = parseInt(timeMatch[4]);
 
                     } else {
-                        // Format is HHMM-HHMM
+                        // No-colon format: HHMM-HHMM
                         timeMatch = range.match(/^(\d{2})(\d{2})-(\d{2})(\d{2})$/);
-                        if (!timeMatch) continue; // Malformed non-colon format
+                        if (!timeMatch) continue; // Skip malformed time
 
                         startHour = parseInt(timeMatch[1]);
                         startMin = parseInt(timeMatch[2]);
@@ -1545,50 +1701,91 @@ document.addEventListener('DOMContentLoaded', () => {
                         endMin = parseInt(timeMatch[4]);
                     }
 
-
+                    /**
+                     * Convert to minutes since midnight for easy comparison
+                     * Example: 14:30 = 14 * 60 + 30 = 870 minutes
+                     */
                     let startMinutes = startHour * 60 + startMin;
                     let endMinutes = endHour * 60 + endMin;
 
-                    // Handle "24:00" or "2400" as end of day
+                    /**
+                     * Handle special case: "24:00" means end of day (midnight)
+                     * Convert to 1440 minutes (24 * 60)
+                     */
                     if (endHour === 24 && endMin === 0) {
-                        endMinutes = 1440; // 24 * 60
+                        endMinutes = 1440;
                     }
 
+                    /**
+                     * Check if current time falls within this time range
+                     * Two cases to handle:
+                     * 1. Standard range: start < end (e.g., 09:00-17:00)
+                     * 2. Overnight range: end < start (e.g., 20:00-02:00)
+                     */
                     if (endMinutes < startMinutes) {
-                        // Overnight case (e.g., 20:00-02:00)
-                        // Open if current time is after start (e.g., 21:00) OR before end (e.g., 01:00)
+                        /**
+                         * OVERNIGHT HOURS (e.g., 20:00-02:00)
+                         * Restaurant closes after midnight
+                         * Open if: current time >= start OR current time < end
+                         * Example: Open at 21:00 (after 20:00) OR 01:00 (before 02:00)
+                         */
                         if (currentMinutes >= startMinutes || currentMinutes < endMinutes) {
                             isOpen = true;
-                            break; // Found an open slot, no need to check other times
+                            console.log('[Finder] Restaurant is OPEN (overnight hours):', range);
+                            break; // Found an open time slot
                         }
                     } else {
-                        // Standard case (e.g., 09:00-17:00)
-                        // Open if current time is on or after start AND before end
+                        /**
+                         * STANDARD HOURS (e.g., 09:00-17:00)
+                         * Normal operating hours within the same day.
+                         *
+                         * We treat time ranges as half-open intervals: [start, end)
+                         * - Start time is inclusive  (currentMinutes >= startMinutes)
+                         * - End time is exclusive    (currentMinutes < endMinutes)
+                         *
+                         * This means that for "09:00-17:00":
+                         * - 14:00 is considered OPEN
+                         * - 17:00 is already CLOSED
+                         *
+                         * Using an exclusive end time is consistent with common interval
+                         * handling (and standards like OSM opening_hours), avoids ambiguity
+                         * at exact boundary times, and keeps the logic simple.
+                         *
+                         * If product requirements ever change and 17:00 should be treated
+                         * as still open, this condition must be updated to use "<=" for
+                         * the end time (and any related boundary logic reviewed).
+                         */
                         if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                             isOpen = true;
-                            break; // Found an open slot
+                            console.log('[Finder] Restaurant is OPEN (standard hours):', range);
+                            break; // Found an open time slot
                         }
                     }
-                } // end for timeRanges
+                } // End of time range iteration
 
                 if (isOpen) {
-                    break; // This rule set made it open, no need to check other rules
+                    break; // Found an open rule, no need to check remaining rules
                 }
 
-            } // end for rules
+            } // End of rule iteration
 
-            // If any rule for today was processed, return its open/closed status.
+            /**
+             * Return result based on whether any rule matched today
+             */
             if (ruleMatchedToday) {
+                // At least one rule applied to today, return the open/closed status
+                console.log('[Finder] Opening hours check result:', isOpen ? 'OPEN' : 'CLOSED');
                 return isOpen;
             }
 
-            // If no rule matched today,
-            // it implies closed.
+            // No rules matched today - assume closed
+            console.log('[Finder] No opening hours rule matched today - assuming CLOSED');
             return false;
 
         } catch (e) {
-            console.error("Error parsing opening hours:", e, hoursString);
-            return null; // Failed to parse
+            // Parser encountered an error - log and return null (unknown)
+            console.error('[Finder] Error parsing opening hours:', e, 'String:', hoursString);
+            return null; // Failed to parse - cannot determine open/closed
         }
     }
 
