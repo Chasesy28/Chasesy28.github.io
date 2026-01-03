@@ -81,7 +81,8 @@ function loadFavorites() {
 function saveFavorites() {
     try {
         localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-        // Also save to cookie for backup with security flags (SameSite prevents CSRF)
+        // Also save to cookie for backup/persistence across localStorage clears
+        // SameSite=Strict prevents CSRF attacks
         document.cookie = `${FAVORITES_STORAGE_KEY}=${encodeURIComponent(JSON.stringify(favorites))};path=/;max-age=31536000;SameSite=Strict`;
         console.log('[Finder] Saved', favorites.length, 'favorites to storage');
     } catch (e) {
@@ -1456,7 +1457,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Date components for holiday checking
         const currentMonth = now.getMonth() + 1;    // 1-12 (JavaScript uses 0-11, so add 1)
-        const currentDayOfMonth = now.getDate();    // 1-31
+        const currentDayOfMonth = now.getDate();    // 1-31 (JavaScript getDate() already returns 1-31, no conversion needed)
         
         // Month name to number mapping for date-based closures
         const monthMap = {
@@ -1736,10 +1737,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         /**
                          * STANDARD HOURS (e.g., 09:00-17:00)
-                         * Normal operating hours within same day
-                         * Open if: start <= current time < end
-                         * Example: Open at 14:00 if hours are 09:00-17:00
-                         * Note: Use < for end time, not <=, so 17:00 is considered closed
+                         * Normal operating hours within the same day.
+                         *
+                         * We treat time ranges as half-open intervals: [start, end)
+                         * - Start time is inclusive  (currentMinutes >= startMinutes)
+                         * - End time is exclusive    (currentMinutes < endMinutes)
+                         *
+                         * This means that for "09:00-17:00":
+                         * - 09:00 is considered OPEN (start time is inclusive)
+                         * - 14:00 is considered OPEN
+                         * - 17:00 is already CLOSED (end time is exclusive)
+                         *
+                         * Using an exclusive end time is consistent with common interval
+                         * handling and OSM opening_hours standards, avoids ambiguity
+                         * at exact boundary times, and keeps the logic simple.
                          */
                         if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
                             isOpen = true;
