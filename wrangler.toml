@@ -13,7 +13,7 @@ main = "workers/index.js"
 
 # Cloudflare Workers API compatibility date
 # Locks worker behavior to specific API version for consistency
-compatibility_date = "2024-12-19"
+compatibility_date = "2025-01-01"
 
 # Cloudflare account identifier
 # Required for deployment to correct account
