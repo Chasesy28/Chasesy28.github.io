@@ -91,7 +91,7 @@ export default {
         
         // Set proper headers for service worker
         resp.headers.set('Content-Type', 'application/javascript');
-        resp.headers.set('Service-Worker-Allowed', '/'); // Allow SW to control entire origin
+        resp.headers.set('Service-Worker-Allowed', '/'); // Explicitly set SW scope to root path (redundant when sw.js is served from '/')
         resp.headers.set('Cache-Control', 'no-cache'); // Always validate with server for updates
         
         // Add security headers
