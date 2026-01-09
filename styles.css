@@ -446,7 +446,7 @@ html.dark .project-description {
 
 /* Dark mode for rain and ground */
 html.dark .drop {
-    background: linear-gradient(to bottom, rgba(255, 211, 105, 0.2), rgba(255, 211, 105, 0.4));
+    background: linear-gradient(to bottom, rgba(47, 255, 0, 0.2), rgba(47, 255, 0, 0.4));
 }
 
 html.dark .ground {
