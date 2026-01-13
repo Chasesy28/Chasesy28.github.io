@@ -151,7 +151,7 @@ nav a:hover {
     /* Your drop appearance */
     width: 5px;
     height: 30px;
-    background: linear-gradient(to bottom, rgba(1, 218, 19, 0.2), rgba(1, 218, 19, 0.5));
+    background: linear-gradient(to bottom, rgba(149, 57, 0, 0.2), rgba(149, 57, 0, 0.5));
     border-radius: 0 0 50% 50%;
     /* Positioning and animation setup */
     position: absolute;
@@ -202,6 +202,8 @@ nav a:hover {
 }
 
 /* ---- Swiper Slide Styling ---- */
+.swiper-pagination-bullet {
+    transition: background-color 0.3s, transform 0.3s;
 .swiper-slide {
     width: 40%;
     background-color: #fffaf0;
@@ -444,9 +446,13 @@ html.dark .project-description {
     background-color: #0f3460;
 }
 
+html.dark .swiper-pagination-bullet {
+    background-color: #454457; 
+    transition: background-color 0.3s, transform 0.3s;
+
 /* Dark mode for rain and ground */
 html.dark .drop {
-    background: linear-gradient(to bottom, rgba(255, 0, 0, 0.6), rgba(255, 0, 0, 0.8));
+    background: linear-gradient(to bottom, rgba(149, 57, 0, 0.6), rgba(149, 57, 0, 0.8));
 }
 
 html.dark .ground {
