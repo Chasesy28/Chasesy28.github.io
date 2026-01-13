@@ -83,7 +83,7 @@ header {
     border-bottom: 3px dashed #ffe77b;
     position: fixed;
     /* Needed so z index works */
-    z-index: 1;
+    z-index: 1000;
     /* put the header above the rain */
 }
 
