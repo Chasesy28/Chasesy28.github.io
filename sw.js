@@ -4,7 +4,7 @@
  * Works in coordination with Cloudflare edge caching for optimal performance
  */
 
-const CACHE_NAME = 'silly-site-cache-v3';
+const CACHE_NAME = 'silly-site-cache-v4';
 
 /**
  * Core application files to cache for offline functionality
@@ -13,14 +13,14 @@ const CACHE_NAME = 'silly-site-cache-v3';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
-  '/Finder.html',
-  '/Finder.js',
-  '/test.html',
+  '/projects/Finder.html',
+  '/projects/Finder.js',
+  '/projects/test.html',
+  '/projects/finder-styles.css',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
   '/styles.css',
-  '/finder-styles.css',
   '/scripts.js'
 ];
 

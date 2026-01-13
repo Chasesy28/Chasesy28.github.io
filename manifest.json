@@ -1,11 +1,16 @@
 {
-    "name": "Silly Site Dev app",
+    "name": "Silly Site - Development Playground",
     "short_name": "Silly Site",
-    "start_url": "/index.html",
-    "description": "Silly website I made.",
+    "start_url": "/",
+    "scope": "/",
+    "description": "A creative playground for web development experiments, featuring rain animations, interactive projects, and modern web technologies.",
     "display": "standalone",
+    "orientation": "portrait-primary",
     "background_color": "#fcba36",
     "theme_color": "#fcba36",
+    "categories": ["entertainment", "education", "lifestyle"],
+    "lang": "en-US",
+    "dir": "ltr",
     "icons": [
         {
             "src": "/icons/icon-192x192.png",
@@ -18,6 +23,33 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Restaurant Finder",
+            "short_name": "Finder",
+            "description": "Search for restaurants using OpenStreetMap",
+            "url": "/projects/Finder.html",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Rain Test",
+            "short_name": "Test",
+            "description": "Test rain animation effects",
+            "url": "/projects/test.html",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
         }
     ]
 }

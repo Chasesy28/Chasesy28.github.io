@@ -490,3 +490,69 @@ h2,
 nav a {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.4s ease;
 }
+
+/* ---- About Me Section ---- */
+.about-me-section {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #fffaf0;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.about-me-section h2 {
+    color: #eba518;
+    margin-top: 0 !important;
+}
+
+.about-me-section p {
+    color: #333;
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin: 1em 0;
+    text-align: left;
+}
+
+/* ---- Footer/Copyright Section ---- */
+.site-footer {
+    position: relative;
+    z-index: 1;
+    padding: 2rem 1rem;
+    text-align: center;
+    background-color: #fffaf0;
+    border-top: 3px dashed #ffe77b;
+    margin-top: 2rem;
+}
+
+.site-footer p {
+    margin: 0.5rem 0;
+    color: #333;
+    font-size: 1rem;
+}
+
+/* Dark mode for about me section */
+html.dark .about-me-section {
+    background-color: #16213e;
+    color: #eaeaea;
+}
+
+html.dark .about-me-section h2 {
+    color: #ffd369;
+}
+
+html.dark .about-me-section p {
+    color: #d1d1d1;
+}
+
+/* Dark mode for footer */
+html.dark .site-footer {
+    background-color: #16213e;
+    border-top: 3px dashed #0f3460;
+}
+
+html.dark .site-footer p {
+    color: #d1d1d1;
+}
