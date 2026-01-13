@@ -9,13 +9,13 @@
       <meta name="theme-color" content="#4f46e5">
       <meta name="apple-mobile-web-app-capable" content="yes">
       <meta name="apple-mobile-web-app-status-bar-style" content="default">
-      <link rel="manifest" href="/manifest.json">
-      <link rel="icon" href="/icons/icon-192x192.png">
+      <link rel="manifest" href="../manifest.json">
+      <link rel="icon" href="../icons/icon-192x192.png">
       <script src="https://cdn.tailwindcss.com"></script>
       <!-- Leaflet.js CSS and JS -->
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
       <!-- CSS -->
-      <link rel="stylesheet" href="finder-styles.css">
+      <link rel="stylesheet" href="./finder-styles.css">
       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
       <style>
          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -543,7 +543,7 @@
          // Register the service worker
          if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-               navigator.serviceWorker.register('/sw.js')
+               navigator.serviceWorker.register('../sw.js')
                   .then(registration => {
                      console.log('Service Worker registered with scope:', registration.scope);
                   })
