@@ -81,7 +81,7 @@ header {
     background-color: #fffaf0;
     /* A light, fun color (floral white) */
     border-bottom: 3px dashed #ffe77b;
-    position: relative;
+    position: fixed;
     /* Needed so z index works */
     z-index: 1;
     /* put the header above the rain */
