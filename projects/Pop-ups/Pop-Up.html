@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pop-up Sign-In Example</title>
+    <style>
+        /* Styles for the main page */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+
+        #open-popup-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="open-popup-btn">Sign In</button>
+
+    <script>
+        // This function will be called BY the popup window when the form is submitted
+        window.handleLogin = (username) => {
+            alert("Hello " + username);
+            // The popup window will close itself
+        };
+
+        // Get the button element
+        const openPopupBtn = document.getElementById('open-popup-btn');
+
+        // Function to open the sign-in popup
+        const openSignInPopup = () => {
+            
+            // --- 1. Define window features ---
+            const width = 450;
+            const height = 350;
+            // Center the popup on the screen
+            const left = (screen.width / 2) - (width / 2);
+            const top = (screen.height / 2) - (height / 2);
+            
+            // This string tells the browser to open a new window with these properties
+            const windowFeatures = `width=${width},height=${height},left=${left},top=${top},popup=yes`;
+
+            // --- 2. Open the new window ---
+            // We open a blank window first. Note the 'signInPopup' name; if clicked
+            // again, it will re-focus the existing popup instead of opening a new one.
+            const popupWindow = window.open('', 'signInPopup', windowFeatures);
+
+            // Check if the popup was blocked by the browser
+            if (!popupWindow) {
+                alert('Popup blocked! Please allow popups for this site to sign in.');
+                return;
+            }
+
+            // --- 3. Define the HTML and CSS content for the popup ---
+            // We create the entire HTML document for the popup as a string
+            const popupHTML = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Sign In</title>
+                    <style>
+                        /* These styles apply ONLY to the popup window */
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 30px;
+                            margin: 0;
+                            background-color: #f0f2f5;
+                        }
+                        h2 {
+                            margin-top: 0;
+                            margin-bottom: 20px;
+                            text-align: center;
+                        }
+                        .form-group {
+                            margin-bottom: 15px;
+                        }
+                        .form-group label {
+                            display: block;
+                            margin-bottom: 5px;
+                            font-weight: bold;
+                        }
+                        .form-group input {
+                            width: 100%;
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                            border-radius: 4px;
+                            box-sizing: border-box;
+                        }
+                        .submit-btn {
+                            width: 100%;
+                            padding: 10px;
+                            background-color: #007bff;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            font-size: 16px;
+                            cursor: pointer;
+                        }
+                        .submit-btn:hover {
+                            background-color: #0056b3;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>Sign In Test Window</h2>
+                    <p>Does not save anything entered</p>
+                    <form id="popup-form">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="submit-btn">Login</button>
+                    </form>
+
+                    <script>
+                        document.getElementById('popup-form').addEventListener('submit', (event) => {
+                            event.preventDefault(); // Prevent the form from reloading the popup
+                            
+                            const username = document.getElementById('username').value;
+                            
+                            // Call the 'handleLogin' function that exists on the PARENT window
+                            if (window.opener && window.opener.handleLogin) {
+                                window.opener.handleLogin(username);
+                            }
+                            
+                            // Close the popup window
+                            window.close();
+                        });
+                    <\/script>
+                </body>
+                </html>
+            `; // Note: We use <\/script> to prevent the browser from closing the main script tag early.
+
+            // --- 4. Write the HTML to the new window ---
+            popupWindow.document.write(popupHTML);
+            popupWindow.document.close(); // Important: Finishes writing to the document
+            popupWindow.focus(); // Bring the new window to the front
+        };
+
+        // Event listener to open the popup when the button is clicked
+        openPopupBtn.addEventListener('click', openSignInPopup);
+    </script>
+</body>
+</html>
