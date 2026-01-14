@@ -8,10 +8,12 @@ const CACHE_NAME = 'silly-site-cache-v4';
 
 /**
  * Core application files to cache for offline functionality
- * These files are essential for the app to work without network connection
+ * These files are essential for the app to work without a network connection
  */
 const URLS_TO_CACHE = [
-  '/',
+/** Temporarily disabled so we can update the project freely
+
+'/',
   '/index.html',
   '/projects/Finder.html',
   '/projects/Finder.js',
@@ -22,6 +24,7 @@ const URLS_TO_CACHE = [
   '/icons/icon-512x512.png',
   '/styles.css',
   '/scripts.js'
+  */
 ];
 
 /**
