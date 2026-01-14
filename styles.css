@@ -85,7 +85,6 @@ header {
     /* Needed so z index works */
     z-index: 1000;
     /* put the header above the rain */
-    width: 100vw;
 }
 
 /* Style the site title in the header */
