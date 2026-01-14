@@ -190,7 +190,7 @@ nav a:hover {
 
 /* New Ground Element for splashes to land on */
 .ground {
-    position: static;
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
