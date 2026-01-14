@@ -37,7 +37,7 @@ h1 {
     color: #ffeaa5;
     font-weight: normal;
     /* Sizing, spacing, and effects from the first version */
-    font-size: 3em ! important ;
+    font-size: 3em ! important;
     margin-top: 2em ! important;
     text-shadow: 2px 2px 4px rgba(149, 57, 0, 0.3);
     /* Ensures the title stays on top of the rain */
@@ -85,6 +85,8 @@ header {
     /* Needed so z index works */
     z-index: 1000;
     /* put the header above the rain */
+    width: auto;
+    height: auto;
 }
 
 /* Style the site title in the header */
@@ -204,6 +206,8 @@ nav a:hover {
 /* ---- Swiper Slide Styling ---- */
 .swiper-pagination-bullet {
     transition: background-color 0.3s, transform 0.3s;
+}
+
 .swiper-slide {
     width: 40%;
     background-color: #fffaf0;
@@ -447,8 +451,9 @@ html.dark .project-description {
 }
 
 html.dark .swiper-pagination-bullet {
-    background-color: #454457; 
+    background-color: #454457;
     transition: background-color 0.3s, transform 0.3s;
+}
 
 /* Dark mode for rain and ground */
 html.dark .drop {
