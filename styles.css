@@ -141,7 +141,7 @@ nav a:hover {
 /* ---- Rain Effect ---- */
 .rain {
     /* This container holds all the drops */
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -190,7 +190,7 @@ nav a:hover {
 
 /* New Ground Element for splashes to land on */
 .ground {
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
