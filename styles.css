@@ -141,7 +141,7 @@ nav a:hover {
 /* ---- Rain Effect ---- */
 .rain {
     /* This container holds all the drops */
-    position: static;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
