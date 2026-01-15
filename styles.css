@@ -8,6 +8,11 @@ body {
     text-rendering: auto;
 }
 
+/*Hides scrollbar*/
+body::-webkit-scrollbar {
+    display: none;
+}
+
 /* --- OFFLINE BANNER STYLES --- */
 .offline-banner {
     position: fixed;
