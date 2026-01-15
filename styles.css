@@ -141,12 +141,12 @@ nav a:hover {
 /* ---- Rain Effect ---- */
 .rain {
     /* This container holds all the drops */
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2;
+    z-index: 0;
 }
 
 .drop {
@@ -162,6 +162,7 @@ nav a:hover {
     pointer-events: none;
     /* Makes drops unclickable */
     animation: rain-fall ease-in infinite;
+    z-index: 2;
 }
 
 /* New Splash Element Styling */
@@ -181,6 +182,7 @@ nav a:hover {
     border-radius: 50%;
     /* Makes it a semi-circle */
     box-shadow: 0 0 8px rgba(149, 57, 0, 0.3);
+    z-index: 2;
 }
 
 /* This class is added by JavaScript to trigger the splash */
@@ -199,7 +201,7 @@ nav a:hover {
     /* Using the same light yellow as the title with gradient */
     border-top: 2px solid rgba(149, 57, 0, 0.2);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 0;
+    z-index: 3;
     /* Sits in front of the rain */
 }
 
