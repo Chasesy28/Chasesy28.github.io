@@ -190,11 +190,11 @@
          <div class="about-me-section cherry-bomb-one-regular" id="about-me">
             <h2>About Me</h2>
             <p>
-               Hi! I'm a passionate programmer who loves experimenting with web technologies and creating fun, interactive experiences. 
+               Hi! I'm a passionate programmer who loves experimenting with web technologies and creating fun, interactive experiences.
                This site is my digital playground where I test new ideas, practice coding skills, and build cool projects.
             </p>
             <p>
-               When I'm not coding, you can find me exploring new technologies, learning about web development best practices, 
+               When I'm not coding, you can find me exploring new technologies, learning about web development best practices,
                and constantly pushing the boundaries of what's possible in the browser.
             </p>
          </div>
@@ -217,15 +217,15 @@
                   navigator.serviceWorker.register('/sw.js')
                      .then(registration => {
                         console.log('[Index] Service Worker registered with scope:', registration.scope);
-                        
+
                         // Check for updates on page load
                         registration.update();
-                        
+
                         // Listen for updates to the service worker
                         registration.addEventListener('updatefound', () => {
                            const newWorker = registration.installing;
                            console.log('[Index] Service Worker update found');
-                           
+
                            newWorker.addEventListener('statechange', () => {
                               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                  console.log('[Index] New Service Worker installed, page will refresh for updates');
@@ -323,6 +323,6 @@
             }
          </script>
          <script src="scripts.js"></script>
+      </div>
    </body>
-
 </html>
