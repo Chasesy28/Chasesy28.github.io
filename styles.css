@@ -182,7 +182,7 @@ nav a:hover {
     border-radius: 50%;
     /* Makes it a semi-circle */
     box-shadow: 0 0 8px rgba(149, 57, 0, 0.3);
-    z-index: 2;
+    z-index: 3;
 }
 
 /* This class is added by JavaScript to trigger the splash */
