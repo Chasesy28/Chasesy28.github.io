@@ -14,7 +14,7 @@ The project now supports **both** the original static HTML site **and** a modern
 ### Core Technologies
 
 - **Vite** (v7.3.1): Lightning-fast build tool and development server
-- **React** (v18+): Modern UI library for building component-based interfaces
+- **React** (v19+): Modern UI library for building component-based interfaces
 - **TypeScript** (v5+): Type-safe JavaScript with enhanced IDE support
 - **Tailwind CSS** (v4+): Utility-first CSS framework
 - **shadcn/ui**: Beautiful, accessible component library built on Radix UI

@@ -4,7 +4,7 @@
   "description": "This project is a basic testing site i use to mess around and test features. 🦄",
   "main": "Finder.js",
   "scripts": {
-    "dev": "vite --open index-vite.html",
+    "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
