@@ -49,27 +49,27 @@
 
         // Function to open the sign-in popup
         const openSignInPopup = () => {
-            
+
             // --- 1. Define window features ---
             const width = 450;
             const height = 350;
-            
+
             let x = (screen.width / 2) - (width / 2);
             let y = (screen.height / 2) - (height / 2);
-            
+
             let dx = 2; // Horizontal speed (pixels per frame)
             let dy = 2; // Vertical speed (pixels per frame)
-        
+
             const windowFeatures = `width=${width},height=${height},left=${x},top=${y},popup=yes`;
-        
+
             // --- 2. Open the new window ---
             const popupWindow = window.open('Evil-popup.html', 'signInPopup', windowFeatures);
-        
+
             if (!popupWindow) {
                 alert('Popup blocked! Please allow popups for this site to sign in.');
                 return;
             }
-        
+
             // --- 3. Define the HTML and CSS content for the popup ---
             const popupHTML = `
                 <!DOCTYPE html>
@@ -82,7 +82,7 @@
                             height: 100%;
                             margin: 0;
                             padding: 0;
-                            overflow: hidden; 
+                            overflow: hidden;
                         }
                         .gif-background {
                             background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/5c/You_Are_An_Idiot_screen.gif');
@@ -100,7 +100,7 @@
                             function playAudioFromLink() {
                                 const audioUrl = 'https://cdn.pixabay.com/download/audio/2023/06/19/audio_95a3f0ae2f.mp3?filename=laugh-high-pitch-154516.mp3';
                                 const audio = new Audio(audioUrl);
-                                audio.loop = true; 
+                                audio.loop = true;
                                 audio.play().catch(e => console.error('Audio failed:', e));
                             }
 
@@ -108,7 +108,7 @@
                                 playAudioFromLink();
 
                                 if (window.opener && !window.opener.closed) {
-                                    
+
                                     // --- 2. THIS IS THE MODIFIED LINE ---
                                     // Send a message instead of calling the function
                                     window.opener.postMessage('spawnNewWindow', '*');
@@ -119,39 +119,39 @@
                     </body>
                 </html>
             `;
-        
+
             // --- 4. Write the HTML to the new window ---
             //popupWindow.document.write(popupHTML);
             popupWindow.document.close();
             popupWindow.focus();
-        
+
             // --- 5. Animation Loop ---
             const movePopup = () => {
                 if (popupWindow.closed) {
                     clearInterval(animationInterval);
                     return;
                 }
-        
+
                 x += dx;
                 y += dy;
-        
-                if (x + width >= screen.availWidth || x <= 0) { dx = -dx; }
-                if (y + height >= screen.availHeight || y <= 0) { dy = -dy; }
-        
-                x = Math.max(0, Math.min(x, screen.availWidth - width));
-                y = Math.max(0, Math.min(y, screen.availHeight - height));
-        
+
+                if (x + popupWindow.outerWidth >= screen.availWidth || x <= 0) { dx = -dx; }
+                if (y + popupWindow.outerHeight >= screen.availHeight || y <= 0) { dy = -dy; }
+
+                x = Math.max(0, Math.min(x, screen.availWidth - popupWindow.outerWidth));
+                y = Math.max(0, Math.min(y, screen.availHeight - popupWindow.outerHeight));
+
                 try {
                     popupWindow.moveTo(x, y);
-                    popupWindow.focus(); 
+                    popupWindow.focus();
                 } catch (e) {
                     // Browser might block this
                 }
             };
-        
+
             const animationInterval = setInterval(movePopup, 16);
         };
-        
+
         // Event listener to open the popup when the button is clicked
         openPopupBtn.addEventListener('click', openSignInPopup);
     </script>
