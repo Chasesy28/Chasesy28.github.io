@@ -132,8 +132,8 @@
                     return;
                 }
 
-                x = popupWindow.screenX + (popupWindow.outerWidth/2);
-                y = popupWindow.screenY + (popupWindow.outerHeight/2);
+                x += dx;
+                y += dy;
 
                 if (x + popupWindow.outerWidth >= screen.availWidth || x <= 0) { dx = -dx; }
                 if (y + popupWindow.outerHeight >= screen.availHeight || y <= 0) { dy = -dy; }
@@ -147,6 +147,8 @@
                 } catch (e) {
                     // Browser might block this
                 }
+                x = popupWindow.screenX + (popupWindow.outerWidth/2);
+                y = popupWindow.screenY + (popupWindow.outerHeight/2);
             };
 
             const animationInterval = setInterval(movePopup, 16);
