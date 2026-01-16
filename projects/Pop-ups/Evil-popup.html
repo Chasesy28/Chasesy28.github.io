@@ -132,8 +132,8 @@
                     return;
                 }
 
-                x += dx;
-                y += dy;
+                x = popupWindow.screenX + (popupWindow.outerWidth/2);
+                y = popupWindow.screenY + (popupWindow.outerHeight/2);
 
                 if (x + popupWindow.outerWidth >= screen.availWidth || x <= 0) { dx = -dx; }
                 if (y + popupWindow.outerHeight >= screen.availHeight || y <= 0) { dy = -dy; }
