@@ -50,6 +50,12 @@ build/
 out/
 *.cache
 
+# Vite build output
+dist/
+
+# TypeScript build info
+*.tsbuildinfo
+
 # Temporary files
 tmp/
 temp/
