@@ -135,8 +135,8 @@
                 x += dx;
                 y += dy;
 
-                if (popupWindow.screenX + popupWindow.outerWidth >= screen.availWidth || popupWindow.screenX <= 0) { dx = -dx; }
-                if (popupWindow.screenY + popupWindow.outerHeight >= screen.availHeight || popupWindow.screenY <= 0) { dy = -dy; }
+                if (x + popupWindow.outerWidth >= screen.availWidth || x <= 0) { dx = -dx; }
+                if (y + popupWindow.outerHeight >= screen.availHeight || y <= 0) { dy = -dy; }
 
                 x = Math.max(0, Math.min(x, screen.availWidth - popupWindow.outerWidth));
                 y = Math.max(0, Math.min(y, screen.availHeight - popupWindow.outerHeight));
