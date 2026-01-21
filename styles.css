@@ -26,6 +26,7 @@ body::-webkit-scrollbar {
     z-index: 9999;
     display: none;
     font-weight: 500;
+    margin-bottom: 50px;
 }
 
 .offline-banner.show {
