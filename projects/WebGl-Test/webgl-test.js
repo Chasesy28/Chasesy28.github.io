@@ -1,4 +1,4 @@
-import { initBuffers } from "./init-buffers.js";
+import { initBuffers } from "./init-buffer.js";
 import { drawScene } from "./draw-scene.js";
 
 let cubeRotation = 0.0;
@@ -150,6 +150,46 @@ function initShaderProgram(gl, vsSource, fsSource) {
   }
 
   return shaderProgram;
+}
+
+//
+// Load a texture from a URL
+//
+function loadTexture(gl, url) {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Put a single pixel in the texture so we can use it immediately.
+  const level = 0;
+  const internalFormat = gl.RGBA;
+  const width = 1;
+  const height = 1;
+  const border = 0;
+  const srcFormat = gl.RGBA;
+  const srcType = gl.UNSIGNED_BYTE;
+  const pixel = new Uint8Array([0, 0, 255, 255]); // opaque blue
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    level,
+    internalFormat,
+    width,
+    height,
+    border,
+    srcFormat,
+    srcType,
+    pixel
+  );
+
+  // Asynchronously load an image
+  const image = new Image();
+  image.onload = function () {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    gl.generateMipmap(gl.TEXTURE_2D);
+  };
+  image.src = url;
+
+  return texture;
 }
 
 //

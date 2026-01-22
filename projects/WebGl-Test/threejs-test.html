@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <title>Three.js Demo - STL Viewer</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        overflow: hidden;
+        background-color: #1a1a1a;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100vh;
+      }
+
+      #ui-container {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+      }
+
+      #controls-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .button {
+        padding: 10px 15px;
+        margin: 5px;
+        background-color: #4a9eff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      .button:hover {
+        background-color: #2e7fd1;
+      }
+
+      .button.active {
+        background-color: #ff6b6b;
+      }
+
+      .toggle-button {
+        padding: 10px 15px;
+        background-color: #333;
+        color: white;
+        border: 2px solid #4a9eff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+      }
+
+      .toggle-button:hover {
+        background-color: #444;
+      }
+
+      .toggle-button.on {
+        background-color: #4a9eff;
+        border-color: #2e7fd1;
+      }
+
+      #preset-menu {
+        background-color: rgba(20, 20, 20, 0.95);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #444;
+        margin-bottom: 10px;
+      }
+
+      #preset-menu h3 {
+        color: #4a9eff;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+
+      .preset-button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        margin: 5px 0;
+        background-color: #2a2a2a;
+        color: #ccc;
+        border: 1px solid #444;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.2s;
+        font-size: 12px;
+      }
+
+      .preset-button:hover {
+        background-color: #3a3a3a;
+        border-color: #4a9eff;
+        color: #fff;
+      }
+
+      .preset-button.active {
+        background-color: #4a9eff;
+        color: white;
+        border-color: #4a9eff;
+      }
+
+      #file-input {
+        display: none;
+      }
+
+      #info-panel {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background-color: rgba(20, 20, 20, 0.9);
+        color: #ccc;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #444;
+        font-size: 12px;
+        max-width: 300px;
+      }
+
+      #info-panel p {
+        margin: 5px 0;
+      }
+
+      .label {
+        color: #4a9eff;
+        font-weight: bold;
+      }
+
+      #render-settings {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(20, 20, 20, 0.95);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #444;
+        max-width: 300px;
+        font-size: 12px;
+      }
+
+      #render-settings h4 {
+        color: #4a9eff;
+        margin-bottom: 10px;
+        font-size: 13px;
+      }
+
+      .setting-group {
+        margin-bottom: 12px;
+      }
+
+      .setting-label {
+        color: #ccc;
+        display: block;
+        margin-bottom: 4px;
+        font-weight: bold;
+      }
+
+      .setting-input {
+        width: 100%;
+        padding: 6px;
+        background-color: #2a2a2a;
+        border: 1px solid #444;
+        color: #ccc;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      .setting-input:focus {
+        outline: none;
+        border-color: #4a9eff;
+      }
+
+      .setting-value {
+        color: #4a9eff;
+        font-weight: bold;
+      }
+
+      #debug-log {
+        position: fixed;
+        bottom: 20px;
+        left: 350px;
+        background-color: rgba(20, 20, 20, 0.95);
+        border: 1px solid #444;
+        border-radius: 8px;
+        width: 400px;
+        height: 300px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        color: #0f0;
+        padding: 10px;
+        z-index: 999;
+        display: none;
+      }
+
+      #debug-log.visible {
+        display: block;
+      }
+
+      .debug-entry {
+        padding: 2px 0;
+        border-bottom: 1px solid #333;
+      }
+
+      .debug-entry.error {
+        color: #f44;
+      }
+
+      .debug-entry.warning {
+        color: #fa0;
+      }
+
+      .debug-entry.info {
+        color: #0af;
+      }
+
+      #debug-toggle {
+        position: fixed;
+        bottom: 20px;
+        left: 310px;
+        width: 30px;
+        height: 30px;
+        background-color: #4a9eff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        color: white;
+        z-index: 1001;
+      }
+
+      #debug-toggle:hover {
+        background-color: #2e7fd1;
+      }
+
+      .render-button {
+        width: 100%;
+        padding: 8px;
+        background-color: #4a9eff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+      }
+
+      .render-button:hover {
+        background-color: #2e7fd1;
+      }
+
+      .render-button:disabled {
+        background-color: #666;
+        cursor: not-allowed;
+      }
+
+      /* === UNIFIED SIDEBAR STYLES === */
+      #sidebar-panel {
+        position: fixed;
+        right: 0;
+        top: 0;
+        width: 320px;
+        height: 100vh;
+        background-color: rgba(15, 15, 15, 0.98);
+        border-left: 2px solid #4a9eff;
+        overflow-y: auto;
+        z-index: 2000;
+        font-size: 12px;
+        scrollbar-width: thin;
+        scrollbar-color: #4a9eff #1a1a1a;
+      }
+
+      #sidebar-panel::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #sidebar-panel::-webkit-scrollbar-track {
+        background: #1a1a1a;
+      }
+
+      #sidebar-panel::-webkit-scrollbar-thumb {
+        background: #4a9eff;
+        border-radius: 4px;
+      }
+
+      #sidebar-panel::-webkit-scrollbar-thumb:hover {
+        background: #2e7fd1;
+      }
+
+      .sidebar-section {
+        padding: 15px;
+        border-bottom: 1px solid #333;
+      }
+
+      .sidebar-section h3 {
+        color: #4a9eff;
+        font-size: 13px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sidebar-section h3::before {
+        content: '';
+        width: 3px;
+        height: 14px;
+        background-color: #4a9eff;
+        border-radius: 2px;
+      }
+
+      .control-item {
+        margin-bottom: 12px;
+      }
+
+      .control-item label {
+        color: #ccc;
+        display: block;
+        margin-bottom: 4px;
+        font-weight: bold;
+        font-size: 11px;
+      }
+
+      .control-item input[type="range"] {
+        width: 100%;
+        cursor: pointer;
+      }
+
+      .control-item select,
+      .control-item input[type="text"] {
+        width: 100%;
+        padding: 6px;
+        background-color: #1f1f1f;
+        border: 1px solid #444;
+        color: #ccc;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+
+      .control-item select:focus,
+      .control-item input[type="text"]:focus {
+        outline: none;
+        border-color: #4a9eff;
+        background-color: #252525;
+      }
+
+      .control-item input[type="checkbox"] {
+        margin-right: 6px;
+        cursor: pointer;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        color: #ccc;
+        font-size: 11px;
+      }
+
+      .value-display {
+        color: #4a9eff;
+        font-weight: bold;
+        font-size: 11px;
+      }
+
+      /* === FPS/STATS COUNTER === */
+      #stats-panel {
+        position: fixed;
+        top: 15px;
+        right: 335px;
+        background-color: rgba(20, 20, 20, 0.95);
+        padding: 12px 15px;
+        border-radius: 6px;
+        border: 1px solid #4a9eff;
+        z-index: 1999;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        color: #0f0;
+        min-width: 150px;
+      }
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 3px 0;
+        padding: 2px 0;
+        border-bottom: 1px solid #333;
+      }
+
+      .stat-row:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .stat-label {
+        color: #0af;
+      }
+
+      .stat-value {
+        color: #0f0;
+        font-weight: bold;
+        text-align: right;
+      }
+
+      /* === TOOLTIP STYLES === */
+      .tooltip-icon {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        background-color: #4a9eff;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 14px;
+        font-size: 10px;
+        font-weight: bold;
+        cursor: help;
+        margin-left: 4px;
+        position: relative;
+      }
+
+      .tooltip-icon:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #1a1a1a;
+        color: #4a9eff;
+        padding: 8px 10px;
+        border-radius: 4px;
+        border: 1px solid #4a9eff;
+        white-space: nowrap;
+        font-size: 10px;
+        z-index: 3000;
+        pointer-events: none;
+        font-weight: normal;
+      }
+
+      .tooltip-icon:hover::before {
+        content: '';
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 4px solid transparent;
+        border-top-color: #4a9eff;
+        z-index: 3000;
+      }
+
+      /* Responsive: Shift canvas when sidebar is present */
+      canvas {
+        margin-right: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="ui-container">
+      <div id="preset-menu">
+        <h3>Presets</h3>
+        <button class="preset-button active" data-preset="cube">Cube</button>
+        <button class="preset-button" data-preset="sphere">Sphere</button>
+        <button class="preset-button" data-preset="pyramid">Pyramid</button>
+        <button class="preset-button" data-preset="torus">Torus</button>
+      </div>
+      <button class="button" id="load-stl-btn">Load STL File</button>
+      <input type="file" id="file-input" accept=".stl" />
+    </div>
+
+    <div id="info-panel">
+      <p><span class="label">Controls:</span></p>
+      <p>WASD - Move Camera</p>
+      <p>Scroll - Zoom In/Out</p>
+      <p>Click + Drag - Rotate View</p>
+      <p><span class="label" id="current-object">Current: Cube</span></p>
+    </div>
+
+    <button id="debug-toggle">D</button>
+    <div id="debug-log"></div>
+
+    <!-- FPS/Stats Counter -->
+    <div id="stats-panel">
+      <div class="stat-row">
+        <span class="stat-label">FPS:</span>
+        <span class="stat-value" id="fps-value">60</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Frame Time:</span>
+        <span class="stat-value" id="frame-time-value">16.67ms</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Triangles:</span>
+        <span class="stat-value" id="triangle-count-value">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Vertices:</span>
+        <span class="stat-value" id="vertex-count-value">0</span>
+      </div>
+    </div>
+
+    <!-- Unified Sidebar Panel -->
+    <div id="sidebar-panel">
+
+      <!-- Scene Controls -->
+      <div class="sidebar-section">
+        <h3>Scene
+          <span class="tooltip-icon" data-tooltip="Control scene lighting and environment settings"></span>
+        </h3>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="ambient-light-toggle" checked />
+              Ambient Light
+            </span>
+            <span class="tooltip-icon" data-tooltip="Background light illuminating entire scene"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>Ambient Intensity: <span class="value-display" id="ambient-value">0.6</span></label>
+          <input type="range" id="ambient-slider" min="0" max="2" step="0.1" value="0.6" />
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="directional-light-toggle" checked />
+              Directional Light
+            </span>
+            <span class="tooltip-icon" data-tooltip="Main directional light (like sunlight) casting shadows"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>Directional Intensity: <span class="value-display" id="directional-value">0.8</span></label>
+          <input type="range" id="directional-slider" min="0" max="2" step="0.1" value="0.8" />
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="environment-map-toggle" />
+              Environment Map
+            </span>
+            <span class="tooltip-icon" data-tooltip="Image-based lighting providing realistic reflections"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="particle-toggle" />
+              Particle Effects
+            </span>
+            <span class="tooltip-icon" data-tooltip="Decorative particle system for visual enhancement"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Material Controls -->
+      <div class="sidebar-section">
+        <h3>Material
+          <span class="tooltip-icon" data-tooltip="Adjust material properties affecting appearance"></span>
+        </h3>
+
+        <div class="control-item">
+          <label>Material Type:
+            <span class="tooltip-icon" data-tooltip="Different materials have different visual properties"></span>
+          </label>
+          <select id="material-select">
+            <option value="standard">Standard (Phong)</option>
+            <option value="metallic">Metallic</option>
+            <option value="plastic">Plastic</option>
+            <option value="rubber">Rubber</option>
+            <option value="physicalMetallic">Physical Metallic</option>
+            <option value="glass">Glass (High-End)</option>
+            <option value="sheenFabric">Sheen Fabric</option>
+          </select>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="shading-toggle" checked />
+              Shading
+            </span>
+            <span class="tooltip-icon" data-tooltip="Enable smooth shading vs flat shading"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Rendering Settings -->
+      <div class="sidebar-section">
+        <h3>Rendering
+          <span class="tooltip-icon" data-tooltip="Core rendering quality and performance settings"></span>
+        </h3>
+
+        <div class="control-item">
+          <label>Exposure: <span class="value-display" id="exposure-display">1.0</span>
+            <span class="tooltip-icon" data-tooltip="Brightness of the rendered scene"></span>
+          </label>
+          <input type="range" id="exposure-slider" min="0.1" max="3" step="0.1" value="1.0" />
+        </div>
+
+        <div class="control-item">
+          <label>FOV: <span class="value-display" id="fov-display">75</span>°
+            <span class="tooltip-icon" data-tooltip="Camera field of view - wider = more visible"></span>
+          </label>
+          <input type="range" id="fov-slider" min="20" max="120" value="75" />
+        </div>
+
+        <div class="control-item">
+          <label>Samples: <span class="value-display" id="samples-display">1</span>
+            <span class="tooltip-icon" data-tooltip="Number of render passes (higher = better quality, slower)"></span>
+          </label>
+          <input type="range" id="samples-slider" min="1" max="256" value="1" />
+        </div>
+
+        <button class="render-button" id="render-btn">Render</button>
+      </div>
+
+      <!-- Post-Processing Effects -->
+      <div class="sidebar-section">
+        <h3>Effects
+          <span class="tooltip-icon" data-tooltip="Advanced post-processing visual effects"></span>
+        </h3>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="bloom-toggle" />
+              Bloom
+            </span>
+            <span class="tooltip-icon" data-tooltip="Glowing effect around bright areas - creates dreamy look"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="ssao-toggle" />
+              SSAO
+            </span>
+            <span class="tooltip-icon"
+              data-tooltip="Screen-Space Ambient Occlusion - darkens crevices for depth"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="ssr-toggle" />
+              SSR
+            </span>
+            <span class="tooltip-icon"
+              data-tooltip="Screen-Space Reflections - reflects scene onto shiny surfaces"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="dof-toggle" />
+              Depth of Field
+            </span>
+            <span class="tooltip-icon" data-tooltip="Blurs out-of-focus areas - cinematic camera effect"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Performance Optimizations -->
+      <div class="sidebar-section">
+        <h3>Performance
+          <span class="tooltip-icon" data-tooltip="Optimizations affecting rendering speed and quality balance"></span>
+        </h3>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="lod-toggle" checked />
+              LOD System
+            </span>
+            <span class="tooltip-icon" data-tooltip="Level of Detail - reduces geometry when camera is far away"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="occlusion-toggle" checked />
+              Occlusion Culling
+            </span>
+            <span class="tooltip-icon" data-tooltip="Skips rendering hidden objects behind walls/geometry"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="shadow-toggle" checked />
+              Shadow Maps
+            </span>
+            <span class="tooltip-icon" data-tooltip="Dynamic shadows from lights - very performance intensive"></span>
+          </label>
+        </div>
+
+        <div class="control-item">
+          <label>
+            <span class="checkbox-label">
+              <input type="checkbox" id="instancing-toggle" />
+              GPU Instancing
+            </span>
+            <span class="tooltip-icon" data-tooltip="Render many identical objects efficiently using GPU"></span>
+          </label>
+        </div>
+
+        <button class="render-button" id="instanced-demo-btn">Load Instanced Objects</button>
+        <button class="render-button" id="baked-lighting-btn">Apply Baked Lighting</button>
+      </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="threejs-test.js"></script>
+  </body>
+
+</html>
