@@ -260,13 +260,13 @@
           * Shows/hides banner based on network connectivity
           */
          const offlineBanner = document.getElementById('offlineBanner');
+         let header = document.getElementById('header');
 
          function updateOnlineStatus() {
             if (!navigator.onLine) {
                console.log('[Index] Network status: OFFLINE');
                offlineBanner.classList.add('show');
                document.body.classList.add('offline-mode');
-               let header = document.getElementById('header');
                let height = window.getComputedStyle(offlineBanner).height;
                header.style.setProperty('top', height);
                alert(height);
@@ -274,6 +274,7 @@
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
                document.body.classList.remove('offline-mode');
+               header.style.setProperty('top', 0);
             }
          }
 
