@@ -267,7 +267,7 @@
                offlineBanner.classList.add('show');
                document.body.classList.add('offline-mode');
                let header = document.getElementById('header');
-               let height = offlineBanner.offsetHeight;
+               let height = window.getComputedStyle(offlineBanner).height;
                header.style.setProperty('top', height);
                alert(height);
             } else {
