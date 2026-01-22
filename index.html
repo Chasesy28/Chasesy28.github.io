@@ -269,6 +269,7 @@
                let header = document.getElementById('header');
                let height = offlineBanner.clientHeight;
                header.style.setProperty('top', height);
+               alert(height);
             } else {
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
