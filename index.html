@@ -269,19 +269,21 @@
                offlineBanner.classList.add('show');
                document.body.classList.add('offline-mode');
                let height = window.getComputedStyle(offlineBanner).height;
-               //height = parseFloat(height);
-               //let rainHeight = window.getComputedStyle(rain).height;
-               //rainHeight = parseFloat(rainHeight) - height;
+               let rainHeight = window.getComputedStyle(rain).height;
+               height = parseFloat(height);
+               rainHeight = parseFloat(rainHeight) - height;
+               height = "{height}px";
+               rainHeight = "{rainHeight}px";
                header.style.setProperty('top', height-1);
                rain.style.setProperty('top', height);
-               //rain.style.setProperty('height', rainHeight);
+               rain.style.setProperty('height', rainHeight);
             } else {
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
                document.body.classList.remove('offline-mode');
                header.style.setProperty('top', 0);
                rain.style.setProperty('top', 0);
-               //rain.style.setProperty('height', "100%");
+               rain.style.setProperty('height', "100%");
             }
          }
 
