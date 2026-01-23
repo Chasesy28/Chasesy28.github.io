@@ -272,11 +272,9 @@
                let rainHeight = window.getComputedStyle(rain).height;
                height = parseFloat(height);
                rainHeight = parseFloat(rainHeight) - height;
-               height = "{height}px";
-               rainHeight = "{rainHeight}px";
-               header.style.setProperty('top', height-1);
-               rain.style.setProperty('top', height);
-               rain.style.setProperty('height', rainHeight);
+               header.style.setProperty('top', "{height-1}px");
+               rain.style.setProperty('top', "{height}px");
+               rain.style.setProperty('height', "{rainHeight}px");
             } else {
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
