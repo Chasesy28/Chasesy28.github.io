@@ -26,6 +26,7 @@ body::-webkit-scrollbar {
     display: none;
     font-weight: 500;
     height: 50;
+    margin: 0;
 }
 
 .offline-banner.show {
@@ -94,7 +95,7 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    margin-bottom: 50px;
+    margin: 0;
 }
 
 /* Style the site title in the header */
