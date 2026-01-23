@@ -261,6 +261,7 @@
           */
          const offlineBanner = document.getElementById('offlineBanner');
          let header = document.getElementById('header');
+         let rain = document.getElementById('rain')
 
          function updateOnlineStatus() {
             if (!navigator.onLine) {
@@ -269,12 +270,13 @@
                document.body.classList.add('offline-mode');
                let height = window.getComputedStyle(offlineBanner).height;
                header.style.setProperty('top', height);
-               alert(height);
+               rain.style.setProperty('top', height);
             } else {
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
                document.body.classList.remove('offline-mode');
                header.style.setProperty('top', 0);
+               rain.style.setProperty('top', 0);
             }
          }
 
