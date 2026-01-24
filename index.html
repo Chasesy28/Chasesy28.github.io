@@ -270,12 +270,9 @@
                document.body.classList.add('offline-mode');
                let height = window.getComputedStyle(offlineBanner).height;
                let rainHeight = window.getComputedStyle(rain).height;
-               alert(height);
                height = parseFloat(height);
-               alert(height);
-               alert(`${height}px`);
                rainHeight = parseFloat(rainHeight) - height;
-               header.style.setProperty('top', `${height-5}px`); //Value needs tweaking
+               header.style.setProperty('top', `${height-10}px`); //Value needs tweaking
                rain.style.setProperty('top', `${height}px`);
                rain.style.setProperty('height', `${rainHeight}px`);
             } else {
