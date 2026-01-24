@@ -261,7 +261,6 @@
           */
          const offlineBanner = document.getElementById('offlineBanner');
          let header = document.getElementById('header');
-         let rain = document.getElementById('rain');
 
          function updateOnlineStatus() {
             if (!navigator.onLine) {
@@ -269,9 +268,7 @@
                offlineBanner.classList.add('show');
                document.body.classList.add('offline-mode');
                let height = window.getComputedStyle(offlineBanner).height;
-               let rainHeight = window.getComputedStyle(rain).height;
                height = parseFloat(height);
-               rainHeight = parseFloat(rainHeight) - height;
                header.style.setProperty('top', `${height}px`);
             } else {
                console.log('[Index] Network status: ONLINE');
