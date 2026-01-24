@@ -272,16 +272,12 @@
                let rainHeight = window.getComputedStyle(rain).height;
                height = parseFloat(height);
                rainHeight = parseFloat(rainHeight) - height;
-               header.style.setProperty('top', `${height}px`); //Value needs tweaking
-               rain.style.setProperty('top', `${height}px`);
-               rain.style.setProperty('height', `${rainHeight}px`);
+               header.style.setProperty('top', `${height}px`);
             } else {
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
                document.body.classList.remove('offline-mode');
                header.style.setProperty('top', 0);
-               rain.style.setProperty('top', 0);
-               rain.style.setProperty('height', "100%");
             }
          }
 
