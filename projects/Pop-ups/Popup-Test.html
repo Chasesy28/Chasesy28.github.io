@@ -47,9 +47,19 @@
 
         const windowFeatures = `width=${width},height=${height},left=${x},top=${y},popup=yes`;
 
-        const popupWindow = window.open ('', 'popup', windowFeatures);
-      }
+        const popupWindow = window.open('', 'popup', windowFeatures);
 
+        let dx = 2;
+        let dy = 2;
+
+        const movePopup = () => {
+          if (popupWindow.closed) {
+            clearInterval(animationInterval);
+            return;
+          }
+          popupWindow.moveBy(dx, dy);
+        }
+      }
       openPopupBtn.addEventListener('click', openPopup);
     </script>
   </body>
