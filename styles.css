@@ -33,7 +33,8 @@ body::-webkit-scrollbar {
     display: block;
 }
 
-/*body.offline-mode {
+/* Test
+body.offline-mode {
     padding-top: 50px;
 }*/
 
