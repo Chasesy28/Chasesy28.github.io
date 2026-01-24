@@ -33,9 +33,9 @@ body::-webkit-scrollbar {
     display: block;
 }
 
-body.offline-mode {
+/*body.offline-mode {
     padding-top: 50px;
-}
+}*/
 
 /* ---- Title Styling ---- */
 h1 {
