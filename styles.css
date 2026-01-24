@@ -33,11 +33,6 @@ body::-webkit-scrollbar {
     display: block;
 }
 
-/* Test
-body.offline-mode {
-    padding-top: 50px;
-}*/
-
 /* ---- Title Styling ---- */
 h1 {
     /* Your color and font weight */
