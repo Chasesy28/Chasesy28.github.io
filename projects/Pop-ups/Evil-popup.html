@@ -126,7 +126,7 @@
             popupWindow.focus();
 
             // --- 5. Animation Loop ---
-            /*const movePopup = () => {
+            const movePopup = () => {
                 if (popupWindow.closed) {
                     clearInterval(animationInterval);
                     return;
@@ -142,12 +142,13 @@
                 y = Math.max(0, Math.min(y, screen.availHeight - height));
 
                 try {
-                    popupWindow.moveTo(x, y);
+                    //popupWindow.moveTo(x, y);
+                    popupWindow.moveBy(dx, dy);
                     popupWindow.focus();
                 } catch (e) {
                     // Browser might block this
                 }
-            };*/
+            };
 
             //const animationInterval = setInterval(movePopup, 16);
         };
