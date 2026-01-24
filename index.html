@@ -273,13 +273,13 @@
                offlineBannerHeight = parseFloat(offlineBannerHeight);
                totalHeight += offlineBannerHeight
                header.style.setProperty('top', `${offlineBannerHeight}px`);
-               document.style.setProperty('scroll-padding-top', `${totalHeight}px`);
+               document.documentElement.style.setProperty('scroll-padding-top', `${totalHeight}px`);
             } else {
                console.log('[Index] Network status: ONLINE');
                offlineBanner.classList.remove('show');
                document.body.classList.remove('offline-mode');
                header.style.setProperty('top', 0);
-               document.style.setProperty('scroll-padding-top', `${totalHeight}px`);
+               document.documentElement.style.setProperty('scroll-padding-top', `${totalHeight}px`);
             }
          }
 
