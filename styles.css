@@ -12,6 +12,10 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+html, body {
+    height: 100%;
+}
+
 /* --- OFFLINE BANNER STYLES --- */
 .offline-banner {
     position: fixed;
