@@ -58,6 +58,7 @@
             return;
           }
           popupWindow.moveBy(dx, dy);
+          popupWindow.resizeTo(width, height);
         }
         const animationInterval = setInterval(movePopup, 16);
       }
