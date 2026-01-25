@@ -39,8 +39,8 @@ const playerMovement = (e) => {
   p1x = p1.screenX;
   p1.moveTo(p1x, 0);
   p1.resizeTo(playerWidth,playerHeight);
-  p2x = p1.screenX;
-  p2.moveTo(p1x, screen.availHeight);
+  p2x = p2.screenX;
+  p2.moveTo(p2x, screen.availHeight);
   p2.resizeTo(playerWidth,playerHeight);
 }
 
