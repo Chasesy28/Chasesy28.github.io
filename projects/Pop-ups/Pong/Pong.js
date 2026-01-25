@@ -25,4 +25,5 @@ document.addEventListener('keydown', (e) => {
     case "ArrowLeft":
       p1.moveBy(-pSpeed, 0);
       break;
+  }
 });
