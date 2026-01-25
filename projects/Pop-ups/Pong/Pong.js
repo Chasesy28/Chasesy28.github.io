@@ -6,7 +6,7 @@ const playerWidth = 450;
 const playerHeight = 50;
 let p1x = (screen.width/2) - (playerWidth/2);
 let p2x = p1x;
-let pSpeed = 2;
+let pSpeed = 5;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${p1x},top=${0},popup=yes`;
 
 const playerMovement = (e) => {
@@ -22,6 +22,7 @@ const playerMovement = (e) => {
       console.log("Left");
       break;
   }
+  p1x = p1.screenX;
   p1.resizeTo(playerWidth,playerHeight);
 }
 
