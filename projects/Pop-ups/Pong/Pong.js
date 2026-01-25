@@ -22,6 +22,7 @@ const playerMovement = (e) => {
       console.log("Left");
       break;
   }
+  p1.resizeTo(playerWidth,playerHeight);
 }
 
 const startGame = () => {
