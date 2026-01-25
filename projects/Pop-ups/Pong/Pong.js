@@ -10,7 +10,8 @@ const startGame = () => {
   const p1Features = `width=${playerWidth},height=${playerHeight},left=${p1x},top=${0},popup=yes`;
 
   const p1 = window.open('', 'Player1', p1Features);
-  p1.moveTo(p1x, 0);
+  p1.moveTo(p1x,0);
+  p1.resizeTo(playerWidth,playerHeight);
 };
 
 startButton.addEventListener('click', startGame);
