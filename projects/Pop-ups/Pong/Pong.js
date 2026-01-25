@@ -21,9 +21,11 @@ document.addEventListener('keydown', (e) => {
   switch(e.key){
     case "ArrowRight":
       p1.moveBy(pSpeed, 0);
+      console.log("Right");
       break;
     case "ArrowLeft":
       p1.moveBy(-pSpeed, 0);
+      console.log("Left");
       break;
   }
 });
