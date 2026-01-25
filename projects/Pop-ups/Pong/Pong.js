@@ -15,17 +15,22 @@ const startGame = () => {
   p1.resizeTo(playerWidth,playerHeight);
 };
 
-startButton.addEventListener('click', startGame);
-
-document.addEventListener('keydown', (e) => {
+const playerMovement = (e) => {
   switch(e.key){
     case "ArrowRight":
+      p1.focus();
       p1.moveBy(pSpeed, 0);
       console.log("Right");
       break;
     case "ArrowLeft":
+      p1.focus();
       p1.moveBy(-pSpeed, 0);
       console.log("Left");
       break;
   }
-});
+}
+
+startButton.addEventListener('click', startGame);
+
+document.addEventListener('keydown', (e) => {playerMovement(e);});
+p1.addEventListener('keydown', (e) => {playerMovement(e);});
