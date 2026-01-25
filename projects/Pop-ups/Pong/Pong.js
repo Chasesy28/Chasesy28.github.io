@@ -48,10 +48,15 @@ const startGame = () => {
   p1 = window.open('', 'Player1', p1Features);
   p1.moveTo(p1x,0);
   p1.resizeTo(playerWidth,playerHeight);
+  p2 = window.open('', 'Player2', p2Features);
+  p2.moveTo(p2x,screen.availHeight);
+  p2.resizeTo(playerWidth,playerHeight);
   document.removeEventListener('keydown', playerMovement);
-  p1.removeEventListener('keydown', playerMovement);
   document.addEventListener('keydown', playerMovement);
+  p1.removeEventListener('keydown', playerMovement);
   p1.addEventListener('keydown', playerMovement);
+  p2.removeEventListener('keydown', playerMovement);
+  p2.addEventListener('keydown', playerMovement);
 };
 
 startButton.addEventListener('click', startGame);
