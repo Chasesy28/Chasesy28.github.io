@@ -4,26 +4,44 @@ let p1;
 let p2;
 const playerWidth = 450;
 const playerHeight = 50;
+let pSpeed = 5;
 let p1x = (screen.width/2) - (playerWidth/2);
 let p2x = p1x;
-let pSpeed = 5;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${p1x},top=${0},popup=yes`;
+const p2Features = `width=${playerWidth},height=${playerHeight},left=${p2x},top=${screen.availHeight},popup=yes`;
+
 
 const playerMovement = (e) => {
   switch(e.key){
     case "ArrowRight":
       p1.focus();
+      p2.focus();
       p1.moveBy(pSpeed, 0);
-      console.log("Right");
       break;
     case "ArrowLeft":
       p1.focus();
+      p2.focus();
       p1.moveBy(-pSpeed, 0);
-      console.log("Left");
+      break;
+    case "D":
+    case "d":
+      p1.focus();
+      p2.focus();
+      p2.moveBy(pSpeed, 0);
+      break;
+    case "A":
+    case "a":
+      p1.focus();
+      p2.focus();
+      p2.moveBy(-pSpeed, 0);
       break;
   }
   p1x = p1.screenX;
+  p1.moveTo(p1x, 0);
   p1.resizeTo(playerWidth,playerHeight);
+  p2x = p1.screenX;
+  p2.moveTo(p1x, screen.availHeight);
+  p2.resizeTo(playerWidth,playerHeight);
 }
 
 const startGame = () => {
