@@ -40,12 +40,12 @@
 
         // --- 1. ADD THIS LISTENER (THE "MAILBOX") ---
         // This listens for messages from any window
-        window.addEventListener('message', (event) => {
+        /*window.addEventListener('message', (event) => {
             // If the message is the one we expect, run the function
             if (event.data === 'spawnNewWindow') {
                 openSignInPopup();
             }
-        });
+        });*/
 
         // Function to open the sign-in popup
         const openSignInPopup = () => {
