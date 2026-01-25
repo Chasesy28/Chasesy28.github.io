@@ -2,7 +2,7 @@ const startButton = document.getElementById("startButton");
 
 const startGame = () => {
   const playerWidth = 450;
-  const playerHeight = 150;
+  const playerHeight = 50;
 
   let p1x = (screen.width/2) - (playerWidth/2);
   let p2x = p1x;
