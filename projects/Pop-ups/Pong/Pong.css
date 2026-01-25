@@ -16,3 +16,7 @@ html, body{
   display: inline-block;
   margin: 4px 2px;
 }
+#startButton:hover {
+  background-color: limegreen;
+  color: dimgray;
+}
