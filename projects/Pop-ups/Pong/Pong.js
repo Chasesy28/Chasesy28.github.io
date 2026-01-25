@@ -17,24 +17,20 @@ const playerMovement = (e) => {
       p1.focus();
       p2.focus();
       p1.moveBy(pSpeed, 0);
-      break;
     case "ArrowLeft":
       p1.focus();
       p2.focus();
       p1.moveBy(-pSpeed, 0);
-      break;
     case "D":
     case "d":
       p1.focus();
       p2.focus();
       p2.moveBy(pSpeed, 0);
-      break;
     case "A":
     case "a":
       p1.focus();
       p2.focus();
       p2.moveBy(-pSpeed, 0);
-      break;
   }
   p1x = p1.screenX;
   p1.moveTo(p1x, 0);
