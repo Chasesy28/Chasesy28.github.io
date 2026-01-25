@@ -9,12 +9,6 @@ let p2x = p1x;
 let pSpeed = 2;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${p1x},top=${0},popup=yes`;
 
-const startGame = () => {
-  p1 = window.open('', 'Player1', p1Features);
-  p1.moveTo(p1x,0);
-  p1.resizeTo(playerWidth,playerHeight);
-};
-
 const playerMovement = (e) => {
   switch(e.key){
     case "ArrowRight":
@@ -30,7 +24,14 @@ const playerMovement = (e) => {
   }
 }
 
-startButton.addEventListener('click', startGame);
+const startGame = () => {
+  p1 = window.open('', 'Player1', p1Features);
+  p1.moveTo(p1x,0);
+  p1.resizeTo(playerWidth,playerHeight);
+  document.removeEventListener('keydown', playerMovement);
+  p1.removeEventListener('keydown', playerMovement);
+  document.addEventListener('keydown', playerMovement);
+  p1.addEventListener('keydown', playerMovement);
+};
 
-document.addEventListener('keydown', (e) => {playerMovement(e);});
-p1.addEventListener('keydown', (e) => {playerMovement(e);});
+startButton.addEventListener('click', startGame);
