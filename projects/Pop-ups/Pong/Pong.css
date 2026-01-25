@@ -18,5 +18,5 @@ html, body{
 }
 #startButton:hover {
   background-color: limegreen;
-  color: dimgray;
+  padding: 5px 10px;
 }
