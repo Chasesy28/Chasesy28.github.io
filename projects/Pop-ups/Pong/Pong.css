@@ -3,7 +3,7 @@ html, body{
   justify-content: center;
   align-items: center;
   height: 100dvh;
-  width: 100dwh;
+  width: 100%;
   background-color: dimgray;
 }
 #startButton {
