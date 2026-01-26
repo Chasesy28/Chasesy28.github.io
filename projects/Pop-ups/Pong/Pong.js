@@ -40,6 +40,8 @@ const playerMovement = (e) => {
 }
 
 const startGame = () => {
+  p1x = (screen.width/2) - (playerWidth/2);
+  p2x = p1x;
   p1 = window.open('', 'Player1', p1Features);
   p1.moveTo(p1x,0);
   p1.resizeTo(playerWidth,playerHeight);
