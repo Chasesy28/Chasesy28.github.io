@@ -10,14 +10,18 @@ let p2y = p1y;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${0},top=${p1y},popup=yes`;
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${screen.availWidth},top=${p2y},popup=yes`;
 
+const resetPlayerValues = () => {
+  p1.resizeTo(playerWidth,playerHeight);
+  p1.moveTo(0,p1y);
+};
+
 const playerMovement = (e) => {
 
-}
+};
 
 const startGame = () => {
   p1 = window.open('','',p1Features);
-  p1.resizeTo(playerWidth,playerHeight);
-  p1.moveTo(0,p1y);
+  resetPlayerValues();
 };
 
 startButton.addEventListener('click', startGame);
