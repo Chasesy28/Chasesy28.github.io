@@ -5,7 +5,7 @@ let p2;
 const playerWidth = 50;
 const playerHeight = 450;
 let pSpeed = 5;
-let p1y = (screen.width/2) - (playerWidth/2);
+let p1y = (screen.height/2) - (playerHeight/2);
 let p2y = p1y;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${0},top=${p1y},popup=yes`;
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${screen.availWidth},top=${p2y},popup=yes`;
