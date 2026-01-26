@@ -10,7 +10,6 @@ let p2x = p1x;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${p1x},top=${0},popup=yes`;
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${p2x},top=${screen.availHeight},popup=yes`;
 
-
 const playerMovement = (e) => {
   switch(e.key){
     case "ArrowRight":
