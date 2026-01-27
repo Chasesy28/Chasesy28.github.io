@@ -977,13 +977,13 @@ window.addEventListener("keyup", (e) => {
   keys[e.key.toLowerCase()] = false;
 });
 
-// Mouse wheel zoom
+// Mouse wheel zoom - Fixed with passive: false to allow preventDefault
 window.addEventListener("wheel", (e) => {
   e.preventDefault();
   const zoomSpeed = 0.1;
   camera.position.z += e.deltaY > 0 ? zoomSpeed : -zoomSpeed;
   camera.position.z = Math.max(0.5, Math.min(50, camera.position.z));
-});
+}, { passive: false });
 
 // Mouse controls for rotation
 document.addEventListener("mousedown", (e) => {
