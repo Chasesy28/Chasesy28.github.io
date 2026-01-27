@@ -20,6 +20,7 @@ const playerMovement = (e) => {
 };
 
 const startGame = () => {
+  p1.close();
   p1 = window.open('','',p1Features);
   resetPlayerValues();
 };
