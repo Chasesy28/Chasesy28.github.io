@@ -2,8 +2,8 @@ const startButton = document.getElementById("startButton");
 
 let p1;
 let p2;
-const playerWidth = 50;
-const playerHeight = 450;
+const playerWidth = 25;
+const playerHeight = 250;
 let pSpeed = 5;
 let p1y = (screen.height/2) - (playerHeight/2);
 let p2y = p1y;
