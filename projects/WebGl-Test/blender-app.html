@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a1a">
+  <title>3D Modeling Studio - Blender-like Web App</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192x192.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      color: #e0e0e0;
+    }
+
+    /* === TOP MENU BAR === */
+    #top-menubar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: linear-gradient(180deg, #2a2a2a 0%, #202020 100%);
+      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
+      z-index: 3000;
+      user-select: none;
+    }
+
+    .menu-item {
+      padding: 0 12px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: #ddd;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      background-color: #4a9eff;
+      color: white;
+    }
+
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      min-width: 200px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+      z-index: 3001;
+    }
+
+    .menu-item:hover .menu-dropdown {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      border-bottom: 1px solid #333;
+      font-size: 12px;
+    }
+
+    .dropdown-item:hover {
+      background-color: #4a9eff;
+    }
+
+    .keybind {
+      color: #888;
+      font-size: 11px;
+      margin-left: 20px;
+    }
+
+    /* === WORKSPACE TABS === */
+    #workspace-tabs {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      right: 0;
+      height: 36px;
+      background: #252525;
+      border-bottom: 1px solid #000;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      z-index: 2500;
+      overflow-x: auto;
+    }
+
+    .workspace-tab {
+      padding: 8px 16px;
+      margin: 0 2px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .workspace-tab:hover {
+      background: #2a2a2a;
+      border-color: #4a9eff;
+    }
+
+    .workspace-tab.active {
+      background: #4a9eff;
+      border-color: #4a9eff;
+      color: white;
+    }
+
+    /* === SIDEBAR === */
+    #sidebar {
+      position: fixed;
+      right: 0;
+      top: 68px;
+      width: 280px;
+      height: calc(100vh - 68px);
+      background: rgba(25, 25, 25, 0.98);
+      border-left: 1px solid #333;
+      overflow-y: auto;
+      z-index: 2000;
+      transition: transform 0.3s ease;
+      scrollbar-width: thin;
+      scrollbar-color: #4a9eff #1a1a1a;
+    }
+
+    #sidebar.collapsed {
+      transform: translateX(280px);
+    }
+
+    #sidebar-toggle {
+      position: fixed;
+      right: 280px;
+      top: 100px;
+      width: 24px;
+      height: 40px;
+      background: #2a2a2a;
+      border: 1px solid #333;
+      border-right: none;
+      border-radius: 4px 0 0 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2001;
+      transition: right 0.3s ease;
+      color: #4a9eff;
+      font-size: 14px;
+    }
+
+    #sidebar.collapsed + #sidebar-toggle {
+      right: 0;
+    }
+
+    #sidebar-toggle:hover {
+      background: #4a9eff;
+      color: white;
+    }
+
+    .sidebar-section {
+      padding: 12px;
+      border-bottom: 1px solid #333;
+    }
+
+    .sidebar-section h3 {
+      font-size: 12px;
+      color: #4a9eff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      background: #4a9eff;
+      border-radius: 50%;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: help;
+      position: relative;
+    }
+
+    .help-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: #4a9eff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #4a9eff;
+      white-space: nowrap;
+      font-size: 10px;
+      z-index: 3000;
+      pointer-events: none;
+      font-weight: normal;
+    }
+
+    .control-item {
+      margin-bottom: 10px;
+    }
+
+    .control-item label {
+      display: block;
+      font-size: 11px;
+      color: #ccc;
+      margin-bottom: 4px;
+    }
+
+    .control-item input[type="range"],
+    .control-item select,
+    .control-item input[type="text"],
+    .control-item input[type="number"] {
+      width: 100%;
+      padding: 4px 6px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #ccc;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .control-item input:focus,
+    .control-item select:focus {
+      outline: none;
+      border-color: #4a9eff;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 8px;
+      background: #4a9eff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: #2e7fd1;
+    }
+
+    .btn:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+
+    /* === CANVAS CONTAINER === */
+    #canvas-container {
+      position: fixed;
+      top: 68px;
+      left: 0;
+      right: 280px;
+      bottom: 0;
+      transition: right 0.3s ease;
+    }
+
+    #sidebar.collapsed ~ #canvas-container {
+      right: 0;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* === STATUS BAR === */
+    #status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 24px;
+      background: #252525;
+      border-top: 1px solid #000;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 11px;
+      color: #999;
+      z-index: 2000;
+      gap: 20px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-value {
+      color: #4a9eff;
+      font-weight: bold;
+    }
+
+    /* === LOADING INDICATOR === */
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px 40px;
+      border-radius: 8px;
+      border: 1px solid #4a9eff;
+      color: #4a9eff;
+      font-size: 14px;
+      z-index: 5000;
+      display: none;
+    }
+
+    #loading.visible {
+      display: block;
+    }
+
+    /* === TOOLTIP === */
+    .tooltip {
+      position: fixed;
+      background: rgba(0, 0, 0, 0.9);
+      color: #4a9eff;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid #4a9eff;
+      font-size: 11px;
+      pointer-events: none;
+      z-index: 6000;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Menu Bar -->
+  <div id="top-menubar">
+    <div class="menu-item">
+      File
+      <div class="menu-dropdown">
+        <div class="dropdown-item" data-action="new"><span>New</span><span class="keybind">Ctrl+N</span></div>
+        <div class="dropdown-item" data-action="open"><span>Open</span><span class="keybind">Ctrl+O</span></div>
+        <div class="dropdown-item" data-action="save"><span>Save</span><span class="keybind">Ctrl+S</span></div>
+        <div class="dropdown-item" data-action="saveas"><span>Save As...</span><span class="keybind">Ctrl+Shift+S</span></div>
+        <div class="dropdown-item" data-action="export"><span>Export</span><span class="keybind">Ctrl+E</span></div>
+        <div class="dropdown-item" data-action="import"><span>Import</span><span class="keybind">Ctrl+I</span></div>
+      </div>
+    </div>
+    <div class="menu-item">
+      Edit
+      <div class="menu-dropdown">
+        <div class="dropdown-item" data-action="undo"><span>Undo</span><span class="keybind">Ctrl+Z</span></div>
+        <div class="dropdown-item" data-action="redo"><span>Redo</span><span class="keybind">Ctrl+Shift+Z</span></div>
+        <div class="dropdown-item" data-action="delete"><span>Delete</span><span class="keybind">X</span></div>
+        <div class="dropdown-item" data-action="duplicate"><span>Duplicate</span><span class="keybind">Shift+D</span></div>
+      </div>
+    </div>
+    <div class="menu-item">
+      Add
+      <div class="menu-dropdown">
+        <div class="dropdown-item" data-action="add-cube"><span>Cube</span><span class="keybind">Shift+A → C</span></div>
+        <div class="dropdown-item" data-action="add-sphere"><span>Sphere</span><span class="keybind">Shift+A → S</span></div>
+        <div class="dropdown-item" data-action="add-cylinder"><span>Cylinder</span><span class="keybind">Shift+A → Y</span></div>
+        <div class="dropdown-item" data-action="add-cone"><span>Cone</span><span class="keybind">Shift+A → O</span></div>
+        <div class="dropdown-item" data-action="add-torus"><span>Torus</span><span class="keybind">Shift+A → T</span></div>
+        <div class="dropdown-item" data-action="add-plane"><span>Plane</span><span class="keybind">Shift+A → P</span></div>
+      </div>
+    </div>
+    <div class="menu-item">
+      View
+      <div class="menu-dropdown">
+        <div class="dropdown-item" data-action="view-front"><span>Front</span><span class="keybind">Numpad 1</span></div>
+        <div class="dropdown-item" data-action="view-back"><span>Back</span><span class="keybind">Ctrl+Numpad 1</span></div>
+        <div class="dropdown-item" data-action="view-right"><span>Right</span><span class="keybind">Numpad 3</span></div>
+        <div class="dropdown-item" data-action="view-left"><span>Left</span><span class="keybind">Ctrl+Numpad 3</span></div>
+        <div class="dropdown-item" data-action="view-top"><span>Top</span><span class="keybind">Numpad 7</span></div>
+        <div class="dropdown-item" data-action="view-bottom"><span>Bottom</span><span class="keybind">Ctrl+Numpad 7</span></div>
+        <div class="dropdown-item" data-action="view-camera"><span>Camera</span><span class="keybind">Numpad 0</span></div>
+      </div>
+    </div>
+    <div class="menu-item">
+      Transform
+      <div class="menu-dropdown">
+        <div class="dropdown-item" data-action="move"><span>Move</span><span class="keybind">G</span></div>
+        <div class="dropdown-item" data-action="rotate"><span>Rotate</span><span class="keybind">R</span></div>
+        <div class="dropdown-item" data-action="scale"><span>Scale</span><span class="keybind">S</span></div>
+      </div>
+    </div>
+    <div class="menu-item">
+      Render
+      <div class="menu-dropdown">
+        <div class="dropdown-item" data-action="render-image"><span>Render Image</span><span class="keybind">F12</span></div>
+        <div class="dropdown-item" data-action="render-animation"><span>Render Animation</span><span class="keybind">Ctrl+F12</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workspace Tabs -->
+  <div id="workspace-tabs">
+    <div class="workspace-tab active" data-workspace="layout">Layout</div>
+    <div class="workspace-tab" data-workspace="modeling">Modeling</div>
+    <div class="workspace-tab" data-workspace="sculpting">Sculpting</div>
+    <div class="workspace-tab" data-workspace="uv-editing">UV Editing</div>
+    <div class="workspace-tab" data-workspace="texture-paint">Texture Paint</div>
+    <div class="workspace-tab" data-workspace="shading">Shading</div>
+    <div class="workspace-tab" data-workspace="rendering">Rendering</div>
+    <div class="workspace-tab" data-workspace="compositing">Compositing</div>
+    <div class="workspace-tab" data-workspace="scripting">Scripting</div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <!-- Scene Section -->
+    <div class="sidebar-section">
+      <h3>Scene <span class="help-icon" data-tooltip="Manage scene objects and properties">?</span></h3>
+      <div class="control-item">
+        <label>Active Object:</label>
+        <select id="object-select">
+          <option value="">None</option>
+        </select>
+      </div>
+      <button class="btn" data-action="delete">Delete Selected</button>
+    </div>
+
+    <!-- Transform Section -->
+    <div class="sidebar-section">
+      <h3>Transform <span class="help-icon" data-tooltip="Position, rotation, and scale controls">?</span></h3>
+      <div class="control-item">
+        <label>Location X:</label>
+        <input type="number" id="loc-x" value="0" step="0.1">
+      </div>
+      <div class="control-item">
+        <label>Location Y:</label>
+        <input type="number" id="loc-y" value="0" step="0.1">
+      </div>
+      <div class="control-item">
+        <label>Location Z:</label>
+        <input type="number" id="loc-z" value="0" step="0.1">
+      </div>
+      <div class="control-item">
+        <label>Rotation X:</label>
+        <input type="number" id="rot-x" value="0" step="1">
+      </div>
+      <div class="control-item">
+        <label>Rotation Y:</label>
+        <input type="number" id="rot-y" value="0" step="1">
+      </div>
+      <div class="control-item">
+        <label>Rotation Z:</label>
+        <input type="number" id="rot-z" value="0" step="1">
+      </div>
+      <div class="control-item">
+        <label>Scale X:</label>
+        <input type="number" id="scale-x" value="1" step="0.1" min="0.01">
+      </div>
+      <div class="control-item">
+        <label>Scale Y:</label>
+        <input type="number" id="scale-y" value="1" step="0.1" min="0.01">
+      </div>
+      <div class="control-item">
+        <label>Scale Z:</label>
+        <input type="number" id="scale-z" value="1" step="0.1" min="0.01">
+      </div>
+    </div>
+
+    <!-- Material Section -->
+    <div class="sidebar-section">
+      <h3>Material <span class="help-icon" data-tooltip="Surface appearance and shading properties">?</span></h3>
+      <div class="control-item">
+        <label>Color:</label>
+        <input type="color" id="material-color" value="#808080">
+      </div>
+      <div class="control-item">
+        <label>Metalness:</label>
+        <input type="range" id="metalness" min="0" max="1" step="0.1" value="0">
+      </div>
+      <div class="control-item">
+        <label>Roughness:</label>
+        <input type="range" id="roughness" min="0" max="1" step="0.1" value="0.5">
+      </div>
+    </div>
+
+    <!-- Lighting Section -->
+    <div class="sidebar-section">
+      <h3>Lighting <span class="help-icon" data-tooltip="Scene illumination settings">?</span></h3>
+      <div class="control-item">
+        <label>Ambient Light:</label>
+        <input type="range" id="ambient-intensity" min="0" max="2" step="0.1" value="0.5">
+      </div>
+      <div class="control-item">
+        <label>Directional Light:</label>
+        <input type="range" id="directional-intensity" min="0" max="2" step="0.1" value="1">
+      </div>
+    </div>
+
+    <!-- Render Settings Section -->
+    <div class="sidebar-section">
+      <h3>Render <span class="help-icon" data-tooltip="Output and quality settings">?</span></h3>
+      <div class="control-item">
+        <label>Resolution X:</label>
+        <input type="number" id="res-x" value="1920" step="1">
+      </div>
+      <div class="control-item">
+        <label>Resolution Y:</label>
+        <input type="number" id="res-y" value="1080" step="1">
+      </div>
+      <button class="btn" data-action="render-image">Render Image</button>
+    </div>
+  </div>
+
+  <!-- Sidebar Toggle -->
+  <div id="sidebar-toggle">◀</div>
+
+  <!-- Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Status Bar -->
+  <div id="status-bar">
+    <div class="status-item">
+      <span>Objects:</span>
+      <span class="status-value" id="status-objects">0</span>
+    </div>
+    <div class="status-item">
+      <span>Vertices:</span>
+      <span class="status-value" id="status-vertices">0</span>
+    </div>
+    <div class="status-item">
+      <span>Faces:</span>
+      <span class="status-value" id="status-faces">0</span>
+    </div>
+    <div class="status-item">
+      <span>FPS:</span>
+      <span class="status-value" id="status-fps">60</span>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div id="loading">Loading...</div>
+
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="blender-app.js"></script>
+</body>
+
+</html>

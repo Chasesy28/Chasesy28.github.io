@@ -5,10 +5,10 @@
     "scope": "/",
     "description": "A creative playground for web development experiments, featuring rain animations, interactive projects, and modern web technologies.",
     "display": "standalone",
-    "orientation": "portrait-primary",
-    "background_color": "#fcba36",
-    "theme_color": "#fcba36",
-    "categories": ["entertainment", "education", "lifestyle"],
+    "orientation": "any",
+    "background_color": "#1a1a1a",
+    "theme_color": "#4a9eff",
+    "categories": ["entertainment", "education", "productivity", "utilities"],
     "lang": "en-US",
     "dir": "ltr",
     "icons": [
@@ -40,16 +40,36 @@
             ]
         },
         {
-            "name": "Rain Test",
-            "short_name": "Test",
-            "description": "Test rain animation effects",
-            "url": "/projects/test.html",
+            "name": "3D Modeling Studio",
+            "short_name": "3D Studio",
+            "description": "Blender-like 3D modeling web application",
+            "url": "/projects/WebGl-Test/blender-app.html",
             "icons": [
                 {
                     "src": "/icons/icon-192x192.png",
                     "sizes": "192x192"
                 }
             ]
+        },
+        {
+            "name": "Three.js Test",
+            "short_name": "Three.js",
+            "description": "Advanced 3D rendering test with Three.js",
+            "url": "/projects/WebGl-Test/threejs-test.html",
+            "icons": [
+                {
+                    "src": "/icons/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "file_handlers": [
+        {
+            "action": "/projects/WebGl-Test/blender-app.html",
+            "accept": {
+                "application/json": [".json"]
+            }
         }
     ]
 }
