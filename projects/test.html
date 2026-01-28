@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="light">
 
 <head>
   <title>Test</title>
@@ -12,13 +12,31 @@
 </head>
 
 <body>
+  <header id="header">
+    <div class="site-title cherry-bomb-one-regular">
+      <a href="/">Silly Site</a>
+    </div>
+    <nav>
+      <ul class="cherry-bomb-one-regular">
+        <li><a href="/">Home</a></li>
+        <li>
+          <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon" style="display: none;">🌙</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
   <div class="rain">
     <div class="ground"></div>
   </div>
+  <div class="cherry-bomb-one-regular">
     <button onclick="history.back()">Back</button>
     <p>Hello <br> Hello, this thing here is useful.</p>
     <input type="range" min="1" max="30" step="0.1" id="input" value="15">
     <p id="test">15</p>
+  </div>
   <script>
     /**
      * RAIN ANIMATION TEST PAGE
@@ -122,6 +140,52 @@
       console.log('[Test Page] Drop density changed to:', dropDensity);
       handleResize(); // Recalculate drop count with new density
     });
+  </script>
+  <script>
+    /**
+     * DARK MODE TOGGLE FUNCTIONALITY FOR TEST PAGE
+     * Syncs with theme stored in localStorage from home page
+     */
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const html = document.documentElement;
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+
+    // Load saved theme or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    html.classList.remove('light', 'dark');
+    html.classList.add(currentTheme);
+    updateIcons(currentTheme);
+    console.log('[Test Page] Theme loaded:', currentTheme);
+
+    // Toggle theme on button click
+    darkModeToggle.addEventListener('click', function () {
+      if (html.classList.contains('dark')) {
+        html.classList.replace('dark', 'light');
+        localStorage.setItem('theme', 'light');
+        updateIcons('light');
+        console.log('[Test Page] Theme switched to: LIGHT');
+      } else {
+        html.classList.replace('light', 'dark');
+        localStorage.setItem('theme', 'dark');
+        updateIcons('dark');
+        console.log('[Test Page] Theme switched to: DARK');
+      }
+    });
+
+    /**
+     * Updates the theme toggle icon based on current theme
+     * @param {string} theme - Either 'light' or 'dark'
+     */
+    function updateIcons(theme) {
+      if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline';
+      } else {
+        sunIcon.style.display = 'inline';
+        moonIcon.style.display = 'none';
+      }
+    }
   </script>
 </body>
 
