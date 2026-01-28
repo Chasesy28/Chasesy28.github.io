@@ -23,9 +23,9 @@ const playerMovement = (e) => {
 
 const startGame = () => {
   if(p1){p1.close();}
-  p1 = window.open('','',p1Features);
+  p1 = window.open('','Player 1',p1Features);
   if(p2){p2.close();}
-  p2 = window.open('','',p2Features);
+  p2 = window.open('','Player 2',p2Features);
   resetPlayerValues();
 };
 
