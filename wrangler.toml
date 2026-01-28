@@ -21,3 +21,9 @@ zone_id = "73fbb56d9b1a45c74519f9abec41fd84"
 [[routes]]
 pattern = "www.silly-site.me/*"
 zone_id = "73fbb56d9b1a45c74519f9abec41fd84"
+
+#logs
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
