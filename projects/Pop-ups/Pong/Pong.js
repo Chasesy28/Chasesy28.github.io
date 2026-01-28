@@ -14,7 +14,7 @@ const resetPlayerValues = () => {
   p1.resizeTo(playerWidth,playerHeight);
   p1.moveTo(0,p1y);
   p2.resizeTo(playerWidth,playerHeight);
-  p2.moveTo(0,p2y);
+  p2.moveTo(screen.availWidth,p2y);
 };
 
 const playerMovement = (e) => {
