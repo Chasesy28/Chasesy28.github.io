@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="en">
 
   <head>
     <meta charset="UTF-8">
@@ -26,6 +26,12 @@
           <li><a href="#projects">Projects</a></li>
           <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
               rel="noopener noreferrer">GitHub</a></li>
+          <li>
+            <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+              <span class="sun-icon">☀️</span>
+              <span class="moon-icon" style="display: none;">🌙</span>
+            </button>
+          </li>
         </ul>
       </nav>
     </header>
@@ -41,6 +47,52 @@
         Go Back to Home
       </a>
     </div>
+    <script>
+      /**
+       * DARK MODE TOGGLE FUNCTIONALITY FOR 404 PAGE
+       * Syncs with theme stored in localStorage from home page
+       */
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const html = document.documentElement;
+      const sunIcon = document.querySelector('.sun-icon');
+      const moonIcon = document.querySelector('.moon-icon');
+
+      // Load saved theme or default to light
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      html.classList.remove('light', 'dark');
+      html.classList.add(currentTheme);
+      updateIcons(currentTheme);
+      console.log('[404] Theme loaded:', currentTheme);
+
+      // Toggle theme on button click
+      darkModeToggle.addEventListener('click', function () {
+        if (html.classList.contains('dark')) {
+          html.classList.replace('dark', 'light');
+          localStorage.setItem('theme', 'light');
+          updateIcons('light');
+          console.log('[404] Theme switched to: LIGHT');
+        } else {
+          html.classList.replace('light', 'dark');
+          localStorage.setItem('theme', 'dark');
+          updateIcons('dark');
+          console.log('[404] Theme switched to: DARK');
+        }
+      });
+
+      /**
+       * Updates the theme toggle icon based on current theme
+       * @param {string} theme - Either 'light' or 'dark'
+       */
+      function updateIcons(theme) {
+        if (theme === 'dark') {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'inline';
+        } else {
+          sunIcon.style.display = 'inline';
+          moonIcon.style.display = 'none';
+        }
+      }
+    </script>
   </body>
 
 </html>
