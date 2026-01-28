@@ -5,16 +5,28 @@ let p2;
 const playerWidth = 150;
 const playerHeight = 400;
 let pSpeed = 5;
-let p1y = (screen.height/2) - (playerHeight/2);
+let p1y = (screen.height / 2) - (playerHeight / 2);
 let p2y = p1y;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${0},top=${p1y},popup=yes`;
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${screen.availWidth},top=${p2y},popup=yes`;
 
 const resetPlayerValues = () => {
-  p1.resizeTo(playerWidth,playerHeight);
-  p1.moveTo(0,p1y);
-  p2.resizeTo(playerWidth,playerHeight);
-  p2.moveTo(screen.availWidth,p2y);
+  p1.resizeTo(playerWidth, playerHeight);
+  p1.moveTo(0, p1y);
+  p2.resizeTo(playerWidth, playerHeight);
+  p2.moveTo(screen.availWidth, p2y);
+  if (p1 && p2) {
+    const closeCheck = setInterval(function () {
+      if (p1.closed) {
+        p2.close();
+        clearInterval(closeCheck);
+      }
+      else if (p2.closed) {
+        p1.close();
+        clearInterval(closeCheck);
+      }
+    }, 500)
+  }
 };
 
 const playerMovement = (e) => {
@@ -22,10 +34,10 @@ const playerMovement = (e) => {
 };
 
 const startGame = () => {
-  if(p1){p1.close();}
-  p1 = window.open('','Player 1',p1Features);
-  if(p2){p2.close();}
-  p2 = window.open('','Player 2',p2Features);
+  if (p1) { p1.close(); }
+  p1 = window.open('', 'Player 1', p1Features);
+  if (p2) { p2.close(); }
+  p2 = window.open('', 'Player 2', p2Features);
   resetPlayerValues();
 };
 
