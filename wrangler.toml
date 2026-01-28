@@ -1,87 +1,23 @@
-#
-# WRANGLER CONFIGURATION FOR CLOUDFLARE WORKERS
-# 
-# This file configures how the Cloudflare Worker is deployed and runs
-# The worker serves the static site through Cloudflare's edge network
-#
-
-# Worker name as it appears in Cloudflare dashboard
 name = "silly-site-worker"
-
-# Entry point for the worker (main JavaScript file)
 main = "workers/index.js"
-
-# Cloudflare Workers API compatibility date
-# Locks worker behavior to specific API version for consistency
 compatibility_date = "2025-01-01"
-
-# Cloudflare account identifier
-# Required for deployment to correct account
 account_id = "d82a8a8eb7c815f16d6fcb5a58f12fd3"
 
-#
-# WORKERS SITES CONFIGURATION
-# Workers Sites serves static files from KV storage at the edge
-#
-[site]
-# Directory to upload as Workers Site assets
-bucket = "./"
+# Modern Assets configuration)
+[assets]
+directory = "./public"   # Point this to your folder of static files
+not_found_handling = "404-page"
 
-# Files and directories to exclude from upload
-# Keeps deployment size small and excludes sensitive/unnecessary files
-exclude = [
-  ".git/**",           # Git repository data
-  ".github/**",        # GitHub Actions workflows
-  "node_modules/**",   # NPM dependencies (not needed at edge)
-  "workers/**",        # Worker source code (compiled separately)
-  "tools/**",          # Development tools
-  ".vscode/**",        # Editor configuration
-  "README.md",         # Documentation
-  "SECURITY.md",       # Security documentation
-  "LICENSE",           # License file
-  "package.json",      # NPM package definition
-  "package-lock.json", # NPM lock file
-  "wrangler.toml",     # This configuration file itself
-  ".gitignore"         # Git ignore rules
-]
-
-#
-# ENVIRONMENT CONFIGURATIONS
-# Different environments for staging and production deployments
-#
-
-# Production environment
 [env.production]
 name = "silly-site-worker-prod"
 
-# Staging environment for testing changes
 [env.staging]
 name = "silly-site-worker-staging"
 
-#
-# ROUTE CONFIGURATION
-# Binds worker to specific domains so it handles all requests
-# Zone IDs link routes to Cloudflare-managed domains
-#
-routes = [
-  { pattern = "silly-site.me/*", zone_id = "73fbb56d9b1a45c74519f9abec41fd84" },
-  { pattern = "www.silly-site.me/*", zone_id = "73fbb56d9b1a45c74519f9abec41fd84" }
-]
+[[routes]]
+pattern = "silly-site.me/*"
+zone_id = "73fbb56d9b1a45c74519f9abec41fd84"
 
-#
-# KV NAMESPACE BINDINGS (Optional)
-# Uncomment to add KV storage for caching or data persistence
-# KV provides fast key-value storage at the edge
-#
-# [[kv_namespaces]]
-# binding = "CACHE"
-# id = "your-kv-namespace-id"
-
-#
-# R2 BUCKET BINDINGS (Optional)
-# Uncomment to add R2 object storage (S3-compatible)
-# Useful for storing large files like images
-#
-# [[r2_buckets]]
-# binding = "IMAGES"
-# bucket_name = "silly-site-images"
+[[routes]]
+pattern = "www.silly-site.me/*"
+zone_id = "73fbb56d9b1a45c74519f9abec41fd84"
