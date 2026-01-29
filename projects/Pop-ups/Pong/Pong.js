@@ -90,9 +90,6 @@ const resetPlayerValues = () => {
       console.log(`${controller[e.key]} released`);
     }
   });
-  if(moveLoop){
-    clearInterval(moveLoop);
-  }
   const moveLoop = setInterval(playerMovement, 500);
 };
 
