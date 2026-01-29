@@ -2,13 +2,38 @@ const startButton = document.getElementById("startButton");
 
 let p1;
 let p2;
-const playerWidth = 150;
-const playerHeight = 400;
+let playerWidth = 150;
+let playerHeight = 400;
 let pSpeed = 5;
 let p1y = (screen.height / 2) - (playerHeight / 2);
 let p2y = p1y;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${0},top=${p1y},popup=yes`;
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${screen.availWidth},top=${p2y},popup=yes`;
+
+//Movement Code
+const controller = {
+  "ArrowUp":{pressed:false, dir:"up", char:1},
+  "ArrowDown":{pressed:false, dir:"down", char:1},
+  "W":{pressed:false, dir:"up", char:2}, "w":{pressed:false, dir:"up", char:2},
+  "S":{pressed:false, dir:"down", char:2}, "s":{pressed:false, dir:"down", char:2}
+};
+
+const playerMovement = () => {
+  Object.keys(controller).forEach(key => {
+    if(controller[key].pressed){
+      if(controller[key].dir == "down"){
+        pSpeed = -pSpeed;
+        if(controller[key].char == 1){
+          p1.moveBy(0,pSpeed);
+        }
+        else{
+          p2.moveBy(0,pSpeed);
+        }
+      }
+    }
+  });
+  pSpeed = 5;
+};
 
 const resetPlayerValues = () => {
   p1.resizeTo(playerWidth, playerHeight);
@@ -27,10 +52,21 @@ const resetPlayerValues = () => {
       }
     }, 500)
   }
-};
 
-const playerMovement = (e) => {
-
+  document.addEventListener("keydown", (e) => {
+    if(controller[e.key]){
+      controller[e.key].pressed = true;
+    }
+  });
+  document.addEventListener("keyup", (e) => {
+    if(controller[e.key]){
+      controller[e.key].pressed = false;
+    }
+  });
+  if(moveLoop){
+    clearInterval(moveLoop);
+  }
+  const moveLoop = setInterval(playerMovement, 500);
 };
 
 const startGame = () => {
