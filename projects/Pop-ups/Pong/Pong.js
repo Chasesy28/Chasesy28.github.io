@@ -8,7 +8,7 @@ let pSpeed = 5;
 let p1y = screen.height / 2 - pHeight / 2;
 let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
-const p2Features = `width=${pWidth},height=${pHeight},left=${screen.width - pWidth - 10},top=${p2y},popup=yes`;
+const p2Features = `width=${pWidth},height=${pHeight},left=${screen.width - pWidth - 20},top=${p2y},popup=yes`;
 
 const controller = {
   W: { pressed: false, dir: "up", char: 1 },
@@ -28,9 +28,13 @@ function updatePlayerValues() {
         pSpeed = -pSpeed;
       }
       if (controller[key].char == 1) {
+        console.log(`p1y before: ${p1y}`);
         p1y += pSpeed;
+        console.log(`p1y after: ${p1y}`);
       } else {
+        console.log(`p2y before: ${p2y}`);
         p2y += pSpeed;
+        console.log(`p2y after: ${p2y}`);
       }
     });
   }
@@ -42,7 +46,7 @@ function updatePlayerValues() {
       }
     });
     p1.moveTo(0, p1y);
-    p2.moveTo(screen.width - pWidth - 10, p2y);
+    p2.moveTo(screen.width - pWidth - 20, p2y);
     p1.resizeTo(pWidth, pHeight);
     p2.resizeTo(pWidth, pHeight);
     p1.focus();
@@ -87,26 +91,31 @@ const startGame = () => {
   document.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
+      console.log(`${controller[e.key]} released`);
     }
   });
   p1.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
+      console.log(`${controller[e.key]} pressed down`);
     }
   });
   p1.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
+      console.log(`${controller[e.key]} released`);
     }
   });
   p2.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
+      console.log(`${controller[e.key]} pressed down`);
     }
   });
   p2.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
+      console.log(`${controller[e.key]} released`);
     }
   });
 };
