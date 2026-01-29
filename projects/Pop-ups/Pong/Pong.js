@@ -10,32 +10,6 @@ let p2y = p1y;
 const p1Features = `width=${playerWidth},height=${playerHeight},left=${0},top=${p1y},popup=yes`;
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${screen.availWidth},top=${p2y},popup=yes`;
 
-//Movement Code
-const controller = {
-  "ArrowUp":{pressed:false, dir:"up", char:1},
-  "ArrowDown":{pressed:false, dir:"down", char:1},
-  "W":{pressed:false, dir:"up", char:2}, "w":{pressed:false, dir:"up", char:2},
-  "S":{pressed:false, dir:"down", char:2}, "s":{pressed:false, dir:"down", char:2}
-};
-
-const playerMovement = () => {
-  console.log("playerMovement run");
-  Object.keys(controller).forEach(key => {
-    if(controller[key].pressed){
-      if(controller[key].dir == "down"){
-        pSpeed = -pSpeed;
-        if(controller[key].char == 1){
-          p1.moveBy(0,pSpeed);
-        }
-        else{
-          p2.moveBy(0,pSpeed);
-        }
-      }
-    }
-  });
-  pSpeed = 5;
-};
-
 const resetPlayerValues = () => {
   p1.resizeTo(playerWidth, playerHeight);
   p1.moveTo(0, p1y);
@@ -53,6 +27,43 @@ const resetPlayerValues = () => {
       }
     }, 500)
   }
+};
+
+//Movement Code
+const controller = {
+  "ArrowUp":{pressed:false, dir:"up", char:1},
+  "ArrowDown":{pressed:false, dir:"down", char:1},
+  "W":{pressed:false, dir:"up", char:2}, "w":{pressed:false, dir:"up", char:2},
+  "S":{pressed:false, dir:"down", char:2}, "s":{pressed:false, dir:"down", char:2}
+};
+
+const playerMovement = () => {
+  console.log("playerMovement run");
+  Object.keys(controller).forEach(key => {
+    if(controller[key].pressed){
+      if(controller[key].dir == "down"){
+        pSpeed = -pSpeed;
+      }
+      if(controller[key].char == 1){
+          p1.moveBy(0,pSpeed);
+          p1y += pSpeed;
+        }
+      else{
+        p2.moveBy(0,pSpeed);
+        p2y += pSpeed;
+      }
+    }
+  });
+  pSpeed = 5;
+  resetPlayerValues();
+};
+
+const startGame = () => {
+  if (p1) { p1.close(); }
+  p1 = window.open('', 'Player 1', p1Features);
+  if (p2) { p2.close(); }
+  p2 = window.open('', 'Player 2', p2Features);
+  resetPlayerValues();
 
   document.addEventListener("keydown", (e) => {
     if(controller[e.key]){
@@ -91,14 +102,6 @@ const resetPlayerValues = () => {
     }
   });
   const moveLoop = setInterval(playerMovement, 500);
-};
-
-const startGame = () => {
-  if (p1) { p1.close(); }
-  p1 = window.open('', 'Player 1', p1Features);
-  if (p2) { p2.close(); }
-  p2 = window.open('', 'Player 2', p2Features);
-  resetPlayerValues();
 };
 
 startButton.addEventListener('click', startGame);
