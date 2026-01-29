@@ -8,7 +8,7 @@ let pSpeed = 5;
 let p1y = screen.height / 2 - pHeight / 2;
 let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
-const p2Features = `width=${pWidth},height=${pHeight},left=${screen.availWidth-pWidth},top=${p2y},popup=yes`;
+const p2Features = `width=${pWidth},height=${pHeight},left=${screen.width - pWidth - 10},top=${p2y},popup=yes`;
 
 const controller = {
   W: { pressed: false, dir: "up", char: 1 },
@@ -21,6 +21,7 @@ const controller = {
 
 function updatePlayerValues() {
   function pMovementCalc() {
+    console.log("Player Movement Calculator");
     Object.keys(controller).forEach((key) => {
       pSpeed = 5;
       if (controller[key].dir == "down") {
@@ -41,7 +42,7 @@ function updatePlayerValues() {
       }
     });
     p1.moveTo(0, p1y);
-    p2.moveTo(screen.availWidth-pWidth, p2y);
+    p2.moveTo(screen.width - pWidth - 10, p2y);
     p1.resizeTo(pWidth, pHeight);
     p2.resizeTo(pWidth, pHeight);
     p1.focus();
