@@ -81,37 +81,37 @@ const startGame = () => {
   document.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
-      console.log(`${controller[e.key]} pressed down`);
+      console.log(`${e.key} pressed down`);
     }
   });
   document.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
-      console.log(`${controller[e.key]} released`);
+      console.log(`${e.key} released`);
     }
   });
   p1.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
-      console.log(`${controller[e.key]} pressed down`);
+      console.log(`${e.key} pressed down`);
     }
   });
   p1.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
-      console.log(`${controller[e.key]} released`);
+      console.log(`${e.key} released`);
     }
   });
   p2.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
-      console.log(`${controller[e.key]} pressed down`);
+      console.log(`${e.key} pressed down`);
     }
   });
   p2.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
-      console.log(`${controller[e.key]} released`);
+      console.log(`${e.key} released`);
     }
   });
 };
