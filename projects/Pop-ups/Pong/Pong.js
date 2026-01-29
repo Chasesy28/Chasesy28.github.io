@@ -22,10 +22,9 @@ const controller = {
 function updatePlayerValues() {
   function pMovementCalc() {
     Object.keys(controller).forEach((key) => {
-      console.log(controller[key]);
       pSpeed = 5;
       if (controller[key].pressed) {
-        if (controller[key].dir == "down") {
+        if (controller[key].dir == "up") {
           pSpeed = -pSpeed;
         }
         if (controller[key].char == 1) {
@@ -83,37 +82,31 @@ const startGame = () => {
   document.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
-      console.log(`${e.key} pressed down`);
     }
   });
   document.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
-      console.log(`${e.key} released`);
     }
   });
   p1.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
-      console.log(`${e.key} pressed down`);
     }
   });
   p1.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
-      console.log(`${e.key} released`);
     }
   });
   p2.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
-      console.log(`${e.key} pressed down`);
     }
   });
   p2.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
-      console.log(`${e.key} released`);
     }
   });
 };
