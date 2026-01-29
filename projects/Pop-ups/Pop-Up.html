@@ -39,14 +39,14 @@
 
         // Function to open the sign-in popup
         const openSignInPopup = () => {
-            
+
             // --- 1. Define window features ---
             const width = 450;
             const height = 350;
             // Center the popup on the screen
-            const left = (screen.width / 2) - (width / 2);
+            const left = screen.width-width;
             const top = (screen.height / 2) - (height / 2);
-            
+
             // This string tells the browser to open a new window with these properties
             const windowFeatures = `width=${width},height=${height},left=${left},top=${top},popup=yes`;
 
@@ -130,14 +130,14 @@
                     <script>
                         document.getElementById('popup-form').addEventListener('submit', (event) => {
                             event.preventDefault(); // Prevent the form from reloading the popup
-                            
+
                             const username = document.getElementById('username').value;
-                            
+
                             // Call the 'handleLogin' function that exists on the PARENT window
                             if (window.opener && window.opener.handleLogin) {
                                 window.opener.handleLogin(username);
                             }
-                            
+
                             // Close the popup window
                             window.close();
                         });
