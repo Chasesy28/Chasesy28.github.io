@@ -11,18 +11,15 @@ const p1Features = `width=${playerWidth},height=${playerHeight},left=${0},top=${
 const p2Features = `width=${playerWidth},height=${playerHeight},left=${screen.availWidth},top=${p2y},popup=yes`;
 
 const controller = {
-  ArrowUp: { pressed: false, dir: "up", char: 1 },
-  ArrowDown: { pressed: false, dir: "down", char: 1 },
-  W: { pressed: false, dir: "up", char: 2 },
-  w: { pressed: false, dir: "up", char: 2 },
-  S: { pressed: false, dir: "down", char: 2 },
-  s: { pressed: false, dir: "down", char: 2 },
+  W: { pressed: false, dir: "up", char: 1 },
+  w: { pressed: false, dir: "up", char: 1 },
+  S: { pressed: false, dir: "down", char: 1 },
+  s: { pressed: false, dir: "down", char: 1 },
+  ArrowUp: { pressed: false, dir: "up", char: 2 },
+  ArrowDown: { pressed: false, dir: "down", char: 2 },
 };
 
 function updatePlayerValues() {
-  p1.resizeTo(playerWidth, playerHeight);
-  p2.resizeTo(playerWidth, playerHeight);
-
   function pMovementCalc() {
     Object.keys(controller).forEach((key) => {
       pSpeed = 5;
@@ -44,7 +41,11 @@ function updatePlayerValues() {
       }
     });
     p1.moveTo(0, p1y);
-    p2.moveTo(0, p2y);
+    p2.moveTo(screen.availWidth, p2y);
+    p1.resizeTo(playerWidth, playerHeight);
+    p2.resizeTo(playerWidth, playerHeight);
+    p1.focus();
+    p2.focus();
   }
 
   pMove();
