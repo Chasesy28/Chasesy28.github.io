@@ -19,6 +19,7 @@ const controller = {
 };
 
 const playerMovement = () => {
+  console.log("playerMovement run");
   Object.keys(controller).forEach(key => {
     if(controller[key].pressed){
       if(controller[key].dir == "down"){
@@ -56,11 +57,37 @@ const resetPlayerValues = () => {
   document.addEventListener("keydown", (e) => {
     if(controller[e.key]){
       controller[e.key].pressed = true;
+      console.log(`${controller[e.key]} pressed down`);
     }
   });
   document.addEventListener("keyup", (e) => {
     if(controller[e.key]){
       controller[e.key].pressed = false;
+      console.log(`${controller[e.key]} released`);
+    }
+  });
+  p1.addEventListener("keydown", (e) => {
+    if(controller[e.key]){
+      controller[e.key].pressed = true;
+      console.log(`${controller[e.key]} pressed down`);
+    }
+  });
+  p1.addEventListener("keyup", (e) => {
+    if(controller[e.key]){
+      controller[e.key].pressed = false;
+      console.log(`${controller[e.key]} released`);
+    }
+  });
+  p2.addEventListener("keydown", (e) => {
+    if(controller[e.key]){
+      controller[e.key].pressed = true;
+      console.log(`${controller[e.key]} pressed down`);
+    }
+  });
+  p2.addEventListener("keyup", (e) => {
+    if(controller[e.key]){
+      controller[e.key].pressed = false;
+      console.log(`${controller[e.key]} released`);
     }
   });
   if(moveLoop){
