@@ -24,13 +24,15 @@ function updatePlayerValues() {
     Object.keys(controller).forEach((key) => {
       console.log(controller[key]);
       pSpeed = 5;
-      if (controller[key].dir == "down") {
-        pSpeed = -pSpeed;
-      }
-      if (controller[key].char == 1) {
-        p1y += pSpeed;
-      } else {
-        p2y += pSpeed;
+      if (controller[key].pressed) {
+        if (controller[key].dir == "down") {
+          pSpeed = -pSpeed;
+        }
+        if (controller[key].char == 1) {
+          p1y += pSpeed;
+        } else {
+          p2y += pSpeed;
+        }
       }
     });
   }
