@@ -23,6 +23,7 @@ function updatePlayerValues() {
   function pMovementCalc() {
     console.log("Player Movement Calculator");
     Object.keys(controller).forEach((key) => {
+      console.log(controller[key]);
       pSpeed = 5;
       if (controller[key].dir == "down") {
         pSpeed = -pSpeed;
