@@ -46,6 +46,8 @@ function updatePlayerValues() {
     p2.resizeTo(playerWidth, playerHeight);
     p1.focus();
     p2.focus();
+
+    requestAnimationFrame(pMove);
   }
 
   pMove();
