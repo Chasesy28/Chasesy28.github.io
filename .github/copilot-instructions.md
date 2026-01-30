@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a testing/experimentation site combining a Vite + React + TypeScript frontend with Cloudflare Workers for serverless edge computing. The codebase spans multiple independent systems: a modern React component library, legacy testing projects (vanilla JS/HTML), and edge worker deployments.
+This is a testing/experimentation site combining a Vite + React + TypeScript frontend with Cloudflare Workers for serverless edge computing. The codebase spans multiple independent systems: a modern React component library, legacy testing projects (vanilla JS/HTML), and edge worker deployments. The React is primarily for the main page and not for any of the other projects.
 
 ## Architecture Patterns
 
@@ -40,6 +40,11 @@ npm run dev      # Start Vite dev server (http://localhost:5173)
 npm run build    # TypeScript check + Vite build to dist/
 npm run preview  # Preview built site locally
 ```
+### DEV RULES
+
+*   **Testing**: If `Chrome-Dev-Tools-MCP` is active, use it to inspect and validate UI/DOM changes immediately after generation.
+*   **Assets**: Use [Lucide React](https://lucide.dev) for iconography.
+*   **Styles**: Refer to `tailwind.config.js` for custom animations provided by the `tailwindcss-animate` plugin.
 
 ### Deployment Strategy
 
