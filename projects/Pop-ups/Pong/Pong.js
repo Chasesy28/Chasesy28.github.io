@@ -4,7 +4,8 @@ let p1;
 let p2;
 let pWidth = 150;
 let pHeight = 400;
-let pSpeed = 5;
+let p1Speed = 5;
+let p2Speed = 5;
 let p1y = screen.height / 2 - pHeight / 2;
 let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
@@ -22,15 +23,20 @@ const controller = {
 function updatePlayerValues() {
   function pMovementCalc() {
     Object.keys(controller).forEach((key) => {
-      pSpeed = 5;
+      p1Speed = 5;
+      p2Speed = 5;
       if (controller[key].pressed) {
         if (controller[key].dir == "up") {
-          pSpeed = -pSpeed;
+          if (controller[key].char == 1) {
+            p1Speed = -p1Speed;
+          } else {
+            p2Speed = -p2Speed;
+          }
         }
         if (controller[key].char == 1) {
-          p1y += pSpeed;
+          p1y += p1Speed;
         } else {
-          p2y += pSpeed;
+          p2y += p2Speed;
         }
       }
     });
