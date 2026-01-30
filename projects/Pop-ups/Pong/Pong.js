@@ -11,6 +11,14 @@ let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
 const p2Features = `width=${pWidth},height=${pHeight},left=${screen.width - pWidth},top=${p2y},popup=yes`;
 
+let ball;
+let ballWidth = 100;
+let ballHeight = 100;
+let ballSpeed = 10;
+let ballX = screen.width / 2 - ballWidth / 2;
+let ballY = screen.height / 2 - ballHeight / 2;
+const ballFeatures = `width=${ballWidth},height=${ballHeight},left=${ballX},top=${ballY},popup=yes`;
+
 const controller = {
   W: { pressed: false, dir: "up", char: 1 },
   w: { pressed: false, dir: "up", char: 1 },
@@ -72,6 +80,10 @@ const startGame = () => {
     p2.close();
   }
   p2 = window.open("", "Player 2", p2Features);
+  if (ball) {
+    ball.close();
+  }
+  ball = window.open("", "Ball", ballFeatures);
   if (p1 && p2) {
     updatePlayerValues();
     const closeCheck = setInterval(function () {
