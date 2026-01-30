@@ -62,6 +62,8 @@ function updatePlayerValues() {
 }
 
 const startGame = () => {
+  p1y = screen.height / 2 - pHeight / 2;
+  p2y = p1y;
   if (p1) {
     p1.close();
   }
