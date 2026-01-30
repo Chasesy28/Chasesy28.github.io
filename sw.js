@@ -4,27 +4,49 @@
  * Works in coordination with Cloudflare edge caching for optimal performance
  */
 
-const CACHE_NAME = 'silly-site-cache-v4';
+const CACHE_NAME = 'silly-site-cache-v5';
 
 /**
  * Core application files to cache for offline functionality
  * These files are essential for the app to work without a network connection
  */
 const URLS_TO_CACHE = [
-/** Temporarily disabled so we can update the project freely
-
-'/',
+  // Core pages
+  '/',
   '/index.html',
-  '/projects/Finder.html',
-  '/projects/Finder.js',
-  '/projects/test.html',
-  '/projects/finder-styles.css',
   '/manifest.json',
+  
+  // Static assets
+  '/styles.css',
+  '/scripts.js',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/styles.css',
-  '/scripts.js'
-  */
+  
+  // Finder project
+  '/projects/Finder/Finder.html',
+  '/projects/Finder/Finder.js',
+  '/projects/Finder/finder-styles.css',
+  
+  // Pop-ups projects
+  '/projects/Pop-ups/Pop-Up.html',
+  '/projects/Pop-ups/Evil-popup.html',
+  '/projects/Pop-ups/Popup-Test.html',
+  '/projects/Pop-ups/Pong/Pong.html',
+  '/projects/Pop-ups/Pong/Pong.js',
+  '/projects/Pop-ups/Pong/Pong.css',
+  
+  // WebGL projects
+  '/projects/WebGl-Test/gl.html',
+  '/projects/WebGl-Test/webgl-test.js',
+  '/projects/WebGl-Test/init-buffer.js',
+  '/projects/WebGl-Test/draw-scene.js',
+  '/projects/WebGl-Test/threejs-test.html',
+  '/projects/WebGl-Test/threejs-test.js',
+  '/projects/WebGl-Test/blender-app.html',
+  '/projects/WebGl-Test/blender-app.js',
+  
+  // Other projects
+  '/projects/test.html'
 ];
 
 /**
