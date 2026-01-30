@@ -4,7 +4,11 @@
  * Works in coordination with Cloudflare edge caching for optimal performance
  */
 
-const CACHE_NAME = 'silly-site-cache-v5';
+// Automatic cache versioning with timestamp - update this when deploying new versions
+// This ensures users get fresh content when the site is updated
+const CACHE_VERSION = '6';
+const CACHE_TIMESTAMP = '2026-01-30T19:35:15Z'; // Update this timestamp when deploying
+const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 
 /**
  * Core application files to cache for offline functionality
@@ -97,8 +101,61 @@ self.addEventListener('activate', (event) => {
       console.log('[Service Worker] Taking control of all clients');
       // Immediately take control of all pages (don't wait for reload)
       return self.clients.claim();
+    }).then(() => {
+      // Notify all clients that a new service worker has taken control
+      return self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({
+            type: 'SW_UPDATED',
+            cacheName: CACHE_NAME,
+            version: CACHE_VERSION,
+            timestamp: CACHE_TIMESTAMP
+          });
+        });
+      });
     })
   );
+});
+
+/**
+ * MESSAGE EVENT
+ * Allows clients to communicate with the service worker
+ * Supports commands like clearing cache or forcing updates
+ */
+self.addEventListener('message', (event) => {
+  console.log('[Service Worker] Received message:', event.data);
+  
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    // Force the waiting service worker to become active
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    // Clear all caches on demand
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            console.log('[Service Worker] Clearing cache:', cacheName);
+            return caches.delete(cacheName);
+          })
+        );
+      }).then(() => {
+        console.log('[Service Worker] All caches cleared');
+        // Notify the client that cache was cleared
+        event.ports[0]?.postMessage({ success: true });
+      })
+    );
+  }
+  
+  if (event.data && event.data.type === 'GET_CACHE_INFO') {
+    // Return current cache information
+    event.ports[0]?.postMessage({
+      cacheName: CACHE_NAME,
+      version: CACHE_VERSION,
+      timestamp: CACHE_TIMESTAMP
+    });
+  }
 });
 
 /**
