@@ -1,13 +1,13 @@
 # Modern Development Stack Setup
 
-This document describes the Vite + TypeScript + React + Tailwind CSS + shadcn/ui configuration added to this project.
+This document describes the Vite + TypeScript + React + Tailwind CSS configuration added to this project.
 
 ## Overview
 
-The project now supports **both** the original static HTML site **and** a modern React development environment:
+The project supports **both** the original static HTML site **and** a modern React development environment:
 
-- **Original Site**: `index.html` - The existing site continues to work as before
-- **React App**: `index-vite.html` - New TypeScript/React application with Vite
+- **Original Site**: `index.html` - The main site using static HTML with local Tailwind CSS
+- **React App**: `index-vite.html` - Optional TypeScript/React application with Vite
 
 ## Tech Stack
 
@@ -16,8 +16,8 @@ The project now supports **both** the original static HTML site **and** a modern
 - **Vite** (v7.3.1): Lightning-fast build tool and development server
 - **React** (v19+): Modern UI library for building component-based interfaces
 - **TypeScript** (v5+): Type-safe JavaScript with enhanced IDE support
-- **Tailwind CSS** (v4+): Utility-first CSS framework
-- **shadcn/ui**: Beautiful, accessible component library built on Radix UI
+- **Tailwind CSS** (v4+): Utility-first CSS framework, built locally with PostCSS
+- **PostCSS**: CSS processing with Tailwind and Autoprefixer
 
 ### Supporting Libraries
 
@@ -26,7 +26,6 @@ The project now supports **both** the original static HTML site **and** a modern
 - **class-variance-authority**: Type-safe component variants
 - **clsx & tailwind-merge**: Utility for merging Tailwind classes
 - **lucide-react**: Beautiful icon library
-- **@radix-ui/react-slot**: Composition primitive for components
 
 ## Project Structure
 
@@ -61,6 +60,7 @@ The project now supports **both** the original static HTML site **and** a modern
 ### vite.config.ts
 
 Configures Vite with:
+
 - React plugin for Fast Refresh
 - Path alias `@` → `./src` for cleaner imports
 - Source maps for debugging
@@ -70,6 +70,7 @@ Configures Vite with:
 ### tsconfig.json
 
 TypeScript configuration with:
+
 - Target: ES2020
 - Strict type checking enabled
 - Path mapping for `@/*` imports
@@ -79,6 +80,7 @@ TypeScript configuration with:
 ### tailwind.config.js
 
 Tailwind CSS v4 configuration with:
+
 - Dark mode support via `class` strategy
 - Extended color palette
 - Custom animations
@@ -89,6 +91,7 @@ Tailwind CSS v4 configuration with:
 ### components.json
 
 shadcn/ui configuration for:
+
 - Component installation path: `@/components`
 - Utilities path: `@/lib/utils`
 - CSS variables and theming
@@ -103,6 +106,7 @@ npm run dev
 ```
 
 Starts the Vite development server with:
+
 - Hot Module Replacement (HMR)
 - Fast Refresh for React
 - TypeScript type checking
@@ -116,6 +120,7 @@ npm run build
 ```
 
 Creates an optimized production build:
+
 1. Runs TypeScript compiler to check types
 2. Bundles with Vite/Rollup
 3. Outputs to `dist/` directory
@@ -129,6 +134,7 @@ npm run preview
 ```
 
 Previews the production build locally:
+
 - Serves the `dist/` directory
 - Tests the production build before deployment
 
@@ -143,6 +149,7 @@ npx shadcn@latest add [component-name]
 ```
 
 Examples:
+
 ```bash
 npx shadcn@latest add button
 npx shadcn@latest add dialog
@@ -152,6 +159,7 @@ npx shadcn@latest add dropdown-menu
 ### Available Components
 
 shadcn/ui provides 40+ accessible components:
+
 - **Layout**: Card, Separator, Tabs, Accordion
 - **Forms**: Input, Textarea, Select, Checkbox, Radio
 - **Feedback**: Alert, Toast, Dialog, Progress
@@ -188,10 +196,10 @@ Use `@/` for cleaner imports:
 
 ```typescript
 // Instead of: import { cn } from '../../lib/utils'
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
 // Instead of: import { Button } from '../../components/ui/button'
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 ```
 
 ## Tailwind CSS
@@ -210,9 +218,7 @@ Dark mode is configured with the `class` strategy. Add the `dark` class to any p
 
 ```tsx
 <div className="dark">
-  <div className="bg-white dark:bg-slate-950">
-    Content adapts to dark mode
-  </div>
+  <div className="bg-white dark:bg-slate-950">Content adapts to dark mode</div>
 </div>
 ```
 
@@ -222,9 +228,7 @@ Full Tailwind utility classes are available:
 
 ```tsx
 <div className="flex items-center gap-4 p-6 rounded-lg border shadow-sm">
-  <Button className="bg-blue-500 hover:bg-blue-600">
-    Custom Button
-  </Button>
+  <Button className="bg-blue-500 hover:bg-blue-600">Custom Button</Button>
 </div>
 ```
 
@@ -242,10 +246,10 @@ Create new components in `src/components/`:
 
 ```tsx
 // src/components/MyComponent.tsx
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 
 export function MyComponent() {
-  return <Button>Click me</Button>
+  return <Button>Click me</Button>;
 }
 ```
 
@@ -254,14 +258,14 @@ export function MyComponent() {
 Import and use in `src/App.tsx`:
 
 ```tsx
-import { MyComponent } from '@/components/MyComponent'
+import { MyComponent } from "@/components/MyComponent";
 
 function App() {
   return (
     <div>
       <MyComponent />
     </div>
-  )
+  );
 }
 ```
 
@@ -293,6 +297,7 @@ Both can coexist and be deployed together.
 To deploy the React app to GitHub Pages alongside the existing site:
 
 1. Build the project:
+
    ```bash
    npm run build
    ```
@@ -345,6 +350,7 @@ The project is already configured with Cloudflare Workers. The React app can be 
 ### TypeScript Errors
 
 Run type checking:
+
 ```bash
 npx tsc --noEmit
 ```
@@ -352,6 +358,7 @@ npx tsc --noEmit
 ### Build Fails
 
 Clear cache and reinstall:
+
 ```bash
 rm -rf node_modules dist
 npm install
@@ -361,6 +368,7 @@ npm run build
 ### Styles Not Applying
 
 Ensure Tailwind imports are at the top of `src/index.css`:
+
 ```css
 @import "tailwindcss";
 ```

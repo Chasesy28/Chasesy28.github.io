@@ -78,12 +78,10 @@
       </script>
 
       <title>Silly Site!</title>
-      <link rel="stylesheet" href="styles.css">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
+      <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css"></script>
       <link rel="manifest" href="/manifest.json">
       <link rel="icon" href="/icons/icon-192x192.png">
 
-      <script src="https://cdn.tailwindcss.com"></script>
       <script>
          tailwind.config = {
             darkMode: 'class',
@@ -206,7 +204,8 @@
                   <div class="slide-content cherry-bomb-one-regular">
                      <img src="/icons/icon-192x192.png" alt="Three.js Test Icon" class="project-icon">
                      <h3>Three.js Test</h3>
-                     <p class="project-description">Advanced 3D modeling and rendering with Three.js featuring real-time lighting and materials.</p>
+                     <p class="project-description">Advanced 3D modeling and rendering with Three.js featuring real-time
+                        lighting and materials.</p>
                   </div>
                </a>
             </div>
@@ -215,7 +214,8 @@
                   <div class="slide-content cherry-bomb-one-regular">
                      <img src="/icons/icon-192x192.png" alt="3D Modeling Studio Icon" class="project-icon">
                      <h3>3D Modeling Studio</h3>
-                     <p class="project-description">Blender-inspired 3D modeling web app with local storage, transform controls, and multiple workspaces.</p>
+                     <p class="project-description">Blender-inspired 3D modeling web app with local storage, transform
+                        controls, and multiple workspaces.</p>
                   </div>
                </a>
             </div>
@@ -271,17 +271,17 @@
                         newWorker.addEventListener('statechange', () => {
                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                               console.log('[Index] New Service Worker installed');
-                              
+
                               // Show update notification to user
                               const updateBanner = document.createElement('div');
                               updateBanner.className = 'offline-banner show';
                               updateBanner.style.backgroundColor = '#4a9eff';
                               updateBanner.style.color = 'white';
                               updateBanner.innerHTML = `
-                                 🔄 New version available! 
-                                 <button onclick="window.location.reload()" 
-                                    style="margin-left: 10px; padding: 5px 15px; background: white; 
-                                           color: #4a9eff; border: none; border-radius: 4px; 
+                                 🔄 New version available!
+                                 <button onclick="window.location.reload()"
+                                    style="margin-left: 10px; padding: 5px 15px; background: white;
+                                           color: #4a9eff; border: none; border-radius: 4px;
                                            cursor: pointer; font-weight: bold;">
                                     Update Now
                                  </button>

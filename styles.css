@@ -1,4 +1,391 @@
-/* ---- Page Setup ---- */
+/*! tailwindcss v4.1.18 | MIT License | https://tailwindcss.com */
+@layer properties;
+
+.\@container {
+    container-type: inline-size;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.visible {
+    visibility: visible;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.relative {
+    position: relative;
+}
+
+.static {
+    position: static;
+}
+
+.sticky {
+    position: sticky;
+}
+
+.isolate {
+    isolation: isolate;
+}
+
+.z-40 {
+    z-index: 40;
+}
+
+.z-50 {
+    z-index: 50;
+}
+
+.container {
+    width: 100%;
+}
+
+.mx-auto {
+    margin-inline: auto;
+}
+
+.block {
+    display: block;
+}
+
+.contents {
+    display: contents;
+}
+
+.flex {
+    display: flex;
+}
+
+.grid {
+    display: grid;
+}
+
+.hidden {
+    display: none;
+}
+
+.inline {
+    display: inline;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.list-item {
+    display: list-item;
+}
+
+.table {
+    display: table;
+}
+
+.h-full {
+    height: 100%;
+}
+
+.max-h-\[90vh\] {
+    max-height: 90vh;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.max-w-\[85\%\] {
+    max-width: 85%;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.flex-shrink {
+    flex-shrink: 1;
+}
+
+.shrink {
+    flex-shrink: 1;
+}
+
+.grow {
+    flex-grow: 1;
+}
+
+.border-collapse {
+    border-collapse: collapse;
+}
+
+.scale-95 {
+    --tw-scale-x: 95%;
+    --tw-scale-y: 95%;
+    --tw-scale-z: 95%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+}
+
+.transform {
+    transform: var(--tw-rotate-x, ) var(--tw-rotate-y, ) var(--tw-rotate-z, ) var(--tw-skew-x, ) var(--tw-skew-y, );
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.resize {
+    resize: both;
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.items-end {
+    align-items: flex-end;
+}
+
+.items-start {
+    align-items: flex-start;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.overflow-y-auto {
+    overflow-y: auto;
+}
+
+.border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+}
+
+.border-t {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 1px;
+}
+
+.border-b {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.leading-none {
+    --tw-leading: 1;
+    line-height: 1;
+}
+
+.break-words {
+    overflow-wrap: break-word;
+}
+
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.whitespace-pre-wrap {
+    white-space: pre-wrap;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.underline {
+    text-decoration-line: underline;
+}
+
+.underline-offset-4 {
+    text-underline-offset: 4px;
+}
+
+.ring {
+    --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+}
+
+.outline {
+    outline-style: var(--tw-outline-style);
+    outline-width: 1px;
+}
+
+.invert {
+    --tw-invert: invert(100%);
+    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
+}
+
+.filter {
+    filter: var(--tw-blur, ) var(--tw-brightness, ) var(--tw-contrast, ) var(--tw-grayscale, ) var(--tw-hue-rotate, ) var(--tw-invert, ) var(--tw-saturate, ) var(--tw-sepia, ) var(--tw-drop-shadow, );
+}
+
+.transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s);
+}
+
+.transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s);
+}
+
+.transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s);
+}
+
+.transition-shadow {
+    transition-property: box-shadow;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s);
+}
+
+.transition-transform {
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: var(--tw-ease, ease);
+    transition-duration: var(--tw-duration, 0s);
+}
+
+.duration-300 {
+    --tw-duration: 300ms;
+    transition-duration: 300ms;
+}
+
+.\[xml\:lang\] {
+    xml: lang;
+}
+
+.hover\:underline {
+    &:hover {
+        @media (hover: hover) {
+            text-decoration-line: underline;
+        }
+    }
+}
+
+.focus\:ring-1 {
+    &:focus {
+        --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+}
+
+.focus\:ring-2 {
+    &:focus {
+        --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+}
+
+.focus\:outline-none {
+    &:focus {
+        --tw-outline-style: none;
+        outline-style: none;
+    }
+}
+
+.focus-visible\:ring-2 {
+    &:focus-visible {
+        --tw-ring-shadow: var(--tw-ring-inset, ) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+}
+
+.focus-visible\:ring-offset-2 {
+    &:focus-visible {
+        --tw-ring-offset-width: 2px;
+        --tw-ring-offset-shadow: var(--tw-ring-inset, ) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    }
+}
+
+.focus-visible\:outline-none {
+    &:focus-visible {
+        --tw-outline-style: none;
+        outline-style: none;
+    }
+}
+
+.disabled\:pointer-events-none {
+    &:disabled {
+        pointer-events: none;
+    }
+}
+
+.disabled\:opacity-50 {
+    &:disabled {
+        opacity: 50%;
+    }
+}
+
+.\[\&_svg\]\:pointer-events-none {
+    & svg {
+        pointer-events: none;
+    }
+}
+
+.\[\&_svg\]\:shrink-0 {
+    & svg {
+        flex-shrink: 0;
+    }
+}
+
 body {
     background-color: #fcba36;
     font-family: "Source Sans Pro", sans-serif;
@@ -7,12 +394,10 @@ body {
     text-rendering: auto;
 }
 
-/*Hides scrollbar*/
 body::-webkit-scrollbar {
     display: none;
 }
 
-/* --- OFFLINE BANNER STYLES --- */
 .offline-banner {
     position: fixed;
     top: 0;
@@ -32,36 +417,26 @@ body::-webkit-scrollbar {
     display: block;
 }
 
-/* ---- Title Styling ---- */
 h1 {
-    /* Your color and font weight */
     color: #ffeaa5;
     font-weight: normal;
-    /* Sizing, spacing, and effects from the first version */
-    font-size: 3em ! important;
-    margin-top: 2em ! important;
+    font-size: 3em !important;
+    margin-top: 2em !important;
     text-shadow: 2px 2px 4px rgba(149, 57, 0, 0.3);
-    /* Ensures the title stays on top of the rain */
     position: relative;
     z-index: 1;
 }
 
-/* ---- subheading H2 Styling ---- */
 h2 {
-    /* Your color and font weight */
     color: #ffe48a;
     font-weight: normal;
-    /* Sizing, spacing, and effects from the first version */
-    font-size: 2em ! important;
-    margin-top: 1em ! important;
+    font-size: 2em !important;
+    margin-top: 1em !important;
     text-shadow: 1px 1px 3px rgba(149, 57, 0, 0.3);
-    /* Shadow matches your color scheme */
-    /* Ensures the title stays on top of the rain */
     position: relative;
     z-index: 1;
 }
 
-/* ---- Cherry Bomb Font ---- */
 .cherry-bomb-one-regular {
     font-family: "Cherry Bomb One", system-ui;
     font-display: swap;
@@ -69,52 +444,34 @@ h2 {
     font-style: normal;
 }
 
-/* --- Header Styling --- */
-
 header {
     display: flex;
-    /* Arranges the title and nav side-by-side */
     justify-content: space-between;
-    /* Pushes title to the left, nav to the right */
     align-items: center;
-    /* Vertically centers them */
     padding: 1rem 2rem;
-    /* Adds some spacing */
     background-color: #fffaf0;
-    /* A light, fun color (floral white) */
     border-bottom: 3px dashed #ffe77b;
     position: sticky;
-    /* Needed so z index works */
     z-index: 1000;
-    /* put the header above the rain */
     top: 0;
     left: 0;
     width: 100%;
     margin-bottom: 50px;
 }
 
-/* Style the site title in the header */
 .site-title {
-    font-size: 2rem ! important;
-    /* Make it big */
+    font-size: 2rem !important;
 }
 
 .site-title a {
     text-decoration: none;
-    /* Remove underline */
     color: #333;
-    /* Dark text color */
 }
-
-/* --- Navigation Styling --- */
 
 nav ul {
     list-style: none;
-    /* Remove bullet points */
     display: flex;
-    /* Make links horizontal */
     gap: 2rem;
-    /* Space out the links */
     margin: 0;
     padding: 0;
     font-size: 1.2rem;
@@ -123,27 +480,16 @@ nav ul {
 nav a {
     text-decoration: none;
     color: #ffd147;
-    /* Match the border color */
     padding-bottom: 5px;
-
-    /* Smooth transition for the hover effect */
     transition: transform 0.2s ease-in-out, color 0.2s;
 }
 
-/* --- The "Silly" Hover Effect --- */
 nav a:hover {
     color: #20b2aa;
-    /* A fun contrasting color (light sea green) */
-
-    /* This makes the link "wiggle" and grow slightly! */
     transform: rotate(5deg) scale(1.1);
 }
 
-
-
-/* ---- Rain Effect ---- */
 .rain {
-    /* This container holds all the drops */
     position: fixed;
     top: 0;
     left: 0;
@@ -154,45 +500,32 @@ nav a:hover {
 }
 
 .drop {
-    /* Your drop appearance */
     width: 5px;
     height: 30px;
     background: linear-gradient(to bottom, rgba(149, 57, 0, 0.2), rgba(149, 57, 0, 0.5));
     border-radius: 0 0 50% 50%;
-    /* Positioning and animation setup */
     position: absolute;
     bottom: 100%;
-    /* Starts each drop above the screen */
     pointer-events: none;
-    /* Makes drops unclickable */
     animation: rain-fall ease-in infinite;
 }
 
-/* New Splash Element Styling */
 .splash {
     position: absolute;
-    /* bottom and left are now controlled by JavaScript */
     transform: translateX(-50%);
-    /* Center the splash on its 'left' coordinate */
     width: 30px;
-    /* Width of the splash */
     height: 15px;
-    /* Height of the splash */
     border-top: 4px solid rgba(149, 57, 0, 0.6);
     border-left: 2px solid rgba(149, 57, 0, 0.3);
     border-right: 2px solid rgba(149, 57, 0, 0.3);
-    /* Splash color */
     border-radius: 50%;
-    /* Makes it a semi-circle */
     box-shadow: 0 0 8px rgba(149, 57, 0, 0.3);
 }
 
-/* This class is added by JavaScript to trigger the splash */
 .splash-animation {
     animation: splash 0.3s ease-out forwards;
 }
 
-/* New Ground Element for splashes to land on */
 .ground {
     position: absolute;
     bottom: 0;
@@ -200,14 +533,11 @@ nav a:hover {
     width: 100%;
     height: 20px;
     background: linear-gradient(to bottom, #ffeaa5, #ffe48a);
-    /* Using the same light yellow as the title with gradient */
     border-top: 2px solid rgba(149, 57, 0, 0.2);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 0;
-    /* Sits in front of the rain */
 }
 
-/* ---- Swiper Slide Styling ---- */
 .swiper-pagination-bullet {
     transition: background-color 0.3s, transform 0.3s;
 }
@@ -219,7 +549,6 @@ nav a:hover {
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: relative;
-    /* Important for splash detection */
     overflow: hidden;
 }
 
@@ -234,6 +563,7 @@ nav a:hover {
 .project-icon {
     width: 120px;
     height: 120px;
+    -o-object-fit: contain;
     object-fit: contain;
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -258,8 +588,6 @@ nav a:hover {
     max-width: 90%;
 }
 
-
-/* Animation for the falling raindrops - more fluid with easing */
 @keyframes rain-fall {
     0% {
         transform: translateY(0);
@@ -275,13 +603,11 @@ nav a:hover {
     }
 
     100% {
-        /* Moves the drop from its starting position to below the screen */
         transform: translateY(98vh);
         opacity: 0.5;
     }
 }
 
-/* New Animation for the splash effect - more dynamic */
 @keyframes splash {
     0% {
         transform: translateX(-50%) scale(0) scaleY(1);
@@ -304,7 +630,6 @@ nav a:hover {
     }
 }
 
-/* Splash effect for slide impacts */
 @keyframes splash-slide {
     0% {
         transform: translate(-50%, -50%) scale(0);
@@ -332,7 +657,6 @@ nav a:hover {
     pointer-events: none;
 }
 
-/* --- Mobile Responsive Styles --- */
 @media (max-width: 768px) {
     body {
         overflow-y: auto;
@@ -389,9 +713,6 @@ nav a:hover {
     }
 }
 
-/* ---- Dark Mode Styles ---- */
-
-/* Dark mode toggle button */
 .dark-mode-toggle {
     background: none;
     border: none;
@@ -405,7 +726,6 @@ nav a:hover {
     transform: scale(1.2) rotate(15deg);
 }
 
-/* Dark mode color scheme */
 html.dark body {
     background-color: #1a1a2e;
     color: #eaeaea;
@@ -438,7 +758,6 @@ html.dark h2 {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* Dark mode for swiper slides */
 html.dark .swiper-slide {
     background-color: #16213e;
     color: #eaeaea;
@@ -459,7 +778,6 @@ html.dark .swiper-pagination-bullet {
     transition: background-color 0.3s, transform 0.3s;
 }
 
-/* Dark mode for rain and ground */
 html.dark .drop {
     background: linear-gradient(to bottom, rgba(255, 211, 105, 0.6), rgba(255, 211, 105, 0.8));
 }
@@ -479,7 +797,6 @@ html.dark .slide-splash {
     background: radial-gradient(circle, rgba(255, 211, 105, 0.5), rgba(255, 211, 105, 0));
 }
 
-/* Dark mode for about section */
 html.dark #about {
     color: #eaeaea;
 }
@@ -488,7 +805,6 @@ html.dark #about p {
     color: #d1d1d1;
 }
 
-/* ---- About Me Section ---- */
 .about-me-section {
     position: relative;
     z-index: 1;
@@ -513,7 +829,6 @@ html.dark #about p {
     text-align: left;
 }
 
-/* ---- Footer/Copyright Section ---- */
 .site-footer {
     position: relative;
     z-index: 1;
@@ -530,7 +845,6 @@ html.dark #about p {
     font-size: 1rem;
 }
 
-/* Dark mode for about me section */
 html.dark .about-me-section {
     background-color: #16213e;
     color: #eaeaea;
@@ -544,7 +858,6 @@ html.dark .about-me-section p {
     color: #d1d1d1;
 }
 
-/* Dark mode for footer */
 html.dark .site-footer {
     background-color: #16213e;
     border-top: 3px dashed #0f3460;
@@ -554,7 +867,6 @@ html.dark .site-footer p {
     color: #d1d1d1;
 }
 
-/* Smooth transitions for theme changes */
 body,
 header,
 .swiper-slide,
@@ -564,4 +876,264 @@ header,
 h2,
 nav a {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.4s ease;
+}
+
+@property --tw-scale-x {
+    syntax: "*";
+    inherits: false;
+    initial-value: 1;
+}
+
+@property --tw-scale-y {
+    syntax: "*";
+    inherits: false;
+    initial-value: 1;
+}
+
+@property --tw-scale-z {
+    syntax: "*";
+    inherits: false;
+    initial-value: 1;
+}
+
+@property --tw-rotate-x {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-rotate-y {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-rotate-z {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-skew-x {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-skew-y {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-border-style {
+    syntax: "*";
+    inherits: false;
+    initial-value: solid;
+}
+
+@property --tw-leading {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000;
+}
+
+@property --tw-shadow-color {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-shadow-alpha {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 100%;
+}
+
+@property --tw-inset-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000;
+}
+
+@property --tw-inset-shadow-color {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-inset-shadow-alpha {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 100%;
+}
+
+@property --tw-ring-color {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-ring-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000;
+}
+
+@property --tw-inset-ring-color {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-inset-ring-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000;
+}
+
+@property --tw-ring-inset {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-ring-offset-width {
+    syntax: "<length>";
+    inherits: false;
+    initial-value: 0px;
+}
+
+@property --tw-ring-offset-color {
+    syntax: "*";
+    inherits: false;
+    initial-value: #fff;
+}
+
+@property --tw-ring-offset-shadow {
+    syntax: "*";
+    inherits: false;
+    initial-value: 0 0 #0000;
+}
+
+@property --tw-outline-style {
+    syntax: "*";
+    inherits: false;
+    initial-value: solid;
+}
+
+@property --tw-blur {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-brightness {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-contrast {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-grayscale {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-hue-rotate {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-invert {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-opacity {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-saturate {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-sepia {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-drop-shadow {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-drop-shadow-color {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-drop-shadow-alpha {
+    syntax: "<percentage>";
+    inherits: false;
+    initial-value: 100%;
+}
+
+@property --tw-drop-shadow-size {
+    syntax: "*";
+    inherits: false;
+}
+
+@property --tw-duration {
+    syntax: "*";
+    inherits: false;
+}
+
+@layer properties {
+    @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+
+        *,
+        ::before,
+        ::after,
+        ::backdrop {
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-scale-z: 1;
+            --tw-rotate-x: initial;
+            --tw-rotate-y: initial;
+            --tw-rotate-z: initial;
+            --tw-skew-x: initial;
+            --tw-skew-y: initial;
+            --tw-border-style: solid;
+            --tw-leading: initial;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-color: initial;
+            --tw-shadow-alpha: 100%;
+            --tw-inset-shadow: 0 0 #0000;
+            --tw-inset-shadow-color: initial;
+            --tw-inset-shadow-alpha: 100%;
+            --tw-ring-color: initial;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-inset-ring-color: initial;
+            --tw-inset-ring-shadow: 0 0 #0000;
+            --tw-ring-inset: initial;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-outline-style: solid;
+            --tw-blur: initial;
+            --tw-brightness: initial;
+            --tw-contrast: initial;
+            --tw-grayscale: initial;
+            --tw-hue-rotate: initial;
+            --tw-invert: initial;
+            --tw-opacity: initial;
+            --tw-saturate: initial;
+            --tw-sepia: initial;
+            --tw-drop-shadow: initial;
+            --tw-drop-shadow-color: initial;
+            --tw-drop-shadow-alpha: 100%;
+            --tw-drop-shadow-size: initial;
+            --tw-duration: initial;
+        }
+    }
 }

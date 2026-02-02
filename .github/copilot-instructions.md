@@ -8,23 +8,12 @@ This is a testing/experimentation site combining a Vite + React + TypeScript fro
 
 ### Frontend Stack
 
-- **Framework**: Vite + React 19 with TypeScript
-- **UI Library**: shadcn/ui components (Radix UI + CVA + Tailwind)
-- **Styling**: Tailwind CSS v4 with dark mode support
+- **Framework**: Vite + React 19 with TypeScript (for main page components)
+- **Styling**: Tailwind CSS v4 built locally with PostCSS, includes dark mode support
 - **Build Output**: `dist/` directory (Vite), configured to preserve existing files
 - **Path Aliases**: `@/` maps to `src/` (see `vite.config.ts`)
-
-### Component Structure
-
-Located in `src/components/ui/` - use shadcn/ui patterns:
-
-- Compound components with subcomponents (e.g., `Card`, `CardHeader`, `CardTitle`)
-- CVA (class-variance-authority) for variant-based styling
-- `cn()` utility (`src/lib/utils.ts`) for merging Tailwind classes + custom CSS
-- React.forwardRef for all primitive components
-- Use `@radix-ui/react-slot` for asChild polymorphism pattern
-
-**Example**: [button.tsx](src/components/ui/button.tsx) implements variant/size system; [card.tsx](src/components/ui/card.tsx) shows compound component pattern.
+- **Static Pages**: Main index.html uses vanilla HTML/JS with local Tailwind CSS
+- **Projects**: Independent vanilla JS/HTML experiments in `projects/` directory
 
 ### Utility Functions
 
@@ -40,11 +29,12 @@ npm run dev      # Start Vite dev server (http://localhost:5173)
 npm run build    # TypeScript check + Vite build to dist/
 npm run preview  # Preview built site locally
 ```
+
 ### DEV RULES
 
-*   **Testing**: If `Chrome-Dev-Tools-MCP` is active, use it to inspect and validate UI/DOM changes immediately after generation.
-*   **Assets**: Use [Lucide React](https://lucide.dev) for iconography.
-*   **Styles**: Refer to `tailwind.config.js` for custom animations provided by the `tailwindcss-animate` plugin.
+- **Testing**: If `Chrome-Dev-Tools-MCP` is active, use it to inspect and validate UI/DOM changes immediately after generation.
+- **Assets**: Use [Lucide React](https://lucide.dev) for iconography.
+- **Styles**: Refer to `tailwind.config.js` for custom animations provided by the `tailwindcss-animate` plugin.
 
 ### Deployment Strategy
 
@@ -83,9 +73,9 @@ Located in `workers/` directory:
 ### Tailwind + Dark Mode
 
 - Dark mode via class strategy (`darkMode: ["class"]`)
-- HSL CSS variables for theming (--primary, --secondary, etc.)
-- All UI components support dark mode out-of-box via Tailwind's `dark:` prefix
-- Animations via `tailwindcss-animate` plugin
+- Tailwind CSS v4 built locally with PostCSS from `styles.css` (includes @tailwind directives)
+- Custom CSS variables and animations in `styles.css`
+- Projects use local Tailwind via relative links to `../../styles.css`
 
 ## Integration Points
 
