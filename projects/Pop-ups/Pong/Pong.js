@@ -87,7 +87,9 @@ function updateValues() {
       ball.MoveTo(ballX, ballY);
       ball.resizeTo(ballWidth, ballHeight);
       ball.focus();
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
 
     requestAnimationFrame(ballMove);
   }
