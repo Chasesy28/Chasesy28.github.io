@@ -88,7 +88,7 @@ function updateValues() {
     ballY = Math.max(0, Math.min(ballY, screen.availHeight - ballHeight));
 
     try {
-      ball.MoveTo(ballX, ballY);
+      ball.moveTo(ballX, ballY);
       ball.resizeTo(ballWidth, ballHeight);
       ball.focus();
     } catch (error) {
