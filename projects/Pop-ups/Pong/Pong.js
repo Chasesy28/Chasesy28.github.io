@@ -15,9 +15,9 @@ const p2Features = `width=${pWidth},height=${pHeight},left=${screen.availWidth -
 
 let ball;
 let ballWidth = 100;
-let ballHeight = 50;
-let ballSpeedX = 10;
-let ballSpeedY = 10;
+let ballHeight = 75;
+let ballSpeedX = 5;
+let ballSpeedY = 5;
 let ballX = screen.availWidth / 2 - ballWidth / 2;
 let ballY = screen.availHeight / 2 - ballHeight / 2;
 const ballFeatures = `width=${ballWidth},height=${ballHeight},left=${ballX},top=${ballY},popup=yes`;
@@ -120,6 +120,8 @@ const startGame = () => {
   }
   ball = window.open("", "Ball", ballFeatures);
   if (p1 && p2 && ball) {
+    ballWidth = ball.outerWidth;
+    ballHeight = ball.outerHeight;
     updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
