@@ -88,10 +88,10 @@ function updateValues() {
       ballSpeedY = -ballSpeedY;
     }
 
-    if (ballX + ballWidth <= pWidth && ballY >= p1y && ballY + ballHeight <= p1y + pHeight) {
+    /*if (ballX + ballWidth <= pWidth && ballY >= p1y && ballY + ballHeight <= p1y + pHeight) {
       ballSpeedX = -ballSpeedX;
-    }
-    if (ballX + ballWidth >= screen.availWidth - pWidth && ballY >= p2y && ballY + ballHeight <= p2y + pHeight) {
+    }*/
+    if (ballX + ballWidth >= screen.availWidth - pWidth && ballY + ballHeight >= p2y && ballY <= p2y + pHeight) {
       ballSpeedX = -ballSpeedX;
     }
 
