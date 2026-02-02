@@ -148,6 +148,8 @@ const startGame = () => {
   document.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
     }
   });
   document.addEventListener("keyup", (e) => {
@@ -158,6 +160,8 @@ const startGame = () => {
   p1.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
     }
   });
   p1.addEventListener("keyup", (e) => {
@@ -168,6 +172,8 @@ const startGame = () => {
   p2.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
     }
   });
   p2.addEventListener("keyup", (e) => {
@@ -178,6 +184,8 @@ const startGame = () => {
   ball.addEventListener("keydown", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
     }
   });
   ball.addEventListener("keyup", (e) => {
