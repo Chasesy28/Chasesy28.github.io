@@ -6,17 +6,18 @@ let pWidth = 150;
 let pHeight = 400;
 let p1Speed = 5;
 let p2Speed = 5;
-let p1y = screen.height / 2 - pHeight / 2;
+let p1y = screen.availHeight / 2 - pHeight / 2;
 let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
-const p2Features = `width=${pWidth},height=${pHeight},left=${screen.width - pWidth},top=${p2y},popup=yes`;
+const p2Features = `width=${pWidth},height=${pHeight},left=${screen.availWidth - pWidth},top=${p2y},popup=yes`;
 
 let ball;
 let ballWidth = 100;
 let ballHeight = 50;
-let ballSpeed = 10;
-let ballX = screen.width / 2 - ballWidth / 2;
-let ballY = screen.height / 2 - ballHeight / 2;
+let ballSpeedX = 10;
+let ballSpeedY = 10;
+let ballX = screen.availWidth / 2 - ballWidth / 2;
+let ballY = screen.availHeight / 2 - ballHeight / 2;
 const ballFeatures = `width=${ballWidth},height=${ballHeight},left=${ballX},top=${ballY},popup=yes`;
 
 const controller = {
@@ -28,7 +29,7 @@ const controller = {
   ArrowDown: { pressed: false, dir: "down", char: 2 },
 };
 
-function updatePlayerValues() {
+function updateValues() {
   function pMovementCalc() {
     Object.keys(controller).forEach((key) => {
       p1Speed = 5;
@@ -57,7 +58,7 @@ function updatePlayerValues() {
       }
     });
     p1.moveTo(0, p1y);
-    p2.moveTo(screen.width - pWidth, p2y);
+    p2.moveTo(screen.availWidth - pWidth, p2y);
     p1.resizeTo(pWidth, pHeight);
     p2.resizeTo(pWidth, pHeight);
     p1.focus();
@@ -67,10 +68,35 @@ function updatePlayerValues() {
   }
 
   pMove();
+
+  function ballMove() {
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    if (ballX + ballWidth >= screen.availWidth || ballX <= 0) {
+      ballSpeedX = -ballSpeedX;
+    }
+    if (ballY + ballHeight >= screen.availHeight || ballY <= 0) {
+      ballSpeedY = -ballSpeedY;
+    }
+
+    ballX = Math.max(0, Math.min(ballX, screen.availWidth - ballWidth));
+    ballY = Math.max(0, Math.min(ballY, screen.availHeight - ballHeight));
+
+    try {
+      ball.MoveTo(ballX, ballY);
+      ball.resizeTo(ballWidth, ballHeight);
+      ball.focus();
+    } catch (error) {}
+
+    requestAnimationFrame(ballMove);
+  }
+
+  ballMove();
 }
 
 const startGame = () => {
-  p1y = screen.height / 2 - pHeight / 2;
+  p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = p1y;
   if (p1) {
     p1.close();
@@ -85,7 +111,7 @@ const startGame = () => {
   }
   ball = window.open("", "Ball", ballFeatures);
   if (p1 && p2 && ball) {
-    updatePlayerValues();
+    updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
         p2.close();
@@ -131,6 +157,16 @@ const startGame = () => {
     }
   });
   p2.addEventListener("keyup", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = false;
+    }
+  });
+  ball.addEventListener("keydown", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = true;
+    }
+  });
+  ball.addEventListener("keyup", (e) => {
     if (controller[e.key]) {
       controller[e.key].pressed = false;
     }
