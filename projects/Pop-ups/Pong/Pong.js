@@ -107,6 +107,9 @@ const startGame = () => {
   gameEnd = false;
   p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = p1y;
+  ballX = screen.availWidth / 2 - ballWidth / 2;
+  ballY = screen.availHeight / 2 - ballHeight / 2;
+
   if (p1) {
     p1.close();
   }
