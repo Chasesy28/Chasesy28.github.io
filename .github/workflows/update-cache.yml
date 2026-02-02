@@ -1,0 +1,29 @@
+name: Update Cache and Deploy
+
+on:
+  push:
+    branches: [main] # Only runs when you push to main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Crucial: allows the bot to save changes back to your repo
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run update script
+        run: |
+          chmod +x update-sw-cache.sh
+          ./update-sw-cache.sh
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add sw.js
+          # Only commit if the file actually changed
+          git diff-index --quiet HEAD || git commit -m "chore: auto-update sw cache timestamp"
+          git push
