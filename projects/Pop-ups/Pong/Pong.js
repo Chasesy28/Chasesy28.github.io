@@ -45,9 +45,13 @@ function updateValues() {
           }
         }
         if (controller[key].char == 1) {
-          p1y += p1Speed;
+          if (p1y > 0 || p1y + pHeight <= screen.availHeight) {
+            p1y += p1Speed;
+          }
         } else {
-          p2y += p2Speed;
+          if (p2y > 0 || p2y + pHeight <= screen.availHeight) {
+            p2y += p2Speed;
+          }
         }
       }
     });
@@ -84,10 +88,10 @@ function updateValues() {
       ballSpeedY = -ballSpeedY;
     }
 
-    if (ballX + ballWidth >= pWidth) {
+    if (ballX + ballWidth <= pWidth && ballY >= p1y && ballY + ballHeight <= p1y + pHeight) {
       ballSpeedX = -ballSpeedX;
     }
-    if (ballX + ballWidth >= screen.availWidth - pWidth) {
+    if (ballX + ballWidth >= screen.availWidth - pWidth && ballY >= p2y && ballY + ballHeight <= p2y + pHeight) {
       ballSpeedX = -ballSpeedX;
     }
 
