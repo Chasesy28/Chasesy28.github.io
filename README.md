@@ -16,28 +16,6 @@ Something silly
 
 This site is optimized for Cloudflare with support for Workers, image optimization, and enhanced security.
 
-### Setting Up Cloudflare Nameservers
-
-1. **Add your domain to Cloudflare:**
-   - Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
-   - Click "Add a Site"
-   - Enter your domain name (e.g., `silly-site.me`)
-   - Choose a plan (Free plan works great!)
-
-2. **Update nameservers:**
-   - Cloudflare will provide you with 2 nameservers (e.g., `ns1.cloudflare.com` and `ns2.cloudflare.com`)
-   - Go to your domain registrar (where you bought your domain)
-   - Replace the existing nameservers with Cloudflare's nameservers
-   - Wait for DNS propagation (can take up to 24 hours)
-
-3. **Configure DNS records:**
-   ```
-   Type: CNAME
-   Name: @
-   Target: chasesy28.github.io
-   Proxy status: Proxied (orange cloud)
-   ```
-
 ### Deploying Cloudflare Workers
 
 Workers provide serverless computing at the edge for enhanced performance and security.
