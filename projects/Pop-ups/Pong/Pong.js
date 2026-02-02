@@ -1,5 +1,7 @@
 const startButton = document.getElementById("startButton");
 
+let gameEnd = false;
+
 let p1;
 let p2;
 let pWidth = 150;
@@ -64,7 +66,9 @@ function updateValues() {
     p1.focus();
     p2.focus();
 
-    requestAnimationFrame(pMove);
+    if (!gameEnd) {
+      requestAnimationFrame(pMove);
+    }
   }
 
   pMove();
@@ -91,13 +95,16 @@ function updateValues() {
       console.error(error);
     }
 
-    requestAnimationFrame(ballMove);
+    if (!gameEnd) {
+      requestAnimationFrame(ballMove);
+    }
   }
 
   ballMove();
 }
 
 const startGame = () => {
+  gameEnd = false;
   p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = p1y;
   if (p1) {
@@ -118,14 +125,17 @@ const startGame = () => {
       if (p1.closed) {
         p2.close();
         ball.close();
+        gameEnd = true;
         clearInterval(closeCheck);
       } else if (p2.closed) {
         p1.close();
         ball.close();
+        gameEnd = true;
         clearInterval(closeCheck);
       } else if (ball.closed) {
         p1.close();
         p2.close();
+        gameEnd = true;
         clearInterval(closeCheck);
       }
     }, 500);
