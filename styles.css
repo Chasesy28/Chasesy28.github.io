@@ -559,6 +559,10 @@ nav a:hover {
     text-align: center;
 }
 
+.slide-content a {
+    text-decoration: none;
+}
+
 .project-icon {
     width: 120px;
     height: 120px;
