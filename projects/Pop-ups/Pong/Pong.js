@@ -67,8 +67,6 @@ function updateValues() {
     p2.moveTo(screen.availWidth - pWidth, p2y);
     p1.resizeTo(pWidth, pHeight);
     p2.resizeTo(pWidth, pHeight);
-    p1.focus();
-    p2.focus();
 
     if (!gameEnd) {
       requestAnimationFrame(pMove);
@@ -101,7 +99,6 @@ function updateValues() {
     try {
       ball.moveTo(ballX, ballY);
       ball.resizeTo(ballWidth, ballHeight);
-      ball.focus();
     } catch (error) {
       console.error(error);
     }
