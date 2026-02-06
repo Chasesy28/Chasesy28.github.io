@@ -27,17 +27,28 @@ const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 
 ## Deploying Updates
 
-### Option 1: Automatic (Recommended)
+### Option 1: Fully Automatic (Default) ⭐
 
-Run the update script before deploying:
+**Good news!** This repository has an automated bot that handles cache updates for you:
+
+- 🤖 **Automatic Updates**: The bot runs on every push to `main` branch
+- ⏰ **Always Current**: Updates `CACHE_TIMESTAMP` to the current UTC time automatically
+- 🔄 **Seamless**: Works alongside your changes without interference
+- 🛡️ **Safe**: Includes loop prevention and smart commit detection
+
+**You don't need to do anything!** Just push your changes, and the bot will update the timestamp for you.
+
+### Option 2: Manual Script
+
+If you need to update the timestamp manually (e.g., for testing):
 
 ```bash
 ./update-sw-cache.sh
 ```
 
-This automatically updates the `CACHE_TIMESTAMP` to the current time, ensuring users get the new version.
+This manually updates the `CACHE_TIMESTAMP` to the current time.
 
-### Option 2: Manual
+### Option 3: Manual Edit (Not Recommended)
 
 Edit `sw.js` and update one of these:
 
@@ -80,10 +91,10 @@ caches.keys().then(keys => console.log('Current caches:', keys));
 
 ## Best Practices
 
-1. **Always update cache version/timestamp when deploying changes** - This is the most important step!
-2. **Test locally before deploying** - Verify the update mechanism works
+1. ✅ **Let the bot handle it** - The automated workflow updates the cache timestamp on every push
+2. **Test locally before deploying** - Verify the update mechanism works if making changes
 3. **Increment CACHE_VERSION for major changes** - Breaking changes, new features
-4. **Update CACHE_TIMESTAMP for minor changes** - Bug fixes, content updates
+4. **The bot updates CACHE_TIMESTAMP automatically** - No manual intervention needed
 5. **Monitor console logs** - Look for service worker registration and update messages
 
 ## Troubleshooting

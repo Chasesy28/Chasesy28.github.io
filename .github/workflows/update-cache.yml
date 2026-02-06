@@ -1,3 +1,17 @@
+# Automatic Service Worker Cache Timestamp Updater
+# 
+# This workflow automatically updates the CACHE_TIMESTAMP in sw.js whenever
+# changes are pushed to the main branch. This ensures users get fresh content
+# by invalidating their cached versions of the service worker.
+#
+# How it works:
+# 1. Triggers on every push to main branch
+# 2. Skips if the commit was made by the bot itself (prevents infinite loops)
+# 3. Runs update-sw-cache.sh to update the timestamp
+# 4. Commits and pushes the change with [skip ci] flag
+#
+# No manual intervention required - just push your changes!
+
 name: Update Cache and Deploy
 
 on:
