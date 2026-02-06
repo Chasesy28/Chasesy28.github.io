@@ -33,10 +33,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 2  # Fetch enough history for rebase, but not entire history
+        uses: actions/checkout@v6
 
       - name: Run update script
         run: |
