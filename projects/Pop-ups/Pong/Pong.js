@@ -16,8 +16,8 @@ const p2Features = `width=${pWidth},height=${pHeight},left=${screen.availWidth -
 let ball;
 let ballWidth = 100;
 let ballHeight = 75;
-let ballSpeedX = 5;
-let ballSpeedY = 5;
+let ballSpeedX;
+let ballSpeedY;
 let ballX = screen.availWidth / 2 - ballWidth / 2;
 let ballY = screen.availHeight / 2 - ballHeight / 2;
 const ballFeatures = `width=${ballWidth},height=${ballHeight},left=${ballX},top=${ballY},popup=yes`;
@@ -114,10 +114,21 @@ function updateValues() {
 const startGame = () => {
   gameEnd = true;
   gameEnd = false;
+
   p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = p1y;
   ballX = screen.availWidth / 2 - ballWidth / 2;
   ballY = screen.availHeight / 2 - ballHeight / 2;
+  if(Math.floor(Math.random() * 2) == 0) {
+    ballSpeedX = 5;
+  } else {
+    ballSpeedX = -5;
+  }
+  if(Math.floor(Math.random() * 2) == 0) {
+    ballSpeedY = 5;
+  } else {
+    ballSpeedY = -5;
+  }
 
   if (p1) {
     p1.close();
