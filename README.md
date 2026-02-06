@@ -94,6 +94,28 @@ curl http://localhost:8787 -I
 
 For more details, see the [workers/README.md](./workers/README.md) file.
 
+## 🤖 Automated Cache Management
+
+This repository includes an automated bot that updates the service worker cache timestamp on every push to `main`. This ensures users always get fresh content when the site is updated.
+
+### How It Works
+
+1. **Automatic Updates**: When you push changes to the `main` branch, a GitHub Actions workflow automatically runs
+2. **Timestamp Update**: The workflow updates the `CACHE_TIMESTAMP` in `sw.js` to the current UTC time
+3. **Seamless Deployment**: The bot commits and pushes the timestamp change without interfering with your original changes
+4. **No Manual Work**: You never need to manually update the service worker timestamp again!
+
+### Technical Details
+
+- **Workflow**: `.github/workflows/update-cache.yml` - Triggers on push to main
+- **Script**: `update-sw-cache.sh` - Updates the timestamp using sed
+- **Race Condition Prevention**: Bot fetches and rebases on latest changes before pushing to avoid conflicts
+- **Retry Logic**: Automatic retry with exponential backoff (2s, 4s, 8s) if push fails
+- **Error Logging**: Captures and logs push failures for debugging
+- **Loop Prevention**: Bot commits are marked with `[skip ci]` and the workflow skips bot-authored commits
+
+For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SERVICE-WORKER-CACHE.md).
+
 ## 🎨 Reminders for dev
 
 - **Fonts:** Add your favorite from **Google fonts**.

@@ -1,3 +1,22 @@
+# Automatic Service Worker Cache Timestamp Updater
+# 
+# This workflow automatically updates the CACHE_TIMESTAMP in sw.js whenever
+# changes are pushed to the main branch. This ensures users get fresh content
+# by invalidating their cached versions of the service worker.
+#
+# How it works:
+# 1. Triggers on every push to main branch
+# 2. Skips if the commit was made by the bot itself (prevents infinite loops)
+# 3. Checks out the main branch (not detached HEAD)
+# 4. Fetches latest changes to avoid race conditions
+# 5. Runs update-sw-cache.sh to update the timestamp
+# 6. Rebases on latest remote changes before committing
+# 7. Commits and pushes with retry logic and exponential backoff (2s, 4s, 8s)
+# 8. Captures and logs error output for debugging push failures
+# 9. Uses [skip ci] flag to prevent triggering other workflows
+#
+# This approach prevents the bot from interfering with user pushes!
+
 name: Update Cache and Deploy
 
 on:
@@ -25,8 +44,41 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch latest changes from remote
+          git fetch origin main
+          
+          # Rebase on top of the latest remote changes
+          git rebase origin/main
+          
           git add sw.js
           if ! git diff-index --quiet HEAD; then
             git commit -m "chore: auto-update sw cache timestamp [skip ci]"
-            git push
+            
+            # Push with explicit branch specification and retry logic with exponential backoff
+            max_attempts=3
+            attempt=0
+            delay=2
+            until [ $attempt -ge $max_attempts ]; do
+              push_output=$(git push origin main 2>&1)
+              push_status=$?
+              if [ $push_status -eq 0 ]; then
+                echo "Successfully pushed changes"
+                break
+              else
+                attempt=$((attempt+1))
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "Push failed with status $push_status. Output: $push_output"
+                  echo "Retrying in ${delay} seconds... (attempt $attempt/$max_attempts)"
+                  sleep $delay
+                  delay=$((delay * 2))  # Exponential backoff
+                  git fetch origin main
+                  git rebase origin/main
+                else
+                  echo "Push failed after $max_attempts attempts"
+                  echo "Final error: $push_output"
+                  exit 1
+                fi
+              fi
+            done
           fi
