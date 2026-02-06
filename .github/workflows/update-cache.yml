@@ -7,10 +7,14 @@
 # How it works:
 # 1. Triggers on every push to main branch
 # 2. Skips if the commit was made by the bot itself (prevents infinite loops)
-# 3. Runs update-sw-cache.sh to update the timestamp
-# 4. Commits and pushes the change with [skip ci] flag
+# 3. Checks out the main branch (not detached HEAD)
+# 4. Fetches latest changes to avoid race conditions
+# 5. Runs update-sw-cache.sh to update the timestamp
+# 6. Rebases on latest remote changes before committing
+# 7. Commits and pushes with retry logic for reliability
+# 8. Uses [skip ci] flag to prevent triggering other workflows
 #
-# No manual intervention required - just push your changes!
+# This approach prevents the bot from interfering with user pushes!
 
 name: Update Cache and Deploy
 
@@ -29,6 +33,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Run update script
         run: |
@@ -39,8 +46,35 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch latest changes from remote
+          git fetch origin main
+          
+          # Rebase on top of the latest remote changes
+          git rebase origin/main
+          
           git add sw.js
           if ! git diff-index --quiet HEAD; then
             git commit -m "chore: auto-update sw cache timestamp [skip ci]"
-            git push
+            
+            # Push with explicit branch specification and retry logic
+            max_attempts=3
+            attempt=0
+            until [ $attempt -ge $max_attempts ]; do
+              if git push origin main; then
+                echo "Successfully pushed changes"
+                break
+              else
+                attempt=$((attempt+1))
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "Push failed, retrying in 2 seconds... (attempt $attempt/$max_attempts)"
+                  sleep 2
+                  git fetch origin main
+                  git rebase origin/main
+                else
+                  echo "Push failed after $max_attempts attempts"
+                  exit 1
+                fi
+              fi
+            done
           fi

@@ -40,11 +40,13 @@ if: github.event.head_commit.author.name != 'github-actions[bot]'
 - ✅ Commit message includes `[skip ci]` flag
 
 ### Execution Steps
-1. ✅ Checkout code
-2. ✅ Make script executable
-3. ✅ Run update script
-4. ✅ Commit changes (if any)
-5. ✅ Push to repository
+1. ✅ Checkout code (on main branch, not detached HEAD)
+2. ✅ Fetch latest changes from remote
+3. ✅ Make script executable
+4. ✅ Run update script
+5. ✅ Rebase on latest remote changes
+6. ✅ Commit changes (if any)
+7. ✅ Push with retry logic (up to 3 attempts)
 
 ## How It Works
 
@@ -59,18 +61,29 @@ if: github.event.head_commit.author.name != 'github-actions[bot]'
    - Detects commit author is NOT github-actions[bot]
    - Proceeds with execution
 
-3. **Script Execution**: `update-sw-cache.sh` runs
+3. **Checkout**: Checks out main branch (not detached HEAD)
+   - Uses `ref: main` to ensure proper branch tracking
+   - Uses `fetch-depth: 0` for full history
+
+4. **Fetch & Rebase**: Gets latest remote changes
+   - Fetches from origin/main
+   - Rebases local changes on top of any new commits
+   - This prevents race conditions with concurrent pushes
+
+5. **Script Execution**: `update-sw-cache.sh` runs
    - Generates current UTC timestamp
    - Updates `CACHE_TIMESTAMP` in `sw.js` using `sed`
    
-4. **Commit & Push**: Bot commits the timestamp change
+6. **Commit & Push**: Bot commits the timestamp change
    ```
    chore: auto-update sw cache timestamp [skip ci]
    ```
    - Marked with `[skip ci]` to avoid triggering other workflows
    - Author: `github-actions[bot]`
+   - Pushes with explicit `origin main` specification
+   - Includes retry logic (up to 3 attempts with 2-second delays)
 
-5. **Loop Prevention**: Next push from bot is detected
+7. **Loop Prevention**: Next push from bot is detected
    - Workflow condition fails: `github.event.head_commit.author.name != 'github-actions[bot]'`
    - Workflow skips execution
    - No infinite loop! ✅
