@@ -86,7 +86,7 @@ function updateValues() {
       ballSpeedY = -ballSpeedY;
     }
 
-    if (ballX + ballWidth <= pWidth && ballY + ballHeight >= p1y && ballY <= p1y + pHeight) {
+    if (ballY + ballHeight >= p1y && ballY <= p1y + pHeight) {
       ballSpeedX = -ballSpeedX;
     }
     if (ballX + ballWidth >= screen.availWidth - pWidth && ballY + ballHeight >= p2y && ballY <= p2y + pHeight) {
