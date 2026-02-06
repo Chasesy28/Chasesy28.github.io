@@ -1,5 +1,5 @@
 const startButton = document.getElementById("startButton");
-
+//f
 let gameEnd = false;
 
 let p1;
