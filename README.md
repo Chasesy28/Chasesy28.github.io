@@ -110,7 +110,8 @@ This repository includes an automated bot that updates the service worker cache 
 - **Workflow**: `.github/workflows/update-cache.yml` - Triggers on push to main
 - **Script**: `update-sw-cache.sh` - Updates the timestamp using sed
 - **Race Condition Prevention**: Bot fetches and rebases on latest changes before pushing to avoid conflicts
-- **Retry Logic**: Automatic retry with backoff if push fails due to concurrent changes
+- **Retry Logic**: Automatic retry with exponential backoff (2s, 4s, 8s) if push fails
+- **Error Logging**: Captures and logs push failures for debugging
 - **Loop Prevention**: Bot commits are marked with `[skip ci]` and the workflow skips bot-authored commits
 
 For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SERVICE-WORKER-CACHE.md).

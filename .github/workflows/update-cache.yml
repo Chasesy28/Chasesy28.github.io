@@ -11,8 +11,9 @@
 # 4. Fetches latest changes to avoid race conditions
 # 5. Runs update-sw-cache.sh to update the timestamp
 # 6. Rebases on latest remote changes before committing
-# 7. Commits and pushes with retry logic for reliability
-# 8. Uses [skip ci] flag to prevent triggering other workflows
+# 7. Commits and pushes with retry logic and exponential backoff (2s, 4s, 8s)
+# 8. Captures and logs error output for debugging push failures
+# 9. Uses [skip ci] flag to prevent triggering other workflows
 #
 # This approach prevents the bot from interfering with user pushes!
 
@@ -35,7 +36,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
+          fetch-depth: 2  # Fetch enough history for rebase, but not entire history
 
       - name: Run update script
         run: |
@@ -57,22 +58,28 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             git commit -m "chore: auto-update sw cache timestamp [skip ci]"
             
-            # Push with explicit branch specification and retry logic
+            # Push with explicit branch specification and retry logic with exponential backoff
             max_attempts=3
             attempt=0
+            delay=2
             until [ $attempt -ge $max_attempts ]; do
-              if git push origin main; then
+              push_output=$(git push origin main 2>&1)
+              push_status=$?
+              if [ $push_status -eq 0 ]; then
                 echo "Successfully pushed changes"
                 break
               else
                 attempt=$((attempt+1))
                 if [ $attempt -lt $max_attempts ]; then
-                  echo "Push failed, retrying in 2 seconds... (attempt $attempt/$max_attempts)"
-                  sleep 2
+                  echo "Push failed with status $push_status. Output: $push_output"
+                  echo "Retrying in ${delay} seconds... (attempt $attempt/$max_attempts)"
+                  sleep $delay
+                  delay=$((delay * 2))  # Exponential backoff
                   git fetch origin main
                   git rebase origin/main
                 else
                   echo "Push failed after $max_attempts attempts"
+                  echo "Final error: $push_output"
                   exit 1
                 fi
               fi
