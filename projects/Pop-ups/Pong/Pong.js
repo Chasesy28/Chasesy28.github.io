@@ -1,5 +1,5 @@
 const startButton = document.getElementById("startButton");
-//f
+
 let gameEnd = false;
 
 let p1;
@@ -86,9 +86,9 @@ function updateValues() {
       ballSpeedY = -ballSpeedY;
     }
 
-    /*if (ballX + ballWidth <= pWidth && ballY >= p1y && ballY + ballHeight <= p1y + pHeight) {
+    if (ballX + ballWidth <= pWidth && ballY + ballHeight >= p1y && ballY <= p1y + pHeight) {
       ballSpeedX = -ballSpeedX;
-    }*/
+    }
     if (ballX + ballWidth >= screen.availWidth - pWidth && ballY + ballHeight >= p2y && ballY <= p2y + pHeight) {
       ballSpeedX = -ballSpeedX;
     }
@@ -112,6 +112,7 @@ function updateValues() {
 }
 
 const startGame = () => {
+  gameEnd = true;
   gameEnd = false;
   p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = p1y;
@@ -133,6 +134,9 @@ const startGame = () => {
   if (p1 && p2 && ball) {
     ballWidth = ball.outerWidth;
     ballHeight = ball.outerHeight;
+    p1.focus();
+    p2.focus();
+    ball.focus();
     updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
