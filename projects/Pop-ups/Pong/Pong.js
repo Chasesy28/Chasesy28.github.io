@@ -67,33 +67,35 @@ document.addEventListener("keydown", handleKeyDown);
 document.addEventListener("keyup", handleKeyUp);
 
 function updateValues() {
-  let lastFrameTime = performance.now();
-
-  function pMove(now) {
-    const deltaMs = Math.min(32, now - lastFrameTime);
-    lastFrameTime = now;
-    const step = deltaMs / 16.67;
-
-    const p1Dir =
-      (controller.W.pressed || controller.w.pressed ? -1 : 0) +
-      (controller.S.pressed || controller.s.pressed ? 1 : 0);
-    const p2Dir =
-      (controller.ArrowUp.pressed ? -1 : 0) +
-      (controller.ArrowDown.pressed ? 1 : 0);
-
-    if (p1Dir !== 0) {
-      p1y = Math.max(
-        0,
-        Math.min(p1y + p1Speed * step * p1Dir, screenHeight - pHeight),
-      );
+  function pMovementCalc(key) {
+    p1Speed = 5;
+    p2Speed = 5;
+    if (controller[key].pressed) {
+      if (controller[key].dir == "up") {
+        if (controller[key].char == 1) {
+          p1Speed = -p1Speed;
+        } else {
+          p2Speed = -p2Speed;
+        }
+      }
+      if (controller[key].char == 1) {
+        if (p1y > 0 || p1y + pHeight <= screenHeight) {
+          p1y += p1Speed;
+        }
+      } else {
+        if (p2y > 0 || p2y + pHeight <= screenHeight) {
+          p2y += p2Speed;
+        }
+      }
     }
-    if (p2Dir !== 0) {
-      p2y = Math.max(
-        0,
-        Math.min(p2y + p2Speed * step * p2Dir, screenHeight - pHeight),
-      );
-    }
+  }
 
+  function pMove() {
+    Object.keys(controller).forEach((key) => {
+      if (controller[key].pressed) {
+        pMovementCalc(key);
+      }
+    });
     // Check if windows are still valid before accessing
     if (p1 && !p1.closed) {
       try {
@@ -118,7 +120,7 @@ function updateValues() {
     }
   }
 
-  requestAnimationFrame(pMove);
+  pMove();
 
   function ballMove() {
     ballX += ballSpeedX;
