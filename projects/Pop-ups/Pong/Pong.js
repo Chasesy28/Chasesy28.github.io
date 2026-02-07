@@ -37,6 +37,32 @@ const controller = {
   ArrowDown: { pressed: false, dir: "down", char: 2 },
 };
 
+function closeAllWindows() {
+  if (p1 && !p1.closed) p1.close();
+  if (p2 && !p2.closed) p2.close();
+  if (ball && !ball.closed) ball.close();
+  gameEnd = true;
+}
+
+function handleKeyDown(e) {
+  if (controller[e.key]) {
+    e.preventDefault();
+    controller[e.key].pressed = true;
+  } else if (e.key === "Escape") {
+    closeAllWindows();
+  }
+}
+
+function handleKeyUp(e) {
+  if (controller[e.key]) {
+    e.preventDefault();
+    controller[e.key].pressed = false;
+  }
+}
+
+document.addEventListener("keydown", handleKeyDown);
+document.addEventListener("keyup", handleKeyUp);
+
 function updateValues() {
   function pMovementCalc(key) {
     p1Speed = 5;
@@ -52,16 +78,10 @@ function updateValues() {
       if (controller[key].char == 1) {
         if (p1y > 0 || p1y + pHeight <= screenHeight) {
           p1y += p1Speed;
-          if (p1 && !p1.closed) {
-            p1.focus();
-          }
         }
       } else {
         if (p2y > 0 || p2y + pHeight <= screenHeight) {
           p2y += p2Speed;
-          if (p2 && !p2.closed) {
-            p2.focus();
-          }
         }
       }
     }
@@ -171,9 +191,6 @@ const startGame = () => {
   if (p1 && p2 && ball) {
     ballWidth = ball.outerWidth;
     ballHeight = ball.outerHeight;
-    if (p1 && !p1.closed) p1.focus();
-    if (p2 && !p2.closed) p2.focus();
-    if (ball && !ball.closed) ball.focus();
     updateValues();
     const closeCheck = setInterval(function () {
       if (!p1 || p1.closed) {
@@ -201,63 +218,21 @@ const startGame = () => {
     return;
   }
 
-  document.addEventListener("keydown", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = true;
-    } else if (e.key == "Escape") {
-      if (p1 && !p1.closed) p1.close();
+  const setupPopupListeners = (popup) => {
+    if (!popup || popup.closed) return;
+    try {
+      popup.removeEventListener("keydown", handleKeyDown);
+      popup.removeEventListener("keyup", handleKeyUp);
+      popup.addEventListener("keydown", handleKeyDown);
+      popup.addEventListener("keyup", handleKeyUp);
+    } catch (error) {
+      console.error(error);
     }
-  });
-  document.addEventListener("keyup", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = false;
-    }
-  });
+  };
 
-  if (p1 && !p1.closed) {
-    p1.addEventListener("keydown", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = true;
-      } else if (e.key == "Escape") {
-        p1.close();
-      }
-    });
-    p1.addEventListener("keyup", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = false;
-      }
-    });
-  }
-
-  if (p2 && !p2.closed) {
-    p2.addEventListener("keydown", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = true;
-      } else if (e.key == "Escape") {
-        p1.close();
-      }
-    });
-    p2.addEventListener("keyup", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = false;
-      }
-    });
-  }
-
-  if (ball && !ball.closed) {
-    ball.addEventListener("keydown", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = true;
-      } else if (e.key == "Escape") {
-        p1.close();
-      }
-    });
-    ball.addEventListener("keyup", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = false;
-      }
-    });
-  }
+  setupPopupListeners(p1);
+  setupPopupListeners(p2);
+  setupPopupListeners(ball);
 };
 
 startButton.addEventListener("click", startGame);
