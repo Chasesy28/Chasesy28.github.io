@@ -14,6 +14,9 @@ const screenWidth = window.screen?.availWidth || window.screen?.width || 1920;
 const screenHeight =
   window.screen?.availHeight || window.screen?.height || 1080;
 
+// Cache p2 x position to prevent jittering
+let p2x = screenWidth - pWidth;
+
 let p1y = screenHeight / 2 - pHeight / 2;
 let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
@@ -36,6 +39,27 @@ const controller = {
   ArrowUp: { pressed: false, dir: "up", char: 2 },
   ArrowDown: { pressed: false, dir: "down", char: 2 },
 };
+
+// Global key event handlers to avoid stacking listeners
+function handleKeyDown(e) {
+  if (controller[e.key]) {
+    e.preventDefault(); // Prevent default browser behavior
+    controller[e.key].pressed = true;
+  } else if (e.key === "Escape") {
+    if (p1 && !p1.closed) p1.close();
+  }
+}
+
+function handleKeyUp(e) {
+  if (controller[e.key]) {
+    e.preventDefault(); // Prevent default browser behavior
+    controller[e.key].pressed = false;
+  }
+}
+
+// Set up event listeners once at the document level
+document.addEventListener("keydown", handleKeyDown);
+document.addEventListener("keyup", handleKeyUp);
 
 function updateValues() {
   function pMovementCalc(key) {
@@ -75,12 +99,21 @@ function updateValues() {
     });
     // Check if windows are still valid before accessing
     if (p1 && !p1.closed) {
-      p1.moveTo(0, p1y);
-      p1.resizeTo(pWidth, pHeight);
+      try {
+        p1.moveTo(0, p1y);
+        p1.resizeTo(pWidth, pHeight);
+      } catch (e) {
+        console.error("Error moving p1:", e);
+      }
     }
     if (p2 && !p2.closed) {
-      p2.moveTo(screenWidth - pWidth, p2y);
-      p2.resizeTo(pWidth, pHeight);
+      try {
+        // Use cached x position to prevent jittering
+        p2.moveTo(p2x, p2y);
+        p2.resizeTo(pWidth, pHeight);
+      } catch (e) {
+        console.error("Error moving p2:", e);
+      }
     }
 
     if (!gameEnd) {
@@ -94,7 +127,7 @@ function updateValues() {
     ballX += ballSpeedX;
     ballY += ballSpeedY;
 
-    if (ballX + ballWidth >= screenWidth || ballX <= 0) {
+    if (ballX + ballWidth >= p2x + pWidth || ballX <= 0) {
       ballSpeedX = -ballSpeedX;
     }
     if (ballY + ballHeight >= screenHeight || ballY <= 0) {
@@ -109,14 +142,14 @@ function updateValues() {
       ballSpeedX = -ballSpeedX;
     }
     if (
-      ballX + ballWidth >= screenWidth - pWidth &&
+      ballX + ballWidth >= p2x &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + pHeight
     ) {
       ballSpeedX = -ballSpeedX;
     }
 
-    ballX = Math.max(0, Math.min(ballX, screenWidth - ballWidth));
+    ballX = Math.max(0, Math.min(ballX, p2x + pWidth - ballWidth));
     ballY = Math.max(0, Math.min(ballY, screenHeight - ballHeight));
 
     try {
@@ -169,6 +202,16 @@ const startGame = () => {
   ball = window.open("", "Ball", ballFeatures);
 
   if (p1 && p2 && ball) {
+    // Recalculate p2x based on actual screen width after popups are opened
+    const actualScreenWidth =
+      window.screen?.availWidth || window.screen?.width || screenWidth;
+    p2x = actualScreenWidth - pWidth;
+
+    // Also verify p2's actual position and use that if available
+    if (p2.screenX !== undefined && p2.screenX > 0) {
+      p2x = p2.screenX;
+    }
+
     ballWidth = ball.outerWidth;
     ballHeight = ball.outerHeight;
     if (p1 && !p1.closed) p1.focus();
@@ -201,63 +244,21 @@ const startGame = () => {
     return;
   }
 
-  document.addEventListener("keydown", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = true;
-    } else if (e.key == "Escape") {
-      if (p1 && !p1.closed) p1.close();
-    }
-  });
-  document.addEventListener("keyup", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = false;
-    }
-  });
+  // Focus the main window to ensure key events are captured
+  window.focus();
 
-  if (p1 && !p1.closed) {
-    p1.addEventListener("keydown", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = true;
-      } else if (e.key == "Escape") {
-        p1.close();
-      }
-    });
-    p1.addEventListener("keyup", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = false;
-      }
-    });
-  }
+  // Set up event listeners on popup windows to capture events there too
+  const setupPopupListeners = (popup) => {
+    if (!popup || popup.closed) return;
 
-  if (p2 && !p2.closed) {
-    p2.addEventListener("keydown", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = true;
-      } else if (e.key == "Escape") {
-        p1.close();
-      }
-    });
-    p2.addEventListener("keyup", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = false;
-      }
-    });
-  }
+    popup.addEventListener("keydown", handleKeyDown);
+    popup.addEventListener("keyup", handleKeyUp);
+    popup.focus();
+  };
 
-  if (ball && !ball.closed) {
-    ball.addEventListener("keydown", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = true;
-      } else if (e.key == "Escape") {
-        p1.close();
-      }
-    });
-    ball.addEventListener("keyup", (e) => {
-      if (controller[e.key]) {
-        controller[e.key].pressed = false;
-      }
-    });
-  }
+  setupPopupListeners(p1);
+  setupPopupListeners(p2);
+  setupPopupListeners(ball);
 };
 
 startButton.addEventListener("click", startGame);
