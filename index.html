@@ -26,9 +26,6 @@
    </head>
 
    <body>
-      <div id="offlineBanner" class="offline-banner">
-         ⚠️ You are currently offline. Some features may not be available.
-      </div>
       <header id="header">
          <div class="site-title cherry-bomb-one-regular">
             <a href="/">Silly Site</a>
@@ -179,6 +176,7 @@
          <p>Built with ❤️ and lots of rain animations</p>
       </footer>
       <!-- Load external JavaScript -->
+      <script src="notification-bars.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
       <script>
          /**
@@ -192,42 +190,8 @@
                   .then(registration => {
                      console.log('[Index] Service Worker registered with scope:', registration.scope);
 
-                     // Check for updates on page load
-                     registration.update();
-
-                     // Listen for updates to the service worker
-                     registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        console.log('[Index] Service Worker update found');
-
-                        newWorker.addEventListener('statechange', () => {
-                           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                              console.log('[Index] New Service Worker installed');
-
-                              // Show update notification to user
-                              const updateBanner = document.createElement('div');
-                              updateBanner.className = 'offline-banner show';
-                              updateBanner.style.backgroundColor = '#4a9eff';
-                              updateBanner.style.color = 'white';
-                              updateBanner.innerHTML = `
-                                 🔄 New version available!
-                                 <button onclick="window.location.reload()"
-                                    style="margin-left: 10px; padding: 5px 15px; background: white;
-                                           color: #4a9eff; border: none; border-radius: 4px;
-                                           cursor: pointer; font-weight: bold;">
-                                    Update Now
-                                 </button>
-                              `;
-                              document.body.insertBefore(updateBanner, document.body.firstChild);
-                           }
-                        });
-                     });
-
-                     // Check for updates periodically (every 60 minutes)
-                     setInterval(() => {
-                        console.log('[Index] Checking for Service Worker updates...');
-                        registration.update();
-                     }, 60 * 60 * 1000);
+                     // Initialize update monitoring using NotificationBars
+                     NotificationBars.initializeUpdateMonitoring(registration);
                   })
                   .catch(error => console.error('[Index] Service Worker registration failed:', error));
 
@@ -244,34 +208,7 @@
           * OFFLINE/ONLINE STATUS DETECTION
           * Shows/hides banner based on network connectivity
           */
-         const offlineBanner = document.getElementById('offlineBanner');
-         const header = document.getElementById('header');
-         let headerHeight = window.getComputedStyle(header).height;
-         headerHeight = parseFloat(headerHeight);
-         let totalHeight = headerHeight;
-
-         function updateOnlineStatus() {
-            if (!navigator.onLine) {
-               console.log('[Index] Network status: OFFLINE');
-               offlineBanner.classList.add('show');
-               document.body.classList.add('offline-mode');
-               let offlineBannerHeight = window.getComputedStyle(offlineBanner).height;
-               offlineBannerHeight = parseFloat(offlineBannerHeight);
-               totalHeight += offlineBannerHeight
-               header.style.setProperty('top', `${offlineBannerHeight}px`);
-               document.documentElement.style.setProperty('scroll-padding-top', `${totalHeight}px`);
-            } else {
-               console.log('[Index] Network status: ONLINE');
-               offlineBanner.classList.remove('show');
-               document.body.classList.remove('offline-mode');
-               header.style.setProperty('top', 0);
-               document.documentElement.style.setProperty('scroll-padding-top', `${totalHeight}px`);
-            }
-         }
-
-         window.addEventListener('online', updateOnlineStatus);
-         window.addEventListener('offline', updateOnlineStatus);
-         updateOnlineStatus(); // Check initial status
+         NotificationBars.initializeOfflineMonitoring();
 
          /**
           * SWIPER CAROUSEL INITIALIZATION
