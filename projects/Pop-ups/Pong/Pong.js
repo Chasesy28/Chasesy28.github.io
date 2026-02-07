@@ -32,35 +32,35 @@ const controller = {
 };
 
 function updateValues() {
-  function pMovementCalc() {
-    Object.keys(controller).forEach((key) => {
-      p1Speed = 5;
-      p2Speed = 5;
-      if (controller[key].pressed) {
-        if (controller[key].dir == "up") {
-          if (controller[key].char == 1) {
-            p1Speed = -p1Speed;
-          } else {
-            p2Speed = -p2Speed;
-          }
-        }
+  function pMovementCalc(key) {
+    p1Speed = 5;
+    p2Speed = 5;
+    if (controller[key].pressed) {
+      if (controller[key].dir == "up") {
         if (controller[key].char == 1) {
-          if (p1y > 0 || p1y + pHeight <= screen.availHeight) {
-            p1y += p1Speed;
-          }
+          p1Speed = -p1Speed;
         } else {
-          if (p2y > 0 || p2y + pHeight <= screen.availHeight) {
-            p2y += p2Speed;
-          }
+          p2Speed = -p2Speed;
         }
       }
-    });
+      if (controller[key].char == 1) {
+        if (p1y > 0 || p1y + pHeight <= screen.availHeight) {
+          p1y += p1Speed;
+          p1.focus();
+        }
+      } else {
+        if (p2y > 0 || p2y + pHeight <= screen.availHeight) {
+          p2y += p2Speed;
+          p2.focus();
+        }
+      }
+    }
   }
 
   function pMove() {
     Object.keys(controller).forEach((key) => {
       if (controller[key].pressed) {
-        pMovementCalc();
+        pMovementCalc(key);
       }
     });
     p1.moveTo(0, p1y);
@@ -86,10 +86,18 @@ function updateValues() {
       ballSpeedY = -ballSpeedY;
     }
 
-    if (ballX <= pWidth) {
+    if (
+      ballX <= pWidth &&
+      ballY + ballHeight >= p1y &&
+      ballY <= p1y + pHeight
+    ) {
       ballSpeedX = -ballSpeedX;
     }
-    if (ballX + ballWidth >= screen.availWidth - pWidth && ballY + ballHeight >= p2y && ballY <= p2y + pHeight) {
+    if (
+      ballX + ballWidth >= screen.availWidth - pWidth &&
+      ballY + ballHeight >= p2y &&
+      ballY <= p2y + pHeight
+    ) {
       ballSpeedX = -ballSpeedX;
     }
 
@@ -119,12 +127,12 @@ const startGame = () => {
   p2y = p1y;
   ballX = screen.availWidth / 2 - ballWidth / 2;
   ballY = screen.availHeight / 2 - ballHeight / 2;
-  if(Math.floor(Math.random() * 2) == 0) {
+  if (Math.floor(Math.random() * 2) == 0) {
     ballSpeedX = 5;
   } else {
     ballSpeedX = -5;
   }
-  if(Math.floor(Math.random() * 2) == 0) {
+  if (Math.floor(Math.random() * 2) == 0) {
     ballSpeedY = 5;
   } else {
     ballSpeedY = -5;
