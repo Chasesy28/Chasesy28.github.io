@@ -40,24 +40,29 @@ const controller = {
   ArrowDown: { pressed: false, dir: "down", char: 2 },
 };
 
-// Global key event handlers to avoid stacking listeners
+function closeAllWindows() {
+  if (p1 && !p1.closed) p1.close();
+  if (p2 && !p2.closed) p2.close();
+  if (ball && !ball.closed) ball.close();
+  gameEnd = true;
+}
+
 function handleKeyDown(e) {
   if (controller[e.key]) {
-    e.preventDefault(); // Prevent default browser behavior
+    e.preventDefault();
     controller[e.key].pressed = true;
   } else if (e.key === "Escape") {
-    if (p1 && !p1.closed) p1.close();
+    closeAllWindows();
   }
 }
 
 function handleKeyUp(e) {
   if (controller[e.key]) {
-    e.preventDefault(); // Prevent default browser behavior
+    e.preventDefault();
     controller[e.key].pressed = false;
   }
 }
 
-// Set up event listeners once at the document level
 document.addEventListener("keydown", handleKeyDown);
 document.addEventListener("keyup", handleKeyUp);
 
@@ -76,16 +81,10 @@ function updateValues() {
       if (controller[key].char == 1) {
         if (p1y > 0 || p1y + pHeight <= screenHeight) {
           p1y += p1Speed;
-          if (p1 && !p1.closed) {
-            p1.focus();
-          }
         }
       } else {
         if (p2y > 0 || p2y + pHeight <= screenHeight) {
           p2y += p2Speed;
-          if (p2 && !p2.closed) {
-            p2.focus();
-          }
         }
       }
     }
@@ -214,9 +213,6 @@ const startGame = () => {
 
     ballWidth = ball.outerWidth;
     ballHeight = ball.outerHeight;
-    if (p1 && !p1.closed) p1.focus();
-    if (p2 && !p2.closed) p2.focus();
-    if (ball && !ball.closed) ball.focus();
     updateValues();
     const closeCheck = setInterval(function () {
       if (!p1 || p1.closed) {
@@ -244,16 +240,16 @@ const startGame = () => {
     return;
   }
 
-  // Focus the main window to ensure key events are captured
-  window.focus();
-
-  // Set up event listeners on popup windows to capture events there too
   const setupPopupListeners = (popup) => {
     if (!popup || popup.closed) return;
-
-    popup.addEventListener("keydown", handleKeyDown);
-    popup.addEventListener("keyup", handleKeyUp);
-    popup.focus();
+    try {
+      popup.removeEventListener("keydown", handleKeyDown);
+      popup.removeEventListener("keyup", handleKeyUp);
+      popup.addEventListener("keydown", handleKeyDown);
+      popup.addEventListener("keyup", handleKeyUp);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   setupPopupListeners(p1);
