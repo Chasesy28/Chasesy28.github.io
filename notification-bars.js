@@ -78,7 +78,7 @@ function initializeOfflineMonitoring() {
                 offlineBanner.classList.remove('show');
             }
             document.body.classList.remove('offline-mode');
-            header.style.setProperty('top', '0');
+            header.style.setProperty('top', '0px');
             document.documentElement.style.setProperty('scroll-padding-top', `${totalHeight}px`);
         }
     }
@@ -94,6 +94,8 @@ function initializeOfflineMonitoring() {
  * @param {ServiceWorkerRegistration} registration - The service worker registration object
  */
 function initializeUpdateMonitoring(registration) {
+    let updateBannerCreated = false; // Track if update banner already exists
+    
     // Check for updates on page load
     registration.update();
     
@@ -103,11 +105,12 @@ function initializeUpdateMonitoring(registration) {
         console.log('[NotificationBars] Service Worker update found');
         
         newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller && !updateBannerCreated) {
                 console.log('[NotificationBars] New Service Worker installed');
                 
                 // Create and show update notification to user
                 createUpdateBanner();
+                updateBannerCreated = true; // Prevent creating multiple banners
             }
         });
     });
