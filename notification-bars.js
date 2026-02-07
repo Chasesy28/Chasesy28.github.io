@@ -28,15 +28,29 @@ function createUpdateBanner() {
     updateBanner.className = 'offline-banner show';
     updateBanner.style.backgroundColor = '#4a9eff';
     updateBanner.style.color = 'white';
-    updateBanner.innerHTML = `
-        🔄 New version available!
-        <button onclick="window.location.reload()"
-            style="margin-left: 10px; padding: 5px 15px; background: white;
-                   color: #4a9eff; border: none; border-radius: 4px;
-                   cursor: pointer; font-weight: bold;">
-            Update Now
-        </button>
-    `;
+    
+    // Create the update message text
+    const messageText = document.createTextNode('🔄 New version available! ');
+    updateBanner.appendChild(messageText);
+    
+    // Create the update button
+    const updateButton = document.createElement('button');
+    updateButton.textContent = 'Update Now';
+    updateButton.style.marginLeft = '10px';
+    updateButton.style.padding = '5px 15px';
+    updateButton.style.background = 'white';
+    updateButton.style.color = '#4a9eff';
+    updateButton.style.border = 'none';
+    updateButton.style.borderRadius = '4px';
+    updateButton.style.cursor = 'pointer';
+    updateButton.style.fontWeight = 'bold';
+    
+    // Attach event listener programmatically
+    updateButton.addEventListener('click', () => {
+        window.location.reload();
+    });
+    
+    updateBanner.appendChild(updateButton);
     
     // Insert at the beginning of the body
     document.body.insertBefore(updateBanner, document.body.firstChild);
@@ -51,6 +65,12 @@ function createUpdateBanner() {
 function initializeOfflineMonitoring() {
     let offlineBanner = null;
     const header = document.getElementById('header');
+    
+    // Check if header exists
+    if (!header) {
+        console.error('[NotificationBars] Header element not found');
+        return;
+    }
     
     function updateOnlineStatus() {
         const headerHeight = parseFloat(window.getComputedStyle(header).height);
