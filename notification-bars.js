@@ -3,6 +3,9 @@
  * Dynamically creates and manages offline and update notification bars
  */
 
+// Constants
+const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // Check for updates every 60 minutes
+
 /**
  * Creates an offline notification bar when the user is offline
  * @returns {HTMLElement} The created offline banner element
@@ -25,6 +28,7 @@ function createOfflineBanner() {
  */
 function createUpdateBanner() {
     const updateBanner = document.createElement('div');
+    // Note: Reusing 'offline-banner' class which provides the base styling for all notification bars
     updateBanner.className = 'offline-banner show';
     updateBanner.style.backgroundColor = '#4a9eff';
     updateBanner.style.color = 'white';
@@ -139,7 +143,7 @@ function initializeUpdateMonitoring(registration) {
     setInterval(() => {
         console.log('[NotificationBars] Checking for Service Worker updates...');
         registration.update();
-    }, 60 * 60 * 1000);
+    }, UPDATE_CHECK_INTERVAL_MS);
 }
 
 // Export functions for use in index.html
