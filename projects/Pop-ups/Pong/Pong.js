@@ -79,11 +79,11 @@ const getPlayBounds = () => {
 const calibrateEdgeOffsets = () => {
   const bounds = getScreenBounds();
   if (p1) {
-    edgeOffsets.left = bounds.left - p1.screenX;
-    edgeOffsets.top = bounds.top - p1.screenY;
+    edgeOffsets.left = p1.screenX - bounds.left;
+    edgeOffsets.top = p1.screenY - p1y;
   }
   if (p2) {
-    edgeOffsets.right = bounds.right - (p2.screenX + p2.outerWidth);
+    edgeOffsets.right = p2.screenX + p2.outerWidth - bounds.right;
   }
 };
 
