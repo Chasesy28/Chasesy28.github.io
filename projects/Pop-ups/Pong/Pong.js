@@ -13,7 +13,7 @@ let p2y = 0;
 
 let ball;
 let ballWidth = 100;
-let ballHeight = 75;
+let ballHeight = 100;
 let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
@@ -36,10 +36,18 @@ const ensureSize = (win, width, height) => {
 
 const getScreenBounds = () => {
   const screenRef = window.screen;
-  const left = Number.isFinite(screenRef.availLeft) ? screenRef.availLeft : 0;
-  const top = Number.isFinite(screenRef.availTop) ? screenRef.availTop : 0;
-  const width = screenRef.availWidth || screenRef.width;
-  const height = screenRef.availHeight || screenRef.height;
+  const left = Number.isFinite(screenRef.left)
+    ? screenRef.left
+    : Number.isFinite(screenRef.availLeft)
+      ? screenRef.availLeft
+      : 0;
+  const top = Number.isFinite(screenRef.top)
+    ? screenRef.top
+    : Number.isFinite(screenRef.availTop)
+      ? screenRef.availTop
+      : 0;
+  const width = screenRef.width || screenRef.availWidth;
+  const height = screenRef.height || screenRef.availHeight;
   return {
     left,
     top,
