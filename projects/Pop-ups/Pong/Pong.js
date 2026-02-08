@@ -261,7 +261,23 @@ const startGame = () => {
     } catch (error) {
       console.error(error);
     }
-    setTimeout(calibrateEdgeOffsets, 100);
+    setTimeout(() => {
+      calibrateEdgeOffsets();
+      const adjustedBounds = getPlayBounds();
+      const p1Width = p1?.outerWidth || pWidth;
+      const p2Width = p2?.outerWidth || pWidth;
+      p1y = adjustedBounds.top + adjustedBounds.height / 2 - pHeight / 2;
+      p2y = p1y;
+      ballX = adjustedBounds.left + adjustedBounds.width / 2 - ballWidth / 2;
+      ballY = adjustedBounds.top + adjustedBounds.height / 2 - ballHeight / 2;
+      try {
+        p1.moveTo(adjustedBounds.left, p1y);
+        p2.moveTo(adjustedBounds.right - p2Width, p2y);
+        ball.moveTo(ballX, ballY);
+      } catch (error) {
+        console.error(error);
+      }
+    }, 100);
     updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
