@@ -31,9 +31,20 @@ const edgeOffsets = {
 
 const ensureSize = (win, width, height) => {
   if (!win) {
-    return;
+    return { width, height };
   }
   win.resizeTo(width, height);
+  let actualWidth = win.outerWidth || width;
+  let actualHeight = win.outerHeight || height;
+  if (!sizeMatches(actualWidth, width) || !sizeMatches(actualHeight, height)) {
+    win.resizeTo(
+      width + (width - actualWidth),
+      height + (height - actualHeight),
+    );
+    actualWidth = win.outerWidth || actualWidth;
+    actualHeight = win.outerHeight || actualHeight;
+  }
+  return { width: actualWidth, height: actualHeight };
 };
 
 const getScreenBounds = () => {
@@ -125,18 +136,20 @@ function updateValues() {
 
   function pMove() {
     const bounds = getPlayBounds();
-    ensureSize(p1, pWidth, pHeight);
-    ensureSize(p2, pWidth, pHeight);
-    const p1Width = p1?.outerWidth || pWidth;
-    const p2Width = p2?.outerWidth || pWidth;
+    const p1Size = ensureSize(p1, pWidth, pHeight);
+    const p2Size = ensureSize(p2, pWidth, pHeight);
+    const p1Width = p1Size.width;
+    const p2Width = p2Size.width;
+    const p1Height = p1Size.height;
+    const p2Height = p2Size.height;
 
     Object.keys(controller).forEach((key) => {
       if (controller[key].pressed) {
         pMovementCalc(key);
       }
     });
-    p1y = clamp(p1y, bounds.top, bounds.bottom - pHeight);
-    p2y = clamp(p2y, bounds.top, bounds.bottom - pHeight);
+    p1y = clamp(p1y, bounds.top, bounds.bottom - p1Height);
+    p2y = clamp(p2y, bounds.top, bounds.bottom - p2Height);
     p1.moveTo(bounds.left, p1y);
     p2.moveTo(bounds.right - p2Width, p2y);
 
@@ -149,14 +162,12 @@ function updateValues() {
 
   function ballMove() {
     const bounds = getPlayBounds();
-    ensureSize(ball, ballWidth, ballHeight);
-    const nextBallWidth = ball?.outerWidth || ballWidth;
-    const nextBallHeight = ball?.outerHeight || ballHeight;
-    if (nextBallWidth !== ballWidth || nextBallHeight !== ballHeight) {
-      ballX -= (nextBallWidth - ballWidth) / 2;
-      ballY -= (nextBallHeight - ballHeight) / 2;
-      ballWidth = nextBallWidth;
-      ballHeight = nextBallHeight;
+    const ballSize = ensureSize(ball, ballWidth, ballHeight);
+    if (ballSize.width !== ballWidth || ballSize.height !== ballHeight) {
+      ballX -= (ballSize.width - ballWidth) / 2;
+      ballY -= (ballSize.height - ballHeight) / 2;
+      ballWidth = ballSize.width;
+      ballHeight = ballSize.height;
     }
     const p1Width = p1?.outerWidth || pWidth;
     const p2Width = p2?.outerWidth || pWidth;
@@ -174,14 +185,14 @@ function updateValues() {
     if (
       ballX <= bounds.left + p1Width &&
       ballY + ballHeight >= p1y &&
-      ballY <= p1y + pHeight
+      ballY <= p1y + p1Height
     ) {
       ballSpeedX = -ballSpeedX;
     }
     if (
       ballX + ballWidth >= bounds.right - p2Width &&
       ballY + ballHeight >= p2y &&
-      ballY <= p2y + pHeight
+      ballY <= p2y + p2Height
     ) {
       ballSpeedX = -ballSpeedX;
     }
@@ -249,11 +260,13 @@ const startGame = () => {
     buildFeatures(ballWidth, ballHeight, ballX, ballY),
   );
   if (p1 && p2 && ball) {
-    p1.resizeTo(pWidth, pHeight);
-    p2.resizeTo(pWidth, pHeight);
-    ball.resizeTo(ballWidth, ballHeight);
-    ballWidth = ball.outerWidth || ballWidth;
-    ballHeight = ball.outerHeight || ballHeight;
+    const p1Size = ensureSize(p1, pWidth, pHeight);
+    const p2Size = ensureSize(p2, pWidth, pHeight);
+    const ballSize = ensureSize(ball, ballWidth, ballHeight);
+    pWidth = p1Size.width;
+    pHeight = p1Size.height;
+    ballWidth = ballSize.width;
+    ballHeight = ballSize.height;
     ballX = bounds.left + bounds.width / 2 - ballWidth / 2;
     ballY = bounds.top + bounds.height / 2 - ballHeight / 2;
     try {
@@ -262,11 +275,18 @@ const startGame = () => {
       console.error(error);
     }
     setTimeout(() => {
+      const p1Size = ensureSize(p1, pWidth, pHeight);
+      const p2Size = ensureSize(p2, pWidth, pHeight);
+      const ballSize = ensureSize(ball, ballWidth, ballHeight);
+      pWidth = p1Size.width;
+      pHeight = p1Size.height;
+      ballWidth = ballSize.width;
+      ballHeight = ballSize.height;
       calibrateEdgeOffsets();
       const adjustedBounds = getPlayBounds();
-      const p1Width = p1?.outerWidth || pWidth;
-      const p2Width = p2?.outerWidth || pWidth;
-      p1y = adjustedBounds.top + adjustedBounds.height / 2 - pHeight / 2;
+      const p1Width = p1Size.width;
+      const p2Width = p2Size.width;
+      p1y = adjustedBounds.top + adjustedBounds.height / 2 - p1Size.height / 2;
       p2y = p1y;
       ballX = adjustedBounds.left + adjustedBounds.width / 2 - ballWidth / 2;
       ballY = adjustedBounds.top + adjustedBounds.height / 2 - ballHeight / 2;
