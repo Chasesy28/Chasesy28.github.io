@@ -102,6 +102,22 @@ const calibrateEdgeOffsets = () => {
   }
 };
 
+const settleRightEdge = (p2Width, p2y) => {
+  if (!p2) {
+    return;
+  }
+  const screenBounds = getScreenBounds();
+  for (let i = 0; i < 3; i += 1) {
+    const bounds = getPlayBounds();
+    p2.moveTo(bounds.right - p2Width, p2y);
+    const overflow = p2.screenX + p2Width - screenBounds.right;
+    if (overflow <= 1) {
+      break;
+    }
+    edgeOffsets.right += overflow;
+  }
+};
+
 const buildFeatures = (width, height, left, top) =>
   `width=${Math.round(width)},height=${Math.round(height)},left=${Math.round(left)},top=${Math.round(top)},popup=yes`;
 
@@ -152,13 +168,7 @@ function updateValues() {
     p2y = clamp(p2y, bounds.top, bounds.bottom - p2Height);
     p1.moveTo(bounds.left, p1y);
     p2.moveTo(bounds.right - p2Width, p2y);
-    const screenBounds = getScreenBounds();
-    const p2Overflow = p2.screenX + p2Width - screenBounds.right;
-    if (p2Overflow > 0) {
-      edgeOffsets.right += p2Overflow;
-      const correctedBounds = getPlayBounds();
-      p2.moveTo(correctedBounds.right - p2Width, p2y);
-    }
+    settleRightEdge(p2Width, p2y);
 
     if (!gameEnd) {
       requestAnimationFrame(pMove);
@@ -304,6 +314,7 @@ const startGame = () => {
       try {
         p1.moveTo(adjustedBounds.left, p1y);
         p2.moveTo(adjustedBounds.right - p2Width, p2y);
+        settleRightEdge(p2Width, p2y);
         ball.moveTo(ballX, ballY);
       } catch (error) {
         console.error(error);
