@@ -98,10 +98,7 @@ const calibrateEdgeOffsets = () => {
     edgeOffsets.top = p1.screenY - p1y;
   }
   if (p2) {
-    edgeOffsets.right = Math.max(
-      0,
-      bounds.right - (p2.screenX + p2.outerWidth),
-    );
+    edgeOffsets.right = Math.max(0, p2.screenX + p2.outerWidth - bounds.right);
   }
 };
 
