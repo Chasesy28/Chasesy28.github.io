@@ -38,23 +38,27 @@ const ensureSize = (win, width, height) => {
 
 const getScreenBounds = () => {
   const screenRef = window.screen;
-  const left = Number.isFinite(screenRef.left)
-    ? screenRef.left
-    : Number.isFinite(screenRef.availLeft)
-      ? screenRef.availLeft
+  const left = Number.isFinite(screenRef.availLeft)
+    ? screenRef.availLeft
+    : Number.isFinite(screenRef.left)
+      ? screenRef.left
       : 0;
-  const top = Number.isFinite(screenRef.top)
-    ? screenRef.top
-    : Number.isFinite(screenRef.availTop)
-      ? screenRef.availTop
+  const top = Number.isFinite(screenRef.availTop)
+    ? screenRef.availTop
+    : Number.isFinite(screenRef.top)
+      ? screenRef.top
       : 0;
-  const width = screenRef.width || screenRef.availWidth;
-  const height = screenRef.height || screenRef.availHeight;
+  const width = Number.isFinite(screenRef.availWidth)
+    ? screenRef.availWidth
+    : screenRef.width;
+  const height = Number.isFinite(screenRef.availHeight)
+    ? screenRef.availHeight
+    : screenRef.height;
   return {
     left,
     top,
-    width,
-    height,
+    width: width || 0,
+    height: height || 0,
     right: left + width,
     bottom: top + height,
   };
