@@ -8,19 +8,37 @@ let pWidth = 150;
 let pHeight = 400;
 let p1Speed = 5;
 let p2Speed = 5;
-let p1y = screen.availHeight / 2 - pHeight / 2;
-let p2y = p1y;
-const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
-const p2Features = `width=${pWidth},height=${pHeight},left=${screen.availWidth - pWidth},top=${p2y},popup=yes`;
+let p1y = 0;
+let p2y = 0;
 
 let ball;
 let ballWidth = 100;
 let ballHeight = 75;
 let ballSpeedX;
 let ballSpeedY;
-let ballX = screen.availWidth / 2 - ballWidth / 2;
-let ballY = screen.availHeight / 2 - ballHeight / 2;
-const ballFeatures = `width=${ballWidth},height=${ballHeight},left=${ballX},top=${ballY},popup=yes`;
+let ballX = 0;
+let ballY = 0;
+
+const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
+const getScreenBounds = () => {
+  const screenRef = window.screen;
+  const left = Number.isFinite(screenRef.availLeft) ? screenRef.availLeft : 0;
+  const top = Number.isFinite(screenRef.availTop) ? screenRef.availTop : 0;
+  const width = screenRef.availWidth || screenRef.width;
+  const height = screenRef.availHeight || screenRef.height;
+  return {
+    left,
+    top,
+    width,
+    height,
+    right: left + width,
+    bottom: top + height,
+  };
+};
+
+const buildFeatures = (width, height, left, top) =>
+  `width=${Math.round(width)},height=${Math.round(height)},left=${Math.round(left)},top=${Math.round(top)},popup=yes`;
 
 const controller = {
   W: { pressed: false, dir: "up", char: 1 },
@@ -44,29 +62,27 @@ function updateValues() {
         }
       }
       if (controller[key].char == 1) {
-        if (p1y > 0 || p1y + pHeight <= screen.availHeight) {
-          p1y += p1Speed;
-          p1.focus();
-        }
+        p1y += p1Speed;
       } else {
-        if (p2y > 0 || p2y + pHeight <= screen.availHeight) {
-          p2y += p2Speed;
-          p2.focus();
-        }
+        p2y += p2Speed;
       }
     }
   }
 
   function pMove() {
+    const bounds = getScreenBounds();
+    const p1Width = p1?.outerWidth || pWidth;
+    const p2Width = p2?.outerWidth || pWidth;
+
     Object.keys(controller).forEach((key) => {
       if (controller[key].pressed) {
         pMovementCalc(key);
       }
     });
-    p1.moveTo(0, p1y);
-    p2.moveTo(screen.availWidth - pWidth, p2y);
-    p1.resizeTo(pWidth, pHeight);
-    p2.resizeTo(pWidth, pHeight);
+    p1y = clamp(p1y, bounds.top, bounds.bottom - pHeight);
+    p2y = clamp(p2y, bounds.top, bounds.bottom - pHeight);
+    p1.moveTo(bounds.left, p1y);
+    p2.moveTo(bounds.right - p2Width, p2y);
 
     if (!gameEnd) {
       requestAnimationFrame(pMove);
@@ -76,37 +92,40 @@ function updateValues() {
   pMove();
 
   function ballMove() {
+    const bounds = getScreenBounds();
+    const p1Width = p1?.outerWidth || pWidth;
+    const p2Width = p2?.outerWidth || pWidth;
+
     ballX += ballSpeedX;
     ballY += ballSpeedY;
 
-    if (ballX + ballWidth >= screen.availWidth || ballX <= 0) {
+    if (ballX + ballWidth >= bounds.right || ballX <= bounds.left) {
       ballSpeedX = -ballSpeedX;
     }
-    if (ballY + ballHeight >= screen.availHeight || ballY <= 0) {
+    if (ballY + ballHeight >= bounds.bottom || ballY <= bounds.top) {
       ballSpeedY = -ballSpeedY;
     }
 
     if (
-      ballX <= pWidth &&
+      ballX <= bounds.left + p1Width &&
       ballY + ballHeight >= p1y &&
       ballY <= p1y + pHeight
     ) {
       ballSpeedX = -ballSpeedX;
     }
     if (
-      ballX + ballWidth >= screen.availWidth - pWidth &&
+      ballX + ballWidth >= bounds.right - p2Width &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + pHeight
     ) {
       ballSpeedX = -ballSpeedX;
     }
 
-    ballX = Math.max(0, Math.min(ballX, screen.availWidth - ballWidth));
-    ballY = Math.max(0, Math.min(ballY, screen.availHeight - ballHeight));
+    ballX = clamp(ballX, bounds.left, bounds.right - ballWidth);
+    ballY = clamp(ballY, bounds.top, bounds.bottom - ballHeight);
 
     try {
       ball.moveTo(ballX, ballY);
-      ball.resizeTo(ballWidth, ballHeight);
     } catch (error) {
       console.error(error);
     }
@@ -123,10 +142,12 @@ const startGame = () => {
   gameEnd = true;
   gameEnd = false;
 
-  p1y = screen.availHeight / 2 - pHeight / 2;
+  const bounds = getScreenBounds();
+
+  p1y = bounds.top + bounds.height / 2 - pHeight / 2;
   p2y = p1y;
-  ballX = screen.availWidth / 2 - ballWidth / 2;
-  ballY = screen.availHeight / 2 - ballHeight / 2;
+  ballX = bounds.left + bounds.width / 2 - ballWidth / 2;
+  ballY = bounds.top + bounds.height / 2 - ballHeight / 2;
   if (Math.floor(Math.random() * 2) == 0) {
     ballSpeedX = 5;
   } else {
@@ -141,21 +162,33 @@ const startGame = () => {
   if (p1) {
     p1.close();
   }
-  p1 = window.open("", "Player 1", p1Features);
+  p1 = window.open(
+    "",
+    "Player 1",
+    buildFeatures(pWidth, pHeight, bounds.left, p1y),
+  );
   if (p2) {
     p2.close();
   }
-  p2 = window.open("", "Player 2", p2Features);
+  p2 = window.open(
+    "",
+    "Player 2",
+    buildFeatures(pWidth, pHeight, bounds.right - pWidth, p2y),
+  );
   if (ball) {
     ball.close();
   }
-  ball = window.open("", "Ball", ballFeatures);
+  ball = window.open(
+    "",
+    "Ball",
+    buildFeatures(ballWidth, ballHeight, ballX, ballY),
+  );
   if (p1 && p2 && ball) {
-    ballWidth = ball.outerWidth;
-    ballHeight = ball.outerHeight;
-    p1.focus();
-    p2.focus();
-    ball.focus();
+    p1.resizeTo(pWidth, pHeight);
+    p2.resizeTo(pWidth, pHeight);
+    ball.resizeTo(ballWidth, ballHeight);
+    ballWidth = ball.outerWidth || ballWidth;
+    ballHeight = ball.outerHeight || ballHeight;
     updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
@@ -177,56 +210,46 @@ const startGame = () => {
     }, 500);
   } else {
     alert("Popup Windows are Blocked!");
+    gameEnd = true;
   }
 
-  document.addEventListener("keydown", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = true;
-    } else if (e.key == "Escape") {
-      p1.close();
-    }
-  });
-  document.addEventListener("keyup", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = false;
-    }
-  });
-  p1.addEventListener("keydown", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = true;
-    } else if (e.key == "Escape") {
-      p1.close();
-    }
-  });
-  p1.addEventListener("keyup", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = false;
-    }
-  });
-  p2.addEventListener("keydown", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = true;
-    } else if (e.key == "Escape") {
-      p1.close();
-    }
-  });
-  p2.addEventListener("keyup", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = false;
-    }
-  });
-  ball.addEventListener("keydown", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = true;
-    } else if (e.key == "Escape") {
-      p1.close();
-    }
-  });
-  ball.addEventListener("keyup", (e) => {
-    if (controller[e.key]) {
-      controller[e.key].pressed = false;
-    }
-  });
+  attachKeyboardListeners();
+  attachPopupListeners(p1);
+  attachPopupListeners(p2);
+  attachPopupListeners(ball);
 };
 
 startButton.addEventListener("click", startGame);
+
+const handleKeyDown = (e) => {
+  if (controller[e.key]) {
+    controller[e.key].pressed = true;
+  } else if (e.key == "Escape") {
+    p1?.close();
+  }
+};
+
+const handleKeyUp = (e) => {
+  if (controller[e.key]) {
+    controller[e.key].pressed = false;
+  }
+};
+
+let listenersAttached = false;
+
+const attachKeyboardListeners = () => {
+  if (listenersAttached) {
+    return;
+  }
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("keyup", handleKeyUp);
+  listenersAttached = true;
+};
+
+const attachPopupListeners = (win) => {
+  if (!win) {
+    return;
+  }
+  win.addEventListener("keydown", handleKeyDown);
+  win.addEventListener("keyup", handleKeyUp);
+};
