@@ -152,6 +152,13 @@ function updateValues() {
     p2y = clamp(p2y, bounds.top, bounds.bottom - p2Height);
     p1.moveTo(bounds.left, p1y);
     p2.moveTo(bounds.right - p2Width, p2y);
+    const screenBounds = getScreenBounds();
+    const p2Overflow = p2.screenX + p2Width - screenBounds.right;
+    if (p2Overflow > 0) {
+      edgeOffsets.right += p2Overflow;
+      const correctedBounds = getPlayBounds();
+      p2.moveTo(correctedBounds.right - p2Width, p2y);
+    }
 
     if (!gameEnd) {
       requestAnimationFrame(pMove);
