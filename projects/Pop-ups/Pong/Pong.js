@@ -13,7 +13,7 @@ let p2y = 0;
 
 let ball;
 let ballWidth = 100;
-let ballHeight = 140;
+let ballHeight = 100;
 let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
@@ -23,16 +23,19 @@ const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 const sizeMatches = (value, target, tolerance = 2) =>
   Math.abs(value - target) <= tolerance;
 
+const edgeOffsets = {
+  left: 0,
+  right: 0,
+  top: 0,
+};
+
 const ensureSize = (win, width, height) => {
   if (!win) {
     return;
   }
   const currentWidth = win.outerWidth;
   const currentHeight = win.outerHeight;
-  if (
-    !sizeMatches(currentWidth, width) ||
-    !sizeMatches(currentHeight, height)
-  ) {
+  if (!sizeMatches(currentWidth, width) || !sizeMatches(currentHeight, height)) {
     win.resizeTo(width, height);
   }
 };
@@ -63,10 +66,10 @@ const getScreenBounds = () => {
 
 const getPlayBounds = () => {
   const bounds = getScreenBounds();
-  const left = p1 ? p1.screenX : bounds.left;
-  const right = p2 ? p2.screenX + (p2.outerWidth || pWidth) : bounds.right;
-  const top = p1 ? p1.screenY : bounds.top;
-  const bottom = top + bounds.height;
+  const left = bounds.left + edgeOffsets.left;
+  const right = bounds.right + edgeOffsets.right;
+  const top = bounds.top + edgeOffsets.top;
+  const bottom = bounds.bottom;
   return {
     left,
     right,
@@ -75,6 +78,17 @@ const getPlayBounds = () => {
     width: right - left,
     height: bottom - top,
   };
+};
+
+const calibrateEdgeOffsets = () => {
+  const bounds = getScreenBounds();
+  if (p1) {
+    edgeOffsets.left = bounds.left - p1.screenX;
+    edgeOffsets.top = bounds.top - p1.screenY;
+  }
+  if (p2) {
+    edgeOffsets.right = bounds.right - (p2.screenX + p2.outerWidth);
+  }
 };
 
 const buildFeatures = (width, height, left, top) =>
@@ -232,6 +246,7 @@ const startGame = () => {
     ball.resizeTo(ballWidth, ballHeight);
     ballWidth = ball.outerWidth || ballWidth;
     ballHeight = ball.outerHeight || ballHeight;
+    setTimeout(calibrateEdgeOffsets, 100);
     updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
