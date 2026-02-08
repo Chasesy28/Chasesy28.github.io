@@ -23,6 +23,12 @@ const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 const sizeMatches = (value, target, tolerance = 2) =>
   Math.abs(value - target) <= tolerance;
 
+const edgeOffsets = {
+  left: 0,
+  right: 0,
+  top: 0,
+};
+
 const ensureSize = (win, width, height) => {
   if (!win) {
     return;
@@ -58,6 +64,33 @@ const getScreenBounds = () => {
   };
 };
 
+const getPlayBounds = () => {
+  const bounds = getScreenBounds();
+  const left = bounds.left + edgeOffsets.left;
+  const right = bounds.right + edgeOffsets.right;
+  const top = bounds.top + edgeOffsets.top;
+  const bottom = bounds.bottom;
+  return {
+    left,
+    right,
+    top,
+    bottom,
+    width: right - left,
+    height: bottom - top,
+  };
+};
+
+const calibrateEdgeOffsets = () => {
+  const bounds = getScreenBounds();
+  if (p1) {
+    edgeOffsets.left = bounds.left - p1.screenX;
+    edgeOffsets.top = bounds.top - p1.screenY;
+  }
+  if (p2) {
+    edgeOffsets.right = bounds.right - (p2.screenX + p2.outerWidth);
+  }
+};
+
 const buildFeatures = (width, height, left, top) =>
   `width=${Math.round(width)},height=${Math.round(height)},left=${Math.round(left)},top=${Math.round(top)},popup=yes`;
 
@@ -91,7 +124,7 @@ function updateValues() {
   }
 
   function pMove() {
-    const bounds = getScreenBounds();
+    const bounds = getPlayBounds();
     ensureSize(p1, pWidth, pHeight);
     ensureSize(p2, pWidth, pHeight);
     const p1Width = p1?.outerWidth || pWidth;
@@ -115,7 +148,7 @@ function updateValues() {
   pMove();
 
   function ballMove() {
-    const bounds = getScreenBounds();
+    const bounds = getPlayBounds();
     ensureSize(ball, ballWidth, ballHeight);
     const p1Width = p1?.outerWidth || pWidth;
     const p2Width = p2?.outerWidth || pWidth;
@@ -166,7 +199,7 @@ const startGame = () => {
   gameEnd = true;
   gameEnd = false;
 
-  const bounds = getScreenBounds();
+  const bounds = getPlayBounds();
 
   p1y = bounds.top + bounds.height / 2 - pHeight / 2;
   p2y = p1y;
@@ -213,6 +246,7 @@ const startGame = () => {
     ball.resizeTo(ballWidth, ballHeight);
     ballWidth = ball.outerWidth || ballWidth;
     ballHeight = ball.outerHeight || ballHeight;
+    setTimeout(calibrateEdgeOffsets, 100);
     updateValues();
     const closeCheck = setInterval(function () {
       if (p1.closed) {
