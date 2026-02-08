@@ -20,6 +20,19 @@ let ballX = 0;
 let ballY = 0;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+const sizeMatches = (value, target, tolerance = 2) =>
+  Math.abs(value - target) <= tolerance;
+
+const ensureSize = (win, width, height) => {
+  if (!win) {
+    return;
+  }
+  const currentWidth = win.outerWidth;
+  const currentHeight = win.outerHeight;
+  if (!sizeMatches(currentWidth, width) || !sizeMatches(currentHeight, height)) {
+    win.resizeTo(width, height);
+  }
+};
 
 const getScreenBounds = () => {
   const screenRef = window.screen;
@@ -71,6 +84,8 @@ function updateValues() {
 
   function pMove() {
     const bounds = getScreenBounds();
+    ensureSize(p1, pWidth, pHeight);
+    ensureSize(p2, pWidth, pHeight);
     const p1Width = p1?.outerWidth || pWidth;
     const p2Width = p2?.outerWidth || pWidth;
 
@@ -93,6 +108,7 @@ function updateValues() {
 
   function ballMove() {
     const bounds = getScreenBounds();
+    ensureSize(ball, ballWidth, ballHeight);
     const p1Width = p1?.outerWidth || pWidth;
     const p2Width = p2?.outerWidth || pWidth;
 
