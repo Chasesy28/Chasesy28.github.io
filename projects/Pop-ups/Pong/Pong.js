@@ -242,6 +242,13 @@ const startGame = () => {
     ball.resizeTo(ballWidth, ballHeight);
     ballWidth = ball.outerWidth || ballWidth;
     ballHeight = ball.outerHeight || ballHeight;
+    ballX = bounds.left + bounds.width / 2 - ballWidth / 2;
+    ballY = bounds.top + bounds.height / 2 - ballHeight / 2;
+    try {
+      ball.moveTo(ballX, ballY);
+    } catch (error) {
+      console.error(error);
+    }
     setTimeout(calibrateEdgeOffsets, 100);
     updateValues();
     const closeCheck = setInterval(function () {
