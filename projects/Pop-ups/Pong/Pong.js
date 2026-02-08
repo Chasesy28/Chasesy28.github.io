@@ -146,6 +146,14 @@ function updateValues() {
   function ballMove() {
     const bounds = getPlayBounds();
     ensureSize(ball, ballWidth, ballHeight);
+    const nextBallWidth = ball?.outerWidth || ballWidth;
+    const nextBallHeight = ball?.outerHeight || ballHeight;
+    if (nextBallWidth !== ballWidth || nextBallHeight !== ballHeight) {
+      ballX -= (nextBallWidth - ballWidth) / 2;
+      ballY -= (nextBallHeight - ballHeight) / 2;
+      ballWidth = nextBallWidth;
+      ballHeight = nextBallHeight;
+    }
     const p1Width = p1?.outerWidth || pWidth;
     const p2Width = p2?.outerWidth || pWidth;
 
