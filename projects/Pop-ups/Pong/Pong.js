@@ -33,11 +33,7 @@ const ensureSize = (win, width, height) => {
   if (!win) {
     return;
   }
-  const currentWidth = win.outerWidth;
-  const currentHeight = win.outerHeight;
-  if (!sizeMatches(currentWidth, width) || !sizeMatches(currentHeight, height)) {
-    win.resizeTo(width, height);
-  }
+  win.resizeTo(width, height);
 };
 
 const getScreenBounds = () => {
