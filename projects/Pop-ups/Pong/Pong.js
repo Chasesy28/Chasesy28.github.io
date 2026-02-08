@@ -8,27 +8,18 @@ let pWidth = 150;
 let pHeight = 400;
 let p1Speed = 5;
 let p2Speed = 5;
-
-// Use window.screen with fallbacks for compatibility
-const screenWidth = window.screen?.availWidth || window.screen?.width || 1920;
-const screenHeight =
-  window.screen?.availHeight || window.screen?.height || 1080;
-
-// Cache p2 x position to prevent jittering
-let p2x = screenWidth - pWidth;
-
-let p1y = screenHeight / 2 - pHeight / 2;
+let p1y = screen.availHeight / 2 - pHeight / 2;
 let p2y = p1y;
 const p1Features = `width=${pWidth},height=${pHeight},left=${0},top=${p1y},popup=yes`;
-const p2Features = `width=${pWidth},height=${pHeight},left=${screenWidth - pWidth},top=${p2y},popup=yes`;
+const p2Features = `width=${pWidth},height=${pHeight},left=${screen.availWidth - pWidth},top=${p2y},popup=yes`;
 
 let ball;
 let ballWidth = 100;
 let ballHeight = 75;
 let ballSpeedX;
 let ballSpeedY;
-let ballX = screenWidth / 2 - ballWidth / 2;
-let ballY = screenHeight / 2 - ballHeight / 2;
+let ballX = screen.availWidth / 2 - ballWidth / 2;
+let ballY = screen.availHeight / 2 - ballHeight / 2;
 const ballFeatures = `width=${ballWidth},height=${ballHeight},left=${ballX},top=${ballY},popup=yes`;
 
 const controller = {
@@ -39,32 +30,6 @@ const controller = {
   ArrowUp: { pressed: false, dir: "up", char: 2 },
   ArrowDown: { pressed: false, dir: "down", char: 2 },
 };
-
-function closeAllWindows() {
-  if (p1 && !p1.closed) p1.close();
-  if (p2 && !p2.closed) p2.close();
-  if (ball && !ball.closed) ball.close();
-  gameEnd = true;
-}
-
-function handleKeyDown(e) {
-  if (controller[e.key]) {
-    e.preventDefault();
-    controller[e.key].pressed = true;
-  } else if (e.key === "Escape") {
-    closeAllWindows();
-  }
-}
-
-function handleKeyUp(e) {
-  if (controller[e.key]) {
-    e.preventDefault();
-    controller[e.key].pressed = false;
-  }
-}
-
-document.addEventListener("keydown", handleKeyDown);
-document.addEventListener("keyup", handleKeyUp);
 
 function updateValues() {
   function pMovementCalc(key) {
@@ -79,12 +44,14 @@ function updateValues() {
         }
       }
       if (controller[key].char == 1) {
-        if (p1y > 0 || p1y + pHeight <= screenHeight) {
+        if (p1y > 0 || p1y + pHeight <= screen.availHeight) {
           p1y += p1Speed;
+          p1.focus();
         }
       } else {
-        if (p2y > 0 || p2y + pHeight <= screenHeight) {
+        if (p2y > 0 || p2y + pHeight <= screen.availHeight) {
           p2y += p2Speed;
+          p2.focus();
         }
       }
     }
@@ -96,24 +63,10 @@ function updateValues() {
         pMovementCalc(key);
       }
     });
-    // Check if windows are still valid before accessing
-    if (p1 && !p1.closed) {
-      try {
-        p1.moveTo(0, p1y);
-        p1.resizeTo(pWidth, pHeight);
-      } catch (e) {
-        console.error("Error moving p1:", e);
-      }
-    }
-    if (p2 && !p2.closed) {
-      try {
-        // Use cached x position to prevent jittering
-        p2.moveTo(p2x, p2y);
-        p2.resizeTo(pWidth, pHeight);
-      } catch (e) {
-        console.error("Error moving p2:", e);
-      }
-    }
+    p1.moveTo(0, p1y);
+    p2.moveTo(screen.availWidth - pWidth, p2y);
+    p1.resizeTo(pWidth, pHeight);
+    p2.resizeTo(pWidth, pHeight);
 
     if (!gameEnd) {
       requestAnimationFrame(pMove);
@@ -126,10 +79,10 @@ function updateValues() {
     ballX += ballSpeedX;
     ballY += ballSpeedY;
 
-    if (ballX + ballWidth >= p2x + pWidth || ballX <= 0) {
+    if (ballX + ballWidth >= screen.availWidth || ballX <= 0) {
       ballSpeedX = -ballSpeedX;
     }
-    if (ballY + ballHeight >= screenHeight || ballY <= 0) {
+    if (ballY + ballHeight >= screen.availHeight || ballY <= 0) {
       ballSpeedY = -ballSpeedY;
     }
 
@@ -141,21 +94,19 @@ function updateValues() {
       ballSpeedX = -ballSpeedX;
     }
     if (
-      ballX + ballWidth >= p2x &&
+      ballX + ballWidth >= screen.availWidth - pWidth &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + pHeight
     ) {
       ballSpeedX = -ballSpeedX;
     }
 
-    ballX = Math.max(0, Math.min(ballX, p2x + pWidth - ballWidth));
-    ballY = Math.max(0, Math.min(ballY, screenHeight - ballHeight));
+    ballX = Math.max(0, Math.min(ballX, screen.availWidth - ballWidth));
+    ballY = Math.max(0, Math.min(ballY, screen.availHeight - ballHeight));
 
     try {
-      if (ball && !ball.closed) {
-        ball.moveTo(ballX, ballY);
-        ball.resizeTo(ballWidth, ballHeight);
-      }
+      ball.moveTo(ballX, ballY);
+      ball.resizeTo(ballWidth, ballHeight);
     } catch (error) {
       console.error(error);
     }
@@ -172,10 +123,10 @@ const startGame = () => {
   gameEnd = true;
   gameEnd = false;
 
-  p1y = screenHeight / 2 - pHeight / 2;
+  p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = p1y;
-  ballX = screenWidth / 2 - ballWidth / 2;
-  ballY = screenHeight / 2 - ballHeight / 2;
+  ballX = screen.availWidth / 2 - ballWidth / 2;
+  ballY = screen.availHeight / 2 - ballHeight / 2;
   if (Math.floor(Math.random() * 2) == 0) {
     ballSpeedX = 5;
   } else {
@@ -187,74 +138,95 @@ const startGame = () => {
     ballSpeedY = -5;
   }
 
-  if (p1 && !p1.closed) {
+  if (p1) {
     p1.close();
   }
   p1 = window.open("", "Player 1", p1Features);
-  if (p2 && !p2.closed) {
+  if (p2) {
     p2.close();
   }
   p2 = window.open("", "Player 2", p2Features);
-  if (ball && !ball.closed) {
+  if (ball) {
     ball.close();
   }
   ball = window.open("", "Ball", ballFeatures);
-
   if (p1 && p2 && ball) {
-    // Recalculate p2x based on actual screen width after popups are opened
-    const actualScreenWidth =
-      window.screen?.availWidth || window.screen?.width || screenWidth;
-    p2x = actualScreenWidth - pWidth;
-
-    // Also verify p2's actual position and use that if available
-    if (p2.screenX !== undefined && p2.screenX > 0) {
-      p2x = p2.screenX;
-    }
-
     ballWidth = ball.outerWidth;
     ballHeight = ball.outerHeight;
+    p1.focus();
+    p2.focus();
+    ball.focus();
     updateValues();
     const closeCheck = setInterval(function () {
-      if (!p1 || p1.closed) {
-        if (p2 && !p2.closed) p2.close();
-        if (ball && !ball.closed) ball.close();
+      if (p1.closed) {
+        p2.close();
+        ball.close();
         gameEnd = true;
         clearInterval(closeCheck);
-      } else if (!p2 || p2.closed) {
-        if (p1 && !p1.closed) p1.close();
-        if (ball && !ball.closed) ball.close();
+      } else if (p2.closed) {
+        p1.close();
+        ball.close();
         gameEnd = true;
         clearInterval(closeCheck);
-      } else if (!ball || ball.closed) {
-        if (p1 && !p1.closed) p1.close();
-        if (p2 && !p2.closed) p2.close();
+      } else if (ball.closed) {
+        p1.close();
+        p2.close();
         gameEnd = true;
         clearInterval(closeCheck);
       }
     }, 500);
   } else {
-    alert(
-      "Popup Windows are Blocked!\n\nPlease allow popups for this site and try again.",
-    );
-    gameEnd = true;
-    return;
+    alert("Popup Windows are Blocked!");
   }
 
-  const setupPopupListeners = (popup) => {
-    if (!popup || popup.closed) return;
-    try {
-      popup.removeEventListener("keydown", handleKeyDown);
-      popup.removeEventListener("keyup", handleKeyUp);
-      popup.addEventListener("keydown", handleKeyDown);
-      popup.addEventListener("keyup", handleKeyUp);
-    } catch (error) {
-      console.error(error);
+  document.addEventListener("keydown", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
     }
-  };
-
-  setupPopupListeners(p1);
-  setupPopupListeners(p2);
-  setupPopupListeners(ball);
+  });
+  document.addEventListener("keyup", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = false;
+    }
+  });
+  p1.addEventListener("keydown", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
+    }
+  });
+  p1.addEventListener("keyup", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = false;
+    }
+  });
+  p2.addEventListener("keydown", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
+    }
+  });
+  p2.addEventListener("keyup", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = false;
+    }
+  });
+  ball.addEventListener("keydown", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = true;
+    } else if (e.key == "Escape") {
+      p1.close();
+    }
+  });
+  ball.addEventListener("keyup", (e) => {
+    if (controller[e.key]) {
+      controller[e.key].pressed = false;
+    }
+  });
 };
 
 startButton.addEventListener("click", startGame);
