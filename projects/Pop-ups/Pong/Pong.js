@@ -12,8 +12,8 @@ let p1y = 0;
 let p2y = 0;
 
 let ball;
-let ballWidth = 100;
-let ballHeight = 100;
+let ballWidth = 200;
+let ballHeight = 200;
 let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
