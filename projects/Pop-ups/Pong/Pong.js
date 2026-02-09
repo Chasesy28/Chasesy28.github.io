@@ -18,6 +18,7 @@ let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
 let ballY = 0;
+let ballSizeLogged = false;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 const sizeMatches = (value, target, tolerance = 2) =>
@@ -30,7 +31,7 @@ const edgeOffsets = {
 };
 
 const POSITION_RIGHT_GUARD = 20;
-const COLLISION_RIGHT_INSET = 40;
+const COLLISION_RIGHT_INSET = 45;
 
 const ensureSize = (win, width, height) => {
   if (!win) {
@@ -47,7 +48,10 @@ const ensureSize = (win, width, height) => {
     win.resizeTo(nextWidth, nextHeight);
     actualWidth = win.outerWidth || actualWidth;
     actualHeight = win.outerHeight || actualHeight;
-    if (sizeMatches(actualWidth, targetWidth) && sizeMatches(actualHeight, targetHeight)) {
+    if (
+      sizeMatches(actualWidth, targetWidth) &&
+      sizeMatches(actualHeight, targetHeight)
+    ) {
       break;
     }
     nextWidth += targetWidth - actualWidth;
@@ -126,7 +130,7 @@ const settleRightEdge = (p2Width, p2y) => {
     p2.moveTo(bounds.right - p2Width, p2y);
     const overflow = p2.screenX + p2Width - screenRight;
     if (!logged) {
-      console.log("P2 debug", {
+      /*console.log("P2 debug", {
         screenRight,
         screenAvailWidth: window.screen.availWidth,
         screenLeft: screenBounds.left,
@@ -134,7 +138,7 @@ const settleRightEdge = (p2Width, p2y) => {
         p2OuterWidth: p2Width,
         boundsRight: bounds.right,
         overflow,
-      });
+      });*/
       logged = true;
     }
     if (overflow <= 1) {
@@ -209,6 +213,15 @@ function updateValues() {
     const p2Size = ensureSize(p2, pWidth, pHeight);
     const ballSize = ensureSize(ball, ballWidth, ballHeight);
     if (ballSize.width !== ballWidth || ballSize.height !== ballHeight) {
+      if (!ballSizeLogged) {
+        console.log("Ball size", {
+          targetWidth: ballWidth,
+          targetHeight: ballHeight,
+          actualWidth: ballSize.width,
+          actualHeight: ballSize.height,
+        });
+        ballSizeLogged = true;
+      }
       ballX -= (ballSize.width - ballWidth) / 2;
       ballY -= (ballSize.height - ballHeight) / 2;
       ballWidth = ballSize.width;
@@ -251,7 +264,7 @@ function updateValues() {
       ballY <= p2y + p2Height
     ) {
       if (!loggedRightCollision) {
-        console.log("Right collision", {
+        /*console.log("Right collision", {
           p2OuterWidth: p2Width,
           p2InnerWidth: p2?.innerWidth,
           p2FrameX,
@@ -259,7 +272,7 @@ function updateValues() {
           p2X,
           rightWall,
           ballRight: ballX + ballWidth,
-        });
+        });*/
         loggedRightCollision = true;
       }
       ballSpeedX = -ballSpeedX;
