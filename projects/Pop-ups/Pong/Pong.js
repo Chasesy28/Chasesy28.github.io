@@ -214,7 +214,11 @@ function updateValues() {
     const p1X = p1?.screenX ?? bounds.left;
     const p2X = p2?.screenX ?? bounds.right - p2Width;
     const leftWall = p1X;
-    const rightWall = p2X + p2Width - RIGHT_EDGE_GUARD;
+    const p2FrameX = p2?.innerWidth
+      ? Math.max(0, (p2Width - p2.innerWidth) / 2)
+      : 0;
+    const rightInset = Math.max(RIGHT_EDGE_GUARD, p2FrameX);
+    const rightWall = p2X + p2Width - rightInset;
 
     ballX += ballSpeedX;
     ballY += ballSpeedY;
@@ -234,7 +238,7 @@ function updateValues() {
       ballSpeedX = -ballSpeedX;
     }
     if (
-      ballX + ballWidth >= p2X - RIGHT_EDGE_GUARD &&
+      ballX + ballWidth >= p2X - rightInset &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + p2Height
     ) {

@@ -7,7 +7,7 @@
 // Automatic cache versioning with timestamp - update this when deploying new versions
 // This ensures users get fresh content when the site is updated
 const CACHE_VERSION = '6';
-const CACHE_TIMESTAMP = '2026-02-09T01:21:19Z'; // Update this timestamp when deploying
+const CACHE_TIMESTAMP = '2026-02-09T01:48:59Z'; // Update this timestamp when deploying
 const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 
 /**
