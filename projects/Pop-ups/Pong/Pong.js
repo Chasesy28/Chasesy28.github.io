@@ -29,7 +29,7 @@ const edgeOffsets = {
   top: 0,
 };
 
-const RIGHT_EDGE_GUARD = 20;
+const RIGHT_EDGE_GUARD = 40;
 
 const ensureSize = (win, width, height) => {
   if (!win) {
