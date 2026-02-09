@@ -36,16 +36,22 @@ const ensureSize = (win, width, height) => {
   if (!win) {
     return { width, height };
   }
-  win.resizeTo(width, height);
-  let actualWidth = win.outerWidth || width;
-  let actualHeight = win.outerHeight || height;
-  if (!sizeMatches(actualWidth, width) || !sizeMatches(actualHeight, height)) {
-    win.resizeTo(
-      width + (width - actualWidth),
-      height + (height - actualHeight),
-    );
+  const targetWidth = Math.round(width);
+  const targetHeight = Math.round(height);
+  let nextWidth = targetWidth;
+  let nextHeight = targetHeight;
+  let actualWidth = win.outerWidth || targetWidth;
+  let actualHeight = win.outerHeight || targetHeight;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    win.resizeTo(nextWidth, nextHeight);
     actualWidth = win.outerWidth || actualWidth;
     actualHeight = win.outerHeight || actualHeight;
+    if (sizeMatches(actualWidth, targetWidth) && sizeMatches(actualHeight, targetHeight)) {
+      break;
+    }
+    nextWidth += targetWidth - actualWidth;
+    nextHeight += targetHeight - actualHeight;
   }
   return { width: actualWidth, height: actualHeight };
 };
