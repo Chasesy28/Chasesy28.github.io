@@ -29,6 +29,8 @@ const edgeOffsets = {
   top: 0,
 };
 
+const RIGHT_EDGE_GUARD = 8;
+
 const ensureSize = (win, width, height) => {
   if (!win) {
     return { width, height };
@@ -78,7 +80,7 @@ const getScreenBounds = () => {
 const getPlayBounds = () => {
   const bounds = getScreenBounds();
   const left = bounds.left + edgeOffsets.left;
-  const right = bounds.right - edgeOffsets.right;
+  const right = bounds.right - edgeOffsets.right - RIGHT_EDGE_GUARD;
   const top = bounds.top + edgeOffsets.top;
   const bottom = bounds.bottom;
   return {
@@ -98,23 +100,27 @@ const calibrateEdgeOffsets = () => {
     edgeOffsets.top = p1.screenY - p1y;
   }
   if (p2) {
-    edgeOffsets.right = Math.max(0, p2.screenX + p2.outerWidth - bounds.right);
+    edgeOffsets.right = Math.max(
+      0,
+      p2.screenX + p2.outerWidth - (bounds.right - RIGHT_EDGE_GUARD),
+    );
   }
 };
 
 const settleRightEdge = (p2Width, p2y) => {
-  if (!p2) {
+  if (!p2 || p2.closed) {
     return;
   }
   const screenBounds = getScreenBounds();
+  const screenRight = screenBounds.right - RIGHT_EDGE_GUARD;
   let logged = false;
   for (let i = 0; i < 3; i += 1) {
     const bounds = getPlayBounds();
     p2.moveTo(bounds.right - p2Width, p2y);
-    const overflow = p2.screenX + p2Width - screenBounds.right;
+    const overflow = p2.screenX + p2Width - screenRight;
     if (!logged) {
       console.log("P2 debug", {
-        screenRight: screenBounds.right,
+        screenRight,
         screenAvailWidth: window.screen.availWidth,
         screenLeft: screenBounds.left,
         p2ScreenX: p2.screenX,
