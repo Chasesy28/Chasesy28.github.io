@@ -13,7 +13,7 @@ let p2y = 0;
 
 let ball;
 let ballWidth = 100;
-let ballHeight = 500;
+let ballHeight = 100;
 let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
@@ -129,18 +129,6 @@ const settleRightEdge = (p2Width, p2y) => {
     const bounds = getPlayBounds();
     p2.moveTo(bounds.right - p2Width, p2y);
     const overflow = p2.screenX + p2Width - screenRight;
-    if (!logged) {
-      /*console.log("P2 debug", {
-        screenRight,
-        screenAvailWidth: window.screen.availWidth,
-        screenLeft: screenBounds.left,
-        p2ScreenX: p2.screenX,
-        p2OuterWidth: p2Width,
-        boundsRight: bounds.right,
-        overflow,
-      });*/
-      logged = true;
-    }
     if (overflow <= 1) {
       break;
     }
@@ -218,15 +206,6 @@ function updateValues() {
       ballWidth = ballSize.width;
       ballHeight = ballSize.height;
     }
-    if (!ballSizeLogged) {
-      console.log("Ball size", {
-        targetWidth: ballWidth,
-        targetHeight: ballHeight,
-        actualWidth: ballSize.width,
-        actualHeight: ballSize.height,
-      });
-      ballSizeLogged = true;
-    }
     const p1Width = p1Size.width;
     const p2Width = p2Size.width;
     const p1Height = p1Size.height;
@@ -263,18 +242,6 @@ function updateValues() {
       ballY + ballHeight >= p2y &&
       ballY <= p2y + p2Height
     ) {
-      if (!loggedRightCollision) {
-        /*console.log("Right collision", {
-          p2OuterWidth: p2Width,
-          p2InnerWidth: p2?.innerWidth,
-          p2FrameX,
-          rightInset,
-          p2X,
-          rightWall,
-          ballRight: ballX + ballWidth,
-        });*/
-        loggedRightCollision = true;
-      }
       ballSpeedX = -ballSpeedX;
     }
 
@@ -341,6 +308,7 @@ const startGame = () => {
     buildFeatures(ballWidth, ballHeight, ballX, ballY),
   );
   if (p1 && p2 && ball) {
+    console.log(`Outer Width: ${ball.outerWidth} Outer Height: ${ball.outerHeight}`);
     const p1Size = ensureSize(p1, pWidth, pHeight);
     const p2Size = ensureSize(p2, pWidth, pHeight);
     const ballSize = ensureSize(ball, ballWidth, ballHeight);
