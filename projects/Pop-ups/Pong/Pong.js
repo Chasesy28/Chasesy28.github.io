@@ -13,7 +13,7 @@ let p2y = 0;
 
 let ball;
 let ballWidth = 100;
-let ballHeight = 100;
+let ballHeight = 500;
 let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
