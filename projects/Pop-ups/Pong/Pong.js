@@ -231,7 +231,7 @@ function updateValues() {
       ballSpeedX = -ballSpeedX;
     }
     if (
-      ballX + ballWidth >= p2X - rightInset &&
+      ballX + ballWidth >= p2X &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + p2Height
     ) {
