@@ -177,10 +177,6 @@ function updateValues() {
     const p2Width = p2Size.width;
     const p1Height = p1Size.height;
     const p2Height = p2Size.height;
-    const p1X = p1?.screenX ?? bounds.left;
-    const p2X = p2?.screenX ?? bounds.right - p2Width;
-    const leftWall = p1X;
-    const rightWall = p2X + p2Width;
 
     Object.keys(controller).forEach((key) => {
       if (controller[key].pressed) {
@@ -219,7 +215,7 @@ function updateValues() {
     ballX += ballSpeedX;
     ballY += ballSpeedY;
 
-    if (ballX + ballWidth >= rightWall || ballX <= leftWall) {
+    if (ballX + ballWidth >= bounds.right || ballX <= bounds.left) {
       ballSpeedX = -ballSpeedX;
     }
     if (ballY + ballHeight >= bounds.bottom || ballY <= bounds.top) {
@@ -227,21 +223,21 @@ function updateValues() {
     }
 
     if (
-      ballX <= p1X + p1Width &&
+      ballX <= bounds.left + p1Width &&
       ballY + ballHeight >= p1y &&
       ballY <= p1y + p1Height
     ) {
       ballSpeedX = -ballSpeedX;
     }
     if (
-      ballX + ballWidth >= p2X &&
+      ballX + ballWidth >= bounds.right - p2Width &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + p2Height
     ) {
       ballSpeedX = -ballSpeedX;
     }
 
-    ballX = clamp(ballX, leftWall, rightWall - ballWidth);
+    ballX = clamp(ballX, bounds.left, bounds.right - ballWidth);
     ballY = clamp(ballY, bounds.top, bounds.bottom - ballHeight);
 
     try {
