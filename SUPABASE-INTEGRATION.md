@@ -79,11 +79,17 @@ npm install @supabase/supabase-js
 #### Phase 1: Setup Supabase Client
 Create `/admin-supabase.js`:
 ```javascript
-// Import Supabase client library (add to package.json dependencies)
+// Import Supabase client library (add @supabase/supabase-js to package.json)
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL'
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY'
+// Load from environment variables - NEVER hardcode credentials
+// Set these in your deployment environment or .env file (add .env to .gitignore)
+const supabaseUrl = process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Supabase credentials not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```

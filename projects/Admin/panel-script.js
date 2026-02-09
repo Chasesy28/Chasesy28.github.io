@@ -295,6 +295,7 @@ function deleteAnnouncementById(announcementId) {
   if (confirm('Are you sure you want to delete this announcement?')) {
     window.Announcements.delete(announcementId);
     loadAnnouncements();
+    showToast('Announcement deleted', 'success');
   }
 }
 
@@ -342,26 +343,8 @@ function openCloudflareAnalytics() {
  */
 function showAnalyticsSetup(e) {
   e.preventDefault();
-  alert(`Cloudflare Analytics Setup:
-
-1. Get your Cloudflare API token from the dashboard
-2. Add the token to your environment configuration
-3. The admin panel will automatically fetch and display analytics
-
-For development, visit the Cloudflare Dashboard directly to view analytics.`);
+  showToast('Check the admin panel docs for Cloudflare Analytics setup instructions', 'info');
 }
-
-/**
- * Escapes HTML to prevent XSS
- */
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Make delete function available globally
-window.deleteAnnouncementById = deleteAnnouncementById;
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
