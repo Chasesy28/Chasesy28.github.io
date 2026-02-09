@@ -157,6 +157,43 @@ function updateAnnouncementPreview() {
 }
 
 /**
+ * Shows a toast notification
+ * @param {string} message - Message to display
+ * @param {string} type - Type: 'success', 'error', 'info'
+ */
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.style.position = 'fixed';
+  toast.style.bottom = '24px';
+  toast.style.right = '24px';
+  toast.style.padding = '16px 24px';
+  toast.style.borderRadius = '8px';
+  toast.style.color = 'white';
+  toast.style.fontWeight = '600';
+  toast.style.zIndex = '10000';
+  toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+  toast.style.animation = 'slideIn 0.3s ease-out';
+  toast.textContent = message;
+  
+  // Set color based on type
+  if (type === 'success') {
+    toast.style.backgroundColor = '#10b981';
+  } else if (type === 'error') {
+    toast.style.backgroundColor = '#ef4444';
+  } else {
+    toast.style.backgroundColor = '#4a9eff';
+  }
+  
+  document.body.appendChild(toast);
+  
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+/**
  * Handles announcement creation
  */
 function handleCreateAnnouncement(e) {
@@ -170,8 +207,8 @@ function handleCreateAnnouncement(e) {
   const announcement = window.Announcements.create(message, type, dismissible);
   window.Announcements.save(announcement);
   
-  // Show success message
-  alert('Announcement created successfully! It will now appear site-wide.');
+  // Show success toast
+  showToast('Announcement created successfully! It will now appear site-wide.', 'success');
   
   // Refresh the list
   loadAnnouncements();
@@ -194,26 +231,61 @@ function loadAnnouncements() {
   
   noAnnouncementsMsg.style.display = 'none';
   
-  announcementsList.innerHTML = announcements.map(announcement => {
+  announcementsList.innerHTML = '';
+  
+  announcements.forEach(announcement => {
     const config = ANNOUNCEMENT_CONFIG[announcement.type];
     const date = new Date(announcement.createdAt).toLocaleString();
     
-    return `
-      <div class="announcement-item">
-        <div class="announcement-item-content">
-          <div style="margin-bottom: 8px;">
-            <span class="announcement-type-badge type-${announcement.type}">${announcement.type.toUpperCase()}</span>
-            ${announcement.dismissible ? '<span style="font-size: 12px; color: #6b7280;">• Dismissible</span>' : ''}
-          </div>
-          <p style="font-size: 14px; color: #111827; margin-bottom: 4px;">${escapeHtml(announcement.message)}</p>
-          <p style="font-size: 12px; color: #6b7280;">Created: ${date}</p>
-        </div>
-        <button class="btn btn-danger" style="padding: 8px 16px; font-size: 12px;" onclick="deleteAnnouncementById('${announcement.id}')">
-          Delete
-        </button>
-      </div>
-    `;
-  }).join('');
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'announcement-item';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'announcement-item-content';
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.style.marginBottom = '8px';
+    
+    const badge = document.createElement('span');
+    badge.className = `announcement-type-badge type-${announcement.type}`;
+    badge.textContent = announcement.type.toUpperCase();
+    headerDiv.appendChild(badge);
+    
+    if (announcement.dismissible) {
+      const dismissText = document.createElement('span');
+      dismissText.style.fontSize = '12px';
+      dismissText.style.color = '#6b7280';
+      dismissText.textContent = ' • Dismissible';
+      headerDiv.appendChild(dismissText);
+    }
+    
+    const messageP = document.createElement('p');
+    messageP.style.fontSize = '14px';
+    messageP.style.color = '#111827';
+    messageP.style.marginBottom = '4px';
+    messageP.textContent = announcement.message;
+    
+    const dateP = document.createElement('p');
+    dateP.style.fontSize = '12px';
+    dateP.style.color = '#6b7280';
+    dateP.textContent = `Created: ${date}`;
+    
+    contentDiv.appendChild(headerDiv);
+    contentDiv.appendChild(messageP);
+    contentDiv.appendChild(dateP);
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'btn btn-danger';
+    deleteBtn.style.padding = '8px 16px';
+    deleteBtn.style.fontSize = '12px';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.addEventListener('click', () => deleteAnnouncementById(announcement.id));
+    
+    itemDiv.appendChild(contentDiv);
+    itemDiv.appendChild(deleteBtn);
+    
+    announcementsList.appendChild(itemDiv);
+  });
 }
 
 /**
@@ -253,7 +325,7 @@ function refreshAnalytics() {
     loadAnalytics();
     refreshAnalyticsBtn.disabled = false;
     refreshAnalyticsBtn.textContent = 'Refresh Analytics';
-    alert('Analytics data refreshed (demo mode)');
+    showToast('Analytics data refreshed (demo mode)', 'info');
   }, 1000);
 }
 

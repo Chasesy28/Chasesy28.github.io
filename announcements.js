@@ -37,8 +37,12 @@ const ANNOUNCEMENT_TYPES = {
  * @returns {Object} Announcement object
  */
 function createAnnouncement(message, type = 'info', dismissible = true) {
+  // Generate unique ID with timestamp + random string to prevent collisions
+  const randomStr = Math.random().toString(36).substring(2, 9);
+  const id = `${Date.now()}-${randomStr}`;
+  
   return {
-    id: Date.now().toString(),
+    id: id,
     message: message,
     type: type,
     dismissible: dismissible,

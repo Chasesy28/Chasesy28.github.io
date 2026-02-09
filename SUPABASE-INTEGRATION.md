@@ -77,12 +77,13 @@ npm install @supabase/supabase-js
 ### 4. Migration Steps
 
 #### Phase 1: Setup Supabase Client
-Create `/src/lib/supabase.ts`:
-```typescript
+Create `/admin-supabase.js`:
+```javascript
+// Import Supabase client library (add to package.json dependencies)
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL'
+const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```

@@ -9,13 +9,19 @@ const ADMIN_SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
  * Simple authentication - checks for hardcoded credentials
+ * 
+ * ⚠️ SECURITY WARNING ⚠️
+ * These hardcoded credentials are for DEMO/DEVELOPMENT ONLY.
+ * NEVER use this in production without replacing with proper authentication.
+ * CHANGE THESE CREDENTIALS BEFORE ANY PUBLIC DEPLOYMENT.
+ * 
  * TODO: Replace with Supabase authentication when integrated
  * @param {string} username - Admin username
  * @param {string} password - Admin password
  * @returns {boolean} True if credentials are valid
  */
 function authenticateAdmin(username, password) {
-  // TODO: Replace with Supabase auth
+  // TODO: Replace with Supabase auth or environment-based credentials
   // For now, using a simple check (NOT SECURE for production)
   const validUsername = 'admin';
   const validPassword = 'admin123'; // TODO: Use environment variable
