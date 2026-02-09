@@ -213,19 +213,19 @@ function updateValues() {
     const p2Size = ensureSize(p2, pWidth, pHeight);
     const ballSize = ensureSize(ball, ballWidth, ballHeight);
     if (ballSize.width !== ballWidth || ballSize.height !== ballHeight) {
-      if (!ballSizeLogged) {
-        console.log("Ball size", {
-          targetWidth: ballWidth,
-          targetHeight: ballHeight,
-          actualWidth: ballSize.width,
-          actualHeight: ballSize.height,
-        });
-        ballSizeLogged = true;
-      }
       ballX -= (ballSize.width - ballWidth) / 2;
       ballY -= (ballSize.height - ballHeight) / 2;
       ballWidth = ballSize.width;
       ballHeight = ballSize.height;
+    }
+    if (!ballSizeLogged) {
+      console.log("Ball size", {
+        targetWidth: ballWidth,
+        targetHeight: ballHeight,
+        actualWidth: ballSize.width,
+        actualHeight: ballSize.height,
+      });
+      ballSizeLogged = true;
     }
     const p1Width = p1Size.width;
     const p2Width = p2Size.width;
