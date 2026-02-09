@@ -18,7 +18,6 @@ let ballSpeedX;
 let ballSpeedY;
 let ballX = 0;
 let ballY = 0;
-let ballSizeLogged = false;
 
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 const sizeMatches = (value, target, tolerance = 2) =>
@@ -39,7 +38,6 @@ const ensureSize = (win, width, height) => {
   }
   const targetWidth = Math.round(width);
   const targetHeight = Math.round(height);
-  console.log(`${win.name} target size`, { targetWidth, targetHeight });
   let nextWidth = targetWidth;
   let nextHeight = targetHeight;
   let actualWidth = win.outerWidth || targetWidth;
@@ -200,13 +198,7 @@ function updateValues() {
     const bounds = getPlayBounds();
     const p1Size = ensureSize(p1, pWidth, pHeight);
     const p2Size = ensureSize(p2, pWidth, pHeight);
-    const ballSize = ensureSize(ball, ballWidth, ballHeight);
-    if (ballSize.width !== ballWidth || ballSize.height !== ballHeight) {
-      ballX -= (ballSize.width - ballWidth) / 2;
-      ballY -= (ballSize.height - ballHeight) / 2;
-      ballWidth = ballSize.width;
-      ballHeight = ballSize.height;
-    }
+    ball.resizeTo(ballWidth, ballHeight);
     const p1Width = p1Size.width;
     const p2Width = p2Size.width;
     const p1Height = p1Size.height;
@@ -219,7 +211,6 @@ function updateValues() {
       : 0;
     const rightInset = Math.max(COLLISION_RIGHT_INSET, p2FrameX);
     const rightWall = p2X + p2Width - rightInset;
-    let loggedRightCollision = false;
 
     ballX += ballSpeedX;
     ballY += ballSpeedY;
