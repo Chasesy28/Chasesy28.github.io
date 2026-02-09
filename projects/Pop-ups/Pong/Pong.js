@@ -39,6 +39,7 @@ const ensureSize = (win, width, height) => {
   }
   const targetWidth = Math.round(width);
   const targetHeight = Math.round(height);
+  console.log(`${win.name} target size`, { targetWidth, targetHeight });
   let nextWidth = targetWidth;
   let nextHeight = targetHeight;
   let actualWidth = win.outerWidth || targetWidth;
