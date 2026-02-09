@@ -29,7 +29,8 @@ const edgeOffsets = {
   top: 0,
 };
 
-const RIGHT_EDGE_GUARD = 40;
+const POSITION_RIGHT_GUARD = 20;
+const COLLISION_RIGHT_INSET = 40;
 
 const ensureSize = (win, width, height) => {
   if (!win) {
@@ -80,7 +81,7 @@ const getScreenBounds = () => {
 const getPlayBounds = () => {
   const bounds = getScreenBounds();
   const left = bounds.left + edgeOffsets.left;
-  const right = bounds.right - edgeOffsets.right - RIGHT_EDGE_GUARD;
+  const right = bounds.right - edgeOffsets.right - POSITION_RIGHT_GUARD;
   const top = bounds.top + edgeOffsets.top;
   const bottom = bounds.bottom;
   return {
@@ -102,7 +103,7 @@ const calibrateEdgeOffsets = () => {
   if (p2) {
     edgeOffsets.right = Math.max(
       0,
-      p2.screenX + p2.outerWidth - (bounds.right - RIGHT_EDGE_GUARD),
+      p2.screenX + p2.outerWidth - (bounds.right - POSITION_RIGHT_GUARD),
     );
   }
 };
@@ -112,7 +113,7 @@ const settleRightEdge = (p2Width, p2y) => {
     return;
   }
   const screenBounds = getScreenBounds();
-  const screenRight = screenBounds.right - RIGHT_EDGE_GUARD;
+  const screenRight = screenBounds.right - POSITION_RIGHT_GUARD;
   let logged = false;
   for (let i = 0; i < 3; i += 1) {
     const bounds = getPlayBounds();
@@ -217,7 +218,7 @@ function updateValues() {
     const p2FrameX = p2?.innerWidth
       ? Math.max(0, (p2Width - p2.innerWidth) / 2)
       : 0;
-    const rightInset = Math.max(RIGHT_EDGE_GUARD, p2FrameX);
+    const rightInset = Math.max(COLLISION_RIGHT_INSET, p2FrameX);
     const rightWall = p2X + p2Width - rightInset;
     let loggedRightCollision = false;
 
