@@ -219,6 +219,7 @@ function updateValues() {
       : 0;
     const rightInset = Math.max(RIGHT_EDGE_GUARD, p2FrameX);
     const rightWall = p2X + p2Width - rightInset;
+    let loggedRightCollision = false;
 
     ballX += ballSpeedX;
     ballY += ballSpeedY;
@@ -242,6 +243,18 @@ function updateValues() {
       ballY + ballHeight >= p2y &&
       ballY <= p2y + p2Height
     ) {
+      if (!loggedRightCollision) {
+        console.log("Right collision", {
+          p2OuterWidth: p2Width,
+          p2InnerWidth: p2?.innerWidth,
+          p2FrameX,
+          rightInset,
+          p2X,
+          rightWall,
+          ballRight: ballX + ballWidth,
+        });
+        loggedRightCollision = true;
+      }
       ballSpeedX = -ballSpeedX;
     }
 
