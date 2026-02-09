@@ -107,10 +107,23 @@ const settleRightEdge = (p2Width, p2y) => {
     return;
   }
   const screenBounds = getScreenBounds();
+  let logged = false;
   for (let i = 0; i < 3; i += 1) {
     const bounds = getPlayBounds();
     p2.moveTo(bounds.right - p2Width, p2y);
     const overflow = p2.screenX + p2Width - screenBounds.right;
+    if (!logged) {
+      console.log("P2 debug", {
+        screenRight: screenBounds.right,
+        screenAvailWidth: window.screen.availWidth,
+        screenLeft: screenBounds.left,
+        p2ScreenX: p2.screenX,
+        p2OuterWidth: p2Width,
+        boundsRight: bounds.right,
+        overflow,
+      });
+      logged = true;
+    }
     if (overflow <= 1) {
       break;
     }
