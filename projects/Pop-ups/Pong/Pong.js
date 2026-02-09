@@ -198,6 +198,7 @@ function updateValues() {
     const bounds = getPlayBounds();
     const p1Size = ensureSize(p1, pWidth, pHeight);
     const p2Size = ensureSize(p2, pWidth, pHeight);
+    console.log(`Ball size`, { width: ballWidth, height: ballHeight });
     ball.resizeTo(ballWidth, ballHeight);
     const p1Width = p1Size.width;
     const p2Width = p2Size.width;
