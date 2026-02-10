@@ -69,3 +69,6 @@ logs/
 playwright-screenshot.png
 .playwright/
 test-results/
+
+# Test files
+test-*.html
