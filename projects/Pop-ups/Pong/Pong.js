@@ -30,7 +30,7 @@ const edgeOffsets = {
 };
 
 const POSITION_RIGHT_GUARD = 10;
-const COLLISION_RIGHT_INSET = 45;
+const COLLISION_RIGHT_INSET = 30;
 
 const ensureSize = (win, width, height) => {
   if (!win) {
@@ -210,8 +210,8 @@ function updateValues() {
     const p2FrameX = p2?.innerWidth
       ? Math.max(0, (p2Width - p2.innerWidth) / 2)
       : 0;
-    //const rightInset = Math.max(COLLISION_RIGHT_INSET, p2FrameX);
-    const rightWall = p2X + p2Width;
+    const rightInset = Math.max(COLLISION_RIGHT_INSET, p2FrameX);
+    const rightWall = p2X + p2Width - rightInset;
 
     ballX += ballSpeedX;
     ballY += ballSpeedY;
@@ -301,7 +301,9 @@ const startGame = () => {
     buildFeatures(ballWidth, ballHeight, ballX, ballY),
   );
   if (p1 && p2 && ball) {
-    console.log(`Outer Width: ${ball.outerWidth} Outer Height: ${ball.outerHeight}`);
+    console.log(
+      `Outer Width: ${ball.outerWidth} Outer Height: ${ball.outerHeight}`,
+    );
     const p1Size = ensureSize(p1, pWidth, pHeight);
     const p2Size = ensureSize(p2, pWidth, pHeight);
     const ballSize = ensureSize(ball, ballWidth, ballHeight);
