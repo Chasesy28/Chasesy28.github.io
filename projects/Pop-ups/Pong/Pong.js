@@ -198,7 +198,6 @@ function updateValues() {
     const bounds = getPlayBounds();
     const p1Size = ensureSize(p1, pWidth, pHeight);
     const p2Size = ensureSize(p2, pWidth, pHeight);
-    console.log(`Ball size`, { width: ballWidth, height: ballHeight });
     ball.resizeTo(ballWidth, ballHeight);
     const p1Width = p1Size.width;
     const p2Width = p2Size.width;
@@ -301,9 +300,6 @@ const startGame = () => {
     buildFeatures(ballWidth, ballHeight, ballX, ballY),
   );
   if (p1 && p2 && ball) {
-    console.log(
-      `Outer Width: ${ball.outerWidth} Outer Height: ${ball.outerHeight}`,
-    );
     const p1Size = ensureSize(p1, pWidth, pHeight);
     const p2Size = ensureSize(p2, pWidth, pHeight);
     const ballSize = ensureSize(ball, ballWidth, ballHeight);
