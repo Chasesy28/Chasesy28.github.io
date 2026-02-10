@@ -3,7 +3,8 @@
  * Styles for offline and update notification banners
  */
 
-/* Base notification banner styles */
+/* Base notification banner styles - provides positioning and layout */
+/* Specific banner types (e.g., .update-banner) override colors */
 .offline-banner {
     position: fixed;
     top: 0;
@@ -22,7 +23,7 @@
     display: block;
 }
 
-/* Update banner specific styles */
+/* Update banner specific styles - overrides .offline-banner colors */
 .update-banner {
     background-color: #4a9eff;
     color: white;

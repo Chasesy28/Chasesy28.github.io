@@ -29,7 +29,10 @@ function createOfflineBanner() {
  */
 function createUpdateBanner() {
   const updateBanner = document.createElement("div");
-  // Using CSS classes for all styling
+  // Using CSS classes for all styling:
+  // - 'offline-banner' provides base positioning and layout
+  // - 'update-banner' overrides colors for blue theme
+  // - 'show' makes the banner visible
   updateBanner.className = "offline-banner update-banner show";
 
   // Create the update message text
