@@ -65,15 +65,18 @@ function initializeOfflineMonitoring() {
   let offlineBanner = null;
   const header = document.getElementById("header");
 
-  // Check if header exists
+  // Log if header is missing but continue initialization
   if (!header) {
-    console.error("[NotificationBars] Header element not found");
-    return;
+    console.warn("[NotificationBars] Header element not found - notification bars will work without header adjustments");
   }
 
   function updateOnlineStatus() {
-    const headerHeight = parseFloat(window.getComputedStyle(header).height);
-    let totalHeight = headerHeight;
+    // Calculate total height for scroll-padding, starting with header height if it exists
+    let totalHeight = 0;
+    if (header) {
+      const headerHeight = parseFloat(window.getComputedStyle(header).height);
+      totalHeight = headerHeight;
+    }
 
     if (!navigator.onLine) {
       console.log("[NotificationBars] Network status: OFFLINE");
@@ -90,7 +93,11 @@ function initializeOfflineMonitoring() {
         window.getComputedStyle(offlineBanner).height,
       );
       totalHeight += offlineBannerHeight;
-      header.style.setProperty("top", `${offlineBannerHeight}px`);
+      
+      // Only adjust header position if header exists
+      if (header) {
+        header.style.setProperty("top", `${offlineBannerHeight}px`);
+      }
       document.documentElement.style.setProperty(
         "scroll-padding-top",
         `${totalHeight}px`,
@@ -102,7 +109,11 @@ function initializeOfflineMonitoring() {
         offlineBanner.classList.remove("show");
       }
       document.body.classList.remove("offline-mode");
-      header.style.setProperty("top", "0px");
+      
+      // Only reset header position if header exists
+      if (header) {
+        header.style.setProperty("top", "0px");
+      }
       document.documentElement.style.setProperty(
         "scroll-padding-top",
         `${totalHeight}px`,
