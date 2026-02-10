@@ -29,10 +29,11 @@ function createOfflineBanner() {
  */
 function createUpdateBanner() {
   const updateBanner = document.createElement("div");
-  // Note: Reusing 'offline-banner' class which provides the base styling for all notification bars
-  updateBanner.className = "offline-banner show";
-  updateBanner.style.backgroundColor = "#4a9eff";
-  updateBanner.style.color = "white";
+  // Using CSS classes for all styling:
+  // - 'offline-banner' provides base positioning and layout
+  // - 'update-banner' overrides colors for blue theme
+  // - 'show' makes the banner visible
+  updateBanner.className = "offline-banner update-banner show";
 
   // Create the update message text
   const messageText = document.createTextNode("🔄 New version available! ");
@@ -41,14 +42,7 @@ function createUpdateBanner() {
   // Create the update button
   const updateButton = document.createElement("button");
   updateButton.textContent = "Update Now";
-  updateButton.style.marginLeft = "10px";
-  updateButton.style.padding = "5px 15px";
-  updateButton.style.background = "white";
-  updateButton.style.color = "#4a9eff";
-  updateButton.style.border = "none";
-  updateButton.style.borderRadius = "4px";
-  updateButton.style.cursor = "pointer";
-  updateButton.style.fontWeight = "bold";
+  updateButton.className = "update-banner-button";
 
   // Attach event listener programmatically
   updateButton.addEventListener("click", () => {
@@ -166,3 +160,51 @@ window.NotificationBars = {
   createOfflineBanner,
   createUpdateBanner,
 };
+
+/**
+ * AUTO-INITIALIZATION
+ * Automatically initializes notification bars when the DOM is ready
+ */
+(function autoInitialize() {
+  // Wait for DOM to be fully loaded before initializing offline monitoring
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOffline);
+  } else {
+    // DOM is already loaded
+    initOffline();
+  }
+
+  function initOffline() {
+    // Initialize offline monitoring immediately
+    initializeOfflineMonitoring();
+  }
+
+  // Initialize service worker - wait for window load event if not already loaded
+  if ('serviceWorker' in navigator) {
+    function initServiceWorker() {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('[NotificationBars] Service Worker registered with scope:', registration.scope);
+          
+          // Initialize update monitoring
+          initializeUpdateMonitoring(registration);
+        })
+        .catch(error => console.error('[NotificationBars] Service Worker registration failed:', error));
+
+      // Listen for service worker messages
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          console.log('[NotificationBars] Service Worker updated:', event.data);
+        }
+      });
+    }
+
+    // Register service worker after window load event
+    if (document.readyState === 'complete') {
+      // Window already loaded
+      initServiceWorker();
+    } else {
+      window.addEventListener('load', initServiceWorker);
+    }
+  }
+})();

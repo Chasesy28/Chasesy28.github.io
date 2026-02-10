@@ -1,0 +1,46 @@
+/**
+ * Notification Bars Styles
+ * Styles for offline and update notification banners
+ */
+
+/* Base notification banner styles - provides positioning and layout */
+/* Specific banner types (e.g., .update-banner) override colors */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #ef4444;
+    color: white;
+    padding: 12px 16px;
+    text-align: center;
+    z-index: 9999;
+    display: none;
+    font-weight: 500;
+}
+
+.offline-banner.show {
+    display: block;
+}
+
+/* Update banner specific styles - overrides .offline-banner colors */
+.update-banner {
+    background-color: #4a9eff;
+    color: white;
+}
+
+/* Update button styles */
+.update-banner-button {
+    margin-left: 10px;
+    padding: 5px 15px;
+    background: white;
+    color: #4a9eff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.update-banner-button:hover {
+    background: #f0f0f0;
+}
