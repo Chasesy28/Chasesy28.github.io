@@ -93,7 +93,7 @@ function initializeOfflineMonitoring() {
         window.getComputedStyle(offlineBanner).height,
       );
       totalHeight += offlineBannerHeight;
-      
+
       // Only adjust header position if header exists
       if (header) {
         header.style.setProperty("top", `${offlineBannerHeight}px`);
@@ -109,7 +109,7 @@ function initializeOfflineMonitoring() {
         offlineBanner.classList.remove("show");
       }
       document.body.classList.remove("offline-mode");
-      
+
       // Only reset header position if header exists
       if (header) {
         header.style.setProperty("top", "0px");
