@@ -163,37 +163,45 @@ window.NotificationBars = {
  * Automatically initializes notification bars when the DOM is ready
  */
 (function autoInitialize() {
-  // Wait for DOM to be fully loaded
+  // Wait for DOM to be fully loaded before initializing offline monitoring
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', initOffline);
   } else {
     // DOM is already loaded
-    init();
+    initOffline();
   }
 
-  function init() {
+  function initOffline() {
     // Initialize offline monitoring immediately
     initializeOfflineMonitoring();
+  }
 
-    // Initialize service worker update monitoring when available
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('[NotificationBars] Service Worker registered with scope:', registration.scope);
-            
-            // Initialize update monitoring
-            initializeUpdateMonitoring(registration);
-          })
-          .catch(error => console.error('[NotificationBars] Service Worker registration failed:', error));
+  // Initialize service worker - wait for window load event if not already loaded
+  if ('serviceWorker' in navigator) {
+    function initServiceWorker() {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('[NotificationBars] Service Worker registered with scope:', registration.scope);
+          
+          // Initialize update monitoring
+          initializeUpdateMonitoring(registration);
+        })
+        .catch(error => console.error('[NotificationBars] Service Worker registration failed:', error));
 
-        // Listen for service worker messages
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'SW_UPDATED') {
-            console.log('[NotificationBars] Service Worker updated:', event.data);
-          }
-        });
+      // Listen for service worker messages
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          console.log('[NotificationBars] Service Worker updated:', event.data);
+        }
       });
+    }
+
+    // Register service worker after window load event
+    if (document.readyState === 'complete') {
+      // Window already loaded
+      initServiceWorker();
+    } else {
+      window.addEventListener('load', initServiceWorker);
     }
   }
 })();
