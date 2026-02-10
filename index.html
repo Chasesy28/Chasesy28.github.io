@@ -16,6 +16,7 @@
 
       <title>Silly Site!</title>
       <link rel="stylesheet" href="styles.css">
+      <link rel="stylesheet" href="notification-bars.css">
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
       <link rel="manifest" href="/manifest.json">
       <link rel="icon" href="/icons/icon-192x192.png">
@@ -179,37 +180,6 @@
       <script src="notification-bars.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.js"></script>
       <script>
-         /**
-          * SERVICE WORKER REGISTRATION
-          * Registers the service worker for offline functionality and caching
-          * Includes automatic update checking and user notifications
-          */
-         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-               navigator.serviceWorker.register('/sw.js')
-                  .then(registration => {
-                     console.log('[Index] Service Worker registered with scope:', registration.scope);
-
-                     // Initialize update monitoring using NotificationBars
-                     NotificationBars.initializeUpdateMonitoring(registration);
-                  })
-                  .catch(error => console.error('[Index] Service Worker registration failed:', error));
-
-               // Listen for service worker messages
-               navigator.serviceWorker.addEventListener('message', (event) => {
-                  if (event.data && event.data.type === 'SW_UPDATED') {
-                     console.log('[Index] Service Worker updated:', event.data);
-                  }
-               });
-            });
-         }
-
-         /**
-          * OFFLINE/ONLINE STATUS DETECTION
-          * Shows/hides banner based on network connectivity
-          */
-         NotificationBars.initializeOfflineMonitoring();
-
          /**
           * SWIPER CAROUSEL INITIALIZATION
           * Creates the project showcase carousel with navigation and pagination
