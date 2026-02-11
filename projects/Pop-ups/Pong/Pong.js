@@ -29,8 +29,8 @@ const edgeOffsets = {
   top: 0,
 };
 
-const POSITION_RIGHT_GUARD = 20;
-const COLLISION_RIGHT_INSET = -30;
+const POSITION_RIGHT_GUARD = 15;
+const COLLISION_RIGHT_INSET = POSITION_RIGHT_GUARD - 50;
 
 const ensureSize = (win, width, height) => {
   if (!win) {
@@ -182,7 +182,7 @@ function updateValues() {
     });
     p1y = clamp(p1y, bounds.top, bounds.bottom - p1Height);
     p2y = clamp(p2y, bounds.top, bounds.bottom - p2Height);
-    p1.moveTo(0, p1y);
+    p1.moveTo(-10, p1y);
     p2.moveTo(bounds.right - p2Width, p2y);
     settleRightEdge(p2Width, p2y);
 
