@@ -223,17 +223,39 @@ function updateValues() {
 
     if (
       ballX <= p1X + p1Width &&
+      ballX >= p1X + p1Width - 10 &&
       ballY + ballHeight >= p1y &&
       ballY <= p1y + p1Height
     ) {
       ballSpeedX = -ballSpeedX;
     }
     if (
+      (ballY + ballHeight >= p1y &&
+        ballY + ballHeight <= p1y + 10 &&
+        ballX <= p1X + p1Width) ||
+      (ballY >= p1y + p1Height &&
+        ballY <= p1y + p1Height + 10 &&
+        ballX <= p1X + p1Width)
+    ) {
+      ballSpeedY = -ballSpeedY;
+    }
+    if (
       ballX + ballWidth >= p2X &&
+      ballX + ballWidth <= p2X + 10 &&
       ballY + ballHeight >= p2y &&
       ballY <= p2y + p2Height
     ) {
       ballSpeedX = -ballSpeedX;
+    }
+    if (
+      (ballY + ballHeight >= p2y &&
+        ballY + ballHeight <= p2y + 10 &&
+        ballX + ballWidth >= p2X) ||
+      (ballY >= p2y + p2Height &&
+        ballY <= p2y + p2Height + 10 &&
+        ballX + ballWidth >= p2X)
+    ) {
+      ballSpeedY = -ballSpeedY;
     }
 
     ballX = clamp(ballX, leftWall, rightWall - ballWidth);
