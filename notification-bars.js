@@ -4,7 +4,7 @@
  */
 
 // Constants
-const UPDATE_CHECK_INTERVAL_MS = 10 * 60 * 1000; // Check for updates every 10 minutes
+const UPDATE_CHECK_INTERVAL_MS = 1 * 60 * 1000; // Check for updates every 1 minute
 
 /**
  * Creates an offline notification bar when the user is offline

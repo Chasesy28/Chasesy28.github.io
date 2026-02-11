@@ -29,8 +29,7 @@ const edgeOffsets = {
   top: 0,
 };
 
-const POSITION_LEFT_GUARD = -30;
-const POSITION_RIGHT_GUARD = 40;
+const POSITION_RIGHT_GUARD = 200;
 const COLLISION_RIGHT_INSET = 200;
 
 const ensureSize = (win, width, height) => {
@@ -90,7 +89,7 @@ const getScreenBounds = () => {
 
 const getPlayBounds = () => {
   const bounds = getScreenBounds();
-  const left = bounds.left + edgeOffsets.left + POSITION_LEFT_GUARD;
+  const left = bounds.left + edgeOffsets.left;
   const right = bounds.right - edgeOffsets.right - POSITION_RIGHT_GUARD;
   const top = bounds.top + edgeOffsets.top;
   const bottom = bounds.bottom;
@@ -124,7 +123,6 @@ const settleRightEdge = (p2Width, p2y) => {
   }
   const screenBounds = getScreenBounds();
   const screenRight = screenBounds.right - POSITION_RIGHT_GUARD;
-  let logged = false;
   for (let i = 0; i < 3; i += 1) {
     const bounds = getPlayBounds();
     p2.moveTo(bounds.right - p2Width, p2y);
@@ -184,7 +182,7 @@ function updateValues() {
     });
     p1y = clamp(p1y, bounds.top, bounds.bottom - p1Height);
     p2y = clamp(p2y, bounds.top, bounds.bottom - p2Height);
-    p1.moveTo(bounds.left, p1y);
+    p1.moveTo(0, p1y);
     p2.moveTo(bounds.right - p2Width, p2y);
     settleRightEdge(p2Width, p2y);
 
