@@ -35,6 +35,11 @@ npm run preview  # Preview built site locally
 - **Testing**: If `Chrome-Dev-Tools-MCP` is active, use it to inspect and validate UI/DOM changes immediately after generation.
 - **Assets**: Use [Lucide React](https://lucide.dev) for iconography.
 - **Styles**: Refer to `tailwind.config.js` for custom animations provided by the `tailwindcss-animate` plugin.
+- **Legacy Code**: Avoid modifying legacy projects in `projects/` unless necessary; they are isolated experiments.
+- **Workers**: Deploy Cloudflare Workers separately using Wrangler CLI; do not include worker code in the Vite build.
+- **Documentation**: Update this file with any architectural changes or new patterns introduced during development.
+- **Code Quality**: Follow consistent code style and best practices; use linters and formatters as configured in the project.
+- **Clutter Avoidance**: Keep the `dist/` directory clean; do not commit build artifacts to version control. Additinally do not create random .md files even as documentation, use this file for all documentation purposes.
 
 ### Deployment Strategy
 
