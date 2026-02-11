@@ -29,7 +29,7 @@ const edgeOffsets = {
   top: 0,
 };
 
-const POSITION_RIGHT_GUARD = 5;
+const POSITION_RIGHT_GUARD = 6;
 const COLLISION_RIGHT_INSET = POSITION_RIGHT_GUARD - 50;
 
 const ensureSize = (win, width, height) => {
