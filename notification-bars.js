@@ -4,7 +4,7 @@
  */
 
 // Constants
-const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // Check for updates every 60 minutes
+const UPDATE_CHECK_INTERVAL_MS = 10 * 60 * 1000; // Check for updates every 10 minutes
 
 /**
  * Creates an offline notification bar when the user is offline
@@ -67,7 +67,9 @@ function initializeOfflineMonitoring() {
 
   // Log if header is missing but continue initialization
   if (!header) {
-    console.warn("[NotificationBars] Header element not found - notification bars will work without header adjustments");
+    console.warn(
+      "[NotificationBars] Header element not found - notification bars will work without header adjustments",
+    );
   }
 
   function updateOnlineStatus() {
@@ -178,8 +180,8 @@ window.NotificationBars = {
  */
 (function autoInitialize() {
   // Wait for DOM to be fully loaded before initializing offline monitoring
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initOffline);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initOffline);
   } else {
     // DOM is already loaded
     initOffline();
@@ -191,31 +193,40 @@ window.NotificationBars = {
   }
 
   // Initialize service worker - wait for window load event if not already loaded
-  if ('serviceWorker' in navigator) {
+  if ("serviceWorker" in navigator) {
     function initServiceWorker() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('[NotificationBars] Service Worker registered with scope:', registration.scope);
-          
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => {
+          console.log(
+            "[NotificationBars] Service Worker registered with scope:",
+            registration.scope,
+          );
+
           // Initialize update monitoring
           initializeUpdateMonitoring(registration);
         })
-        .catch(error => console.error('[NotificationBars] Service Worker registration failed:', error));
+        .catch((error) =>
+          console.error(
+            "[NotificationBars] Service Worker registration failed:",
+            error,
+          ),
+        );
 
       // Listen for service worker messages
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SW_UPDATED') {
-          console.log('[NotificationBars] Service Worker updated:', event.data);
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        if (event.data && event.data.type === "SW_UPDATED") {
+          console.log("[NotificationBars] Service Worker updated:", event.data);
         }
       });
     }
 
     // Register service worker after window load event
-    if (document.readyState === 'complete') {
+    if (document.readyState === "complete") {
       // Window already loaded
       initServiceWorker();
     } else {
-      window.addEventListener('load', initServiceWorker);
+      window.addEventListener("load", initServiceWorker);
     }
   }
 })();
