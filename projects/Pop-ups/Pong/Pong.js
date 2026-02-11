@@ -29,8 +29,9 @@ const edgeOffsets = {
   top: 0,
 };
 
-const POSITION_RIGHT_GUARD = 15;
-const COLLISION_RIGHT_INSET = 50;
+const POSITION_LEFT_GUARD = -30;
+const POSITION_RIGHT_GUARD = 40;
+const COLLISION_RIGHT_INSET = 200;
 
 const ensureSize = (win, width, height) => {
   if (!win) {
@@ -89,7 +90,7 @@ const getScreenBounds = () => {
 
 const getPlayBounds = () => {
   const bounds = getScreenBounds();
-  const left = bounds.left + edgeOffsets.left;
+  const left = bounds.left + edgeOffsets.left + POSITION_LEFT_GUARD;
   const right = bounds.right - edgeOffsets.right - POSITION_RIGHT_GUARD;
   const top = bounds.top + edgeOffsets.top;
   const bottom = bounds.bottom;

@@ -9,6 +9,7 @@
       Silly Page not found
     </title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/notification-bars.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12/swiper-bundle.min.css" />
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icons/icon-192x192.png">
@@ -26,9 +27,6 @@
   </head>
 
   <body>
-    <div id="offlineBanner" class="offline-banner">
-      ⚠️ You are currently offline. Some features may not be available.
-    </div>
     <header id="header">
       <div class="site-title cherry-bomb-one-regular">
         <a href="/">Silly Site</a>
@@ -109,6 +107,7 @@
     </script>
     <!-- Site-wide announcements system -->
     <script src="/announcements.js"></script>
+    <script src="/notification-bars.js"></script>
     <script>
       // Initialize announcements when page loads
       window.Announcements.initialize();
