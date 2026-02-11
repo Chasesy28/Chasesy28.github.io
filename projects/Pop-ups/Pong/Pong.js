@@ -209,7 +209,7 @@ function updateValues() {
       ? Math.max(0, (p2Width - p2.innerWidth) / 2)
       : 0;
     const rightInset = Math.max(COLLISION_RIGHT_INSET, p2FrameX);
-    const rightWall = p2X + p2Width - rightInset;
+    const rightWall = p2X + p2Width - COLLISION_RIGHT_INSET;
 
     ballX += ballSpeedX;
     ballY += ballSpeedY;
