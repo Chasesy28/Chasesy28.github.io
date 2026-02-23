@@ -51,6 +51,9 @@ function update() {
     p2.resizeTo(pWidth, pHeight);
     ball.resizeTo(ballWidth, ballHeight);
 
+    let sideMargin = 10;
+    let topMargin = 50;
+
     if ((controller.W.pressed || controller.w.pressed) && p1y > 0) {
       p1y -= pSpeed;
     }
@@ -75,19 +78,52 @@ function update() {
     }
 
     if (
-      ballX <= p1RightEdge&&
-      ballX >= p1RightEdge - 10 &&
+      ballX <= p1RightEdge &&
+      ballX >= p1RightEdge - sideMargin &&
       ballBottomEdge >= p1y &&
       ballY <= p1BottomEdge
     ) {
       ballSpeedX = -ballSpeedX;
     } else if (
       ballRightEdge >= p2x &&
-      ballX <= p2x + 10 &&
+      ballRightEdge <= p2x + sideMargin &&
       ballBottomEdge >= p2y &&
       ballY <= p2BottomEdge
     ) {
       ballSpeedX = -ballSpeedX;
+    }
+
+    if (
+      ballBottomEdge >= p1y &&
+      ballBottomEdge <= p1y + topMargin &&
+      ballX <= p1RightEdge &&
+      ballRightEdge >= p1x
+    ) {
+      if (ballBottomEdge >= p1y) {
+        ballY = p1y - ballHeight;
+      }
+      ballSpeedY = -ballSpeedY;
+    } else if (
+      ballY <= p1BottomEdge &&
+      ballY >= p1BottomEdge - topMargin &&
+      ballX <= p1RightEdge &&
+      ballRightEdge >= p1x
+    ) {
+      ballSpeedY = -ballSpeedY;
+    } else if (
+      ballBottomEdge >= p2y &&
+      ballBottomEdge <= p2y + topMargin &&
+      ballRightEdge >= p2x &&
+      ballX <= p2RightEdge
+    ) {
+      ballSpeedY = -ballSpeedY;
+    } else if (
+      ballY <= p2BottomEdge &&
+      ballY >= p2BottomEdge - topMargin &&
+      ballRightEdge >= p2x &&
+      ballX <= p2RightEdge
+    ) {
+      ballSpeedY = -ballSpeedY;
     }
 
     ballX += ballSpeedX;
