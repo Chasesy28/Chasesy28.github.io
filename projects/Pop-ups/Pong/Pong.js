@@ -17,9 +17,9 @@ let pWidth = 150;
 let pHeight = 400;
 let pSpeed = 5;
 let p1x = 0;
-let p2x = screen.width - pWidth - 8;
-let p1y = screen.height / 2 - pHeight / 2;
-let p2y = screen.height / 2 - pHeight / 2;
+let p2x = screen.availWidth - pWidth - 8;
+let p1y = screen.availHeight / 2 - pHeight / 2;
+let p2y = screen.availHeight / 2 - pHeight / 2;
 
 let p1RightEdge = p1x + pWidth;
 let p1BottomEdge = p1y + pHeight;
@@ -32,8 +32,8 @@ let ballWidth = 200;
 let ballHeight = 200;
 let ballSpeedX;
 let ballSpeedY;
-let ballX = screen.width / 2 - ballWidth / 2;
-let ballY = screen.height / 2 - ballHeight / 2;
+let ballX = screen.availWidth / 2 - ballWidth / 2;
+let ballY = screen.availHeight / 2 - ballHeight / 2;
 
 let ballRightEdge = ballX + ballWidth;
 let ballBottomEdge = ballY + ballHeight;
@@ -56,21 +56,21 @@ function update() {
     }
     if (
       (controller.S.pressed || controller.s.pressed) &&
-      p1y < screen.height - pHeight
+      p1y < screen.availHeight - pHeight
     ) {
       p1y += pSpeed;
     }
     if (controller.ArrowUp.pressed && p2y > 0) {
       p2y -= pSpeed;
     }
-    if (controller.ArrowDown.pressed && p2y < screen.height - pHeight) {
+    if (controller.ArrowDown.pressed && p2y < screen.availHeight - pHeight) {
       p2y += pSpeed;
     }
 
-    if (ballRightEdge >= screen.width || ballX <= 0) {
+    if (ballRightEdge >= screen.availWidth || ballX <= 0) {
       ballSpeedX = -ballSpeedX;
     }
-    if (ballBottomEdge >= screen.height || ballY <= 0) {
+    if (ballBottomEdge >= screen.availHeight || ballY <= 0) {
       ballSpeedY = -ballSpeedY;
     }
 
@@ -128,10 +128,10 @@ function startGame() {
   gameEnd = true;
   gameEnd = false;
 
-  p1y = screen.height / 2 - pHeight / 2;
-  p2y = screen.height / 2 - pHeight / 2;
-  ballX = screen.width / 2 - ballWidth / 2;
-  ballY = screen.height / 2 - ballHeight / 2;
+  p1y = screen.availHeight / 2 - pHeight / 2;
+  p2y = screen.availHeight / 2 - pHeight / 2;
+  ballX = screen.availWidth / 2 - ballWidth / 2;
+  ballY = screen.availHeight / 2 - ballHeight / 2;
 
   if (Math.floor(Math.random() * 2) == 0) {
     ballSpeedX = 5;
