@@ -1119,132 +1119,131 @@ nav a {
             --tw-drop-shadow-size: initial;
             --tw-duration: initial;
         }
-
-        /* custom loader and accessibility styles */
-        #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-
-        .loader {
-            text-align: center;
-        }
-
-        .loader-icon {
-            font-size: 2rem;
-            display: block;
-            animation: jump 1s infinite ease-in-out;
-        }
-
-        .loader-bar {
-            width: 200px;
-            height: 6px;
-            background: #ddd;
-            margin-top: 0.75rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .loader-progress {
-            width: 0;
-            height: 100%;
-            background: #4a9eff;
-            animation: loadBar 2.5s forwards;
-        }
-
-        @keyframes jump {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-15px);
-            }
-        }
-
-        @keyframes loadBar {
-            to {
-                width: 100%;
-            }
-        }
-
-        .accessibility-button {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            /* remove bottom so it lives in top-right corner */
-            z-index: 10001;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 50%;
-            width: 3rem;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        /* hover effect to indicate interactivity */
-        .accessibility-button:hover {
-            background: #f0f0f0;
-        }
-
-        #accessibility-settings {
-            position: fixed;
-            top: 10%;
-            right: 10%;
-            background: #fff;
-            border: 1px solid #aaa;
-            padding: 1rem;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            z-index: 10002;
-            max-width: 300px;
-        }
-
-        @media (max-width: 640px) {
-            #accessibility-settings {
-                top: auto;
-                bottom: 4rem;
-                right: 1rem;
-                left: 1rem;
-                width: auto;
-                max-width: none;
-            }
-
-            .accessibility-button {
-                top: auto;
-                bottom: 1rem;
-            }
-        }
-
-        #accessibility-settings button {
-            margin: 0.3rem;
-        }
-
-        .high-contrast {
-            filter: contrast(1.5) brightness(1.1);
-        }
-
-        .reduce-motion * {
-            animation-duration: 0.001ms !important;
-            transition-duration: 0.001ms !important;
-        }
-
-        /* responsive navigation for small screens */
-        @media (max-width: 640px) {
-            header nav ul {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
     }
 }
+
+/* custom loader and accessibility styles */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.loader {
+    text-align: center;
+}
+
+.loader-icon {
+    font-size: 2rem;
+    display: block;
+    animation: jump 1s infinite ease-in-out;
+}
+
+.loader-bar {
+    width: 200px;
+    height: 6px;
+    background: #ddd;
+    margin-top: 0.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.loader-progress {
+    width: 0;
+    height: 100%;
+    background: #4a9eff;
+    animation: loadBar 2.5s forwards;
+}
+
+@keyframes jump {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes loadBar {
+    to {
+        width: 100%;
+    }
+}
+
+.accessibility-button {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    /* remove bottom so it lives in top-right corner */
+    z-index: 10001;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* hover effect to indicate interactivity */
+.accessibility-button:hover {
+    background: #f0f0f0;
+}
+
+#accessibility-settings {
+    position: fixed;
+    top: 10%;
+    right: 10%;
+    background: #fff;
+    border: 1px solid #aaa;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 10002;
+    max-width: 300px;
+}
+
+@media (max-width: 640px) {
+    #accessibility-settings {
+        top: auto;
+        bottom: 4rem;
+        right: 1rem;
+        left: 1rem;
+        width: auto;
+        max-width: none;
+    }
+
+    .accessibility-button {
+        top: auto;
+        bottom: 1rem;
+    }
+}
+
+#accessibility-settings button {
+    margin: 0.3rem;
+}
+
+.high-contrast {
+    filter: contrast(1.5) brightness(1.1);
+}
+
+.reduce-motion * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+}
+
+/* responsive navigation for small screens */
+@media (max-width: 640px) {
+    header nav ul {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }

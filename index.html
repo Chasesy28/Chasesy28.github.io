@@ -221,48 +221,6 @@
             pagination: { el: '.swiper-pagination' },
             navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
          });
-
-         // Dark mode toggle: persist theme and switch icons
-         const darkModeToggle = document.getElementById('darkModeToggle');
-         const html = document.documentElement;
-         const sunIcon = document.querySelector('.sun-icon');
-         const moonIcon = document.querySelector('.moon-icon');
-
-         // Load saved theme or default to light
-         const currentTheme = localStorage.getItem('theme') || 'light';
-         html.classList.remove('light', 'dark');
-         html.classList.add(currentTheme);
-         updateIcons(currentTheme);
-         console.log('[Index] Theme loaded:', currentTheme);
-
-         // Toggle theme on button click
-         darkModeToggle.addEventListener('click', function () {
-            if (html.classList.contains('dark')) {
-               html.classList.replace('dark', 'light');
-               localStorage.setItem('theme', 'light');
-               updateIcons('light');
-               console.log('[Index] Theme switched to: LIGHT');
-            } else {
-               html.classList.replace('light', 'dark');
-               localStorage.setItem('theme', 'dark');
-               updateIcons('dark');
-               console.log('[Index] Theme switched to: DARK');
-            }
-         });
-
-         /**
-          * Updates the theme toggle icon based on current theme
-          * @param {string} theme - Either 'light' or 'dark'
-          */
-         function updateIcons(theme) {
-            if (theme === 'dark') {
-               sunIcon.style.display = 'none';
-               moonIcon.style.display = 'inline';
-            } else {
-               sunIcon.style.display = 'inline';
-               moonIcon.style.display = 'none';
-            }
-         }
       </script>
       <script src="scripts.js"></script>
       <!-- Site-wide announcements system -->
