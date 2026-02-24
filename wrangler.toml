@@ -1,3 +1,6 @@
+# primary worker configuration
+# Cloudflare dashboard settings (Polish, Argo Smart Routing, Auto Minify)
+# should be enabled via the Cloudflare dashboard; not in this file.
 name = "silly-site-worker"
 main = "workers/index.js"
 compatibility_date = "2025-01-01"

@@ -1,32 +1,28 @@
-/**
- * Site-wide Announcements System
- * Manages creation, storage, and display of admin announcements
- * Extends notification-bars.js pattern for site-wide messages
- */
+// Site-wide announcement banners stored locally; dismissable for each visitor
 
-const ANNOUNCEMENTS_STORAGE_KEY = 'site_announcements';
-const DISMISSED_ANNOUNCEMENTS_KEY = 'dismissed_announcements';
+const ANNOUNCEMENTS_STORAGE_KEY = "site_announcements";
+const DISMISSED_ANNOUNCEMENTS_KEY = "dismissed_announcements";
 
 /**
  * Announcement types with default styling
  */
 const ANNOUNCEMENT_TYPES = {
   info: {
-    backgroundColor: '#4a9eff',
-    icon: 'ℹ️'
+    backgroundColor: "#4a9eff",
+    icon: "ℹ️",
   },
   success: {
-    backgroundColor: '#10b981',
-    icon: '✓'
+    backgroundColor: "#10b981",
+    icon: "✓",
   },
   warning: {
-    backgroundColor: '#f59e0b',
-    icon: '⚠️'
+    backgroundColor: "#f59e0b",
+    icon: "⚠️",
   },
   error: {
-    backgroundColor: '#ef4444',
-    icon: '❌'
-  }
+    backgroundColor: "#ef4444",
+    icon: "❌",
+  },
 };
 
 /**
@@ -36,35 +32,37 @@ const ANNOUNCEMENT_TYPES = {
  * @param {boolean} dismissible - Whether users can dismiss the announcement
  * @returns {Object} Announcement object
  */
-function createAnnouncement(message, type = 'info', dismissible = true) {
+function createAnnouncement(message, type = "info", dismissible = true) {
   // Generate unique ID with timestamp + cryptographically secure random string
   const randomArray = new Uint32Array(1);
   crypto.getRandomValues(randomArray);
   const randomStr = randomArray[0].toString(36);
   const id = `${Date.now()}-${randomStr}`;
-  
+
   return {
     id: id,
     message: message,
     type: type,
     dismissible: dismissible,
-    createdAt: Date.now()
+    createdAt: Date.now(),
   };
 }
 
 /**
- * Saves an announcement to storage
- * TODO: Replace with Supabase database when integrated
+ * Saves an announcement to localStorage (placeholder until backend is added)
  * @param {Object} announcement - Announcement object to save
  */
 function saveAnnouncement(announcement) {
   try {
     const announcements = getActiveAnnouncements();
     announcements.push(announcement);
-    localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(announcements));
-    console.log('[Announcements] Saved announcement:', announcement.id);
+    localStorage.setItem(
+      ANNOUNCEMENTS_STORAGE_KEY,
+      JSON.stringify(announcements),
+    );
+    console.log("[Announcements] Saved announcement:", announcement.id);
   } catch (e) {
-    console.error('[Announcements] Error saving announcement:', e);
+    console.error("[Announcements] Error saving announcement:", e);
   }
 }
 
@@ -77,7 +75,7 @@ function getActiveAnnouncements() {
     const stored = localStorage.getItem(ANNOUNCEMENTS_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (e) {
-    console.error('[Announcements] Error loading announcements:', e);
+    console.error("[Announcements] Error loading announcements:", e);
     return [];
   }
 }
@@ -89,11 +87,11 @@ function getActiveAnnouncements() {
 function deleteAnnouncement(announcementId) {
   try {
     const announcements = getActiveAnnouncements();
-    const filtered = announcements.filter(a => a.id !== announcementId);
+    const filtered = announcements.filter((a) => a.id !== announcementId);
     localStorage.setItem(ANNOUNCEMENTS_STORAGE_KEY, JSON.stringify(filtered));
-    console.log('[Announcements] Deleted announcement:', announcementId);
+    console.log("[Announcements] Deleted announcement:", announcementId);
   } catch (e) {
-    console.error('[Announcements] Error deleting announcement:', e);
+    console.error("[Announcements] Error deleting announcement:", e);
   }
 }
 
@@ -120,13 +118,16 @@ function dismissAnnouncement(announcementId) {
   try {
     const dismissed = localStorage.getItem(DISMISSED_ANNOUNCEMENTS_KEY);
     const dismissedIds = dismissed ? JSON.parse(dismissed) : [];
-    
+
     if (!dismissedIds.includes(announcementId)) {
       dismissedIds.push(announcementId);
-      localStorage.setItem(DISMISSED_ANNOUNCEMENTS_KEY, JSON.stringify(dismissedIds));
+      localStorage.setItem(
+        DISMISSED_ANNOUNCEMENTS_KEY,
+        JSON.stringify(dismissedIds),
+      );
     }
   } catch (e) {
-    console.error('[Announcements] Error dismissing announcement:', e);
+    console.error("[Announcements] Error dismissing announcement:", e);
   }
 }
 
@@ -140,69 +141,70 @@ function displayAnnouncementBanner(announcement) {
   if (announcement.dismissible && isAnnouncementDismissed(announcement.id)) {
     return null;
   }
-  
-  const typeConfig = ANNOUNCEMENT_TYPES[announcement.type] || ANNOUNCEMENT_TYPES.info;
-  
-  const banner = document.createElement('div');
+
+  const typeConfig =
+    ANNOUNCEMENT_TYPES[announcement.type] || ANNOUNCEMENT_TYPES.info;
+
+  const banner = document.createElement("div");
   banner.id = `announcement-${announcement.id}`;
-  banner.className = 'offline-banner show'; // Reuse existing notification bar styles
+  banner.className = "offline-banner show"; // Reuse existing notification bar styles
   banner.style.backgroundColor = typeConfig.backgroundColor;
-  banner.style.color = 'white';
-  banner.style.display = 'flex';
-  banner.style.alignItems = 'center';
-  banner.style.justifyContent = 'space-between';
-  banner.style.gap = '10px';
-  
+  banner.style.color = "white";
+  banner.style.display = "flex";
+  banner.style.alignItems = "center";
+  banner.style.justifyContent = "space-between";
+  banner.style.gap = "10px";
+
   // Message container
-  const messageContainer = document.createElement('div');
-  messageContainer.style.display = 'flex';
-  messageContainer.style.alignItems = 'center';
-  messageContainer.style.gap = '8px';
-  
-  const icon = document.createElement('span');
+  const messageContainer = document.createElement("div");
+  messageContainer.style.display = "flex";
+  messageContainer.style.alignItems = "center";
+  messageContainer.style.gap = "8px";
+
+  const icon = document.createElement("span");
   icon.textContent = typeConfig.icon;
-  icon.style.fontSize = '18px';
-  
-  const messageText = document.createElement('span');
+  icon.style.fontSize = "18px";
+
+  const messageText = document.createElement("span");
   messageText.textContent = announcement.message;
-  
+
   messageContainer.appendChild(icon);
   messageContainer.appendChild(messageText);
   banner.appendChild(messageContainer);
-  
+
   // Dismiss button (if dismissible)
   if (announcement.dismissible) {
-    const dismissBtn = document.createElement('button');
-    dismissBtn.textContent = '×';
-    dismissBtn.style.background = 'transparent';
-    dismissBtn.style.border = 'none';
-    dismissBtn.style.color = 'white';
-    dismissBtn.style.fontSize = '24px';
-    dismissBtn.style.cursor = 'pointer';
-    dismissBtn.style.padding = '0 8px';
-    dismissBtn.style.opacity = '0.8';
-    dismissBtn.style.transition = 'opacity 0.2s';
-    
-    dismissBtn.addEventListener('mouseenter', () => {
-      dismissBtn.style.opacity = '1';
+    const dismissBtn = document.createElement("button");
+    dismissBtn.textContent = "×";
+    dismissBtn.style.background = "transparent";
+    dismissBtn.style.border = "none";
+    dismissBtn.style.color = "white";
+    dismissBtn.style.fontSize = "24px";
+    dismissBtn.style.cursor = "pointer";
+    dismissBtn.style.padding = "0 8px";
+    dismissBtn.style.opacity = "0.8";
+    dismissBtn.style.transition = "opacity 0.2s";
+
+    dismissBtn.addEventListener("mouseenter", () => {
+      dismissBtn.style.opacity = "1";
     });
-    
-    dismissBtn.addEventListener('mouseleave', () => {
-      dismissBtn.style.opacity = '0.8';
+
+    dismissBtn.addEventListener("mouseleave", () => {
+      dismissBtn.style.opacity = "0.8";
     });
-    
-    dismissBtn.addEventListener('click', () => {
+
+    dismissBtn.addEventListener("click", () => {
       dismissAnnouncement(announcement.id);
-      banner.classList.remove('show');
+      banner.classList.remove("show");
       setTimeout(() => banner.remove(), 300);
     });
-    
+
     banner.appendChild(dismissBtn);
   }
-  
+
   // Insert at the beginning of the body
   document.body.insertBefore(banner, document.body.firstChild);
-  
+
   return banner;
 }
 
@@ -211,7 +213,7 @@ function displayAnnouncementBanner(announcement) {
  */
 function displayAllAnnouncements() {
   const announcements = getActiveAnnouncements();
-  announcements.forEach(announcement => {
+  announcements.forEach((announcement) => {
     displayAnnouncementBanner(announcement);
   });
 }
@@ -222,8 +224,8 @@ function displayAllAnnouncements() {
  */
 function initializeAnnouncementSystem() {
   // Wait for DOM to be ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', displayAllAnnouncements);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", displayAllAnnouncements);
   } else {
     displayAllAnnouncements();
   }
@@ -239,5 +241,5 @@ window.Announcements = {
   isDismissed: isAnnouncementDismissed,
   display: displayAnnouncementBanner,
   displayAll: displayAllAnnouncements,
-  initialize: initializeAnnouncementSystem
+  initialize: initializeAnnouncementSystem,
 };

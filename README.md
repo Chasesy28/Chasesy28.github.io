@@ -4,6 +4,14 @@
 
 This project is a basic testing site I use to mess around and test features. 🦄
 
+> ⚠️ The `projects/` directory contains isolated experiments; the main
+> site does not depend on them and they are not touched during normal
+> updates or deployments.
+
+It now includes a simple **loading screen** (jumping icon + progress bar) and a small
+accessibility panel for font size, contrast and motion reduction. Mobile layout
+and touch support are verified, and the Vite/TS code is just a sandbox.
+
 The site combines a static HTML frontend with local Tailwind CSS v4, independent project experiments, and Cloudflare Workers for edge computing.
 
 ## 🏗 What's next?
@@ -56,6 +64,18 @@ The image optimizer worker provides:
 - Dynamic resizing with query parameters
 - Quality optimization
 - Aggressive caching for faster load times
+
+> **Tip:** the Cloudflare dashboard also offers **Polish** (under Speed →
+> Optimization) which will compress images automatically. Set it to lossless or
+> lossy as you prefer and enable WebP/AVIF conversion if the worker isn't used.
+
+### Cloudflare Performance Features
+
+- **Argo Smart Routing** (Traffic → Argo) can dramatically cut latency by
+  routing traffic across Cloudflare's internal backbone. Enable it in the
+  dashboard and consider enabling the free trial under your account.
+- Enable Auto Minify (JavaScript/CSS/HTML) and Brotli compression for extra
+  speed.
 
 **Usage examples:**
 
@@ -119,6 +139,9 @@ For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SER
 ## 🎨 Reminders for dev
 
 - **Fonts:** Add your favorite from **Google fonts**.
+- **Accessibility:** A panel provides font size, high‑contrast and reduced‑motion controls. It now
+  includes keyboard support (Esc to close), focus management and closes when clicking outside.
+- **Mobile:** Layout is responsive with a simple columnar nav on narrow screens; always test on phones/tablets.
   [Go to tutorial about fonts](https://www.w3schools.com/w3css/w3css_fonts_google.asp)
 
 - **Icons:** Add icons with **Fontawesome** and their free library.

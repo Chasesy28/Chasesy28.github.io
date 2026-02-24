@@ -1,18 +1,22 @@
 # Supabase Integration Guide
 
+> **Note:** The live site currently uses a simple localStorage-backed system for authentication and announcements. Supabase plans are documented below but not active.
+
 This document outlines the preparation for Supabase integration and the migration path from the current localStorage-based system.
 
 ## Current Implementation
 
 ### Authentication
+
 - **Current**: localStorage-based session with hardcoded credentials
 - **Location**: `/admin-auth.js`
-- **Features**: 
+- **Features**:
   - Simple username/password check
   - 24-hour session duration
   - Session refresh capability
 
 ### Announcements
+
 - **Current**: localStorage for announcement storage
 - **Location**: `/announcements.js`
 - **Features**:
@@ -27,6 +31,7 @@ This document outlines the preparation for Supabase integration and the migratio
 #### Tables to Create
 
 **`admin_users` table**:
+
 ```sql
 create table admin_users (
   id uuid primary key default uuid_generate_v4(),
@@ -37,6 +42,7 @@ create table admin_users (
 ```
 
 **`announcements` table**:
+
 ```sql
 create table announcements (
   id uuid primary key default uuid_generate_v4(),
@@ -50,6 +56,7 @@ create table announcements (
 ```
 
 **`announcement_dismissals` table**:
+
 ```sql
 create table announcement_dismissals (
   id uuid primary key default uuid_generate_v4(),
@@ -63,6 +70,7 @@ create table announcement_dismissals (
 ### 2. Environment Configuration
 
 Create a `.env` file (add to `.gitignore`):
+
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -77,66 +85,79 @@ npm install @supabase/supabase-js
 ### 4. Migration Steps
 
 #### Phase 1: Setup Supabase Client
+
 Create `/admin-supabase.js`:
+
 ```javascript
 // Import Supabase client library (add @supabase/supabase-js to package.json)
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
 // Load from environment variables - NEVER hardcode credentials
 // Set these in your deployment environment or .env file (add .env to .gitignore)
-const supabaseUrl = process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl =
+  process.env.SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey =
+  process.env.SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase credentials not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+  console.error(
+    "Supabase credentials not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
+  );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ```
 
 #### Phase 2: Migrate Authentication
+
 1. Enable Supabase Auth with Email/Password provider
 2. Update `admin-auth.js` to use Supabase Auth:
+
    ```javascript
-   import { supabase } from './lib/supabase'
-   
+   import { supabase } from "./lib/supabase";
+
    async function authenticateAdmin(email, password) {
      const { data, error } = await supabase.auth.signInWithPassword({
        email,
-       password
-     })
-     return { data, error }
+       password,
+     });
+     return { data, error };
    }
    ```
 
 #### Phase 3: Migrate Announcements
+
 1. Update `announcements.js` to use Supabase Database:
    ```javascript
    async function saveAnnouncement(announcement) {
-     const { data, error } = await supabase
-       .from('announcements')
-       .insert({
-         message: announcement.message,
-         type: announcement.type,
-         dismissible: announcement.dismissible
-       })
-     return { data, error }
+     const { data, error } = await supabase.from("announcements").insert({
+       message: announcement.message,
+       type: announcement.type,
+       dismissible: announcement.dismissible,
+     });
+     return { data, error };
    }
    ```
 
 #### Phase 4: Real-time Updates
+
 Enable real-time subscriptions for live announcement updates:
+
 ```javascript
 const subscription = supabase
-  .channel('announcements')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'announcements'
-  }, (payload) => {
-    displayAnnouncementBanner(payload.new)
-  })
-  .subscribe()
+  .channel("announcements")
+  .on(
+    "postgres_changes",
+    {
+      event: "INSERT",
+      schema: "public",
+      table: "announcements",
+    },
+    (payload) => {
+      displayAnnouncementBanner(payload.new);
+    },
+  )
+  .subscribe();
 ```
 
 ### 5. Row Level Security (RLS)
@@ -170,11 +191,13 @@ create policy "Users can dismiss announcements"
 ### 6. Cloudflare Analytics Integration
 
 #### Option A: Cloudflare API (Recommended)
+
 - Use Cloudflare Analytics API to fetch data
 - Store API token in Cloudflare Workers environment variables
 - Create a worker endpoint to proxy analytics data
 
 #### Option B: Supabase Edge Functions
+
 - Use Supabase Edge Functions to fetch Cloudflare Analytics
 - Store credentials securely in Supabase Vault
 - Call from admin panel via API
@@ -182,6 +205,7 @@ create policy "Users can dismiss announcements"
 ### 7. Testing Checklist
 
 Before going live with Supabase:
+
 - [ ] Test authentication flow (login, logout, session persistence)
 - [ ] Test announcement CRUD operations
 - [ ] Test announcement dismissal tracking
@@ -195,6 +219,7 @@ Before going live with Supabase:
 ## Backwards Compatibility
 
 During migration, maintain backwards compatibility:
+
 1. Check if Supabase is configured (check for env variables)
 2. If configured, use Supabase
 3. If not, fall back to localStorage

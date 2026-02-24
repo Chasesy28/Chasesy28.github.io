@@ -3,8 +3,10 @@
 
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,
-                   initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-status-bar-style" content="default">
     <title>
       Silly Page not found
     </title>
@@ -27,6 +29,26 @@
   </head>
 
   <body>
+    <!-- full‑screen loader shown until page fully loaded -->
+    <div id="loading-screen" aria-live="polite" role="status" aria-label="Loading" aria-hidden="true">
+      <div class="loader">
+        <span class="loader-icon" aria-hidden="true">🔄</span>
+        <div class="loader-bar" aria-hidden="true">
+          <div class="loader-progress"></div>
+        </div>
+      </div>
+    </div>
+    <!-- accessibility settings trigger and panel -->
+    <button id="accessibility-toggle" aria-label="Accessibility settings" class="accessibility-button">⚙️</button>
+    <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true" aria-label="Accessibility options"
+      aria-hidden="true">
+      <h2>Accessibility</h2>
+      <button id="increase-font">A+</button>
+      <button id="decrease-font">A-</button>
+      <button id="toggle-contrast">High contrast</button>
+      <button id="toggle-reduced-motion">Reduce motion</button>
+      <button id="close-accessibility">Close</button>
+    </div>
     <header id="header">
       <div class="site-title cherry-bomb-one-regular">
         <a href="/">Silly Site</a>
@@ -59,52 +81,8 @@
         Go Back to Home
       </a>
     </div>
-    <script>
-      /**
-       * DARK MODE TOGGLE FUNCTIONALITY FOR 404 PAGE
-       * Syncs with theme stored in localStorage from home page
-       */
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      const html = document.documentElement;
-      const sunIcon = document.querySelector('.sun-icon');
-      const moonIcon = document.querySelector('.moon-icon');
-
-      // Load saved theme or default to light
-      const currentTheme = localStorage.getItem('theme') || 'light';
-      html.classList.remove('light', 'dark');
-      html.classList.add(currentTheme);
-      updateIcons(currentTheme);
-      console.log('[404] Theme loaded:', currentTheme);
-
-      // Toggle theme on button click
-      darkModeToggle.addEventListener('click', function () {
-        if (html.classList.contains('dark')) {
-          html.classList.replace('dark', 'light');
-          localStorage.setItem('theme', 'light');
-          updateIcons('light');
-          console.log('[404] Theme switched to: LIGHT');
-        } else {
-          html.classList.replace('light', 'dark');
-          localStorage.setItem('theme', 'dark');
-          updateIcons('dark');
-          console.log('[404] Theme switched to: DARK');
-        }
-      });
-
-      /**
-       * Updates the theme toggle icon based on current theme
-       * @param {string} theme - Either 'light' or 'dark'
-       */
-      function updateIcons(theme) {
-        if (theme === 'dark') {
-          sunIcon.style.display = 'none';
-          moonIcon.style.display = 'inline';
-        } else {
-          sunIcon.style.display = 'inline';
-          moonIcon.style.display = 'none';
-        }
-      }
-    </script>
+    <!-- Core utilities (rain, loader, accessibility, theme) -->
+    <script src="/scripts.js"></script>
     <!-- Site-wide announcements system -->
     <script src="/announcements.js"></script>
     <script src="/notification-bars.js"></script>

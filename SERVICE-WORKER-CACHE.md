@@ -20,8 +20,8 @@ The service worker (`sw.js`) provides offline functionality by caching essential
 The cache uses a combination of version number and timestamp:
 
 ```javascript
-const CACHE_VERSION = '6';
-const CACHE_TIMESTAMP = '2026-01-30T19:35:15Z';
+const CACHE_VERSION = "6";
+const CACHE_TIMESTAMP = "2026-01-30T19:35:15Z";
 const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 ```
 
@@ -56,14 +56,16 @@ Edit `sw.js` and update one of these:
 2. Update `CACHE_TIMESTAMP` to current time for minor updates
 
 Example:
+
 ```javascript
-const CACHE_VERSION = '7';  // Increment this
-const CACHE_TIMESTAMP = '2026-02-01T10:30:00Z';  // Or update this
+const CACHE_VERSION = "7"; // Increment this
+const CACHE_TIMESTAMP = "2026-02-01T10:30:00Z"; // Or update this
 ```
 
 ## Testing Cache Updates
 
 1. Start a local server:
+
    ```bash
    npx http-server -p 8080 .
    ```
@@ -80,13 +82,13 @@ const CACHE_TIMESTAMP = '2026-02-01T10:30:00Z';  // Or update this
 Users can manually clear the cache by running this in the browser console:
 
 ```javascript
-navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
+navigator.serviceWorker.controller.postMessage({ type: "CLEAR_CACHE" });
 ```
 
 ### Check Current Cache Version
 
 ```javascript
-caches.keys().then(keys => console.log('Current caches:', keys));
+caches.keys().then((keys) => console.log("Current caches:", keys));
 ```
 
 ## Best Practices
@@ -116,7 +118,7 @@ caches.keys().then(keys => console.log('Current caches:', keys));
 The service worker caches 25 essential files:
 
 - Core pages: `/`, `/index.html`, `/manifest.json`
-- Static assets: `/styles.css`, `/scripts.js`, icons
+- Static assets: `/styles.css`, `/scripts.js`, icons (includes loader/accessibility code)
 - All project HTML, CSS, and JS files
 
 See `URLS_TO_CACHE` array in `sw.js` for the complete list.
