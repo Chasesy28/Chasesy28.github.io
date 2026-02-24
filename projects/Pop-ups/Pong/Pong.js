@@ -83,6 +83,9 @@ function update() {
       ballBottomEdge >= p1y &&
       ballY <= p1BottomEdge
     ) {
+      if(ballX <= p1RightEdge) {
+        ballX = p1RightEdge;
+      }
       ballSpeedX = -ballSpeedX;
     } else if (
       ballRightEdge >= p2x &&
@@ -90,6 +93,9 @@ function update() {
       ballBottomEdge >= p2y &&
       ballY <= p2BottomEdge
     ) {
+      if(ballRightEdge >= p2x) {
+        ballX = p2x - ballWidth;
+      }
       ballSpeedX = -ballSpeedX;
     }
 
@@ -109,6 +115,9 @@ function update() {
       ballX <= p1RightEdge &&
       ballRightEdge >= p1x
     ) {
+      if (ballY <= p1BottomEdge) {
+        ballY = p1BottomEdge;
+      }
       ballSpeedY = -ballSpeedY;
     } else if (
       ballBottomEdge >= p2y &&
@@ -116,6 +125,9 @@ function update() {
       ballRightEdge >= p2x &&
       ballX <= p2RightEdge
     ) {
+      if (ballBottomEdge >= p2y) {
+        ballY = p2y - ballHeight;
+      }
       ballSpeedY = -ballSpeedY;
     } else if (
       ballY <= p2BottomEdge &&
@@ -123,6 +135,9 @@ function update() {
       ballRightEdge >= p2x &&
       ballX <= p2RightEdge
     ) {
+      if (ballY <= p2BottomEdge) {
+        ballY = p2BottomEdge;
+      }
       ballSpeedY = -ballSpeedY;
     }
 
