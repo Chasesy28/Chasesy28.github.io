@@ -37,18 +37,6 @@
          </div>
       </div>
 
-      <!-- accessibility settings trigger and panel -->
-      <button id="accessibility-toggle" aria-label="Accessibility settings" class="accessibility-button">⚙️</button>
-      <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true" aria-label="Accessibility options"
-         aria-hidden="true">
-         <h2>Accessibility</h2>
-         <button id="increase-font">A+</button>
-         <button id="decrease-font">A-</button>
-         <button id="toggle-contrast">High contrast</button>
-         <button id="toggle-reduced-motion">Reduce motion</button>
-         <button id="close-accessibility">Close</button>
-      </div>
-
       <header id="header">
          <div class="site-title cherry-bomb-one-regular">
             <a href="/">Silly Site</a>
@@ -61,6 +49,11 @@
                <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
                      rel="noopener noreferrer">GitHub</a></li>
                <li>
+                  <!-- accessibility settings trigger and panel -->
+                  <button id="accessibility-toggle" aria-label="Accessibility settings"
+                     class="accessibility-button">⚙️</button>
+               </li>
+               <li>
                   <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
                      <span class="sun-icon">☀️</span>
                      <span class="moon-icon" style="display: none;">🌙</span>
@@ -69,6 +62,18 @@
             </ul>
          </nav>
       </header>
+      <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true" aria-labop="Accessibility options"
+         aria-hidden="true">
+         <h2>Accessibility</h2>
+         <button id="increase-font">Increase Font</button>
+         <button id="decrease-font">Decrease Font</button>
+         <button id="toggle-contrast">High contrast</button>
+         <button id="toggle-reduced-motion">Reduce motion</button>
+         <button id="close-accessibility">Close</button>
+         <h3>Rain Slider</h3>
+         <p id="rain-slider-value">15</p>
+         <input type="range" min="1" max="30" step="0.1" id="rain-slider" value="15">
+      </div>
       <div class="rain">
          <div class="ground"></div>
       </div>
