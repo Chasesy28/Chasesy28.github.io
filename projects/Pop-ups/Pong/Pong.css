@@ -29,7 +29,7 @@ body {
   font-size: 16px;
   cursor: pointer;
   border: solid;
-  border-radius: 10px;
+  border-radius: 14px;
   color: black;
   text-align: center;
   display: inline-block;
@@ -39,4 +39,11 @@ body {
 #startButton:hover {
   background-color: limegreen;
   padding: 12px 24px;
+  border-radius: 16px;
+}
+
+#startButton:active {
+  background-color: rgb(50, 150, 50);
+  padding: 10px 14px;
+  border-radius: 12px;
 }
