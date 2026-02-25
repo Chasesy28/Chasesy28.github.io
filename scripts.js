@@ -59,11 +59,11 @@ function initAccessibility() {
   const apply = () => {
     const size = parseFloat(localStorage.getItem("fontSize") || "1");
     document.documentElement.style.fontSize = size + "rem";
-    document.body.classList.toggle(
+    document.documentElement.classList.toggle(
       "high-contrast",
       localStorage.getItem("highContrast") === "true",
     );
-    document.body.classList.toggle(
+    document.documentElement.classList.toggle(
       "reduce-motion",
       localStorage.getItem("reduceMotion") === "true",
     );
