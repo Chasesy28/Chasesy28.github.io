@@ -1,4 +1,4 @@
-import { authenticateAdmin } from './supabase'
+import { authenticateAdmin, supabase } from './supabase'
 
 const SESSION_KEY = 'admin_session'
 const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
@@ -27,6 +27,52 @@ export class AdminAuthManager {
       console.error('Login error:', error)
       return null
     }
+  }
+
+  /**
+   * Sign in with Google OAuth
+   */
+  async loginWithGoogle(redirectPath: string = '/admin') {
+    const redirectTo = `${window.location.origin}${redirectPath}`
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent'
+        }
+      }
+    })
+
+    if (error) {
+      throw error
+    }
+  }
+
+  /**
+   * Initialize local admin session from Supabase auth session
+   */
+  async initializeAuthFromSupabase() {
+    const { data, error } = await supabase.auth.getSession()
+
+    if (error) {
+      throw error
+    }
+
+    const userEmail = data.session?.user?.email
+    if (!userEmail) return null
+
+    const admin = await authenticateAdmin(userEmail)
+    if (!admin) {
+      await supabase.auth.signOut()
+      this.logout()
+      throw new Error('Your account is authenticated but is not authorized for admin access.')
+    }
+
+    this.createSession(admin)
+    return admin
   }
 
   /**
@@ -89,7 +135,8 @@ export class AdminAuthManager {
   /**
    * Logout user
    */
-  logout() {
+  async logout() {
+    await supabase.auth.signOut()
     localStorage.removeItem(this.sessionKey)
   }
 

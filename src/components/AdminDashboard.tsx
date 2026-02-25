@@ -18,8 +18,6 @@ interface Announcement {
 
 export function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -48,7 +46,20 @@ export function AdminDashboard() {
   }, [isAuthenticated])
 
   const checkAuth = async () => {
-    const authenticated = authManager.isAuthenticated()
+    let authenticated = authManager.isAuthenticated()
+
+    if (!authenticated) {
+      try {
+        const admin = await authManager.initializeAuthFromSupabase()
+        authenticated = !!admin
+        if (admin) {
+          setLoginError('')
+        }
+      } catch (error) {
+        setLoginError(error instanceof Error ? error.message : 'Unable to validate authenticated session')
+      }
+    }
+
     setIsAuthenticated(authenticated)
     if (authenticated) {
       const session = authManager.getSession()
@@ -60,22 +71,14 @@ export function AdminDashboard() {
     }
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleGoogleLogin = async () => {
     setIsLoggingIn(true)
     setLoginError('')
+
     try {
-      const result = await authManager.login(email)
-      if (result) {
-        setEmail('')
-        setPassword('')
-        await checkAuth()
-      } else {
-        setLoginError('Invalid credentials. Make sure this email is in the admin_users table.')
-      }
-    } catch (err) {
-      setLoginError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
+      await authManager.loginWithGoogle('/admin')
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : 'Google sign-in failed')
       setIsLoggingIn(false)
     }
   }
@@ -121,8 +124,8 @@ export function AdminDashboard() {
     }
   }
 
-  const handleLogout = () => {
-    authManager.logout()
+  const handleLogout = async () => {
+    await authManager.logout()
     setIsAuthenticated(false)
     setSessionEmail('')
     setSessionExpiration(0)
@@ -144,35 +147,7 @@ export function AdminDashboard() {
               Admin Login
             </h1>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@sillysites.com"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={isLoggingIn}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Your password"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={isLoggingIn}
-                />
-              </div>
-
+            <div className="space-y-4">
               {loginError && (
                 <div className="p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-lg text-red-800 dark:text-red-300 text-sm">
                   {loginError}
@@ -180,23 +155,24 @@ export function AdminDashboard() {
               )}
 
               <Button
-                type="submit"
+                type="button"
                 disabled={isLoggingIn}
                 className="w-full"
+                onClick={handleGoogleLogin}
               >
                 {isLoggingIn ? (
                   <>
                     <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Logging in...
+                    Redirecting...
                   </>
                 ) : (
-                  'Login'
+                  'Continue with Google'
                 )}
               </Button>
-            </form>
+            </div>
 
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-4 text-center">
-              Demo credentials: admin@sillysites.com / test@sillysites.com
+              Sign in with a Google account that exists in the admin_users table.
             </p>
           </div>
         </Card>
