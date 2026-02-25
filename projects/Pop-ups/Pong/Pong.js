@@ -21,6 +21,9 @@ let p2x = screen.availWidth - pWidth - 8;
 let p1y = screen.availHeight / 2 - pHeight / 2;
 let p2y = screen.availHeight / 2 - pHeight / 2;
 
+let p1Score = 0;
+let p2Score = 0;
+
 let p1RightEdge = p1x + pWidth;
 let p1BottomEdge = p1y + pHeight;
 
@@ -37,6 +40,35 @@ let ballY = screen.availHeight / 2 - ballHeight / 2;
 
 let ballRightEdge = ballX + ballWidth;
 let ballBottomEdge = ballY + ballHeight;
+
+const randomizeBallDirection = () => {
+  if (Math.floor(Math.random() * 2) == 0) {
+    ballSpeedX = 5;
+  } else {
+    ballSpeedX = -5;
+  }
+  if (Math.floor(Math.random() * 2) == 0) {
+    ballSpeedY = 5;
+  } else {
+    ballSpeedY = -5;
+  }
+};
+
+function resetBall() {
+  ballX = screen.availWidth / 2 - ballWidth / 2;
+  ballY = screen.availHeight / 2 - ballHeight / 2;
+  randomizeBallDirection();
+}
+
+function updateScore(player) {
+  if (player == 1) {
+    p1Score++;
+  } else if (player == 2) {
+    p2Score++;
+  }
+  document.getElementById("p1Score").textContent = `P1 Score: ${p1Score}`;
+  document.getElementById("p2Score").textContent = `P2 Score: ${p2Score}`;
+}
 
 function update() {
   p1RightEdge = p1x + pWidth;
@@ -70,8 +102,12 @@ function update() {
       p2y += pSpeed;
     }
 
-    if (ballRightEdge >= screen.availWidth || ballX <= 0) {
-      ballSpeedX = -ballSpeedX;
+    if (ballRightEdge >= screen.availWidth) {
+      resetBall();
+      updateScore(1);
+    } else if (ballX <= 0) {
+      resetBall();
+      updateScore(2);
     }
     if (ballBottomEdge >= screen.availHeight || ballY <= 0) {
       ballSpeedY = -ballSpeedY;
@@ -83,7 +119,7 @@ function update() {
       ballBottomEdge >= p1y &&
       ballY <= p1BottomEdge
     ) {
-      if(ballX <= p1RightEdge) {
+      if (ballX <= p1RightEdge) {
         ballX = p1RightEdge;
       }
       ballSpeedX = -ballSpeedX;
@@ -93,7 +129,7 @@ function update() {
       ballBottomEdge >= p2y &&
       ballY <= p2BottomEdge
     ) {
-      if(ballRightEdge >= p2x) {
+      if (ballRightEdge >= p2x) {
         ballX = p2x - ballWidth;
       }
       ballSpeedX = -ballSpeedX;
@@ -181,19 +217,12 @@ function startGame() {
 
   p1y = screen.availHeight / 2 - pHeight / 2;
   p2y = screen.availHeight / 2 - pHeight / 2;
-  ballX = screen.availWidth / 2 - ballWidth / 2;
-  ballY = screen.availHeight / 2 - ballHeight / 2;
 
-  if (Math.floor(Math.random() * 2) == 0) {
-    ballSpeedX = 5;
-  } else {
-    ballSpeedX = -5;
-  }
-  if (Math.floor(Math.random() * 2) == 0) {
-    ballSpeedY = 5;
-  } else {
-    ballSpeedY = -5;
-  }
+  p1Score = 0;
+  p2Score = 0;
+  updateScore(0);
+
+  resetBall();
 
   if (p1) {
     p1.close();
