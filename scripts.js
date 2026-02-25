@@ -51,7 +51,6 @@ function initThemeToggle() {
 function initAccessibility() {
   const panel = document.getElementById("accessibility-settings");
   const toggleBtn = document.getElementById("accessibility-toggle");
-  const closeBtn = document.getElementById("close-accessibility");
   const inc = document.getElementById("increase-font");
   const dec = document.getElementById("decrease-font");
   const contrastBtn = document.getElementById("toggle-contrast");
@@ -81,14 +80,6 @@ function initAccessibility() {
       } else {
         toggleBtn.focus();
       }
-    }
-  });
-
-  closeBtn?.addEventListener("click", () => {
-    if (panel) {
-      panel.classList.add("hidden");
-      panel.setAttribute("aria-hidden", "true");
-      toggleBtn?.focus();
     }
   });
 
@@ -144,6 +135,72 @@ function initAccessibility() {
   if (panel) {
     panel.setAttribute("aria-hidden", panel.classList.contains("hidden"));
   }
+
+  panel.style.bottom = "10%";
+  panel.style.right = "10%";
+
+  function dragElement(elmnt) {
+    var pos1 = 0,
+      pos2 = 0,
+      pos3 = 0,
+      pos4 = 0;
+    if (document.getElementById(elmnt.id + "header")) {
+      // if present, the header is where you move the DIV from:
+      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    } else {
+      // otherwise, move the DIV from anywhere inside the DIV:
+      elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+      e = e || window.event;
+      e.preventDefault();
+      // get the mouse cursor position at startup:
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+      document.onmouseup = closeDragElement;
+      // call a function whenever the cursor moves:
+      document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+      e = e || window.event;
+      e.preventDefault();
+
+      // Calculate how much the mouse moved
+      pos1 = pos3 - e.clientX;
+      pos2 = pos4 - e.clientY;
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+
+      // Get the parent dimensions (usually the window)
+      var parentWidth = window.innerWidth;
+      var parentHeight = window.innerHeight;
+
+      // Calculate new Right and Bottom positions
+      // We use (Parent Dimension - Offset - Element Dimension) to find the distance from the edge
+      var newRight =
+        parentWidth - (elmnt.offsetLeft + elmnt.offsetWidth) + pos1;
+      var newBottom =
+        parentHeight - (elmnt.offsetTop + elmnt.offsetHeight) + pos2;
+
+      // Apply the styles
+      elmnt.style.right = newRight + "px";
+      elmnt.style.bottom = newBottom + "px";
+
+      // Clear top/left so they don't fight with right/bottom
+      elmnt.style.top = "auto";
+      elmnt.style.left = "auto";
+    }
+
+    function closeDragElement() {
+      // stop moving when mouse button is released:
+      document.onmouseup = null;
+      document.onmousemove = null;
+    }
+  }
+
+  dragElement(panel);
 }
 
 const rainContainer = document.querySelector(".rain");

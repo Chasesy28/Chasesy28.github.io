@@ -1179,7 +1179,7 @@ nav a {
 
 .accessibility-button {
     position: fixed;
-    top: 1rem;
+    bottom: 1rem;
     right: 1rem;
     /* remove bottom so it lives in top-right corner */
     z-index: 10001;
@@ -1200,9 +1200,7 @@ nav a {
 }
 
 #accessibility-settings {
-    position: fixed;
-    top: 10%;
-    right: 10%;
+    position: absolute;
     background: #fff;
     border: 1px solid #aaa;
     padding: 1rem;
