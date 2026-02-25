@@ -7,7 +7,7 @@
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Update the CACHE_TIMESTAMP in sw.js
-sed -i "s/const CACHE_TIMESTAMP = '[^']*'/const CACHE_TIMESTAMP = '${TIMESTAMP}'/" sw.js
+sed -i "s|const CACHE_TIMESTAMP = \"[^\"]*\";|const CACHE_TIMESTAMP = \"$TIMESTAMP\";|" sw.js
 
 echo "✓ Updated service worker cache timestamp to: ${TIMESTAMP}"
 echo "✓ Users will receive the new version on their next visit"
