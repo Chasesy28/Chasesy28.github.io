@@ -69,9 +69,11 @@
          <button id="decrease-font">Decrease Font</button>
          <button id="toggle-contrast">High contrast</button>
          <button id="toggle-reduced-motion">Reduce motion</button>
-         <h3>Rain Slider</h3>
-         <p id="rain-slider-value">15</p>
-         <input type="range" min="1" max="30" step="0.1" id="rain-slider" value="15">
+         <div class="rain-slider-container">
+            <h3>Rain Slider</h3>
+            <input type="number" min="1" max="30" id="rain-number" value="15">
+            <input type="range" min="1" max="30" step="0.1" id="rain-slider" value="15">
+         </div>
       </div>
       <div class="rain">
          <div class="ground"></div>

@@ -81,6 +81,8 @@ function initAccessibility() {
         toggleBtn.focus();
       }
     }
+    panel.style.bottom = "10%";
+    panel.style.right = "10%";
   });
 
   // close on Escape key
@@ -136,9 +138,6 @@ function initAccessibility() {
     panel.setAttribute("aria-hidden", panel.classList.contains("hidden"));
   }
 
-  panel.style.bottom = "10%";
-  panel.style.right = "10%";
-
   function dragElement(elmnt) {
     var pos1 = 0,
       pos2 = 0,
@@ -154,16 +153,23 @@ function initAccessibility() {
 
     function dragMouseDown(e) {
       e = e || window.event;
+
+      // 1. Define which element(s) should NOT trigger a drag
+      // This checks if the clicked element has the class "no-drag"
+      if (e.target.closest(".rain-slider-container")) {
+        return; // Exit the function early so dragging never starts
+      }
+
       e.preventDefault();
       // get the mouse cursor position at startup:
       pos3 = e.clientX;
       pos4 = e.clientY;
       document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
       document.onmousemove = elementDrag;
     }
 
     function elementDrag(e) {
+      elmnt.style.position = "absolute";
       e = e || window.event;
       e.preventDefault();
 
@@ -191,6 +197,8 @@ function initAccessibility() {
       // Clear top/left so they don't fight with right/bottom
       elmnt.style.top = "auto";
       elmnt.style.left = "auto";
+
+      elmnt.style.position = "fixed";
     }
 
     function closeDragElement() {
@@ -431,11 +439,17 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 const rainSlider = document.getElementById("rain-slider");
-const rainSliderValue = document.getElementById("rain-slider-value");
+const rainNumber = document.getElementById("rain-number");
 
 rainSlider.addEventListener("input", function () {
   dropDensity = rainSlider.value;
-  rainSliderValue.textContent = String(dropDensity);
+  rainNumber.value = String(dropDensity);
+  console.log("[Test Page] Drop density changed to:", dropDensity);
+  handleResize(); // Recalculate drop count with new density
+});
+rainNumber.addEventListener("input", function () {
+  dropDensity = rainNumber.value;
+  rainSlider.value = String(dropDensity);
   console.log("[Test Page] Drop density changed to:", dropDensity);
   handleResize(); // Recalculate drop count with new density
 });

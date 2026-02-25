@@ -737,7 +737,8 @@ html.dark h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-html.dark h2 {
+html.dark h2,
+html.dark h3 {
     color: #ffd369;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
