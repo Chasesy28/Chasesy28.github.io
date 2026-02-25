@@ -1201,7 +1201,7 @@ nav a {
 }
 
 #accessibility-settings {
-    position: absolute;
+    position: fixed;
     background: #fff;
     border: 1px solid #aaa;
     padding: 1rem;
