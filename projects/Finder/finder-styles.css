@@ -230,19 +230,35 @@ html.dark .site-footer a {
    color: rgb(235, 165, 24);
 }
 
-html.light .search-input {
+.search-input {
    background-color: rgb(101, 110, 128);
-   border-color: rgb(209, 213, 219);
+   border-color: rgb(102, 103, 105);
 }
 
-html.light .search-input::placeholder {
+.search-input:focus {
+   border-color: blue;
+}
+
+.search-input::placeholder {
    color: rgb(164, 164, 164)
 }
 
-html.dark .search-box {
+.result-card {
+   background-color: #fffaf0;
+}
+
+input[type="checkbox"] {
+   accent-color: blue;
+}
+
+input[type="checkbox"]:hover {
+   outline: 1px solid blue;
+}
+
+/*html.dark .search-box {
    background-color: #16213e;
    color: #bfbfbf;
-}
+}*/
 
 html.dark .search-input {
    background-color: rgb(55, 65, 81);
@@ -251,4 +267,12 @@ html.dark .search-input {
 
 html.dark .search-input::placeholder {
    color: rgb(130, 130, 130)
+}
+
+html.dark .result-card {
+   background-color: #16213e;
+}
+
+html.dark #getLocationButton:hover {
+   background-color: rgb(66, 66, 66);
 }

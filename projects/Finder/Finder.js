@@ -1050,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", () => {
     container.scrollTop = container.scrollHeight;
   }
 
-  // --- OSM Search Logic (the acutual code)---
+  // --- OSM Search Logic (the actual code)---
 
   searchButton.addEventListener("click", searchOSM);
   inputs.forEach((input) => {
@@ -1425,7 +1425,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function createResultCard(data, showFavoriteIndicator = false) {
     const card = document.createElement("div");
     card.className =
-      "bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow";
+      "result-card rounded-lg shadow p-4 flex flex-col justify-between cursor-pointer hover:shadow-lg transition-shadow";
 
     const openStatus =
       data.isOpen === true
