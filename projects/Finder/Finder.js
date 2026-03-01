@@ -1429,10 +1429,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const openStatus =
       data.isOpen === true
-        ? '<span class="text-xs font-medium text-green-600 dark:text-green-400">Open</span>'
+        ? '<span class="open-true text-xs font-medium">Open</span>'
         : data.isOpen === false
-          ? '<span class="text-xs font-medium text-red-600 dark:text-red-400">Closed</span>'
-          : '<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Hours Unknown</span>';
+          ? '<span class="open-false text-xs font-medium">Closed</span>'
+          : '<span class="open-unknown text-xs font-medium">Hours Unknown</span>';
 
     const favoriteIndicator = showFavoriteIndicator
       ? '<span class="text-yellow-500 mr-2">★</span>'

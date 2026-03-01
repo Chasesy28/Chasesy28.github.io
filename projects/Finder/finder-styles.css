@@ -233,6 +233,7 @@ html.dark .site-footer a {
 .search-input {
    background-color: rgb(101, 110, 128);
    border-color: rgb(102, 103, 105);
+   text-align: center;
 }
 
 .search-input:focus {
@@ -247,18 +248,26 @@ html.dark .site-footer a {
    background-color: #fffaf0;
 }
 
+.open-true {
+   color: rgb(22, 163, 74);
+}
+
+.open-false {
+   color: rgb(220, 38, 38);
+}
+
+.open-unknown {
+   color: rgb(107, 114, 128);
+}
+
 input[type="checkbox"] {
    accent-color: blue;
 }
 
-input[type="checkbox"]:hover {
-   outline: 1px solid blue;
-}
-
-/*html.dark .search-box {
+html.dark .search-box {
    background-color: #16213e;
    color: #bfbfbf;
-}*/
+}
 
 html.dark .search-input {
    background-color: rgb(55, 65, 81);
@@ -273,6 +282,22 @@ html.dark .result-card {
    background-color: #16213e;
 }
 
+html.dark input[type="checkbox"] {
+   accent-color: cyan;
+}
+
 html.dark #getLocationButton:hover {
-   background-color: rgb(66, 66, 66);
+   background-color: rgb(44, 52, 65);
+}
+
+html.dark .open-true {
+   color: rgb(74, 222, 128);
+}
+
+html.dark .open-false {
+   color: rgb(248, 113, 113);
+}
+
+html.dark .open-unknown {
+   color: rgb(156, 163, 175);
 }
