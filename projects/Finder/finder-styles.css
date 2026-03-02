@@ -280,6 +280,22 @@ input[type="checkbox"] {
    color: rgb(22, 101, 52);
 }
 
+.directions-button {
+   background-color: rgb(49, 172, 94)
+}
+
+.directions-button:hover {
+   background-color: rgb(22, 101, 52);
+}
+
+.ai-configure-button {
+   color: rgb(107, 114, 128);
+}
+
+.ai-configure-button:hover {
+   color: rgb(66, 71, 80);
+}
+
 html.dark .search-box {
    background-color: #16213e;
    color: #bfbfbf;
@@ -337,4 +353,20 @@ html.dark .directions {
 
 html.dark .directions:hover {
    color: rgb(134, 239, 172);
+}
+
+html.dark .directions-button {
+   background-color: rgb(49, 172, 94)
+}
+
+html.dark .directions-button:hover {
+   background-color: rgb(22, 101, 52);
+}
+
+html.dark .ai-configure-button {
+   color: rgb(107, 114, 128);
+}
+
+html.dark .ai-configure-button:hover {
+   color: rgb(154, 165, 183);
 }

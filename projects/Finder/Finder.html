@@ -116,11 +116,11 @@
       <div id="restaurantModal"
          class="fixed inset-0 bg-opacity-75 flex items-center justify-center p-4 hidden z-40 transition-opacity duration-300">
          <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]">
+            class="result-card rounded-xl shadow-xl p-6 w-full max-w-2xl transform scale-95 transition-transform duration-300 overflow-y-auto max-h-[90vh]">
             <!-- Modal Header -->
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
                <div class="flex items-center gap-2">
-                  <h3 id="modalName" class="text-2xl font-bold text-indigo-700 dark:text-indigo-400">Restaurant Name
+                  <h3 id="modalName" class="place-name text-2xl font-bold">Restaurant Name
                   </h3>
                   <button id="modalFavoriteBtn" class="favorite-btn" title="Add to favorites">☆</button>
                </div>
@@ -132,13 +132,13 @@
                <!-- Left Column: Details -->
                <div>
                   <h4 class="text-lg font-semibold mb-2">Details</h4>
-                  <p class="text-sm text-gray-700 dark:text-gray-200 font-medium capitalize mb-2">
+                  <p class="text-sm font-medium capitalize mb-2">
                      <strong>Cuisine:</strong> <span id="modalCuisine"></span>
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <p class="info text-sm mt-2">
                      <strong>Address:</strong> <span id="modalAddress"></span>
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  <p class="info text-sm mt-2">
                      <strong>Hours:</strong>
                      <span id="modalHours" class="block text-xs whitespace-pre-wrap break-words mt-1"></span>
                   </p>
@@ -149,7 +149,7 @@
                            🤖 Ask AI for Info
                         </button>
                         <button id="configureApiBtn"
-                           class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                           class="ai-configure-button text-xs">
                            ⚙️ Configure API
                         </button>
                      </div>
@@ -177,13 +177,13 @@
                </div>
                <!-- Right Column: Map -->
                <div>
-                  <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">Location</h4>
+                  <h4 class="text-lg font-semibold mb-2">Location</h4>
                   <div id="modalMap" class="h-64 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
                   <p id="modalMapMessage" class="text-xs text-center text-gray-500 dark:text-gray-400 mt-1 hidden">Map
                      data
                      not available for this location.</p>
                   <button id="modalDirectionsBtn"
-                     class="w-full mt-3 bg-green-600 dark:bg-green-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-colors hidden">
+                     class="directions-button w-full mt-3 bg-green-600 dark:bg-green-500 text-white font-medium py-2 px-4 rounded-lg shadow-md hover:bg-green-700 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 transition-colors hidden">
                      🧭 Get Directions
                   </button>
                </div>
