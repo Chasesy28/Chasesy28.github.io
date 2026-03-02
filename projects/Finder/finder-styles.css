@@ -296,6 +296,10 @@ input[type="checkbox"] {
    color: rgb(66, 71, 80);
 }
 
+.security-warning {
+   color: rgb(137, 75, 0);
+}
+
 html.dark .search-box {
    background-color: #16213e;
    color: #bfbfbf;
@@ -369,4 +373,8 @@ html.dark .ai-configure-button {
 
 html.dark .ai-configure-button:hover {
    color: rgb(154, 165, 183);
+}
+
+html.dark .security-warning {
+   color: rgb(255, 240, 133);
 }
