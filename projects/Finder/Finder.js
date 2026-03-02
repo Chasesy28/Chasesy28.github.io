@@ -1445,20 +1445,20 @@ document.addEventListener("DOMContentLoaded", () => {
                          <div class="flex justify-between items-center mb-2">
                              <div class="flex items-center">
                                  ${favoriteIndicator}
-                                 <h3 class="text-lg font-semibold text-indigo-700 dark:text-indigo-400">${data.name}</h3>
+                                 <h3 class="place-name text-lg font-semibold">${data.name}</h3>
                              </div>
                              <div class="flex items-center gap-2">
                                  ${favButton}
                                  ${openStatus}
                              </div>
                          </div>
-                         <p class="text-sm text-gray-700 dark:text-gray-200 font-medium capitalize">
+                         <p class="text-sm font-medium capitalize">
                              <strong>Cuisine:</strong> ${data.cuisine.replace(/_/g, " ")}
                          </p>
-                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                         <p class="info text-sm mt-2">
                              <strong>Address:</strong> ${data.address}
                          </p>
-                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                         <p class="info text-sm mt-2">
                              <strong>Hours:</strong>
                              <span class="text-xs truncate block whitespace-nowrap overflow-hidden">
                                  ${data.openingHours || "Not specified"}
@@ -1467,7 +1467,7 @@ document.addEventListener("DOMContentLoaded", () => {
                          ${
                            data.lat && data.lon
                              ? `
-                         <button class="directions-btn mt-2 text-xs text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 font-medium">
+                         <button class="directions directions-btn mt-2 text-xs font-medium">
                              🧭 Get Directions
                          </button>
                          `

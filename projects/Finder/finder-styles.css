@@ -244,6 +244,10 @@ html.dark .site-footer a {
    color: rgb(164, 164, 164)
 }
 
+input[type="checkbox"] {
+   accent-color: blue;
+}
+
 .result-card {
    background-color: #fffaf0;
 }
@@ -260,13 +264,30 @@ html.dark .site-footer a {
    color: rgb(107, 114, 128);
 }
 
-input[type="checkbox"] {
-   accent-color: blue;
+.place-name {
+   color: rgb(235, 165, 24);
+}
+
+.info {
+   color: rgb(107, 114, 128);
+}
+
+.directions {
+   color: rgb(49, 172, 94)
+}
+
+.directions:hover {
+   color: rgb(22, 101, 52);
 }
 
 html.dark .search-box {
    background-color: #16213e;
    color: #bfbfbf;
+}
+
+html.dark .search-box h1,
+html.dark .search-box h2 {
+   color: rgb(255, 211, 105);
 }
 
 html.dark .search-input {
@@ -300,4 +321,20 @@ html.dark .open-false {
 
 html.dark .open-unknown {
    color: rgb(156, 163, 175);
+}
+
+html.dark .place-name {
+   color: rgb(255, 211, 105);
+}
+
+html.dark .info {
+   color: rgb(141, 150, 168);
+}
+
+html.dark .directions {
+   color: rgb(74, 222, 128)
+}
+
+html.dark .directions:hover {
+   color: rgb(134, 239, 172);
 }
