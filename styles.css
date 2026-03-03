@@ -1,6 +1,11 @@
 /*! tailwindcss v4.1.18 | MIT License | https://tailwindcss.com */
 @layer properties;
 
+:root {
+    --h1-light-mode-text-color: #ffeaa5;
+    --h2-light-mode-text-color: #ffe48a;
+}
+
 .\@container {
     container-type: inline-size;
 }
@@ -399,17 +404,16 @@ body::-webkit-scrollbar {
 }
 
 h1 {
-    color: #ffeaa5;
+    color: var(--h1-light-mode-text-color);
     font-weight: normal;
     font-size: 3em !important;
-    margin-top: 2em !important;
     text-shadow: 2px 2px 4px rgba(149, 57, 0, 0.3);
     position: relative;
     z-index: 1;
 }
 
 h2 {
-    color: #ffe48a;
+    color: var(--h2-light-mode-text-color);
     font-weight: normal;
     font-size: 2em !important;
     margin-top: 1em !important;
@@ -455,13 +459,14 @@ nav ul {
     margin: 0;
     padding: 0;
     font-size: 1.2rem;
+    align-items: center;
 }
 
 nav a {
     text-decoration: none;
     color: #ffd147;
-    padding-bottom: 5px;
     transition: transform 0.2s ease-in-out, color 0.2s;
+    height: fit-content;
 }
 
 nav a:hover {
@@ -512,7 +517,7 @@ nav a:hover {
     left: 0;
     width: 100%;
     height: 20px;
-    background: linear-gradient(to bottom, #ffeaa5, #ffe48a);
+    background: linear-gradient(to bottom, var(--h1-light-mode-text-color), var(--h2-light-mode-text-color));
     border-top: 2px solid rgba(149, 57, 0, 0.2);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 0;

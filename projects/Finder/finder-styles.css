@@ -1,32 +1,5 @@
 /* Finder Page Specific Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-body {
-   font-family: 'Inter', sans-serif;
-}
-
-/* --- OFFLINE BANNER STYLES --- */
-.offline-banner {
-   position: fixed;
-   top: 0;
-   left: 0;
-   right: 0;
-   background-color: #ef4444;
-   color: white;
-   padding: 12px 16px;
-   text-align: center;
-   z-index: 9999;
-   display: none;
-   font-weight: 500;
-}
-
-.offline-banner.show {
-   display: block;
-}
-
-body.offline-mode {
-   padding-top: 50px;
-}
 
 /* --- SPINNER STYLES --- */
 /* Base spinner animation */
@@ -46,7 +19,8 @@ body.offline-mode {
 /* Spinner for light backgrounds (e.g., gray button) */
 .spinner-dark {
    border: 4px solid rgba(0, 0, 0, .1);
-   border-left-color: #4f46e5; /* indigo-600 */
+   border-left-color: #4f46e5;
+   /* indigo-600 */
 }
 
 /* Spinner for dark backgrounds (e.g., indigo button) */
@@ -65,18 +39,18 @@ body.offline-mode {
    animation: spin 1s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-   #loading .spinner-page {
-      border-color: rgba(255, 255, 255, .1);
-      border-left-color: #818cf8; /* indigo-400 */
-   }
+html.dark #loading .spinner-page {
+   border-color: rgba(255, 255, 255, .1);
+   border-left-color: #818cf8;
+   /* indigo-400 */
 }
 
 /* --- END SPINNER STYLES --- */
 
 /* Tailwind prose styles for AI output */
 .prose {
-   color: #374151; /* gray-700 */
+   color: #374151;
+   /* gray-700 */
    line-height: 1.65;
 }
 
@@ -89,7 +63,8 @@ body.offline-mode {
 }
 
 .prose h4 {
-   font-size: 1.125rem; /* text-lg */
+   font-size: 1.125rem;
+   /* text-lg */
    font-weight: 600;
    margin-top: 1.5em;
    margin-bottom: 0.5em;
@@ -103,7 +78,8 @@ body.offline-mode {
 }
 
 .prose a {
-   color: #4f46e5; /* indigo-600 */
+   color: #4f46e5;
+   /* indigo-600 */
    text-decoration: none;
 }
 
@@ -124,7 +100,6 @@ body.offline-mode {
    margin: 0;
    font-size: 0.9rem;
    color: #555;
-   font-family: 'Inter', sans-serif;
 }
 
 .site-footer a {
@@ -138,31 +113,36 @@ body.offline-mode {
 }
 
 /* Dark Mode Styles */
-@media (prefers-color-scheme: dark) {
-   .prose {
-      color: #d1d5db; /* gray-300 */
-   }
+html.dark .prose {
+   color: #d1d5db;
+   /* gray-300 */
+}
 
-   .prose h4 {
-      color: #f3f4f6; /* gray-100 */
-   }
+html.dark .prose h4 {
+   color: #f3f4f6;
+   /* gray-100 */
+}
 
-   .prose a {
-      color: #818cf8; /* indigo-400 */
-   }
+html.dark .prose a {
+   color: #818cf8;
+   /* indigo-400 */
+}
 
-   .site-footer {
-      background-color: #1f2937; /* gray-800 */
-      border-top-color: #374151; /* gray-700 */
-   }
+html.dark .site-footer {
+   background-color: #1f2937;
+   /* gray-800 */
+   border-top-color: #374151;
+   /* gray-700 */
+}
 
-   .site-footer p {
-      color: #9ca3af; /* gray-400 */
-   }
+html.dark .site-footer p {
+   color: #9ca3af;
+   /* gray-400 */
+}
 
-   .site-footer a {
-      color: #60a5fa; /* blue-400 */
-   }
+html.dark .site-footer a {
+   color: #60a5fa;
+   /* blue-400 */
 }
 
 .leaflet-container {
@@ -237,4 +217,166 @@ body.offline-mode {
    .view-toggle-container button {
       width: 100%;
    }
+}
+
+/* Styles for parity */
+
+.search-box {
+   background-color: #fffaf0;
+}
+
+.search-box h1,
+.search-box h2 {
+   color: rgb(235, 165, 24);
+}
+
+.search-input {
+   background-color: rgb(101, 110, 128);
+   border-color: rgb(102, 103, 105);
+   text-align: center;
+}
+
+.search-input:focus {
+   border-color: blue;
+}
+
+.search-input::placeholder {
+   color: rgb(164, 164, 164);
+}
+
+input[type="checkbox"] {
+   accent-color: blue;
+}
+
+.result-card {
+   background-color: #fffaf0;
+}
+
+.open-true {
+   color: rgb(22, 163, 74);
+}
+
+.open-false {
+   color: rgb(220, 38, 38);
+}
+
+.open-unknown {
+   color: rgb(107, 114, 128);
+}
+
+.place-name {
+   color: rgb(235, 165, 24);
+}
+
+.info {
+   color: rgb(107, 114, 128);
+}
+
+.directions {
+   color: rgb(49, 172, 94)
+}
+
+.directions:hover {
+   color: rgb(22, 101, 52);
+}
+
+.directions-button {
+   background-color: rgb(49, 172, 94)
+}
+
+.directions-button:hover {
+   background-color: rgb(22, 101, 52);
+}
+
+.ai-configure-button {
+   color: rgb(107, 114, 128);
+}
+
+.ai-configure-button:hover {
+   color: rgb(66, 71, 80);
+}
+
+.security-notice {
+   color: rgb(137, 75, 0);
+   background-color: rgb(249, 245, 200);
+}
+
+html.dark .search-box {
+   background-color: #16213e;
+   color: #bfbfbf;
+}
+
+html.dark .search-box h1,
+html.dark .search-box h2 {
+   color: rgb(255, 211, 105);
+}
+
+html.dark .search-input {
+   background-color: rgb(55, 65, 81);
+   border-color: rgb(75, 85, 99);
+}
+
+html.dark .search-input::placeholder {
+   color: rgb(130, 130, 130);
+}
+
+html.dark .result-card {
+   background-color: #16213e;
+}
+
+html.dark input[type="checkbox"] {
+   accent-color: cyan;
+}
+
+html.dark #getLocationButton:hover {
+   background-color: rgb(44, 52, 65);
+}
+
+html.dark .open-true {
+   color: rgb(74, 222, 128);
+}
+
+html.dark .open-false {
+   color: rgb(248, 113, 113);
+}
+
+html.dark .open-unknown {
+   color: rgb(156, 163, 175);
+}
+
+html.dark .place-name {
+   color: rgb(255, 211, 105);
+}
+
+html.dark .info {
+   color: rgb(141, 150, 168);
+}
+
+html.dark .directions {
+   color: rgb(74, 222, 128)
+}
+
+html.dark .directions:hover {
+   color: rgb(134, 239, 172);
+}
+
+html.dark .directions-button {
+   background-color: rgb(49, 172, 94)
+}
+
+html.dark .directions-button:hover {
+   background-color: rgb(22, 101, 52);
+}
+
+html.dark .ai-configure-button {
+   color: rgb(107, 114, 128);
+}
+
+html.dark .ai-configure-button:hover {
+   color: rgb(154, 165, 183);
+}
+
+html.dark .security-notice {
+   color: rgb(255, 240, 133);
+   background-color: rgba(115, 63, 10, 0.3);
 }
