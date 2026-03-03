@@ -317,7 +317,7 @@ html.dark .search-input {
 }
 
 html.dark .search-input::placeholder {
-   color: rgb(130, 130, 130)
+   color: rgb(130, 130, 130);
 }
 
 html.dark .result-card {
