@@ -1,5 +1,5 @@
 /* Finder Page Specific Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 
 /* --- SPINNER STYLES --- */
 /* Base spinner animation */
@@ -241,7 +241,7 @@ html.dark .site-footer a {
 }
 
 .search-input::placeholder {
-   color: rgb(164, 164, 164)
+   color: rgb(164, 164, 164);
 }
 
 input[type="checkbox"] {
