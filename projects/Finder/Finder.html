@@ -54,35 +54,35 @@
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
                <h4 class="text-lg font-semibold">🔐 API Key Setup</h4>
                <button id="closeApiKeyModal"
-                  class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
+                  class="ai-configure-button text-3xl leading-none">&times;</button>
             </div>
             <div
-               class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg">
-               <p class="security-warning text-xs">
+               class="security-notice mb-4 p-3 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+               <p class="text-xs">
                   <strong>⚠️ Security Notice:</strong> Your API key is stored in session storage only and will be
                   cleared
                   when you close the browser. Never share your API key publicly.
                </p>
             </div>
             <div class="mb-4">
-               <label for="apiKeyInput" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+               <label for="apiKeyInput" class="block text-sm font-medium mb-2">
                   OpenAI-Compatible API Key
                </label>
                <input type="password" id="apiKeyInput"
-                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  class="search-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="sk-..." autocomplete="off">
-               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+               <p class="info text-xs mt-2">
                   Works with OpenAI, Azure OpenAI, or any OpenAI-compatible API endpoint.
                </p>
             </div>
             <div class="mb-4">
-               <label for="apiEndpointInput" class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+               <label for="apiEndpointInput" class="block text-sm font-medium mb-2">
                   API Endpoint (optional)
                </label>
                <input type="text" id="apiEndpointInput"
-                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  class="search-input w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   placeholder="https://api.openai.com/v1/chat/completions" autocomplete="off">
-               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+               <p class="info text-xs mt-2">
                   Leave empty to use OpenAI default. For GitHub Copilot or custom endpoints, enter the full URL.
                </p>
             </div>
@@ -96,7 +96,7 @@
                   Clear Key
                </button>
             </div>
-            <p id="apiKeyStatus" class="text-xs text-center mt-3 text-gray-500 dark:text-gray-400"></p>
+            <p id="apiKeyStatus" class="text-xs text-center mt-3"></p>
          </div>
       </div>
       <!-- Message Modal (not really needed)-->
@@ -125,7 +125,7 @@
                   <button id="modalFavoriteBtn" class="favorite-btn" title="Add to favorites">☆</button>
                </div>
                <button id="closeRestaurantModal"
-                  class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-3xl leading-none">&times;</button>
+                  class="ai-configure-button text-3xl leading-none">&times;</button>
             </div>
             <!-- Modal Content -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
