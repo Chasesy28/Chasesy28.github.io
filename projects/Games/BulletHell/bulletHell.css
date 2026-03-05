@@ -1,10 +1,6 @@
-html,
 body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100dvh;
-  width: 100%;
+  width: 100dvw;
   background-color: dimgray;
 }
 
@@ -19,6 +15,8 @@ body {
   text-align: center;
   display: inline-block;
   margin: 4px 2px;
+  top: 50%;
+  left: 50%;
 }
 
 #startButton:hover {
