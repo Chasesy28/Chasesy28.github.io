@@ -6,7 +6,14 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
-function gameLoop() {
-  ctx.fillStyle = "dimgray";
+const backgroundColor = (ctx, color) => {
+  ctx.fillStyle = color;
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
+}
+
+function gameLoop() {
+  backgroundColor(ctx, "dimgray");
+  ctx.fillStyle = "green";
+  ctx.fillRect(50, 50, 100, 100);
+  requestAnimationFrame(gameLoop);
 }
