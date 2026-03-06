@@ -1,15 +1,12 @@
-const startButton = document.getElementById("startButton");
 const gameArea = document.getElementById("gameArea");
+const ctx = gameArea.getContext("2d");
 
-let player;
+gameArea.style.width = "100dvw";
+gameArea.style.height = "100dvh";
+gameArea.width = gameArea.offsetWidth;
+gameArea.height = gameArea.offsetHeight;
 
-const startGame = () => {
-  player = document.createElement("div");
-  gameArea.appendChild(player);
-  player.style.width = '100px';
-  player.style.height = '100px';
-  player.style.left = 0;
-  player.style.top = 0;
+function gameLoop() {
+  ctx.fillStyle = "dimgray";
+  ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 }
-
-startButton.addEventListener("click", startGame);
