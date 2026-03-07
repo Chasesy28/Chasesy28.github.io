@@ -14,6 +14,8 @@ let playerY = gameArea.height / 2;
 let playerSize = 50;
 let playerSpeed = 5;
 
+let enemyList = [];
+
 const controller = {
   W: { pressed: false },
   w: { pressed: false },
@@ -25,14 +27,71 @@ const controller = {
   d: { pressed: false },
 };
 
-class enemy {
-  constructor(x, y, size, speed) {
+class Player {
+  constructor(x, y, size, speed, health, color) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.speed = speed;
+    this.health = health;
+    this.color = color;
   }
-  create(color) {
+  createPlayer() {
+    if (this.health > 0) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(
+        this.x - this.size / 2,
+        this.y - this.size / 2,
+        this.size,
+        this.size,
+      );
+    }
+    /*if (this.health <= 0) {
+      alert("Game Over!");
+      window.location.reload();
+    }*/
+  }
+  move() {
+    if (controller.W.pressed || controller.w.pressed) {
+      this.y -= this.speed;
+    }
+    if (controller.S.pressed || controller.s.pressed) {
+      this.y += this.speed;
+    }
+    if (controller.A.pressed || controller.a.pressed) {
+      this.x -= this.speed;
+    }
+    if (controller.D.pressed || controller.d.pressed) {
+      this.x += this.speed;
+    }
+    playerX = this.x;
+    playerY = this.y;
+  }
+  hurt(damage) {
+    this.health -= damage;
+    this.color = "red";
+  }
+}
+
+const player = new Player(
+  playerX,
+  playerY,
+  playerSize,
+  playerSpeed,
+  100,
+  "white",
+);
+
+class Enemy {
+  constructor(x, y, size, speed, health, damage) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.speed = speed;
+    this.health = health;
+    this.damage = damage;
+  }
+  createEnemy(color) {
     ctx.fillStyle = color;
     ctx.fillRect(
       this.x - this.size / 2,
@@ -41,18 +100,23 @@ class enemy {
       this.size,
     );
   }
-  moveTowardsPlayer() {
-    const dx = playerX - this.x;
-    const dy = playerY - this.y;
+  damagePlayer(player) {
+    player.hurt(this.damage);
+  }
+  moveTowardsPosition(targetX, targetY) {
+    const dx = targetX - this.x;
+    const dy = targetY - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
     if (distance > 0) {
       this.x += (dx / distance) * this.speed;
       this.y += (dy / distance) * this.speed;
+      if (distance < this.speed) {
+        this.x = targetX;
+        this.y = targetY;
+      }
     }
   }
 }
-
-const enemy1 = new enemy(100, 100, 30, 2);
 
 const backgroundColor = (ctx, color) => {
   ctx.fillStyle = color;
@@ -61,27 +125,22 @@ const backgroundColor = (ctx, color) => {
 
 function gameLoop() {
   backgroundColor(ctx, "dimgray");
-  if (controller.W.pressed || controller.w.pressed) {
-    playerY -= playerSpeed;
+  player.move();
+  player.createPlayer();
+  if (enemyList.length < 1) {
+    const enemy1 = new Enemy(100, 100, 30, playerSpeed - 1, 100, 10);
+    enemyList.push(enemy1);
   }
-  if (controller.S.pressed || controller.s.pressed) {
-    playerY += playerSpeed;
+  enemyList[0].moveTowardsPosition(playerX, playerY);
+  if (
+    enemyList[0].x < playerX + player.size / 2 &&
+    enemyList[0].x > playerX - player.size / 2 &&
+    enemyList[0].y < playerY + player.size / 2 &&
+    enemyList[0].y > playerY - player.size / 2
+  ) {
+    enemyList[0].damagePlayer(player);
   }
-  if (controller.A.pressed || controller.a.pressed) {
-    playerX -= playerSpeed;
-  }
-  if (controller.D.pressed || controller.d.pressed) {
-    playerX += playerSpeed;
-  }
-  ctx.fillStyle = "red";
-  ctx.fillRect(
-    playerX - playerSize / 2,
-    playerY - playerSize / 2,
-    playerSize,
-    playerSize,
-  );
-  enemy1.moveTowardsPlayer();
-  enemy1.create("blue");
+  enemyList[0].createEnemy("blue");
   requestAnimationFrame(gameLoop);
 }
 
