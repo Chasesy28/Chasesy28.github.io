@@ -65,13 +65,6 @@ function initializeOfflineMonitoring() {
   let offlineBanner = null;
   const header = document.getElementById("header");
 
-  // Log if header is missing but continue initialization
-  if (!header) {
-    console.warn(
-      "[NotificationBars] Header element not found - notification bars will work without header adjustments",
-    );
-  }
-
   function updateOnlineStatus() {
     // Calculate total height for scroll-padding, starting with header height if it exists
     let totalHeight = 0;

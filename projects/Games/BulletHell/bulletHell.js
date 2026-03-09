@@ -64,6 +64,16 @@ class Player {
     if (controller.D.pressed || controller.d.pressed) {
       this.x += this.speed;
     }
+    if (this.x + this.size / 2 - this.size > gameArea.width) {
+      this.x = this.size / 2 - this.size;
+    } else if (this.x - this.size / 2 + this.size < 0) {
+      this.x = gameArea.width - this.size / 2 + this.size;
+    }
+    if (this.y + this.size / 2 - this.size > gameArea.height) {
+      this.y = this.size / 2 - this.size;
+    } else if (this.y - this.size / 2 + this.size < 0) {
+      this.y = gameArea.height - this.size / 2 + this.size;
+    }
     playerX = this.x;
     playerY = this.y;
   }
@@ -103,17 +113,44 @@ class Enemy {
   damagePlayer(player) {
     player.hurt(this.damage);
   }
-  moveTowardsPosition(targetX, targetY) {
+  moveTowardsPosition(targetX, targetY, size) {
     const dx = targetX - this.x;
     const dy = targetY - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const stopOffset = size / 2 + this.size / 2;
+
+    if (absDy > absDx) {
+      targetY += dy > 0 ? -stopOffset : stopOffset;
+    } else if (absDx > absDy) {
+      targetX += dx > 0 ? -stopOffset : stopOffset;
+    } else if (absDx > 0 || absDy > 0) {
+      if (Math.random() < 0.5) {
+        targetY += dy > 0 ? -stopOffset : stopOffset;
+      } else {
+        targetX += dx > 0 ? -stopOffset : stopOffset;
+      }
+    } else {
+      return true;
+    }
+
+    const moveDx = targetX - this.x;
+    const moveDy = targetY - this.y;
+    const distance = Math.sqrt(moveDx * moveDx + moveDy * moveDy);
     if (distance > 0) {
-      this.x += (dx / distance) * this.speed;
-      this.y += (dy / distance) * this.speed;
+      if (distance > this.speed * 10) {
+        this.x += (moveDx / distance) * this.speed * 1.5;
+        this.y += (moveDy / distance) * this.speed * 1.5;
+      } else {
+        this.x += (moveDx / distance) * this.speed;
+        this.y += (moveDy / distance) * this.speed;
+      }
       if (distance < this.speed) {
         this.x = targetX;
         this.y = targetY;
       }
+    } else {
+      return true;
     }
   }
 }
@@ -131,16 +168,10 @@ function gameLoop() {
     const enemy1 = new Enemy(100, 100, 30, playerSpeed - 1, 100, 10);
     enemyList.push(enemy1);
   }
-  enemyList[0].moveTowardsPosition(playerX, playerY);
-  if (
-    enemyList[0].x < playerX + player.size / 2 &&
-    enemyList[0].x > playerX - player.size / 2 &&
-    enemyList[0].y < playerY + player.size / 2 &&
-    enemyList[0].y > playerY - player.size / 2
-  ) {
-    enemyList[0].damagePlayer(player);
+  if (enemyList[0].moveTowardsPosition(player.x, player.y, player.size)) {
+    //enemyList[0].damagePlayer(player);
   }
-  enemyList[0].createEnemy("blue");
+  enemyList[0].createEnemy("darkred");
   requestAnimationFrame(gameLoop);
 }
 
