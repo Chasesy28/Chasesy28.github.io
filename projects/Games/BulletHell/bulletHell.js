@@ -35,6 +35,8 @@ class Player {
     this.speed = speed;
     this.health = health;
     this.color = color;
+    this.invulnerable = false;
+    this.iFrames = 0;
   }
   createPlayer() {
     if (this.health > 0) {
@@ -46,10 +48,9 @@ class Player {
         this.size,
       );
     }
-    /*if (this.health <= 0) {
-      alert("Game Over!");
-      window.location.reload();
-    }*/
+    if (this.health <= 0) {
+      //window.location.reload();
+    }
   }
   move() {
     if (controller.W.pressed || controller.w.pressed) {
@@ -78,8 +79,18 @@ class Player {
     playerY = this.y;
   }
   hurt(damage) {
-    this.health -= damage;
-    this.color = "red";
+    if (!this.invulnerable) {
+      this.health -= damage;
+      this.color = "red";
+      this.invulnerable = true;
+      this.iFrames = 15;
+    } else {
+      this.iFrames--;
+      this.color = "white";
+      if (this.iFrames <= 0) {
+        this.invulnerable = false;
+      }
+    }
   }
 }
 
@@ -100,6 +111,7 @@ class Enemy {
     this.speed = speed;
     this.health = health;
     this.damage = damage;
+    this.attackCooldown = 0;
   }
   createEnemy(color) {
     ctx.fillStyle = color;
@@ -111,8 +123,14 @@ class Enemy {
     );
   }
   damagePlayer(player) {
-    player.hurt(this.damage);
+    if (this.attackCooldown <= 0) {
+      this.attackCooldown = 5;
+      player.hurt(this.damage);
+    } else {
+      this.attackCooldown--;
+    }
   }
+  stayOutOfObject(target) {}
   moveTowardsPosition(targetX, targetY, size) {
     const dx = targetX - this.x;
     const dy = targetY - this.y;
@@ -168,10 +186,10 @@ function gameLoop() {
     const enemy1 = new Enemy(100, 100, 30, playerSpeed - 1, 100, 10);
     enemyList.push(enemy1);
   }
-  if (enemyList[0].moveTowardsPosition(player.x, player.y, player.size)) {
-    //enemyList[0].damagePlayer(player);
-  }
   enemyList[0].createEnemy("darkred");
+  if (enemyList[0].moveTowardsPosition(player.x, player.y, player.size)) {
+    enemyList[0].damagePlayer(player);
+  }
   requestAnimationFrame(gameLoop);
 }
 
