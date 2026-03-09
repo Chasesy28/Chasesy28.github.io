@@ -38,21 +38,15 @@ class Player {
     this.color = this.mainColor;
     this.invulnerable = false;
     this.iFrames = 0;
+    this.knockbackVelocityX = 0;
+    this.knockbackVelocityY = 0;
   }
   createPlayer() {
     if (this.health > 0) {
       if (this.iFrames > 0) {
-        /*if (
-          this.iFrames % 8 === 0 ||
-          (this.iFrames + 1) % 4 === 0 ||
-          (this.iFrames + 2) % 4 === 0
-        ) {
-          this.color = "red";
-        } else {
-          this.color = this.mainColor;
-        }*/
-        for (let i = 0; i < 4; i++) {
-          if ((this.iFrames + i) % 8 == 0) {
+        this.iFrames--;
+        for (let i = 0; i < 5; i++) {
+          if ((this.iFrames + i) % 10 == 0) {
             this.color = "red";
             break;
           } else {
@@ -61,6 +55,7 @@ class Player {
         }
       } else {
         this.color = this.mainColor;
+        this.invulnerable = false;
       }
       ctx.fillStyle = this.color;
       ctx.fillRect(
@@ -69,9 +64,6 @@ class Player {
         this.size,
         this.size,
       );
-    }
-    if (this.health <= 0) {
-      //window.location.reload();
     }
   }
   move() {
@@ -87,6 +79,19 @@ class Player {
     if (controller.D.pressed || controller.d.pressed) {
       this.x += this.speed;
     }
+
+    this.x += this.knockbackVelocityX;
+    this.y += this.knockbackVelocityY;
+    this.knockbackVelocityX *= 0.88;
+    this.knockbackVelocityY *= 0.88;
+
+    if (Math.abs(this.knockbackVelocityX) < 0.05) {
+      this.knockbackVelocityX = 0;
+    }
+    if (Math.abs(this.knockbackVelocityY) < 0.05) {
+      this.knockbackVelocityY = 0;
+    }
+
     if (this.x + this.size / 2 - this.size > gameArea.width) {
       this.x = this.size / 2 - this.size;
     } else if (this.x - this.size / 2 + this.size < 0) {
@@ -104,14 +109,23 @@ class Player {
     if (!this.invulnerable) {
       this.health -= damage;
       this.invulnerable = true;
-      this.iFrames = 15;
-    } else {
-      this.iFrames--;
-      this.color = this.mainColor;
-      if (this.iFrames <= 0) {
-        this.invulnerable = false;
-      }
+      this.iFrames = 30;
     }
+  }
+  knockback(sourceX, sourceY, strength) {
+    let dx = this.x - sourceX;
+    let dy = this.y - sourceY;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance === 0) {
+      dx = 1;
+      dy = 0;
+      distance = 1;
+    }
+
+    const impulse = strength;
+    this.knockbackVelocityX += (dx / distance) * impulse;
+    this.knockbackVelocityY += (dy / distance) * impulse;
   }
 }
 
@@ -125,13 +139,14 @@ const player = new Player(
 );
 
 class Enemy {
-  constructor(x, y, size, speed, health, damage) {
+  constructor(x, y, size, speed, health, damage, range) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.speed = speed;
     this.health = health;
     this.damage = damage;
+    this.range = range;
     this.attackCooldown = 0;
   }
   createEnemy(color) {
@@ -144,12 +159,26 @@ class Enemy {
     );
   }
   damagePlayer(player) {
-    if (this.attackCooldown <= 0) {
-      this.attackCooldown = 2;
-      player.hurt(this.damage);
+    if (!player.invulnerable) {
+      if (this.attackCooldown <= 0) {
+        this.attackCooldown = 2;
+        player.hurt(this.damage);
+        return true;
+      } else {
+        this.attackCooldown--;
+        return false;
+      }
     } else {
-      this.attackCooldown--;
+      return false;
     }
+  }
+  isPlayerWithinRange(player) {
+    const dx = player.x - this.x;
+    const dy = player.y - this.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const hitRange = this.range + this.size / 2 + player.size / 2;
+
+    return distance <= hitRange;
   }
   stayOutOfObject(target) {}
   moveTowardsPosition(targetX, targetY, size) {
@@ -169,8 +198,6 @@ class Enemy {
       } else {
         targetX += dx > 0 ? -stopOffset : stopOffset;
       }
-    } else {
-      return true;
     }
 
     const moveDx = targetX - this.x;
@@ -188,7 +215,8 @@ class Enemy {
         this.x = targetX;
         this.y = targetY;
       }
-    } else {
+    }
+    if (distance <= this.range) {
       return true;
     }
   }
@@ -203,13 +231,18 @@ function gameLoop() {
   backgroundColor(ctx, "dimgray");
   player.move();
   player.createPlayer();
-  if (enemyList.length < 1) {
-    const enemy1 = new Enemy(100, 100, 30, playerSpeed - 1, 100, 10);
+  if (enemyList.length < 2) {
+    const enemy1 = new Enemy(Math.random() * gameArea.width, Math.random() * gameArea.height, 30, playerSpeed - 1, 100, 10, 5);
     enemyList.push(enemy1);
   }
-  enemyList[0].createEnemy("darkred");
-  if (enemyList[0].moveTowardsPosition(player.x, player.y, player.size)) {
-    enemyList[0].damagePlayer(player);
+  for (let i = 0; i < enemyList.length; i++) {
+    enemyList[i].createEnemy("darkred");
+    enemyList[i].moveTowardsPosition(player.x, player.y, player.size);
+    if (enemyList[i].isPlayerWithinRange(player)) {
+      if (enemyList[i].damagePlayer(player)) {
+        player.knockback(enemyList[i].x, enemyList[i].y, 10);
+      }
+    }
   }
   requestAnimationFrame(gameLoop);
 }
