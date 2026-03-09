@@ -34,12 +34,34 @@ class Player {
     this.size = size;
     this.speed = speed;
     this.health = health;
-    this.color = color;
+    this.mainColor = color;
+    this.color = this.mainColor;
     this.invulnerable = false;
     this.iFrames = 0;
   }
   createPlayer() {
     if (this.health > 0) {
+      if (this.iFrames > 0) {
+        /*if (
+          this.iFrames % 8 === 0 ||
+          (this.iFrames + 1) % 4 === 0 ||
+          (this.iFrames + 2) % 4 === 0
+        ) {
+          this.color = "red";
+        } else {
+          this.color = this.mainColor;
+        }*/
+        for (let i = 0; i < 4; i++) {
+          if ((this.iFrames + i) % 8 == 0) {
+            this.color = "red";
+            break;
+          } else {
+            this.color = this.mainColor;
+          }
+        }
+      } else {
+        this.color = this.mainColor;
+      }
       ctx.fillStyle = this.color;
       ctx.fillRect(
         this.x - this.size / 2,
@@ -81,12 +103,11 @@ class Player {
   hurt(damage) {
     if (!this.invulnerable) {
       this.health -= damage;
-      this.color = "red";
       this.invulnerable = true;
       this.iFrames = 15;
     } else {
       this.iFrames--;
-      this.color = "white";
+      this.color = this.mainColor;
       if (this.iFrames <= 0) {
         this.invulnerable = false;
       }
@@ -124,7 +145,7 @@ class Enemy {
   }
   damagePlayer(player) {
     if (this.attackCooldown <= 0) {
-      this.attackCooldown = 5;
+      this.attackCooldown = 2;
       player.hurt(this.damage);
     } else {
       this.attackCooldown--;
