@@ -115,14 +115,30 @@ class Player {
   knockback(sourceX, sourceY, strength) {
     let dx = this.x - sourceX;
     let dy = this.y - sourceY;
-    let distance = Math.sqrt(dx * dx + dy * dy);
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
 
-    if (distance === 0) {
+    if (absDx === 0 && absDy === 0) {
       dx = 1;
       dy = 0;
-      distance = 1;
+    } else {
+      const maxComponent = Math.max(absDx, absDy);
+      const minComponent = Math.min(absDx, absDy);
+      const cornerRatioThreshold = 0.75;
+      const isNearCorner = minComponent / maxComponent >= cornerRatioThreshold;
+
+      if (!isNearCorner) {
+        if (absDx >= absDy) {
+          dx = Math.sign(dx);
+          dy = 0;
+        } else {
+          dx = 0;
+          dy = Math.sign(dy);
+        }
+      }
     }
 
+    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
     const impulse = strength;
     this.knockbackVelocityX += (dx / distance) * impulse;
     this.knockbackVelocityY += (dy / distance) * impulse;
@@ -134,7 +150,7 @@ const player = new Player(
   playerY,
   playerSize,
   playerSpeed,
-  100,
+  1000000,
   "white",
 );
 
@@ -180,47 +196,55 @@ class Enemy {
     }
   }
   isPlayerWithinRange(player) {
-    const dx = player.x - this.x;
-    const dy = player.y - this.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const hitRange = this.range + this.size / 2 + player.size / 2;
+    const playerHalf = player.size / 2;
+    const enemyAttackHalf = this.size / 2 + this.range;
+    const dx = Math.abs(player.x - this.x);
+    const dy = Math.abs(player.y - this.y);
 
-    return distance <= hitRange;
+    return (
+      dx <= playerHalf + enemyAttackHalf && dy <= playerHalf + enemyAttackHalf
+    );
   }
   stayOutOfObject(target) {}
   moveTowardsPosition(targetX, targetY, size) {
-    const dx = targetX - this.x;
-    const dy = targetY - this.y;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-    const stopOffset = size / 2 + this.size / 2;
+    const playerHalf = size / 2;
+    const enemyHalf = this.size / 2;
+    const minX = targetX - playerHalf - enemyHalf;
+    const maxX = targetX + playerHalf + enemyHalf;
+    const minY = targetY - playerHalf - enemyHalf;
+    const maxY = targetY + playerHalf + enemyHalf;
 
-    if (absDy > absDx) {
-      targetY += dy > 0 ? -stopOffset : stopOffset;
-    } else if (absDx > absDy) {
-      targetX += dx > 0 ? -stopOffset : stopOffset;
-    } else if (absDx > 0 || absDy > 0) {
-      if (Math.random() < 0.5) {
-        targetY += dy > 0 ? -stopOffset : stopOffset;
-      } else {
-        targetX += dx > 0 ? -stopOffset : stopOffset;
-      }
+    // Move toward the closest reachable point around the player's body.
+    let desiredX = Math.max(minX, Math.min(this.x, maxX));
+    let desiredY = Math.max(minY, Math.min(this.y, maxY));
+
+    if (desiredX === this.x && desiredY === this.y) {
+      const deltaLeft = Math.abs(this.x - minX);
+      const deltaRight = Math.abs(maxX - this.x);
+      const deltaTop = Math.abs(this.y - minY);
+      const deltaBottom = Math.abs(maxY - this.y);
+      const smallestDelta = Math.min(
+        deltaLeft,
+        deltaRight,
+        deltaTop,
+        deltaBottom,
+      );
+
+      if (smallestDelta === deltaLeft) desiredX = minX;
+      else if (smallestDelta === deltaRight) desiredX = maxX;
+      else if (smallestDelta === deltaTop) desiredY = minY;
+      else desiredY = maxY;
     }
 
-    const moveDx = targetX - this.x;
-    const moveDy = targetY - this.y;
+    const moveDx = desiredX - this.x;
+    const moveDy = desiredY - this.y;
     const distance = Math.sqrt(moveDx * moveDx + moveDy * moveDy);
     if (distance > 0) {
-      if (distance > this.speed * 10) {
-        this.x += (moveDx / distance) * this.speed * 1.5;
-        this.y += (moveDy / distance) * this.speed * 1.5;
-      } else {
-        this.x += (moveDx / distance) * this.speed;
-        this.y += (moveDy / distance) * this.speed;
-      }
+      this.x += (moveDx / distance) * this.speed;
+      this.y += (moveDy / distance) * this.speed;
       if (distance < this.speed) {
-        this.x = targetX;
-        this.y = targetY;
+        this.x = desiredX;
+        this.y = desiredY;
       }
     }
     if (distance <= this.range) {
@@ -241,11 +265,12 @@ function gameLoop() {
   player.move();
   player.createPlayer();
   while (enemyList.length < enemyCap) {
+    let enemySize = Math.random() * 20 + 30;
     const enemy1 = new Enemy(
       Math.random() * gameArea.width,
       Math.random() * gameArea.height,
-      Math.random() * 20 + 30,
-      Math.random() * 1.5 + 5,
+      enemySize,
+      enemySize * (Math.random() + 0.5) * 0.15,
       100,
       10,
     );
@@ -256,7 +281,7 @@ function gameLoop() {
     enemyList[i].moveTowardsPosition(player.x, player.y, player.size);
     if (enemyList[i].isPlayerWithinRange(player)) {
       if (enemyList[i].damagePlayer(player)) {
-        player.knockback(enemyList[i].x, enemyList[i].y, 10);
+        player.knockback(enemyList[i].x, enemyList[i].y, 1);
       }
     }
   }
