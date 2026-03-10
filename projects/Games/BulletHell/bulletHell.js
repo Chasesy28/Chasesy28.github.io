@@ -139,23 +139,30 @@ const player = new Player(
 );
 
 class Enemy {
-  constructor(x, y, size, speed, health, damage, range) {
+  constructor(x, y, size, speed, health, damage) {
     this.x = x;
     this.y = y;
     this.size = size;
     this.speed = speed;
     this.health = health;
     this.damage = damage;
-    this.range = range;
+    this.range = size / 6;
     this.attackCooldown = 0;
   }
   createEnemy(color) {
-    ctx.fillStyle = color;
+    ctx.fillStyle = "black";
     ctx.fillRect(
       this.x - this.size / 2,
       this.y - this.size / 2,
       this.size,
       this.size,
+    );
+    ctx.fillStyle = color;
+    ctx.fillRect(
+      this.x - (this.size - 2.5) / 2,
+      this.y - (this.size - 2.5) / 2,
+      this.size - 2.5,
+      this.size - 2.5,
     );
   }
   damagePlayer(player) {
@@ -227,12 +234,21 @@ const backgroundColor = (ctx, color) => {
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
+const enemyCap = 15000;
+
 function gameLoop() {
   backgroundColor(ctx, "dimgray");
   player.move();
   player.createPlayer();
-  if (enemyList.length < 2) {
-    const enemy1 = new Enemy(Math.random() * gameArea.width, Math.random() * gameArea.height, 30, playerSpeed - 1, 100, 10, 5);
+  while (enemyList.length < enemyCap) {
+    const enemy1 = new Enemy(
+      Math.random() * gameArea.width,
+      Math.random() * gameArea.height,
+      Math.random() * 20 + 30,
+      Math.random() * 1.5 + 5,
+      100,
+      10,
+    );
     enemyList.push(enemy1);
   }
   for (let i = 0; i < enemyList.length; i++) {
