@@ -298,8 +298,6 @@ const projectileTypes = {
   },
 };
 
-const PROJECTILE_SPREAD_RADIANS = 0.25;
-
 class Projectile {
   constructor(x, y, creator, type) {
     this.x = x;
@@ -311,6 +309,8 @@ class Projectile {
     this.creator = creator;
     this.type = type;
     if (this.creator === "player") {
+      let PROJECTILE_SPREAD_RADIANS = Math.sqrt((this.x-mouseX) ** 2 + (this.y-mouseY) ** 2) * 0.0025;
+      PROJECTILE_SPREAD_RADIANS = Math.min(PROJECTILE_SPREAD_RADIANS, 0.5);
       const baseDirection = Math.atan2(mouseY - this.y, mouseX - this.x);
       const spreadOffset = (Math.random() * 2 - 1) * PROJECTILE_SPREAD_RADIANS;
       this.direction = baseDirection + spreadOffset;
