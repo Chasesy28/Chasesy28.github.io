@@ -16,6 +16,8 @@ let playerSpeed = 5;
 
 let enemyList = [];
 
+let projectileList = [];
+
 const controller = {
   W: { pressed: false },
   w: { pressed: false },
@@ -25,6 +27,10 @@ const controller = {
   s: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
+  R: { pressed: false },
+  r: { pressed: false },
+  F: { pressed: false },
+  f: { pressed: false },
 };
 
 class Player {
@@ -143,6 +149,28 @@ class Player {
     this.knockbackVelocityX += (dx / distance) * impulse;
     this.knockbackVelocityY += (dy / distance) * impulse;
   }
+  fireProjectile() {
+    if (controller.r.pressed || controller.R.pressed) {
+      for (let i = 0; i < 25; i++) {
+        const projectile = new Projectile(
+          this.x,
+          this.y,
+          "player",
+          "basicPlayer",
+        );
+        projectileList.push(projectile);
+      }
+    }
+    if (controller.f.pressed || controller.F.pressed) {
+      const projectile = new Projectile(
+        this.x,
+        this.y,
+        "player",
+        "homingPlayer",
+      );
+      projectileList.push(projectile);
+    }
+  }
 }
 
 const player = new Player(
@@ -254,17 +282,88 @@ class Enemy {
   }
 }
 
+const projectileTypes = {
+  basicPlayer: {
+    size: 5,
+    speed: 10,
+    damage: 10,
+    color: "yellow",
+    lifespan: 60,
+  },
+  homingPlayer: {
+    size: 10,
+    speed: 5,
+    damage: 15,
+    color: "orange",
+    lifespan: 180,
+  },
+};
+
+class Projectile {
+  constructor(x, y, creator, type) {
+    this.x = x;
+    this.y = y;
+    this.size = projectileTypes[type].size;
+    this.speed = projectileTypes[type].speed;
+    this.damage = projectileTypes[type].damage;
+    this.lifespan = projectileTypes[type].lifespan;
+    this.creator = creator;
+    this.type = type;
+    if (this.creator === "player") {
+      let PROJECTILE_SPREAD_RADIANS = Math.sqrt((this.x-mouseX) ** 2 + (this.y-mouseY) ** 2) * 0.0025;
+      PROJECTILE_SPREAD_RADIANS = Math.min(PROJECTILE_SPREAD_RADIANS, 0.5);
+      const baseDirection = Math.atan2(mouseY - this.y, mouseX - this.x);
+      const spreadOffset = (Math.random() * 2 - 1) * PROJECTILE_SPREAD_RADIANS;
+      this.direction = baseDirection + spreadOffset;
+    }
+  }
+  createProjectile() {
+    ctx.fillStyle = projectileTypes[this.type].color;
+    if (this.lifespan <= projectileTypes[this.type].lifespan / 2) {
+      ctx.globalAlpha = 0.5;
+    } else if (this.lifespan <= projectileTypes[this.type].lifespan / 4) {
+      ctx.globalAlpha = 0.25;
+    } else if (this.lifespan <= projectileTypes[this.type].lifespan / 8) {
+      ctx.globalAlpha = 0.125;
+    }
+    ctx.fillRect(
+      this.x - this.size / 2,
+      this.y - this.size / 2,
+      this.size,
+      this.size,
+    );
+  }
+  moveTowardsPosition(targetX, targetY) {
+    const moveDx = targetX - this.x;
+    const moveDy = targetY - this.y;
+    const distance = Math.sqrt(moveDx * moveDx + moveDy * moveDy);
+    if (distance > 0) {
+      this.x += (moveDx / distance) * this.speed;
+      this.y += (moveDy / distance) * this.speed;
+    }
+  }
+  moveForward() {
+    this.x += this.speed * Math.cos(this.direction);
+    this.y += this.speed * Math.sin(this.direction);
+  }
+  destroy(i) {
+    projectileList.splice(i, 1);
+  }
+}
+
 const backgroundColor = (ctx, color) => {
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
-const enemyCap = 1;
+const enemyCap = 1500;
 
 function gameLoop() {
+  ctx.globalAlpha = 1.0;
   backgroundColor(ctx, "dimgray");
   player.move();
   player.createPlayer();
+  player.fireProjectile(10, 10);
   while (enemyList.length < enemyCap) {
     let enemySize = Math.random() * 20 + 30;
     const basicEnemy = new Enemy(
@@ -288,6 +387,34 @@ function gameLoop() {
     if (enemyList[i].isPlayerWithinRange(player)) {
       if (enemyList[i].damagePlayer(player)) {
         player.knockback(enemyList[i].x, enemyList[i].y, 1);
+      }
+    }
+  }
+  for (let i = 0; i < projectileList.length; i++) {
+    projectileList[i].lifespan--;
+    if (projectileList[i].lifespan <= 0) {
+      projectileList[i].destroy(i);
+      continue;
+    }
+    projectileList[i].createProjectile();
+    if (projectileList[i].creator === "player") {
+      if (projectileList[i].type === "basicPlayer") {
+        projectileList[i].moveForward();
+      } else if (projectileList[i].type === "homingPlayer") {
+        projectileList[i].moveTowardsPosition(mouseX, mouseY);
+      }
+      if (
+        projectileList[i].x - projectileList[i].size / 2 > gameArea.width + projectileList[i].size * 10 ||
+        projectileList[i].x + projectileList[i].size / 2 < -projectileList[i].size * 10
+      ) {
+        projectileList[i].destroy(i);
+      } else if (
+        projectileList[i].y - projectileList[i].size / 2 >
+          gameArea.height + projectileList[i].size * 10 ||
+        projectileList[i].y + projectileList[i].size / 2 <
+          -projectileList[i].size * 10
+      ) {
+        projectileList[i].destroy(i);
       }
     }
   }

@@ -37,6 +37,7 @@ This site uses the following external services:
 - All user data (favorites, preferences) is stored locally in the browser
 - No server-side data collection or processing
 - Service Worker caches resources for offline functionality
+- There is a EXfill script on the index page for testing purposes, please do not spam Messages to the webhook.
 
 ## Reporting a Vulnerability
 

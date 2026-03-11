@@ -661,9 +661,11 @@ nav a:hover {
     }
 
     header {
-        flex-direction: row;
-        gap: 1rem;
+        display: flex;
+        flex-direction: column;
         padding: 1rem;
+        gap: 1rem;
+
     }
 
     .site-title {
@@ -1247,7 +1249,9 @@ nav a {
 /* responsive navigation for small screens */
 @media (max-width: 640px) {
     header nav ul {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 1rem;
     }
 }
