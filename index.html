@@ -109,6 +109,7 @@
                <a href="/">Home</a>
                <a href="#about-me">About Me</a>
                <a href="#projects">Projects</a>
+               <a href="#games">Games</a>
                <a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
                   rel="noopener noreferrer">GitHub</a>
                <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
@@ -156,7 +157,7 @@
          </p>
       </div>
       <h2 id="projects" class="cherry-bomb-one-regular">My Projects</h2>
-      <div class="swiper">
+      <div class="swiper" id="projects-swiper">
          <div class="swiper-wrapper">
             <div class="swiper-slide">
                <a href="/projects/Finder/Finder.html">
@@ -232,6 +233,46 @@
          <div class="swiper-button-next"></div>
          <div class="swiper-button-prev"></div>
       </div>
+      <!-- Games Section -->
+      <h2 id="games" class="cherry-bomb-one-regular">Games</h2>
+      <div class="swiper" id="games-swiper">
+         <div class="swiper-wrapper">
+            <div class="swiper-slide">
+               <a href="/projects/Games/BulletHell/bulletHell.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Bullet Hell Icon" class="project-icon">
+                     <h3>Bullet Hell</h3>
+                     <p class="project-description">A fast-paced bullet hell shooter game built with vanilla JavaScript
+                        and Canvas.</p>
+                  </div>
+               </a>
+            </div>
+            <div class="swiper-slide">
+               <a href="/projects/Games/Pong/Pong.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-512x512.png" alt="Pong Icon" class="project-icon">
+                     <h3>Popup Pong</h3>
+                     <p class="project-description">A creative twist on classic Pong played across browser popup
+                        windows.</p>
+                  </div>
+               </a>
+            </div>
+            <div class="swiper-slide">
+               <a href="/projects/Games/SM64/SuperMario.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/images/SuperMarioTitle.png" alt="Super Mario 64 Icon" class="project-icon">
+                     <h3>Super Mario 64</h3>
+                     <p class="project-description">Super Mario 64 running in the browser via WebAssembly.</p>
+                  </div>
+               </a>
+            </div>
+         </div>
+         <!-- Optional Pagination -->
+         <div class="swiper-pagination"></div>
+         <!-- Optional Navigation -->
+         <div class="swiper-button-next"></div>
+         <div class="swiper-button-prev"></div>
+      </div>
       <!-- About Me Section -->
       <div class="about-me-section cherry-bomb-one-regular" id="about-me">
          <h2>About Me</h2>
@@ -260,7 +301,7 @@
           * SWIPER CAROUSEL INITIALIZATION
           * Creates the project showcase carousel with navigation and pagination
           */
-         const swiper = new Swiper('.swiper', {
+         const swiperConfig = {
             loop: true,
             slidesPerView: 1,
             spaceBetween: 10,
@@ -269,7 +310,9 @@
             },
             pagination: { el: '.swiper-pagination' },
             navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-         });
+         };
+         const projectsSwiper = new Swiper('#projects-swiper', swiperConfig);
+         const gamesSwiper = new Swiper('#games-swiper', swiperConfig);
       </script>
       <script src="scripts.js"></script>
       <!-- Site-wide announcements system -->
