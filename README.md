@@ -1,6 +1,10 @@
-# Chasesy28.github.io
+# Silly-site.me
 
 # 👋 Hello There!
+
+## Created by Chase Bremer and Benjamin Zimmet
+
+> Disclaimer: AI was used in the creation of certain aspects of this site.
 
 This project is a basic testing site I use to mess around and test features. 🦄
 
