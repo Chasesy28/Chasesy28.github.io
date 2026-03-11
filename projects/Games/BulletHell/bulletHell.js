@@ -234,13 +234,14 @@ class Enemy {
     );
   }
   stayOutOfObject(target) {}
-  moveTowardsPosition(targetX, targetY, size) {
+  moveTowardsPosition(targetX, targetY, size, gap) {
     const playerHalf = size / 2;
     const enemyHalf = this.size / 2;
-    const minX = targetX - playerHalf - enemyHalf;
-    const maxX = targetX + playerHalf + enemyHalf;
-    const minY = targetY - playerHalf - enemyHalf;
-    const maxY = targetY + playerHalf + enemyHalf;
+    const desiredGap = Math.max(0, gap || 0);
+    const minX = targetX - playerHalf - enemyHalf - desiredGap;
+    const maxX = targetX + playerHalf + enemyHalf + desiredGap;
+    const minY = targetY - playerHalf - enemyHalf - desiredGap;
+    const maxY = targetY + playerHalf + enemyHalf + desiredGap;
 
     // Move toward the closest reachable point around the player's body.
     let desiredX = Math.max(minX, Math.min(this.x, maxX));
@@ -365,7 +366,7 @@ function gameLoop() {
   player.fireProjectile(10, 10);
   while (enemyList.length < enemyCap) {
     let enemySize = Math.random() * 20 + 30;
-    const enemy1 = new Enemy(
+    const basicEnemy = new Enemy(
       Math.random() * gameArea.width,
       Math.random() * gameArea.height,
       enemySize,
@@ -373,11 +374,16 @@ function gameLoop() {
       100,
       10,
     );
-    enemyList.push(enemy1);
+    enemyList.push(basicEnemy);
   }
   for (let i = 0; i < enemyList.length; i++) {
     enemyList[i].createEnemy("darkred");
-    enemyList[i].moveTowardsPosition(player.x, player.y, player.size);
+    enemyList[i].moveTowardsPosition(
+      player.x,
+      player.y,
+      player.size,
+      enemyList[i].range,
+    );
     if (enemyList[i].isPlayerWithinRange(player)) {
       if (enemyList[i].damagePlayer(player)) {
         player.knockback(enemyList[i].x, enemyList[i].y, 1);
