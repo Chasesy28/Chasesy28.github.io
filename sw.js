@@ -7,11 +7,7 @@
 // Automatic cache versioning with timestamp - update this when deploying new versions
 // This ensures users get fresh content when the site is updated
 const CACHE_VERSION = "7";
-<<<<<<< HEAD
 const CACHE_TIMESTAMP = "2026-03-11T21:59:39Z"; // Update this timestamp when deploying
-=======
-const CACHE_TIMESTAMP = "2026-03-11T21:59:39Z"; // Update this timestamp when deploying
->>>>>>> 5ac043c (Add projectile mechanics for player; implement basic and homing projectiles)
 const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 
 /**
