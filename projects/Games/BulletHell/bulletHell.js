@@ -198,7 +198,7 @@ const player = new Player(
   playerSize,
   playerSpeed,
   1000000,
-  "red",
+  "white",
 );
 
 const enemyTypes = {
