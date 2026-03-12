@@ -159,6 +159,6 @@ For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SER
 - **APP** Form available on the index page.
 
 - Verified Green hosting
-[![Green Hosting Badge](https://s3.nl-ams.scw.cloud/tgwf-web-app-live/greenweb_badges/v3/silly-site.me.png)](https://app.greenweb.org/api/v3/greencheckimage/silly-site.me?nocache=true)
+[![Green Hosting Badge](https://app.greenweb.org/api/v3/greencheckimage/silly-site.me?nocache=true)](https://s3.nl-ams.scw.cloud/tgwf-web-app-live/greenweb_badges/v3/silly-site.me.png)
 
 - (add more later)...
