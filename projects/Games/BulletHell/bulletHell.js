@@ -266,7 +266,7 @@ class Enemy {
     this.attackCooldown = 0;
   }
   createEnemy(color) {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "blue";
     ctx.fillRect(
       this.x - this.size / 2,
       this.y - this.size / 2,

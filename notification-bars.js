@@ -46,7 +46,7 @@ function createUpdateBanner() {
 
   // Attach event listener programmatically
   updateButton.addEventListener("click", () => {
-    window.postMessage("CLEAR_CACHE");
+    window.postMessage("CLEAR_CACHED_FILES");
     window.location.reload();
   });
 
