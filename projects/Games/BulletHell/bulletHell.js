@@ -310,7 +310,8 @@ class Projectile {
     this.creator = creator;
     this.type = type;
     if (this.creator === "player") {
-      let PROJECTILE_SPREAD_RADIANS = Math.sqrt((this.x-mouseX) ** 2 + (this.y-mouseY) ** 2) * 0.0025;
+      let PROJECTILE_SPREAD_RADIANS =
+        Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2) * 0.0025;
       PROJECTILE_SPREAD_RADIANS = Math.min(PROJECTILE_SPREAD_RADIANS, 0.5);
       const baseDirection = Math.atan2(mouseY - this.y, mouseX - this.x);
       const spreadOffset = (Math.random() * 2 - 1) * PROJECTILE_SPREAD_RADIANS;
@@ -378,12 +379,7 @@ function gameLoop() {
   }
   for (let i = 0; i < enemyList.length; i++) {
     enemyList[i].createEnemy("darkred");
-    enemyList[i].moveTowardsPosition(
-      player.x,
-      player.y,
-      player.size,
-      enemyList[i].range,
-    );
+    enemyList[i].moveTowardsPosition(player.x, player.y, player.size, 0);
     if (enemyList[i].isPlayerWithinRange(player)) {
       if (enemyList[i].damagePlayer(player)) {
         player.knockback(enemyList[i].x, enemyList[i].y, 1);
@@ -404,8 +400,10 @@ function gameLoop() {
         projectileList[i].moveTowardsPosition(mouseX, mouseY);
       }
       if (
-        projectileList[i].x - projectileList[i].size / 2 > gameArea.width + projectileList[i].size * 10 ||
-        projectileList[i].x + projectileList[i].size / 2 < -projectileList[i].size * 10
+        projectileList[i].x - projectileList[i].size / 2 >
+          gameArea.width + projectileList[i].size * 10 ||
+        projectileList[i].x + projectileList[i].size / 2 <
+          -projectileList[i].size * 10
       ) {
         projectileList[i].destroy(i);
       } else if (
