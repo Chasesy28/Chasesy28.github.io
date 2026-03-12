@@ -40,7 +40,7 @@ class Player {
     this.y = y;
     this.size = size;
     this.speed = speed;
-    this.sprintSpeed = speed * 5;
+    this.sprintSpeed = speed * 1.5;
     this.health = health;
     this.mainColor = color;
     this.color = this.mainColor;
@@ -236,8 +236,17 @@ const enemyTypes = {
     damage: 10,
     range: 200,
     attackCooldown: 5,
-    gap: 190,
+    gap: 200,
   },
+  boss: {
+    size: 100,
+    speed: 1.5,
+    health: 1000,
+    damage: 15,
+    range: 10,
+    attackCooldown: 3,
+    gap: 0,
+  }
 };
 
 class Enemy {
@@ -294,7 +303,31 @@ class Enemy {
       dx <= playerHalf + enemyAttackHalf && dy <= playerHalf + enemyAttackHalf
     );
   }
-  stayOutOfObject(target) {}
+  stayOutOfObject(target) {
+    const targetHalf = target.size / 2;
+    const enemyHalf = this.size / 2;
+    const minX = target.x - targetHalf - enemyHalf;
+    const maxX = target.x + targetHalf + enemyHalf;
+    const minY = target.y - targetHalf - enemyHalf;
+    const maxY = target.y + targetHalf + enemyHalf;
+    if (this.x > minX && this.x < maxX && this.y > minY && this.y < maxY) {
+      const deltaLeft = Math.abs(this.x - minX);
+      const deltaRight = Math.abs(maxX - this.x);
+      const deltaTop = Math.abs(this.y - minY);
+      const deltaBottom = Math.abs(maxY - this.y);
+      const smallestDelta = Math.min(
+        deltaLeft,
+        deltaRight,
+        deltaTop,
+        deltaBottom,
+      );
+
+      if (smallestDelta === deltaLeft) this.x = minX;
+      else if (smallestDelta === deltaRight) this.x = maxX;
+      else if (smallestDelta === deltaTop) this.y = minY;
+      else this.y = maxY;
+    }
+  }
   moveTowardsPosition(targetX, targetY, size) {
     const playerHalf = size / 2;
     const enemyHalf = this.size / 2;
@@ -340,6 +373,16 @@ class Enemy {
     if (distance <= this.range) {
       return true;
     }
+    if (this.x >= gameArea.width - this.size / 2) {
+      this.x = this.size / 2;
+    } else if (this.x <= this.size / 2) {
+      this.x = gameArea.width - this.size / 2;
+    }
+    if (this.y >= gameArea.height - this.size / 2) {
+      this.y = this.size / 2;
+    } else if (this.y <= this.size / 2) {
+      this.y = gameArea.height - this.size / 2;
+    }
   }
 }
 
@@ -371,8 +414,9 @@ class Projectile {
     this.creator = creator;
     this.type = type;
     if (this.creator === "player") {
+      let projectileSpread = 0.001;
       let PROJECTILE_SPREAD_RADIANS =
-        Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2) * 0.0025;
+        Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2) * projectileSpread;
       PROJECTILE_SPREAD_RADIANS = Math.min(PROJECTILE_SPREAD_RADIANS, 0.5);
       const baseDirection = Math.atan2(mouseY - this.y, mouseX - this.x);
       const spreadOffset = (Math.random() * 2 - 1) * PROJECTILE_SPREAD_RADIANS;
@@ -415,7 +459,7 @@ const backgroundColor = (ctx, color) => {
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
-const enemyCap = 15;
+const enemyCap = 5;
 
 function gameLoop() {
   ctx.globalAlpha = 1.0;
@@ -440,6 +484,12 @@ function gameLoop() {
     if (enemyList[i].isPlayerWithinRange(player)) {
       if (enemyList[i].damagePlayer(player)) {
         player.knockback(enemyList[i].x, enemyList[i].y, 1);
+      }
+    }
+    enemyList[i].stayOutOfObject(player);
+    for (let j = 0; j < enemyList.length; j++) {
+      if (i !== j) {
+        enemyList[i].stayOutOfObject(enemyList[j]);
       }
     }
   }
