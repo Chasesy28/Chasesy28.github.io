@@ -46,17 +46,8 @@ function createUpdateBanner() {
 
   // Attach event listener programmatically
   updateButton.addEventListener("click", () => {
-    if (navigator.serviceWorker.controller) {
-      const messageChannel = new MessageChannel();
-      messageChannel.port1.onmessage = () => {
-        window.location.reload();
-      };
-      navigator.serviceWorker.controller.postMessage({ type: "CLEAR_CACHE" }, [
-        messageChannel.port2,
-      ]);
-    } else {
-      window.location.reload();
-    }
+    window.postMessage("CLEAR_CACHE");
+    window.location.reload();
   });
 
   updateBanner.appendChild(updateButton);
