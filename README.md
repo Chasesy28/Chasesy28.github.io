@@ -157,6 +157,8 @@ For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SER
 > ⚡️ **Tip:** [Set up Google Analytics](https://www.w3schools.com/howto/howto_google_analytics.asp) to get valuable insights about your space and visitors.
 
 - **APP** Form available on the index page.
+
+- Verified Green hosting
 [![Green Hosting Badge](https://s3.nl-ams.scw.cloud/tgwf-web-app-live/greenweb_badges/v3/silly-site.me.png)](https://app.greenweb.org/api/v3/greencheckimage/silly-site.me?nocache=true)
 
 - (add more later)...
