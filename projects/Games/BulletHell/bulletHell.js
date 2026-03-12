@@ -27,6 +27,7 @@ const controller = {
   s: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
+  "`": { pressed: false },
   R: { pressed: false },
   r: { pressed: false },
   F: { pressed: false },
@@ -39,6 +40,7 @@ class Player {
     this.y = y;
     this.size = size;
     this.speed = speed;
+    this.sprintSpeed = speed * 5;
     this.health = health;
     this.mainColor = color;
     this.color = this.mainColor;
@@ -73,17 +75,27 @@ class Player {
     }
   }
   move() {
+    const speed = controller["`"].pressed ? this.sprintSpeed : this.speed;
+    let moveX = 0;
+    let moveY = 0;
+
     if (controller.W.pressed || controller.w.pressed) {
-      this.y -= this.speed;
+      moveY -= 1;
     }
     if (controller.S.pressed || controller.s.pressed) {
-      this.y += this.speed;
+      moveY += 1;
     }
     if (controller.A.pressed || controller.a.pressed) {
-      this.x -= this.speed;
+      moveX -= 1;
     }
     if (controller.D.pressed || controller.d.pressed) {
-      this.x += this.speed;
+      moveX += 1;
+    }
+
+    if (moveX !== 0 || moveY !== 0) {
+      const magnitude = Math.hypot(moveX, moveY);
+      this.x += (moveX / magnitude) * speed;
+      this.y += (moveY / magnitude) * speed;
     }
 
     this.x += this.knockbackVelocityX;
@@ -182,15 +194,28 @@ const player = new Player(
   "white",
 );
 
+const enemyTypes = {
+  basic: {
+    size: 40,
+    speed: 2.5,
+    health: 100,
+    damage: 10,
+    range: 5,
+    attackCooldown: 2,
+  },
+};
+
 class Enemy {
-  constructor(x, y, size, speed, health, damage) {
+  constructor(x, y, type) {
     this.x = x;
     this.y = y;
-    this.size = size;
-    this.speed = speed;
-    this.health = health;
-    this.damage = damage;
-    this.range = size / 6;
+    this.type = type;
+    this.size = enemyTypes[type].size;
+    this.speed = enemyTypes[type].speed;
+    this.health = enemyTypes[type].health;
+    this.damage = enemyTypes[type].damage;
+    this.range = enemyTypes[type].range;
+    this.maxAttackCooldown = enemyTypes[type].attackCooldown;
     this.attackCooldown = 0;
   }
   createEnemy(color) {
@@ -212,7 +237,7 @@ class Enemy {
   damagePlayer(player) {
     if (!player.invulnerable) {
       if (this.attackCooldown <= 0) {
-        this.attackCooldown = 2;
+        this.attackCooldown = this.maxAttackCooldown;
         player.hurt(this.damage);
         return true;
       } else {
@@ -287,7 +312,7 @@ const projectileTypes = {
     size: 5,
     speed: 10,
     damage: 10,
-    color: "yellow",
+    color: "cyan",
     lifespan: 60,
   },
   homingPlayer: {
@@ -320,13 +345,10 @@ class Projectile {
   }
   createProjectile() {
     ctx.fillStyle = projectileTypes[this.type].color;
-    if (this.lifespan <= projectileTypes[this.type].lifespan / 2) {
-      ctx.globalAlpha = 0.5;
-    } else if (this.lifespan <= projectileTypes[this.type].lifespan / 4) {
-      ctx.globalAlpha = 0.25;
-    } else if (this.lifespan <= projectileTypes[this.type].lifespan / 8) {
-      ctx.globalAlpha = 0.125;
-    }
+    ctx.globalAlpha = Math.max(
+      0,
+      this.lifespan / projectileTypes[this.type].lifespan,
+    );
     ctx.fillRect(
       this.x - this.size / 2,
       this.y - this.size / 2,
@@ -357,7 +379,7 @@ const backgroundColor = (ctx, color) => {
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
-const enemyCap = 1500;
+const enemyCap = 10;
 
 function gameLoop() {
   ctx.globalAlpha = 1.0;
@@ -370,10 +392,7 @@ function gameLoop() {
     const basicEnemy = new Enemy(
       Math.random() * gameArea.width,
       Math.random() * gameArea.height,
-      enemySize,
-      enemySize * (Math.random() + 0.5) * 0.15,
-      100,
-      10,
+      "basic",
     );
     enemyList.push(basicEnemy);
   }
