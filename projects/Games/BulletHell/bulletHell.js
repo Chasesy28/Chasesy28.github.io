@@ -444,7 +444,6 @@ document.addEventListener("mousemove", function (event) {
 });
 
 const handleKeyDown = (e) => {
-  console.log(e.key);
   if (controller[e.key]) {
     controller[e.key].pressed = true;
   }
