@@ -11,7 +11,7 @@ let mouseY;
 
 let playerX = gameArea.width / 2;
 let playerY = gameArea.height / 2;
-let playerSize = 50;
+let playerSize = 40;
 let playerSpeed = 5;
 
 let enemyList = [];
@@ -65,12 +65,19 @@ class Player {
         this.color = this.mainColor;
         this.invulnerable = false;
       }
-      ctx.fillStyle = this.color;
+      ctx.fillStyle = "black";
       ctx.fillRect(
         this.x - this.size / 2,
         this.y - this.size / 2,
         this.size,
         this.size,
+      );
+      ctx.fillStyle = this.color;
+      ctx.fillRect(
+        this.x - (this.size - 2.5) / 2,
+        this.y - (this.size - 2.5) / 2,
+        this.size - 2.5,
+        this.size - 2.5,
       );
     }
   }
@@ -201,7 +208,35 @@ const enemyTypes = {
     health: 100,
     damage: 10,
     range: 5,
-    attackCooldown: 2,
+    attackCooldown: 5,
+    gap: 0,
+  },
+  small: {
+    size: 25,
+    speed: 5,
+    health: 25,
+    damage: 5,
+    range: 5,
+    attackCooldown: 1,
+    gap: 0,
+  },
+  large: {
+    size: 75,
+    speed: 1,
+    health: 300,
+    damage: 20,
+    range: 10,
+    attackCooldown: 10,
+    gap: 0,
+  },
+  rangeBasic: {
+    size: 40,
+    speed: 2.5,
+    health: 100,
+    damage: 10,
+    range: 200,
+    attackCooldown: 5,
+    gap: 190,
   },
 };
 
@@ -215,6 +250,7 @@ class Enemy {
     this.health = enemyTypes[type].health;
     this.damage = enemyTypes[type].damage;
     this.range = enemyTypes[type].range;
+    this.gap = enemyTypes[type].gap;
     this.maxAttackCooldown = enemyTypes[type].attackCooldown;
     this.attackCooldown = 0;
   }
@@ -259,10 +295,10 @@ class Enemy {
     );
   }
   stayOutOfObject(target) {}
-  moveTowardsPosition(targetX, targetY, size, gap) {
+  moveTowardsPosition(targetX, targetY, size) {
     const playerHalf = size / 2;
     const enemyHalf = this.size / 2;
-    const desiredGap = Math.max(0, gap || 0);
+    const desiredGap = Math.max(0, this.gap || 0);
     const minX = targetX - playerHalf - enemyHalf - desiredGap;
     const maxX = targetX + playerHalf + enemyHalf + desiredGap;
     const minY = targetY - playerHalf - enemyHalf - desiredGap;
@@ -379,7 +415,7 @@ const backgroundColor = (ctx, color) => {
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
-const enemyCap = 10;
+const enemyCap = 15;
 
 function gameLoop() {
   ctx.globalAlpha = 1.0;
@@ -388,13 +424,15 @@ function gameLoop() {
   player.createPlayer();
   player.fireProjectile(10, 10);
   while (enemyList.length < enemyCap) {
-    let enemySize = Math.random() * 20 + 30;
-    const basicEnemy = new Enemy(
+    let enemyTypeKeys = Object.keys(enemyTypes);
+    let randomType =
+      enemyTypeKeys[Math.floor(Math.random() * enemyTypeKeys.length)];
+    const enemy = new Enemy(
       Math.random() * gameArea.width,
       Math.random() * gameArea.height,
-      "basic",
+      randomType,
     );
-    enemyList.push(basicEnemy);
+    enemyList.push(enemy);
   }
   for (let i = 0; i < enemyList.length; i++) {
     enemyList[i].createEnemy("darkred");
