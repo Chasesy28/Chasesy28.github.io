@@ -48,6 +48,8 @@ class Player {
     this.iFrames = 0;
     this.knockbackVelocityX = 0;
     this.knockbackVelocityY = 0;
+    //Less than 1 is less knockback over time, more than 1 is more knockback over time
+    this.knockbackResistance = 88/100;
   }
   createPlayer() {
     if (this.health > 0) {
@@ -107,8 +109,8 @@ class Player {
 
     this.x += this.knockbackVelocityX;
     this.y += this.knockbackVelocityY;
-    this.knockbackVelocityX *= 0.88;
-    this.knockbackVelocityY *= 0.88;
+    this.knockbackVelocityX *= this.knockbackResistance;
+    this.knockbackVelocityY *= this.knockbackResistance;
 
     if (Math.abs(this.knockbackVelocityX) < 0.05) {
       this.knockbackVelocityX = 0;
@@ -483,7 +485,7 @@ function gameLoop() {
     enemyList[i].moveTowardsPosition(player.x, player.y, player.size, 0);
     if (enemyList[i].isPlayerWithinRange(player)) {
       if (enemyList[i].damagePlayer(player)) {
-        player.knockback(enemyList[i].x, enemyList[i].y, 1);
+        player.knockback(enemyList[i].x, enemyList[i].y, 1.5);
       }
     }
     enemyList[i].stayOutOfObject(player);
