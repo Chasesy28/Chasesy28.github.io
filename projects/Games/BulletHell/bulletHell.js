@@ -49,7 +49,7 @@ class Player {
     this.knockbackVelocityX = 0;
     this.knockbackVelocityY = 0;
     //Less than 1 is less knockback over time, more than 1 is more knockback over time
-    this.knockbackResistance = 88/100;
+    this.knockbackResistance = 88 / 100;
   }
   createPlayer() {
     if (this.health > 0) {
@@ -248,7 +248,7 @@ const enemyTypes = {
     range: 10,
     attackCooldown: 3,
     gap: 0,
-  }
+  },
 };
 
 class Enemy {
@@ -418,7 +418,8 @@ class Projectile {
     if (this.creator === "player") {
       let projectileSpread = 0.001;
       let PROJECTILE_SPREAD_RADIANS =
-        Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2) * projectileSpread;
+        Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2) *
+        projectileSpread;
       PROJECTILE_SPREAD_RADIANS = Math.min(PROJECTILE_SPREAD_RADIANS, 0.5);
       const baseDirection = Math.atan2(mouseY - this.y, mouseX - this.x);
       const spreadOffset = (Math.random() * 2 - 1) * PROJECTILE_SPREAD_RADIANS;
@@ -453,6 +454,18 @@ class Projectile {
   }
   destroy(i) {
     projectileList.splice(i, 1);
+  }
+  collideWithTarget(target) {
+    const targetHalf = target.size / 2;
+    const enemyHalf = this.size / 2;
+    const minX = target.x - targetHalf - enemyHalf;
+    const maxX = target.x + targetHalf + enemyHalf;
+    const minY = target.y - targetHalf - enemyHalf;
+    const maxY = target.y + targetHalf + enemyHalf;
+    if (this.x > minX && this.x < maxX && this.y > minY && this.y < maxY) {
+      return true;
+    }
+    return false;
   }
 }
 
@@ -506,7 +519,30 @@ function gameLoop() {
       if (projectileList[i].type === "basicPlayer") {
         projectileList[i].moveForward();
       } else if (projectileList[i].type === "homingPlayer") {
-        projectileList[i].moveTowardsPosition(mouseX, mouseY);
+        let closestEnemyDistance = Infinity;
+        let closestEnemy = null;
+        for (let j = 0; j < enemyList.length; j++) {
+          let distance = Math.sqrt(
+            (enemyList[j].x - projectileList[i].x) ** 2 +
+              (enemyList[j].y - projectileList[i].y) ** 2,
+          );
+          if (distance < closestEnemyDistance) {
+            closestEnemyDistance = distance;
+            closestEnemy = enemyList[j];
+          }
+        }
+        projectileList[i].moveTowardsPosition(closestEnemy.x, closestEnemy.y);
+      }
+      let hitEnemy = false;
+      for (let j = 0; j < enemyList.length; j++) {
+        if (projectileList[i].collideWithTarget(enemyList[j])) {
+          projectileList[i].destroy(i);
+          hitEnemy = true;
+          break;
+        }
+      }
+      if (hitEnemy) {
+        continue;
       }
       if (
         projectileList[i].x - projectileList[i].size / 2 >
@@ -515,6 +551,7 @@ function gameLoop() {
           -projectileList[i].size * 10
       ) {
         projectileList[i].destroy(i);
+        continue;
       } else if (
         projectileList[i].y - projectileList[i].size / 2 >
           gameArea.height + projectileList[i].size * 10 ||
@@ -522,6 +559,7 @@ function gameLoop() {
           -projectileList[i].size * 10
       ) {
         projectileList[i].destroy(i);
+        continue;
       }
     }
   }
