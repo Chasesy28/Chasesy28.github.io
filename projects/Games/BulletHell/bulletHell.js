@@ -259,8 +259,8 @@ const enemyTypes = {
     gap: 0,
   },
   small: {
-    size: 25,
-    speed: 5,
+    size: 30,
+    speed: 4,
     health: 25,
     damage: 5,
     range: 5,
@@ -276,7 +276,7 @@ const enemyTypes = {
     attackCooldown: 10,
     gap: 0,
   },
-  rangeBasic: {
+  rangedBasic: {
     size: 40,
     speed: 2.5,
     health: 100,
@@ -329,7 +329,7 @@ class Enemy {
       this.size - 2.5,
     );
   }
-  damagePlayer(player) {
+  damageObject(player) {
     if (!player.invulnerable) {
       if (this.attackCooldown <= 0) {
         this.attackCooldown = this.maxAttackCooldown;
@@ -492,6 +492,7 @@ const projectileTypes = {
     color: "cyan",
     lifespan: 60,
     projectileSpread: 1e-4,
+    knockback: 1,
   },
   shotgunPlayer: {
     size: 7.5,
@@ -500,6 +501,7 @@ const projectileTypes = {
     color: "blue",
     lifespan: 60,
     projectileSpread: 1e-3,
+    knockback: 0.1,
   },
   homingPlayer: {
     size: 10,
@@ -508,6 +510,7 @@ const projectileTypes = {
     color: "orange",
     lifespan: 180,
     projectileSpread: 0,
+    knockback: 1.5,
   },
   auraPlayer: {
     size: 5,
@@ -516,6 +519,7 @@ const projectileTypes = {
     color: "darkcyan",
     lifespan: 15,
     projectileSpread: 0,
+    knockback: 5e-3,
   },
 };
 class Projectile {
@@ -637,7 +641,7 @@ function gameLoop() {
     enemyList[i].createEnemy("darkred");
     enemyList[i].moveTowardsPosition(player.x, player.y, player.size, 0);
     if (enemyList[i].isPlayerWithinRange(player)) {
-      if (enemyList[i].damagePlayer(player)) {
+      if (enemyList[i].damageObject(player)) {
         player.knockback(enemyList[i].x, enemyList[i].y, 1.5);
       }
     }
@@ -680,7 +684,7 @@ function gameLoop() {
           enemyList[j].knockback(
             projectileList[i].x,
             projectileList[i].y,
-            Math.min(1.5, projectileList[i].damage / 10),
+            projectileTypes[projectileList[i].type].knockback * 10,
           );
           projectileList[i].destroy(i);
           hitEnemy = true;
