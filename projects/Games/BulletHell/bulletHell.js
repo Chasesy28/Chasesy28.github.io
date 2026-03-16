@@ -9,16 +9,6 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
-let backgroundAnimationFrame = 0;
-function animateBackground() {
-  backgroundAnimationFrame++;
-  const animationSpeed = 0.05;
-  const offset = backgroundAnimationFrame * animationSpeed;
-  BackgroundAnimation.style.backgroundPosition = `${offset}px ${offset}px`;
-  requestAnimationFrame(animateBackground);
-}
-animateBackground();
-
 let mouseX;
 let mouseY;
 
@@ -644,7 +634,7 @@ function resolveEnemyOverlaps() {
 
 function gameLoop() {
   ctx.globalAlpha = 1.0;
-  ctx.clearRect(0, 0, gameArea.width, gameArea.height);
+  backgroundColor(ctx, "grey");
   player.move();
   player.createPlayer();
   player.fireProjectile();

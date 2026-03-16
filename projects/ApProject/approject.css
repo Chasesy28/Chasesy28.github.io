@@ -10,14 +10,7 @@ body {
 	/* Prevents scrolling */
 	touch-action: none;
 	/* Prevents pull-to-refresh and pinch-zoom on touchscreens */
-}
-
-/* Canvas CSS */
-canvas {
-	display: block;
-	background-color: green;
-	width: 100%;
-	height: 100%;
+	display: flex;
 }
 
 /* Container CSS to force full viewport coverage */
