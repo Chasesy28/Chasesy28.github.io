@@ -329,11 +329,11 @@ class Enemy {
       this.size - 2.5,
     );
   }
-  damageObject(player) {
-    if (!player.invulnerable) {
+  damageObject(object) {
+    if (!object.invulnerable) {
       if (this.attackCooldown <= 0) {
         this.attackCooldown = this.maxAttackCooldown;
-        player.hurt(this.damage);
+        object.hurt(this.damage);
         return true;
       } else {
         this.attackCooldown--;
@@ -343,14 +343,14 @@ class Enemy {
       return false;
     }
   }
-  isPlayerWithinRange(player) {
-    const playerHalf = player.size / 2;
+  isObjectWithinRange(object) {
+    const objectHalf = object.size / 2;
     const enemyAttackHalf = this.size / 2 + this.range;
-    const dx = Math.abs(player.x - this.x);
-    const dy = Math.abs(player.y - this.y);
+    const dx = Math.abs(object.x - this.x);
+    const dy = Math.abs(object.y - this.y);
 
     return (
-      dx <= playerHalf + enemyAttackHalf && dy <= playerHalf + enemyAttackHalf
+      dx <= objectHalf + enemyAttackHalf && dy <= objectHalf + enemyAttackHalf
     );
   }
   stayOutOfObject(target) {
@@ -587,6 +587,20 @@ class Projectile {
     }
     return false;
   }
+  damageObject(object) {
+    if (!object.invulnerable) {
+      if (this.attackCooldown <= 0) {
+        this.attackCooldown = this.maxAttackCooldown;
+        object.hurt(this.damage);
+        return true;
+      } else {
+        this.attackCooldown--;
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 }
 
 const backgroundColor = (ctx, color) => {
@@ -640,7 +654,7 @@ function gameLoop() {
   for (let i = 0; i < enemyList.length; i++) {
     enemyList[i].createEnemy("darkred");
     enemyList[i].moveTowardsPosition(player.x, player.y, player.size, 0);
-    if (enemyList[i].isPlayerWithinRange(player)) {
+    if (enemyList[i].isObjectWithinRange(player)) {
       if (enemyList[i].damageObject(player)) {
         player.knockback(enemyList[i].x, enemyList[i].y, 1.5);
       }
