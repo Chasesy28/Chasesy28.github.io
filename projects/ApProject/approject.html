@@ -7,18 +7,18 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AP Project Tam High 2026-Chase and Benjamin</title>
     <!--link to the JavaScript file Defer attribute to prevent dom from loading until the js is loaded-->
-    <script src="/projects/APProject/approject.js" defer></script>
+    <script src="/projects/ApProject/approject.js" defer></script>
     <!--link to the CSS file-->
-    <link rel="stylesheet" href="/projects/APProject/approject.css">
+    <link rel="stylesheet" href="/projects/ApProject/approject.css">
     <!--Manifest to ensure proper fullscreen compatibility, landscape fullscreen, and sets the browsers' theming to black, encoded in URL JSON formatting so I don't need to make a new manifest.json file.-->
     <link rel="manifest"
-      href="data:application/manifest+json,{%22name%22:%22CanvasPlayer%22,%22short_name%22:%22Play%22,%22display%22:%22standalone%22,%22orientation%22:%22landscape%22,%22start_url%22:%22.%22,%22background_color%22:%22#000000%22,%22theme_color%22:%22#000000%22}">
+      href="data:application/manifest+json,{%22name%22:%22CanvasPlayer%22,%22short_name%22:%22Play%22,%22display%22:%22standalone%22,%22orientation%22:%22landscape%22,%22start_url%22:%22.%22,%2２background_color%２２:%２＃000000%２２,%２ theme_color%２２:%２＃000000%２２}">
   </head>
 
   <body>
     <div class="canvas-container">
       <canvas id="gameCanvas"></canvas>
-      <button id="playButton" class="play-overlay" onclick="StartGame()">▶</button>
+      <button id="playButton" class="play-overlay" onclick="startGame()">▶</button>
       <button id="fullscreenButton" class="fs-button" onclick="toggleFullScreen()">⛶</button>
     </div>
   </body>

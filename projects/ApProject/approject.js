@@ -16,4 +16,19 @@ function toggleFullScreen() {
   }
 }
 
-document.addEventListener("click", toggleFullScreen);
+function backgroundColor(ctx, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, gameArea.width, gameArea.height);
+}
+
+function gameLoop() {
+  backgroundColor(ctx, "green");
+  requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+  const playButton = document.getElementById("playButton");
+  playButton.classList.add("hidden");
+  gameLoop();
+  // Initialize and start the game here
+}
