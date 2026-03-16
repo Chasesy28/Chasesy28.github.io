@@ -47,7 +47,7 @@ const weaponTypes = {
   2: {
     projectileType: "homingPlayer",
     shotAmmo: 1,
-    cooldown: 20 * 60,
+    cooldown: 1 * 60,
   },
   3: {
     projectileType: "auraPlayer",
@@ -483,7 +483,7 @@ class Enemy {
 
 const projectileTypes = {
   basicPlayer: {
-    size: 5,
+    size: 10,
     speed: 10,
     damage: 10,
     color: "cyan",
@@ -491,7 +491,7 @@ const projectileTypes = {
     projectileSpread: 1e-4,
   },
   shotgunPlayer: {
-    size: 5,
+    size: 7.5,
     speed: 10,
     damage: 10,
     color: "blue",
@@ -510,12 +510,11 @@ const projectileTypes = {
     size: 5,
     speed: 10,
     damage: 1,
-    color: "chocolate",
+    color: "darkcyan",
     lifespan: 15,
     projectileSpread: 0,
   },
 };
-
 class Projectile {
   constructor(x, y, creator, type) {
     this.x = x;
