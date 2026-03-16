@@ -8,6 +8,7 @@ gameArea.height = gameArea.offsetHeight;
 
 let mouseX;
 let mouseY;
+let mouseDown = false;
 
 let playerX = gameArea.width / 2;
 let playerY = gameArea.height / 2;
@@ -30,8 +31,29 @@ const controller = {
   "`": { pressed: false },
   R: { pressed: false },
   r: { pressed: false },
-  F: { pressed: false },
-  f: { pressed: false },
+};
+
+const weaponTypes = {
+  0: {
+    projectileType: "basicPlayer",
+    shotAmmo: 1,
+    cooldown: 0.5 * 60,
+  },
+  1: {
+    projectileType: "shotgunPlayer",
+    shotAmmo: 25,
+    cooldown: 1 * 60,
+  },
+  2: {
+    projectileType: "homingPlayer",
+    shotAmmo: 1,
+    cooldown: 20 * 60,
+  },
+  3: {
+    projectileType: "auraPlayer",
+    shotAmmo: 1,
+    cooldown: 0,
+  },
 };
 
 class Player {
@@ -48,9 +70,12 @@ class Player {
     this.iFrames = 0;
     this.knockbackVelocityX = 0;
     this.knockbackVelocityY = 0;
-    //Less than 1 is less knockback over time, more than 1 is more knockback over time
     this.knockbackResistance = 88 / 100;
+    this.weapon = 0;
+    const weaponTypeNames = Object.keys(weaponTypes);
+    this.weaponCooldowns = Array(weaponTypeNames.length).fill(0);
   }
+
   createPlayer() {
     if (this.health > 0) {
       if (this.iFrames > 0) {
@@ -83,6 +108,7 @@ class Player {
       );
     }
   }
+
   move() {
     const speed = controller["`"].pressed ? this.sprintSpeed : this.speed;
     let moveX = 0;
@@ -132,6 +158,7 @@ class Player {
     playerX = this.x;
     playerY = this.y;
   }
+
   hurt(damage) {
     if (!this.invulnerable) {
       this.health -= damage;
@@ -139,6 +166,7 @@ class Player {
       this.iFrames = 30;
     }
   }
+
   knockback(sourceX, sourceY, strength) {
     let dx = this.x - sourceX;
     let dy = this.y - sourceY;
@@ -166,30 +194,44 @@ class Player {
     }
 
     const distance = Math.sqrt(dx * dx + dy * dy) || 1;
-    const impulse = strength;
-    this.knockbackVelocityX += (dx / distance) * impulse;
-    this.knockbackVelocityY += (dy / distance) * impulse;
+    const aura = strength;
+    this.knockbackVelocityX += (dx / distance) * aura;
+    this.knockbackVelocityY += (dy / distance) * aura;
   }
+
   fireProjectile() {
-    if (controller.r.pressed || controller.R.pressed) {
-      for (let i = 0; i < 25; i++) {
+    if (this.weapon == 3) {
+      const auraCount = 180;
+      const auraRadius = this.size * 0.5;
+      for (let i = 0; i < auraCount; i++) {
+        const angle = (Math.PI * 2 * i) / auraCount;
+        const spawnX = this.x + Math.cos(angle) * auraRadius;
+        const spawnY = this.y + Math.sin(angle) * auraRadius;
+        const projectile = new Projectile(
+          spawnX,
+          spawnY,
+          "player",
+          "auraPlayer",
+        );
+        projectile.direction = angle;
+        projectileList.push(projectile);
+      }
+    } else if (mouseDown && this.weaponCooldowns[this.weapon] <= 0) {
+      for (let i = 0; i < weaponTypes[this.weapon].shotAmmo; i++) {
         const projectile = new Projectile(
           this.x,
           this.y,
           "player",
-          "basicPlayer",
+          weaponTypes[this.weapon].projectileType,
         );
         projectileList.push(projectile);
       }
+      this.weaponCooldowns[this.weapon] = weaponTypes[this.weapon].cooldown;
     }
-    if (controller.f.pressed || controller.F.pressed) {
-      const projectile = new Projectile(
-        this.x,
-        this.y,
-        "player",
-        "homingPlayer",
-      );
-      projectileList.push(projectile);
+    for (let i = 0; i < this.weaponCooldowns.length; i++) {
+      if (this.weaponCooldowns[i] > 0) {
+        this.weaponCooldowns[i]--;
+      }
     }
   }
 }
@@ -264,6 +306,9 @@ class Enemy {
     this.gap = enemyTypes[type].gap;
     this.maxAttackCooldown = enemyTypes[type].attackCooldown;
     this.attackCooldown = 0;
+    this.knockbackVelocityX = 0;
+    this.knockbackVelocityY = 0;
+    this.knockbackResistance = 88 / 100;
   }
   createEnemy(color) {
     ctx.fillStyle = "black";
@@ -372,19 +417,67 @@ class Enemy {
         this.y = desiredY;
       }
     }
-    if (distance <= this.range) {
-      return true;
+
+    this.x += this.knockbackVelocityX;
+    this.y += this.knockbackVelocityY;
+    this.knockbackVelocityX *= this.knockbackResistance;
+    this.knockbackVelocityY *= this.knockbackResistance;
+
+    if (Math.abs(this.knockbackVelocityX) < 0.05) {
+      this.knockbackVelocityX = 0;
     }
-    if (this.x >= gameArea.width - this.size / 2) {
-      this.x = this.size / 2;
-    } else if (this.x <= this.size / 2) {
-      this.x = gameArea.width - this.size / 2;
+    if (Math.abs(this.knockbackVelocityY) < 0.05) {
+      this.knockbackVelocityY = 0;
     }
-    if (this.y >= gameArea.height - this.size / 2) {
-      this.y = this.size / 2;
-    } else if (this.y <= this.size / 2) {
-      this.y = gameArea.height - this.size / 2;
+
+    if (this.x + this.size / 2 - this.size > gameArea.width) {
+      this.x = this.size / 2 - this.size;
+    } else if (this.x - this.size / 2 + this.size < 0) {
+      this.x = gameArea.width - this.size / 2 + this.size;
     }
+    if (this.y + this.size / 2 - this.size > gameArea.height) {
+      this.y = this.size / 2 - this.size;
+    } else if (this.y - this.size / 2 + this.size < 0) {
+      this.y = gameArea.height - this.size / 2 + this.size;
+    }
+
+    const remainingDx = desiredX - this.x;
+    const remainingDy = desiredY - this.y;
+    return (
+      Math.sqrt(remainingDx * remainingDx + remainingDy * remainingDy) <=
+      this.range
+    );
+  }
+  knockback(sourceX, sourceY, strength) {
+    let dx = this.x - sourceX;
+    let dy = this.y - sourceY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    if (absDx === 0 && absDy === 0) {
+      dx = 1;
+      dy = 0;
+    } else {
+      const maxComponent = Math.max(absDx, absDy);
+      const minComponent = Math.min(absDx, absDy);
+      const cornerRatioThreshold = 0.75;
+      const isNearCorner = minComponent / maxComponent >= cornerRatioThreshold;
+
+      if (!isNearCorner) {
+        if (absDx >= absDy) {
+          dx = Math.sign(dx);
+          dy = 0;
+        } else {
+          dx = 0;
+          dy = Math.sign(dy);
+        }
+      }
+    }
+
+    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+    const aura = strength;
+    this.knockbackVelocityX += (dx / distance) * aura;
+    this.knockbackVelocityY += (dy / distance) * aura;
   }
 }
 
@@ -395,6 +488,15 @@ const projectileTypes = {
     damage: 10,
     color: "cyan",
     lifespan: 60,
+    projectileSpread: 1e-4,
+  },
+  shotgunPlayer: {
+    size: 5,
+    speed: 10,
+    damage: 10,
+    color: "blue",
+    lifespan: 60,
+    projectileSpread: 1e-3,
   },
   homingPlayer: {
     size: 10,
@@ -402,6 +504,15 @@ const projectileTypes = {
     damage: 15,
     color: "orange",
     lifespan: 180,
+    projectileSpread: 0,
+  },
+  auraPlayer: {
+    size: 5,
+    speed: 10,
+    damage: 1,
+    color: "chocolate",
+    lifespan: 15,
+    projectileSpread: 0,
   },
 };
 
@@ -415,12 +526,15 @@ class Projectile {
     this.lifespan = projectileTypes[type].lifespan;
     this.creator = creator;
     this.type = type;
+    this.projectileSpread = projectileTypes[type].projectileSpread;
     if (this.creator === "player") {
-      let projectileSpread = 0.001;
       let PROJECTILE_SPREAD_RADIANS =
         Math.sqrt((this.x - mouseX) ** 2 + (this.y - mouseY) ** 2) *
-        projectileSpread;
+        this.projectileSpread;
       PROJECTILE_SPREAD_RADIANS = Math.min(PROJECTILE_SPREAD_RADIANS, 0.5);
+      if (this.type === "shotgunPlayer") {
+        PROJECTILE_SPREAD_RADIANS = Math.max(PROJECTILE_SPREAD_RADIANS, 0.1);
+      }
       const baseDirection = Math.atan2(mouseY - this.y, mouseX - this.x);
       const spreadOffset = (Math.random() * 2 - 1) * PROJECTILE_SPREAD_RADIANS;
       this.direction = baseDirection + spreadOffset;
@@ -429,7 +543,7 @@ class Projectile {
   createProjectile() {
     ctx.fillStyle = projectileTypes[this.type].color;
     ctx.globalAlpha = Math.max(
-      0,
+      0.3,
       this.lifespan / projectileTypes[this.type].lifespan,
     );
     ctx.fillRect(
@@ -475,13 +589,37 @@ const backgroundColor = (ctx, color) => {
 };
 
 const enemyCap = 5;
+let wasRPressed = false;
+
+function resolveEnemyOverlaps() {
+  const totalPasses = Math.max(1, enemyList.length);
+
+  for (let pass = 0; pass < totalPasses; pass++) {
+    for (let i = 0; i < enemyList.length; i++) {
+      for (let j = 0; j < enemyList.length; j++) {
+        if (i !== j) {
+          enemyList[i].stayOutOfObject(enemyList[j]);
+        }
+      }
+    }
+
+    for (let i = 0; i < enemyList.length; i++) {
+      enemyList[i].stayOutOfObject(player);
+    }
+  }
+}
 
 function gameLoop() {
   ctx.globalAlpha = 1.0;
   backgroundColor(ctx, "dimgray");
   player.move();
   player.createPlayer();
-  player.fireProjectile(10, 10);
+  player.fireProjectile();
+  const isRPressed = controller.R.pressed || controller.r.pressed;
+  if (isRPressed && !wasRPressed) {
+    player.weapon = (player.weapon + 1) % Object.keys(weaponTypes).length;
+  }
+  wasRPressed = isRPressed;
   while (enemyList.length < enemyCap) {
     let enemyTypeKeys = Object.keys(enemyTypes);
     let randomType =
@@ -493,6 +631,9 @@ function gameLoop() {
     );
     enemyList.push(enemy);
   }
+
+  resolveEnemyOverlaps();
+
   for (let i = 0; i < enemyList.length; i++) {
     enemyList[i].createEnemy("darkred");
     enemyList[i].moveTowardsPosition(player.x, player.y, player.size, 0);
@@ -501,41 +642,47 @@ function gameLoop() {
         player.knockback(enemyList[i].x, enemyList[i].y, 1.5);
       }
     }
-    enemyList[i].stayOutOfObject(player);
-    for (let j = 0; j < enemyList.length; j++) {
-      if (i !== j) {
-        enemyList[i].stayOutOfObject(enemyList[j]);
-      }
-    }
   }
   for (let i = 0; i < projectileList.length; i++) {
-    projectileList[i].lifespan--;
     if (projectileList[i].lifespan <= 0) {
       projectileList[i].destroy(i);
       continue;
     }
     projectileList[i].createProjectile();
     if (projectileList[i].creator === "player") {
-      if (projectileList[i].type === "basicPlayer") {
+      if (
+        projectileList[i].type === "basicPlayer" ||
+        projectileList[i].type === "shotgunPlayer" ||
+        projectileList[i].type === "auraPlayer"
+      ) {
         projectileList[i].moveForward();
       } else if (projectileList[i].type === "homingPlayer") {
-        let closestEnemyDistance = Infinity;
-        let closestEnemy = null;
-        for (let j = 0; j < enemyList.length; j++) {
-          let distance = Math.sqrt(
-            (enemyList[j].x - projectileList[i].x) ** 2 +
-              (enemyList[j].y - projectileList[i].y) ** 2,
-          );
-          if (distance < closestEnemyDistance) {
-            closestEnemyDistance = distance;
-            closestEnemy = enemyList[j];
+        if (projectileList[i].lifespan > 155) {
+          projectileList[i].moveForward();
+        } else {
+          let closestEnemyDistance = Infinity;
+          let closestEnemy = null;
+          for (let j = 0; j < enemyList.length; j++) {
+            let distance = Math.sqrt(
+              (enemyList[j].x - projectileList[i].x) ** 2 +
+                (enemyList[j].y - projectileList[i].y) ** 2,
+            );
+            if (distance < closestEnemyDistance) {
+              closestEnemyDistance = distance;
+              closestEnemy = enemyList[j];
+            }
           }
+          projectileList[i].moveTowardsPosition(closestEnemy.x, closestEnemy.y);
         }
-        projectileList[i].moveTowardsPosition(closestEnemy.x, closestEnemy.y);
       }
       let hitEnemy = false;
       for (let j = 0; j < enemyList.length; j++) {
         if (projectileList[i].collideWithTarget(enemyList[j])) {
+          enemyList[j].knockback(
+            projectileList[i].x,
+            projectileList[i].y,
+            Math.min(1.5, projectileList[i].damage / 10),
+          );
           projectileList[i].destroy(i);
           hitEnemy = true;
           break;
@@ -562,6 +709,7 @@ function gameLoop() {
         continue;
       }
     }
+    projectileList[i].lifespan--;
   }
   requestAnimationFrame(gameLoop);
 }
@@ -569,6 +717,14 @@ function gameLoop() {
 document.addEventListener("mousemove", function (event) {
   mouseX = event.clientX;
   mouseY = event.clientY;
+});
+
+document.addEventListener("mousedown", function (event) {
+  mouseDown = true;
+});
+
+document.addEventListener("mouseup", function (event) {
+  mouseDown = false;
 });
 
 const handleKeyDown = (e) => {
