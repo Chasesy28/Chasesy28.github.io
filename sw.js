@@ -7,7 +7,7 @@
 // Automatic cache versioning with timestamp - update this when deploying new versions
 // This ensures users get fresh content when the site is updated
 const CACHE_VERSION = "7";
-const CACHE_TIMESTAMP = "2026-03-11T19:12:59Z"; // Update this timestamp when deploying
+const CACHE_TIMESTAMP = "2026-03-16T04:10:59Z"; // Update this timestamp when deploying
 const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 
 /**
@@ -35,9 +35,6 @@ const URLS_TO_CACHE = [
   "/projects/Pop-ups/Pop-Up.html",
   "/projects/Pop-ups/Evil-popup.html",
   "/projects/Pop-ups/Popup-Test.html",
-  "/projects/Pop-ups/Pong/Pong.html",
-  "/projects/Pop-ups/Pong/Pong.js",
-  "/projects/Pop-ups/Pong/Pong.css",
 
   // WebGL projects
   "/projects/WebGl-Test/gl.html",
@@ -49,8 +46,13 @@ const URLS_TO_CACHE = [
   "/projects/WebGl-Test/blender-app.html",
   "/projects/WebGl-Test/blender-app.js",
 
-  // Other projects
-  "/projects/test.html",
+  // Game projects
+  "/projects/Games/BulletHell/bulletHell.html",
+  "/projects/Games/BulletHell/bulletHell.js",
+  "/projects/Games/BulletHell/bulletHell.css",
+  "/projects/Games/Pong/Pong.html",
+  "/projects/Games/Pong/Pong.js",
+  "/projects/Games/Pong/Pong.css",
 ];
 
 /**
@@ -152,6 +154,53 @@ self.addEventListener("message", (event) => {
           console.log("[Service Worker] All caches cleared");
           // Notify the client that cache was cleared
           event.ports[0]?.postMessage({ success: true });
+        }),
+    );
+  }
+
+  if (event.data && event.data.type === "CLEAR_CACHED_FILES") {
+    // Clear only this app's cached files, preserving other cache storage data
+    event.waitUntil(
+      caches
+        .open(CACHE_NAME)
+        .then(async (cache) => {
+          const deleteTargets = URLS_TO_CACHE.map(
+            (path) => new URL(path, self.location.origin).href,
+          );
+
+          let deleted = 0;
+          await Promise.all(
+            deleteTargets.map(async (targetUrl) => {
+              const removed = await cache.delete(targetUrl);
+              if (removed) {
+                deleted += 1;
+              }
+            }),
+          );
+
+          console.log(
+            "[Service Worker] Cleared cached files from current cache:",
+            deleted,
+          );
+
+          // Notify the client that file cache entries were cleared
+          event.ports[0]?.postMessage({
+            success: true,
+            type: "CLEAR_CACHED_FILES",
+            deleted,
+            cacheName: CACHE_NAME,
+          });
+        })
+        .catch((error) => {
+          console.error(
+            "[Service Worker] Failed to clear cached files from current cache:",
+            error,
+          );
+          event.ports[0]?.postMessage({
+            success: false,
+            type: "CLEAR_CACHED_FILES",
+            error: String(error),
+          });
         }),
     );
   }

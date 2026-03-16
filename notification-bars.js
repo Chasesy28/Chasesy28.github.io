@@ -4,7 +4,7 @@
  */
 
 // Constants
-const UPDATE_CHECK_INTERVAL_MS = 1 * 60 * 1000; // Check for updates every 1 minute
+const UPDATE_CHECK_INTERVAL_MS = 5 * 60 * 1000; // Check for updates every 5 minutes
 
 /**
  * Creates an offline notification bar when the user is offline
@@ -46,6 +46,7 @@ function createUpdateBanner() {
 
   // Attach event listener programmatically
   updateButton.addEventListener("click", () => {
+    window.postMessage("CLEAR_CACHED_FILES");
     window.location.reload();
   });
 

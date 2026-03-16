@@ -1,0 +1,66 @@
+/* Body and HTML Reset */
+html,
+body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	overflow: hidden;
+	position: fixed;
+	/* Prevents scrolling */
+	touch-action: none;
+	/* Prevents pull-to-refresh and pinch-zoom on touchscreens */
+}
+
+/* Canvas CSS */
+canvas {
+	display: block;
+	background: #000;
+	width: 100%;
+	height: 100%;
+}
+
+/* Container CSS to force full viewport coverage */
+.canvas-container {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Overlay Buttons */
+.play-overlay,
+.fs-button {
+	position: absolute;
+	cursor: pointer;
+	border: none;
+	border-radius: 3px;
+	background: rgba(65, 74, 151, 0.6);
+	z-index: 10;
+	color: #e9eeee;
+	transition: background 0.2s ease-in-out;
+	/*smooth hover transition */
+}
+
+.play-overlay:hover,
+.fs-button:hover {
+	background: rgba(65, 74, 151, 0.9);
+}
+
+.play-overlay {
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px 30px;
+	font-size: 2rem;
+}
+
+.fs-button {
+	bottom: 15px;
+	right: 15px;
+	padding: 8px 12px;
+	font-size: 1.5rem;
+}

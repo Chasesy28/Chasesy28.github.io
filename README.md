@@ -9,11 +9,11 @@
 This project is a basic testing site I use to mess around and test features. 🦄
 
 > ⚠️ The `projects/` directory contains isolated experiments; the main
-> site does not depend on them and they are not touched during normal
+> site does not depend on them, and they are not touched during normal
 > updates or deployments.
 
 It now includes a simple **loading screen** (jumping icon + progress bar) and a small
-accessibility panel for font size, contrast and motion reduction. Mobile layout
+accessibility panel for font size, contrast, and motion reduction. Mobile layout
 and touch support are verified, and the Vite/TS code is just a sandbox.
 
 The site combines a static HTML frontend with local Tailwind CSS v4, independent project experiments, and Cloudflare Workers for edge computing.
@@ -70,7 +70,7 @@ The image optimizer worker provides:
 - Aggressive caching for faster load times
 
 > **Tip:** the Cloudflare dashboard also offers **Polish** (under Speed →
-> Optimization) which will compress images automatically. Set it to lossless or
+> Optimization, which will compress images automatically. Set it to lossless or
 > lossy as you prefer and enable WebP/AVIF conversion if the worker isn't used.
 
 ### Cloudflare Performance Features
@@ -133,7 +133,7 @@ This repository includes an automated bot that updates the service worker cache 
 
 - **Workflow**: `.github/workflows/update-cache.yml` - Triggers on push to main
 - **Script**: `update-sw-cache.sh` - Updates the timestamp using sed
-- **Race Condition Prevention**: Bot fetches and rebases on latest changes before pushing to avoid conflicts
+- **Race Condition Prevention**: Bot fetches and rebases on the latest changes before pushing to avoid conflicts
 - **Retry Logic**: Automatic retry with exponential backoff (2s, 4s, 8s) if push fails
 - **Error Logging**: Captures and logs push failures for debugging
 - **Loop Prevention**: Bot commits are marked with `[skip ci]` and the workflow skips bot-authored commits
@@ -143,8 +143,8 @@ For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SER
 ## 🎨 Reminders for dev
 
 - **Fonts:** Add your favorite from **Google fonts**.
-- **Accessibility:** A panel provides font size, high‑contrast and reduced‑motion controls. It now
-  includes keyboard support (Esc to close), focus management and closes when clicking outside.
+- **Accessibility:** A panel provides font size, high‑contrast, and reduced‑motion controls. It now
+  includes keyboard support (Esc to close), focus management, and closes when clicking outside.
 - **Mobile:** Layout is responsive with a simple columnar nav on narrow screens; always test on phones/tablets.
   [Go to tutorial about fonts](https://www.w3schools.com/w3css/w3css_fonts_google.asp)
 
@@ -157,5 +157,7 @@ For more information about cache management, see [SERVICE-WORKER-CACHE.md](./SER
 > ⚡️ **Tip:** [Set up Google Analytics](https://www.w3schools.com/howto/howto_google_analytics.asp) to get valuable insights about your space and visitors.
 
 - **APP** Form available on the index page.
+
+- Verified Green hosting [![Green Hosting Badge](https://app.greenweb.org/api/v3/greencheckimage/silly-site.me?nocache=true)](https://s3.nl-ams.scw.cloud/tgwf-web-app-live/greenweb_badges/v3/silly-site.me.png)
 
 - (add more later)...

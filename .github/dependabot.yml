@@ -1,21 +1,21 @@
 version: 2
 updates:
-  # Enable version updates for npm dependencies (if added in future)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    rebase-strategy: "auto"
     labels:
       - "dependencies"
       - "automated"
 
-  # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    rebase-strategy: "auto"
     labels:
       - "dependencies"
       - "github-actions"
