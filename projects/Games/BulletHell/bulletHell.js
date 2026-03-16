@@ -16,8 +16,11 @@ let playerSize = 40;
 let playerSpeed = 5;
 
 let enemyList = [];
+const enemyCap = 5;
 
 let projectileList = [];
+
+let wasRPressed = false;
 
 const controller = {
   W: { pressed: false },
@@ -586,9 +589,6 @@ const backgroundColor = (ctx, color) => {
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
-
-const enemyCap = 5;
-let wasRPressed = false;
 
 function resolveEnemyOverlaps() {
   const totalPasses = Math.max(1, enemyList.length);
