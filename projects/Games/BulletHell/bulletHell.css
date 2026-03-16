@@ -12,3 +12,24 @@ body {
   margin: 0;
   padding: 0;
 }
+
+#backgroundAnimation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  /* Keep it behind the canvas */
+  background-image: url('your-pattern.png');
+  /* Needs a tiling image */
+  background-color: #333;
+}
+
+#gameArea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  /* Ensure canvas is see-through */
+}

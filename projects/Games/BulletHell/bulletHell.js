@@ -1,13 +1,29 @@
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
+const scoreElement = document.getElementById("score");
+const healthElement = document.getElementById("health");
+const BackgroundAnimation = document.getElementById("backgroundAnimation");
 
 gameArea.style.width = "100dvw";
 gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
+let backgroundAnimationFrame = 0;
+function animateBackground() {
+  backgroundAnimationFrame++;
+  const animationSpeed = 0.05;
+  const offset = backgroundAnimationFrame * animationSpeed;
+  BackgroundAnimation.style.backgroundPosition = `${offset}px ${offset}px`;
+  requestAnimationFrame(animateBackground);
+}
+animateBackground();
+
 let mouseX;
 let mouseY;
+
+let score = 0;
+let health = 100;
 let mouseDown = false;
 
 let playerX = gameArea.width / 2;
@@ -628,7 +644,7 @@ function resolveEnemyOverlaps() {
 
 function gameLoop() {
   ctx.globalAlpha = 1.0;
-  backgroundColor(ctx, "dimgray");
+  ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   player.move();
   player.createPlayer();
   player.fireProjectile();
