@@ -13,16 +13,6 @@ body {
 	display: flex;
 }
 
-/* Container CSS to force full viewport coverage */
-.canvas-container {
-	position: relative;
-	width: 100vw;
-	height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
 /* Overlay Buttons */
 .play-overlay,
 .fs-button {
