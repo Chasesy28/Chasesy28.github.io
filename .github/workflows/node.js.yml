@@ -63,6 +63,11 @@ jobs:
               cp "$file" dist/
             fi
           done
+      - name: Create /vite directory for GitHub Pages clean-URL routing
+        run: |
+          set -e
+          mkdir -p dist/vite
+          cp dist/vite.html dist/vite/index.html
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

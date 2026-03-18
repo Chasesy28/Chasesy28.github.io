@@ -65,7 +65,20 @@ function getCacheTime(contentType, pathname) {
 }
 
 /**
- * Main fetch handler for all requests
+ * Resolves the HTML entry point to serve for a given pathname.
+ * /vite and /vite/* routes use vite.html (the React app);
+ * everything else falls back to index.html (the legacy site).
+ * @param {string} pathname - URL pathname of the request
+ * @returns {string} HTML file path to serve
+ */
+function resolveHtmlEntry(pathname) {
+  if (pathname === '/vite' || pathname.startsWith('/vite/')) {
+    return '/vite.html';
+  }
+  return '/index.html';
+}
+
+/**
  * @param {Request} request - Incoming HTTP request
  * @param {Object} env - Environment bindings (KV namespaces, secrets, etc.)
  * @param {Object} ctx - Execution context with waitUntil and passThroughOnException
@@ -109,14 +122,15 @@ export default {
       const options = {
         /**
          * Request mapper for SPA routing
-         * Maps directory and extension-less URLs to index.html
+         * Maps directory and extension-less URLs to their HTML entry points
          */
         mapRequestToAsset: (req) => {
           const reqUrl = new URL(req.url);
-          // Serve index.html for directory requests or SPA-style routes
+          // Serve the appropriate HTML entry for SPA-style routes
           if (reqUrl.pathname.endsWith('/') || !reqUrl.pathname.includes('.')) {
-            console.log('[Worker] SPA route detected, serving index.html for:', reqUrl.pathname);
-            return new Request(`${reqUrl.origin}/index.html`, req);
+            const htmlEntry = resolveHtmlEntry(reqUrl.pathname);
+            console.log('[Worker] SPA route detected, serving', htmlEntry, 'for:', reqUrl.pathname);
+            return new Request(`${reqUrl.origin}${htmlEntry}`, req);
           }
           return req;
         },
@@ -144,12 +158,14 @@ export default {
       
       /**
        * FALLBACK ERROR HANDLING
-       * If asset not found or error occurs, try serving index.html for SPA routing
-       * This handles 404s gracefully for client-side routes
+       * If asset not found or error occurs, try serving the appropriate HTML entry
+       * for SPA routing. /vite routes fall back to vite.html; everything else to index.html.
        */
       try {
-        console.log('[Worker] Attempting fallback to index.html');
-        const fallback = await getAssetFromKV({ request: new Request(new URL(request.url).origin + '/index.html') });
+        console.log('[Worker] Attempting fallback');
+        const origin = new URL(request.url).origin;
+        const pathname = new URL(request.url).pathname;
+        const fallback = await getAssetFromKV({ request: new Request(origin + resolveHtmlEntry(pathname)) });
         const fr = new Response(fallback.body, fallback);
         Object.entries(SECURITY_HEADERS).forEach(([k, v]) => fr.headers.set(k, v));
         fr.headers.set('Cache-Control', `public, max-age=${CACHE_TIMES.html}`);
