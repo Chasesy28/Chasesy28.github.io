@@ -38,9 +38,16 @@ class Player {
 
 const player = new Player(100, 100, 50, "/images/Mario.png");
 
+let activeLevelData = [
+  [],
+  [],
+  []
+]
+
 function gameLoop() {
   backgroundColor("lightblue");
   player.drawPlayer();
+  buildLevel(3);
   requestAnimationFrame(gameLoop);
 }
 
