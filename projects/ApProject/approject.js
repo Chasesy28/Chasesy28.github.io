@@ -6,6 +6,11 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
+let globalCameraX = 0;
+let globalCameraY = 0;
+let relativeCameraX = gameArea.width / 2;
+let relativeCameraY = gameArea.height / 2;
+
 function toggleFullScreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
@@ -23,6 +28,15 @@ function backgroundColor(color) {
 
 backgroundColor("black");
 
+const controller = {
+  W: { pressed: false },
+  w: { pressed: false },
+  A: { pressed: false },
+  a: { pressed: false },
+  D: { pressed: false },
+  d: { pressed: false },
+};
+
 class Player {
   constructor(x, y, size, imageSrc) {
     this.x = x;
@@ -30,24 +44,39 @@ class Player {
     this.size = size;
     this.image = new Image();
     this.image.src = imageSrc;
+    this.grounded = false;
+    this.jumping = false;
   }
-  drawPlayer () {
-    ctx.drawImage(this.image, this.x, this.y, this.image.width, this.image.height);
+  drawPlayer() {
+    let height = this.size * (this.image.height / this.image.width);
+    ctx.drawImage(this.image, this.x, this.y, this.size, height);
+  }
+  move() {
+    if (!this.grounded && !this.jumping) {
+      this.y += 5;
+    }
+    if (controller.W.pressed || controller.w.pressed) {
+      this.jumping = true;
+      this.y -= 5;
+    } else {
+      this.jumping = false;
+    }
+    if (controller.A.pressed || controller.a.pressed) {
+      this.x -= 5;
+    }
+    if (controller.D.pressed || controller.d.pressed) {
+      this.x += 5;
+    }
   }
 }
 
-const player = new Player(100, 100, 50, "/images/Mario.png");
+const player = new Player(100, 100, 35, "/images/Mario.png");
 
-let activeLevelData = [
-  [],
-  [],
-  []
-]
+let activeLevelData = [[], [], []];
 
 function gameLoop() {
   backgroundColor("lightblue");
   player.drawPlayer();
-  buildLevel(3);
   requestAnimationFrame(gameLoop);
 }
 
@@ -56,3 +85,15 @@ function startGame() {
   playButton.classList.add("hidden");
   gameLoop();
 }
+
+window.document.addEventListener("keydown", function (e) {
+  if (controller[e.key]) {
+    controller[e.key].pressed = true;
+  }
+});
+
+window.document.addEventListener("keyup", function (e) {
+  if (controller[e.key]) {
+    controller[e.key].pressed = false;
+  }
+});

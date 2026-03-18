@@ -783,17 +783,14 @@ document.addEventListener("mouseup", function (event) {
   mouseDown = false;
 });
 
-const handleKeyDown = (e) => {
+window.document.addEventListener("keydown", function (e) {
   if (controller[e.key]) {
     controller[e.key].pressed = true;
   }
-};
+});
 
-const handleKeyUp = (e) => {
+window.document.addEventListener("keyup", function (e) {
   if (controller[e.key]) {
     controller[e.key].pressed = false;
   }
-};
-
-window.document.addEventListener("keydown", handleKeyDown);
-window.document.addEventListener("keyup", handleKeyUp);
+});
