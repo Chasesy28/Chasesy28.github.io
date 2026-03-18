@@ -318,8 +318,26 @@ class Enemy {
     this.knockbackVelocityX = 0;
     this.knockbackVelocityY = 0;
     this.knockbackResistance = 88 / 100;
+    this.mainColor = "darkred";
+    this.color = this.mainColor;
+    this.invulnerable = false;
+    this.iFrames = 0;
   }
-  createEnemy(color) {
+  createEnemy() {
+    if (this.iFrames > 0) {
+      this.iFrames--;
+      for (let i = 0; i < 5; i++) {
+        if ((this.iFrames + i) % 10 == 0) {
+          this.color = "red";
+          break;
+        } else {
+          this.color = this.mainColor;
+        }
+      }
+    } else {
+      this.color = this.mainColor;
+      this.invulnerable = false;
+    }
     ctx.fillStyle = "black";
     ctx.fillRect(
       this.x - this.size / 2,
@@ -327,7 +345,7 @@ class Enemy {
       this.size,
       this.size,
     );
-    ctx.fillStyle = color;
+    ctx.fillStyle = this.color;
     ctx.fillRect(
       this.x - (this.size - 2.5) / 2,
       this.y - (this.size - 2.5) / 2,
@@ -458,35 +476,55 @@ class Enemy {
     );
   }
   knockback(sourceX, sourceY, strength) {
-    let dx = this.x - sourceX;
-    let dy = this.y - sourceY;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
+    if (!this.knockbackInvulnerable) {
+      let dx = this.x - sourceX;
+      let dy = this.y - sourceY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
 
-    if (absDx === 0 && absDy === 0) {
-      dx = 1;
-      dy = 0;
-    } else {
-      const maxComponent = Math.max(absDx, absDy);
-      const minComponent = Math.min(absDx, absDy);
-      const cornerRatioThreshold = 0.75;
-      const isNearCorner = minComponent / maxComponent >= cornerRatioThreshold;
+      if (absDx === 0 && absDy === 0) {
+        dx = 1;
+        dy = 0;
+      } else {
+        const maxComponent = Math.max(absDx, absDy);
+        const minComponent = Math.min(absDx, absDy);
+        const cornerRatioThreshold = 0.75;
+        const isNearCorner =
+          minComponent / maxComponent >= cornerRatioThreshold;
 
-      if (!isNearCorner) {
-        if (absDx >= absDy) {
-          dx = Math.sign(dx);
-          dy = 0;
-        } else {
-          dx = 0;
-          dy = Math.sign(dy);
+        if (!isNearCorner) {
+          if (absDx >= absDy) {
+            dx = Math.sign(dx);
+            dy = 0;
+          } else {
+            dx = 0;
+            dy = Math.sign(dy);
+          }
         }
       }
-    }
 
-    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
-    const aura = strength;
-    this.knockbackVelocityX += (dx / distance) * aura;
-    this.knockbackVelocityY += (dy / distance) * aura;
+      const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+      const aura = strength;
+      this.knockbackVelocityX += (dx / distance) * aura;
+      this.knockbackVelocityY += (dy / distance) * aura;
+      this.knockbackInvulnerable = true;
+      setTimeout(() => {
+        this.knockbackInvulnerable = false;
+      }, 2);
+    }
+  }
+  destroy(i) {
+    enemyList.splice(i, 1);
+  }
+  hurt(damage) {
+    if (!this.invulnerable) {
+      this.health -= damage;
+      this.invulnerable = true;
+      this.iFrames = 30;
+    }
+    if (this.health <= 0) {
+      this.destroy(enemyList.indexOf(this));
+    }
   }
 }
 
@@ -507,7 +545,7 @@ const projectileTypes = {
     color: "blue",
     lifespan: 60,
     projectileSpread: 1e-3,
-    knockback: 0.1,
+    knockback: 5,
   },
   homingPlayer: {
     size: 10,
@@ -521,7 +559,7 @@ const projectileTypes = {
   auraPlayer: {
     size: 5,
     speed: 10,
-    damage: 1,
+    damage: 25,
     color: "darkcyan",
     lifespan: 15,
     projectileSpread: 0,
@@ -595,14 +633,8 @@ class Projectile {
   }
   damageObject(object) {
     if (!object.invulnerable) {
-      if (this.attackCooldown <= 0) {
-        this.attackCooldown = this.maxAttackCooldown;
-        object.hurt(this.damage);
-        return true;
-      } else {
-        this.attackCooldown--;
-        return false;
-      }
+      object.hurt(this.damage);
+      return true;
     } else {
       return false;
     }
@@ -658,7 +690,7 @@ function gameLoop() {
   resolveEnemyOverlaps();
 
   for (let i = 0; i < enemyList.length; i++) {
-    enemyList[i].createEnemy("darkred");
+    enemyList[i].createEnemy();
     enemyList[i].moveTowardsPosition(player.x, player.y, player.size, 0);
     if (enemyList[i].isObjectWithinRange(player)) {
       if (enemyList[i].damageObject(player)) {
@@ -701,10 +733,11 @@ function gameLoop() {
       let hitEnemy = false;
       for (let j = 0; j < enemyList.length; j++) {
         if (projectileList[i].collideWithTarget(enemyList[j])) {
+          projectileList[i].damageObject(enemyList[j]);
           enemyList[j].knockback(
             projectileList[i].x,
             projectileList[i].y,
-            projectileTypes[projectileList[i].type].knockback * 10,
+            projectileTypes[projectileList[i].type].knockback,
           );
           projectileList[i].destroy(i);
           hitEnemy = true;
