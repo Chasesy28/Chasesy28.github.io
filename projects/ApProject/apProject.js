@@ -68,28 +68,42 @@ class Player {
       this.x += 5;
     }
   }
+  groundedDetection(object) {
+    if (this.y + this.size >= object.y && this.y < object.y + object.height && this.x + this.size > object.x && this.x < object.x + object.width) {
+      this.grounded = true;
+      this.y = object.y - this.size;
+    } else {
+      this.grounded = false;
+    }
+  }
 }
 
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
-let activeLevelData = [[], [], []];
-const level1 = [
-  [new Block(0, 0, 50, 50), new Block(50, 300, 50, 50)],
-  [new Block(150, 350, 50, 50), new Block(200, 350, 50, 50)],
-  [new Block(0, 400, 50, 50), new Block(50, 400, 50, 50)],
-];
+let activeLevelData = [];
 
-const level2 = [
+const level1 = [
   [0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 0],
+  [0, 1, 1, 1, 0, 1],
   [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0],
+  [0, 1, 0, 1, 0],
 ];
 
 function gameLoop() {
   backgroundColor("lightblue");
+  activeLevelData = convertToObjects(level1);
+  buildLevel(activeLevelData);
   player.drawPlayer();
   player.move();
-  buildLevel(level2);
+  for (let i = 0; i < activeLevelData.length; i++) {
+    for (let j = 0; j < activeLevelData[i].length; j++) {
+      if (activeLevelData[i][j].solid) {
+        player.groundedDetection(activeLevelData[i][j]);
+      }
+    }
+  }
   requestAnimationFrame(gameLoop);
 }
 

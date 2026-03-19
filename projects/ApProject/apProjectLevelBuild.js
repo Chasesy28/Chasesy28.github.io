@@ -15,11 +15,10 @@ function convertToObjects(levelData) {
 }
 
 function buildLevel(levelData) {
-  let level = convertToObjects(levelData);
   for (let i = 0; i < levelData.length; i++) {
     //Builds each column in the row
     for (let j = 0; j < levelData[i].length; j++) {
-      level[i][j].draw();
+      levelData[i][j].draw();
     }
   }
 }
