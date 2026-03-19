@@ -77,6 +77,7 @@ let activeLevelData = [[], [], []];
 function gameLoop() {
   backgroundColor("lightblue");
   player.drawPlayer();
+  player.move();
   requestAnimationFrame(gameLoop);
 }
 
