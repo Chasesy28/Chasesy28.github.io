@@ -5,7 +5,7 @@ class Block {
     this.width = width;
     this.height = height;
   }
-  drawBlock() {
+  draw() {
     ctx.fillStyle = "brown";
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }

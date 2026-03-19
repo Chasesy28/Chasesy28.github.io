@@ -73,11 +73,23 @@ class Player {
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let activeLevelData = [[], [], []];
+const level1 = [
+  [new Block(0, 0, 50, 50), new Block(50, 300, 50, 50)],
+  [new Block(150, 350, 50, 50), new Block(200, 350, 50, 50)],
+  [new Block(0, 400, 50, 50), new Block(50, 400, 50, 50)],
+];
+
+const level2 = [
+  [0, 0, 0, 0, 0],
+  [0, 1, 1, 1, 0],
+  [0, 0, 0, 0, 0],
+];
 
 function gameLoop() {
   backgroundColor("lightblue");
   player.drawPlayer();
   player.move();
+  buildLevel(level2);
   requestAnimationFrame(gameLoop);
 }
 
