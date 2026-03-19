@@ -29,9 +29,10 @@ let currentView = "list"; // Current view mode: 'list', 'map', or 'favorites'
 let favorites = []; // Array of saved favorite restaurants
 let modalAbortController = null; // AbortController for cleanup of modal event listeners
 const FAVORITES_STORAGE_KEY = "restaurant_favorites";
-const API_KEY_SESSION_KEY = "copilot_api_key_session"; // Session-only storage for API key (security)
+const API_KEY_SESSION_KEY = "copilot_api_key_session"; // Session-only storage for API key presence flag (non-sensitive)
 let conversationHistory = []; // Chat history for AI conversation continuity
 let currentRestaurantContext = null; // Current restaurant context for AI chat
+let apiKeyInMemory = null; // Holds the actual API key only in memory for the current page session
 
 // ========================================
 // AI CONFIGURATION
@@ -186,7 +187,8 @@ loadFavorites();
  */
 function getApiKey() {
   try {
-    return sessionStorage.getItem(API_KEY_SESSION_KEY);
+    // Return the API key stored only in memory for the current page session
+    return apiKeyInMemory;
   } catch (e) {
     console.error("[Finder] Error accessing session storage:", e);
     return null;
@@ -194,17 +196,22 @@ function getApiKey() {
 }
 
 /**
- * Sets the API key in session storage only
- * This ensures the key is cleared when the browser closes
+ * Sets the API key using in-memory storage only.
+ * A non-sensitive presence flag is stored in session storage so the UI can
+ * still detect that an API key has been configured for this session.
  * @param {string} key - The API key to store
  * @returns {boolean} True if successful
  */
 function setApiKey(key) {
   try {
     if (key && key.trim()) {
-      sessionStorage.setItem(API_KEY_SESSION_KEY, key.trim());
+      const trimmedKey = key.trim();
+      // Keep the actual key only in memory for the current page session
+      apiKeyInMemory = trimmedKey;
+      // Store a non-sensitive presence flag in session storage
+      sessionStorage.setItem(API_KEY_SESSION_KEY, "true");
       console.log(
-        "[Finder] API key saved to session storage (will be cleared on browser close)",
+        "[Finder] API key configured for this session (stored only in memory; presence flag saved to session storage)",
       );
       return true;
     }
