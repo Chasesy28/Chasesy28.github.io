@@ -37,7 +37,10 @@
     "darkcyan",
     "darkred",
     "dimgray",
+    "exfil",
+    "EXFILTRATION",
     "knockback",
+    "labop",
     "threejs"
   ]
 }
