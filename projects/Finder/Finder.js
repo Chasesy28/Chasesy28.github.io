@@ -1032,6 +1032,15 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {string} content - The message content
    * @param {HTMLElement} container - The container to append to
    */
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   function renderChatMessage(role, content, container) {
     const messageDiv = document.createElement("div");
     messageDiv.className = `chat-message ${role === "user" ? "text-right" : ""} mb-3`;
@@ -1042,8 +1051,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "inline-block bg-indigo-100 dark:bg-indigo-900/50 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-[85%] text-left"
         : "inline-block bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-lg max-w-[85%]";
 
-    // Simple markdown-like formatting
-    let formattedContent = content
+    // Simple markdown-like formatting on escaped content
+    let formattedContent = escapeHtml(content)
       .replace(/\n/g, "<br>")
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>");
