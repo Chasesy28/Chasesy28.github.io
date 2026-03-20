@@ -147,7 +147,7 @@ class Player {
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let activeLevelData = [];
-
+//All blocks past the middle of the screen are counting as 2 blocks long
 const level1 = [
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   [0, 2, 2, 2, 0],
