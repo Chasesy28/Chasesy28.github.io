@@ -117,7 +117,7 @@ class Player {
     if (
       previousBottom <= object.y &&
       currentBottom >= object.y &&
-      this.x + this.size > object.x &&
+      this.x + this.size > object.x + this.globalOffsetX &&
       this.x < object.x + object.width
     ) {
       this.grounded = true;
@@ -152,7 +152,7 @@ const level1 = [
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   [0, 2, 2, 2, 0],
   [0, "p", 0, 0, 3],
-  [0, 1, 1, 1, 0],
+  [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
@@ -175,7 +175,7 @@ function gameLoop() {
     for (const block of row) {
       if (block.solid) {
         if (
-          Math.abs(player.x - block.x) < 100 &&
+          Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
           Math.abs(player.y - block.y) < 100
         ) {
           player.groundedDetection(block);
