@@ -41,6 +41,9 @@ class Player {
     this.image = new Image();
     this.image.src = imageSrc;
 
+    this.spawnX = x;
+    this.spawnY = y;
+
     this.velX = 0;
     this.velY = 0;
     this.prevY = y;
@@ -56,6 +59,14 @@ class Player {
     this.currentGroundBlock = null;
     this.lastTemporaryBlock = null;
 
+    this.globalOffsetX = 0;
+  }
+
+  spawn() {
+    this.x = this.spawnX;
+    this.y = this.spawnY;
+    this.velX = 0;
+    this.velY = 0;
     this.globalOffsetX = 0;
   }
 
@@ -140,7 +151,7 @@ let activeLevelData = [];
 const level1 = [
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   [0, 2, 2, 2, 0],
-  [0, 0, 0, 0, 3],
+  [0, "p", 0, 0, 3],
   [0, 1, 1, 1, 0],
   [0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -150,7 +161,7 @@ const level2 = [
   [0, 1, 1, 1, 0],
   [0, 0, 0, 0, 3],
   [0, 3, 2, 3, 0],
-  [0, 0, 0, 0, 0],
+  ["p", 0, 0, 0, 0],
   [1, 1, 1, 1, 1],
 ];
 
@@ -175,9 +186,11 @@ function gameLoop() {
   }
   if (controller["1"]?.pressed) {
     activeLevelData = convertToObjects(level1);
+    player.spawn();
   }
   if (controller["2"]?.pressed) {
     activeLevelData = convertToObjects(level2);
+    player.spawn();
   }
   buildLevel(activeLevelData);
   player.drawPlayer();
@@ -188,6 +201,7 @@ function startGame() {
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
   activeLevelData = convertToObjects(level1);
+  player.spawn();
   gameLoop();
   visualViewport.addEventListener("resize", function () {
     //just in case the user changes orientation or something
