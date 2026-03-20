@@ -41,6 +41,8 @@ class Player {
     this.image = new Image();
     this.image.src = imageSrc;
 
+    this.height = null;
+
     this.spawnX = x;
     this.spawnY = y;
 
@@ -72,8 +74,8 @@ class Player {
 
   drawPlayer() {
     if (this.image.complete && this.image.width > 0) {
-      let height = this.size * (this.image.height / this.image.width);
-      ctx.drawImage(this.image, this.x, this.y, this.size, height);
+      this.height = this.size * (this.image.height / this.image.width);
+      ctx.drawImage(this.image, this.x, this.y, this.size, this.height);
     }
   }
 
@@ -112,13 +114,13 @@ class Player {
 
   groundedDetection(object) {
     const previousBottom = this.prevY + this.size;
-    const currentBottom = this.y + this.size;
+    const currentBottom = this.y + this.height;
 
     if (
       previousBottom <= object.y &&
       currentBottom >= object.y &&
       this.x + this.size > object.x - this.globalOffsetX &&
-      this.x < object.x + object.width
+      this.x < object.x + object.width - this.globalOffsetX
     ) {
       this.grounded = true;
       this.currentGroundBlock = object;
@@ -126,7 +128,7 @@ class Player {
         object.startTempDisappear();
       }
       this.velY = 0;
-      this.y = object.y - this.size;
+      this.y = object.y - this.height;
     }
   }
 
@@ -138,16 +140,13 @@ class Player {
       this.y = 0;
       this.velY = 0;
     } else if (this.y + this.size > gameArea.height) {
-      this.y = gameArea.height - this.size;
-      this.velY = 0;
-      this.grounded = true;
+      this.spawn();
     }
   }
 }
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let activeLevelData = [];
-//All blocks past the middle of the screen are counting as 2 blocks long
 const level1 = [
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   [0, 2, 2, 2, 0],
@@ -179,11 +178,11 @@ function gameLoop() {
           Math.abs(player.y - block.y) < 100
         ) {
           player.groundedDetection(block);
-          player.gameBoundaryDetection();
         }
       }
     }
   }
+  player.gameBoundaryDetection();
   if (controller["1"]?.pressed) {
     activeLevelData = convertToObjects(level1);
     player.spawn();
@@ -223,3 +222,5 @@ window.document.addEventListener("keyup", function (e) {
     controller[e.key].pressed = false;
   }
 });
+
+console.log(gameArea.height);
