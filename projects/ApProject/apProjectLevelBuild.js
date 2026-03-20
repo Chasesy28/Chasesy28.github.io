@@ -6,7 +6,10 @@ function convertToObjects(levelData) {
     let row = [];
     for (let j = 0; j < levelData[i].length; j++) {
       if (levelData[i][j] === 1) {
-        row.push(new Block(j * 50, i * 50, 50, 50));
+        row.push(new Block(j * 50, i * 50, 50, 50, "basic"));
+      }
+      if (levelData[i][j] === 2) {
+        row.push(new Block(j * 50, i * 50, 50, 50, "temporary"));
       }
     }
     level.push(row);

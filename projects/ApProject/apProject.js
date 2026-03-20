@@ -69,9 +69,17 @@ class Player {
     }
   }
   groundedDetection(object) {
-    if (this.y + this.size >= object.y && this.y < object.y + object.height && this.x + this.size > object.x && this.x < object.x + object.width) {
+    if (
+      this.y + this.size >= object.y &&
+      this.y < object.y + object.height &&
+      this.x + this.size > object.x &&
+      this.x < object.x + object.width
+    ) {
       this.grounded = true;
       this.y = object.y - this.size;
+      if (object.temporary) {
+        object.tempDisappear();
+      }
     } else {
       this.grounded = false;
     }
@@ -84,16 +92,16 @@ let activeLevelData = [];
 
 const level1 = [
   [0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 0, 1],
+  [0, 1, 1, 1, 0],
   [0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0],
+  [0, 2, 2, 2, 0],
   [0, 0, 0, 0, 0],
   [0, 1, 0, 1, 0],
 ];
 
 function gameLoop() {
+  ctx.globalAlpha = 1;
   backgroundColor("lightblue");
-  activeLevelData = convertToObjects(level1);
   buildLevel(activeLevelData);
   player.drawPlayer();
   player.move();
@@ -110,6 +118,7 @@ function gameLoop() {
 function startGame() {
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
+  activeLevelData = convertToObjects(level1);
   gameLoop();
 }
 
