@@ -33,6 +33,10 @@ export class AdminAuthManager {
    * Sign in with Google OAuth
    */
   async loginWithGoogle(redirectPath: string = '/admin') {
+    if (!supabase) {
+      throw new Error('Supabase is not configured. Google sign-in is unavailable.')
+    }
+
     const redirectTo = `${window.location.origin}${redirectPath}`
 
     const { error } = await supabase.auth.signInWithOAuth({
@@ -55,6 +59,10 @@ export class AdminAuthManager {
    * Initialize local admin session from Supabase auth session
    */
   async initializeAuthFromSupabase() {
+    if (!supabase) {
+      throw new Error('Supabase is not configured. Admin auth is unavailable.')
+    }
+
     const { data, error } = await supabase.auth.getSession()
 
     if (error) {
@@ -136,7 +144,9 @@ export class AdminAuthManager {
    * Logout user
    */
   async logout() {
-    await supabase.auth.signOut()
+    if (supabase) {
+      await supabase.auth.signOut()
+    }
     localStorage.removeItem(this.sessionKey)
   }
 

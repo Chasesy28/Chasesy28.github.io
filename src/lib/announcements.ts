@@ -36,8 +36,13 @@ export class AnnouncementsManager {
       // Filter out dismissed announcements for this user
       const visibleAnnouncements = []
       for (const announcement of announcements) {
+        if (announcement.dismissible === false) {
+          visibleAnnouncements.push(announcement)
+          continue
+        }
+
         const isDismissed = await isAnnouncementDismissed(announcement.id, this.userIdentifier)
-        if (!isDismissed && announcement.dismissible !== false) {
+        if (!isDismissed) {
           visibleAnnouncements.push(announcement)
         }
       }
@@ -80,13 +85,18 @@ export class AnnouncementsManager {
   /**
    * Create a new announcement (admin only)
    */
-  async create(message: string, type: string = 'info', adminId: string | null = null) {
+  async create(
+    message: string,
+    type: string = 'info',
+    dismissible: boolean = true,
+    adminId: string | null = null
+  ) {
     try {
       if (!['info', 'success', 'warning', 'error'].includes(type)) {
         throw new Error('Invalid announcement type')
       }
 
-      const announcement = await createAnnouncement(message, type, adminId)
+      const announcement = await createAnnouncement(message, type, dismissible, adminId)
       if (announcement) {
         this.dispatchEvent('announcement:created', announcement)
       }

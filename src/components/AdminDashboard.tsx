@@ -29,6 +29,7 @@ export function AdminDashboard() {
   const [isCreating, setIsCreating] = useState(false)
 
   const [sessionEmail, setSessionEmail] = useState('')
+  const [sessionAdminId, setSessionAdminId] = useState<string | null>(null)
   const [sessionExpiration, setSessionExpiration] = useState(0)
 
   useEffect(() => {
@@ -65,6 +66,7 @@ export function AdminDashboard() {
       const session = authManager.getSession()
       if (session) {
         setSessionEmail(session.email)
+        setSessionAdminId(session.adminId)
         const expirationMinutes = authManager.getSessionExpirationMinutes()
         setSessionExpiration(expirationMinutes ?? 0)
       }
@@ -101,7 +103,7 @@ export function AdminDashboard() {
 
     setIsCreating(true)
     try {
-      await announcementsManager.create(newMessage, newType, sessionEmail)
+      await announcementsManager.create(newMessage, newType, newDismissible, sessionAdminId)
       setNewMessage('')
       setNewType('info')
       setNewDismissible(true)
@@ -128,6 +130,7 @@ export function AdminDashboard() {
     await authManager.logout()
     setIsAuthenticated(false)
     setSessionEmail('')
+    setSessionAdminId(null)
     setSessionExpiration(0)
   }
 

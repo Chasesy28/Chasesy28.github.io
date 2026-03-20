@@ -3,16 +3,32 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase credentials are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or .env.')
+const hasSupabaseCredentials = Boolean(supabaseUrl && supabaseAnonKey)
+
+if (!hasSupabaseCredentials) {
+  console.warn('Supabase credentials are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or .env.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = hasSupabaseCredentials
+  ? createClient(supabaseUrl!, supabaseAnonKey!)
+  : null
+
+function requireSupabaseClient() {
+  if (!supabase) {
+    throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+  }
+  return supabase
+}
+
+export function isSupabaseConfigured() {
+  return hasSupabaseCredentials
+}
 
 // Helper function to get announcements
 export async function getAnnouncements() {
   try {
-    const { data, error } = await supabase
+    const client = requireSupabaseClient()
+    const { data, error } = await client
       .from('announcements')
       .select('*')
       .eq('active', true)
@@ -29,7 +45,8 @@ export async function getAnnouncements() {
 // Helper function to dismiss an announcement
 export async function dismissAnnouncement(announcementId: string, userIdentifier: string) {
   try {
-    const { error } = await supabase
+    const client = requireSupabaseClient()
+    const { error } = await client
       .from('announcement_dismissals')
       .insert({
         announcement_id: announcementId,
@@ -47,7 +64,8 @@ export async function dismissAnnouncement(announcementId: string, userIdentifier
 // Helper function to check if an announcement is dismissed for a user
 export async function isAnnouncementDismissed(announcementId: string, userIdentifier: string) {
   try {
-    const { data, error } = await supabase
+    const client = requireSupabaseClient()
+    const { data, error } = await client
       .from('announcement_dismissals')
       .select('id')
       .eq('announcement_id', announcementId)
@@ -65,7 +83,8 @@ export async function isAnnouncementDismissed(announcementId: string, userIdenti
 // Helper function to authenticate admin
 export async function authenticateAdmin(email: string) {
   try {
-    const { data, error } = await supabase
+    const client = requireSupabaseClient()
+    const { data, error } = await client
       .from('admin_users')
       .select('*')
       .eq('email', email)
@@ -75,7 +94,7 @@ export async function authenticateAdmin(email: string) {
 
     if (data) {
       // Update last login
-      await supabase
+      await client
         .from('admin_users')
         .update({ last_login: new Date().toISOString() })
         .eq('id', data.id)
@@ -90,15 +109,21 @@ export async function authenticateAdmin(email: string) {
 }
 
 // Helper function to create announcement
-export async function createAnnouncement(message: string, type: string, createdBy: string | null) {
+export async function createAnnouncement(
+  message: string,
+  type: string,
+  dismissible: boolean,
+  createdBy: string | null
+) {
   try {
-    const { data, error } = await supabase
+    const client = requireSupabaseClient()
+    const { data, error } = await client
       .from('announcements')
       .insert({
         message,
         type,
         created_by: createdBy,
-        dismissible: true,
+        dismissible,
         active: true
       })
       .select()
@@ -114,7 +139,8 @@ export async function createAnnouncement(message: string, type: string, createdB
 // Helper function to delete announcement
 export async function deleteAnnouncement(announcementId: string) {
   try {
-    const { error } = await supabase
+    const client = requireSupabaseClient()
+    const { error } = await client
       .from('announcements')
       .update({ active: false })
       .eq('id', announcementId)
