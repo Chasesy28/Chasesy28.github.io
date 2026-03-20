@@ -117,7 +117,7 @@ class Player {
     if (
       previousBottom <= object.y &&
       currentBottom >= object.y &&
-      this.x + this.size > object.x + this.globalOffsetX &&
+      this.x + this.size > object.x - this.globalOffsetX &&
       this.x < object.x + object.width
     ) {
       this.grounded = true;
