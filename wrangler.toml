@@ -8,7 +8,7 @@ account_id = "d82a8a8eb7c815f16d6fcb5a58f12fd3"
 
 # Modern Assets configuration)
 [assets]
-directory = "./public"   # Point this to your folder of static files
+directory = "./dist"   # Point to built output directory (run `npm run build` before deploying)
 not_found_handling = "404-page"
 
 [env.production]

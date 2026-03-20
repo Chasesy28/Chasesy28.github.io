@@ -11,7 +11,8 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, _res, next) => {
           const url = req.url ?? ''
-          if (url === '/' || url === '/admin' || url === '/admin/') {
+          const viteRoutes = ['/', '/admin', '/admin/', '/vite', '/vite/']
+          if (viteRoutes.includes(url)) {
             req.url = '/vite.html'
           }
           next()
@@ -20,7 +21,8 @@ export default defineConfig({
       configurePreviewServer(server) {
         server.middlewares.use((req, _res, next) => {
           const url = req.url ?? ''
-          if (url === '/' || url === '/admin' || url === '/admin/') {
+          const viteRoutes = ['/', '/admin', '/admin/', '/vite', '/vite/']
+          if (viteRoutes.includes(url)) {
             req.url = '/vite.html'
           }
           next()

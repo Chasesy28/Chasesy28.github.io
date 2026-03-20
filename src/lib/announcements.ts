@@ -9,6 +9,21 @@ import {
 const USER_IDENTIFIER_KEY = 'announcement_user_id'
 
 /**
+ * Generate a cryptographically secure random string of the given length.
+ */
+function generateSecureRandomString(length: number): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const bytes = new Uint8Array(length)
+  window.crypto.getRandomValues(bytes)
+
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    result += alphabet[bytes[i] % alphabet.length]
+  }
+  return result
+}
+
+/**
  * Get or create a unique user identifier for announcement dismissals
  */
 function getUserIdentifier() {
@@ -16,7 +31,8 @@ function getUserIdentifier() {
 
   if (!userId) {
     // Create a new unique identifier
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const randomSuffix = generateSecureRandomString(9)
+    userId = `user_${Date.now()}_${randomSuffix}`
     localStorage.setItem(USER_IDENTIFIER_KEY, userId)
   }
 

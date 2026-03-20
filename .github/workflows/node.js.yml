@@ -25,9 +25,9 @@ jobs:
         node-version: [20.x, 22.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
@@ -41,9 +41,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js 22.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22.x
           cache: "npm"
@@ -63,8 +63,13 @@ jobs:
               cp "$file" dist/
             fi
           done
+      - name: Create /vite directory for GitHub Pages clean-URL routing
+        run: |
+          set -e
+          mkdir -p dist/vite
+          cp dist/vite.html dist/vite/index.html
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
