@@ -8,6 +8,15 @@ const blockTypes = {
     color: "gray",
     solid: true,
     temporary: true,
+    disappearTime: 30,
+    reappearTime: 120,
+  },
+  permanentTemporary: {
+    color: "dimgray",
+    solid: true,
+    temporary: true,
+    disappearTime: 45,
+    reappearTime: undefined,
   },
 };
 class Block {
@@ -16,16 +25,43 @@ class Block {
     this.y = y;
     this.width = width;
     this.height = height;
+    this.type = type;
     this.color = blockTypes[type].color;
     this.solid = blockTypes[type].solid;
     this.temporary = blockTypes[type].temporary;
+    this.timeToDisappear;
+    this.timeToReappear;
   }
   draw() {
+    if (this.temporary && this.timeToDisappear !== undefined) {
+      this.timeToDisappear -= 1;
+      ctx.globalAlpha = this.timeToDisappear / blockTypes[this.type].disappearTime;
+      if (this.timeToDisappear <= 0) {
+        this.tempDisappear();
+      }
+    }
+    if (this.temporary && this.timeToReappear !== undefined) {
+      this.timeToReappear -= 1;
+      if (this.timeToReappear <= 0) {
+        this.tempReappear();
+      }
+    }
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.globalAlpha = 1;
+  }
+  startTempDisappear() {
+    this.timeToDisappear = blockTypes[this.type].disappearTime;
   }
   tempDisappear() {
     this.solid = false;
     this.color = "rgba(0,0,0,0)";
+    this.timeToDisappear = undefined;
+    this.timeToReappear = blockTypes[this.type].reappearTime;
+  }
+  tempReappear() {
+    this.solid = true;
+    this.color = blockTypes[this.type].color;
+    this.timeToReappear = undefined;
   }
 }

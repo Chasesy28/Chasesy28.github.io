@@ -51,9 +51,8 @@ class Player {
     this.friction = 0.92;
     this.gravity = 0.5;
     this.jumpStrength = -11; // perfect 3 block jump (do not touch)
-    this.isjumping = false;
     this.grounded = false;
-    this.maxfallSpeed = 15;
+    this.maxFallSpeed = 15;
     this.maxVelX = 5;
     this.maxVelY = 15;
     this.acceleration = 0;
@@ -87,8 +86,8 @@ class Player {
     this.prevY = this.y;
 
     this.velY += this.gravity;
-    if (this.velY > this.maxfallSpeed) {
-      this.velY = this.maxfallSpeed;
+    if (this.velY > this.maxFallSpeed) {
+      this.velY = this.maxFallSpeed;
     }
     this.y += this.velY;
   }
@@ -105,6 +104,9 @@ class Player {
     ) {
       this.grounded = true;
       this.currentGroundBlock = object;
+      if (this.currentGroundBlock.temporary && this.currentGroundBlock.timeToDisappear === undefined) {
+        object.startTempDisappear();
+      }
       this.velY = 0;
       this.y = object.y - this.size;
     }
@@ -129,8 +131,7 @@ class Player {
 
   handleTemporaryBlockDeparture() {
     if (
-      this.lastTemporaryBlock &&
-      this.currentGroundBlock !== this.lastTemporaryBlock
+      this.lastTemporaryBlock && this.currentGroundBlock !== this.lastTemporaryBlock
     ) {
       this.lastTemporaryBlock.tempDisappear();
       this.lastTemporaryBlock = null;
@@ -147,9 +148,9 @@ let activeLevelData = [];
 
 const level1 = [
   [0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 0],
-  [0, 0, 0, 0, 0],
   [0, 2, 2, 2, 0],
+  [0, 0, 0, 0, 3],
+  [0, 1, 1, 1, 0],
   [0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1],
 ];
@@ -173,7 +174,7 @@ function gameLoop() {
       }
     }
   }
-  player.handleTemporaryBlockDeparture();
+  //player.handleTemporaryBlockDeparture();
   buildLevel(activeLevelData);
   player.drawPlayer();
   requestAnimationFrame(gameLoop);
