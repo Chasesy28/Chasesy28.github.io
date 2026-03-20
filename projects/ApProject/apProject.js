@@ -6,11 +6,6 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
-let globalCameraX = 0;
-let globalCameraY = 0;
-let relativeCameraX = gameArea.width / 2;
-let relativeCameraY = gameArea.height / 2;
-
 function toggleFullScreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
