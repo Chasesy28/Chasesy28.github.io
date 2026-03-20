@@ -35,6 +35,8 @@ const controller = {
   a: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
+  1: { pressed: false },
+  2: { pressed: false },
 };
 class Player {
   constructor(x, y, size, imageSrc) {
@@ -58,6 +60,8 @@ class Player {
     this.acceleration = 0;
     this.currentGroundBlock = null;
     this.lastTemporaryBlock = null;
+
+    this.globalOffsetX = 0;
   }
 
   drawPlayer() {
@@ -76,7 +80,15 @@ class Player {
     }
 
     this.velX *= this.friction;
-    this.x += this.velX;
+    if (this.x >= gameArea.width / 2) {
+      this.globalOffsetX += this.velX;
+      if (this.globalOffsetX <= 0) {
+        this.globalOffsetX = 0;
+        this.x += this.velX;
+      }
+    } else {
+      this.x += this.velX;
+    }
 
     if ((controller.W?.pressed || controller.w?.pressed) && this.grounded) {
       this.velY = this.jumpStrength;
@@ -116,9 +128,6 @@ class Player {
     if (this.x < 0) {
       this.x = 0;
       this.velX = 0;
-    } else if (this.x + this.size > gameArea.width) {
-      this.x = gameArea.width - this.size;
-      this.velX = 0;
     } else if (this.y < 0) {
       this.y = 0;
       this.velY = 0;
@@ -128,29 +137,24 @@ class Player {
       this.grounded = true;
     }
   }
-
-  handleTemporaryBlockDeparture() {
-    if (
-      this.lastTemporaryBlock && this.currentGroundBlock !== this.lastTemporaryBlock
-    ) {
-      this.lastTemporaryBlock.tempDisappear();
-      this.lastTemporaryBlock = null;
-    }
-
-    if (this.currentGroundBlock?.temporary) {
-      this.lastTemporaryBlock = this.currentGroundBlock;
-    }
-  }
 }
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let activeLevelData = [];
 
 const level1 = [
-  [0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   [0, 2, 2, 2, 0],
   [0, 0, 0, 0, 3],
   [0, 1, 1, 1, 0],
+  [0, 0, 0, 0, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+];
+const level2 = [
+  [0, 0, 0, 0, 0],
+  [0, 1, 1, 1, 0],
+  [0, 0, 0, 0, 3],
+  [0, 3, 2, 3, 0],
   [0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1],
 ];
@@ -174,7 +178,12 @@ function gameLoop() {
       }
     }
   }
-  //player.handleTemporaryBlockDeparture();
+  if (controller["1"]?.pressed) {
+    activeLevelData = convertToObjects(level1);
+  }
+  if (controller["2"]?.pressed) {
+    activeLevelData = convertToObjects(level2);
+  }
   buildLevel(activeLevelData);
   player.drawPlayer();
   requestAnimationFrame(gameLoop);
