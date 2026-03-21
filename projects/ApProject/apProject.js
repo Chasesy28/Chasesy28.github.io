@@ -30,8 +30,8 @@ const controller = {
   a: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
-  1: { pressed: false },
-  2: { pressed: false },
+  ArrowLeft: { pressed: false },
+  ArrowRight: { pressed: false },
 };
 class Player {
   constructor(x, y, size, imageSrc) {
@@ -181,35 +181,50 @@ class Player {
 }
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
+let currentLevel = 0;
+let levelSwitchCooldown = false;
 let activeLevelData = [];
-const level1 = [
-  [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
-  [0, 2, 2, 2, 0],
-  [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-  [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [],
-  [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [],
-  [0, 0, 1],
-  [],
-  [0, 1],
-  [],
-  [0, 0, 1],
-  [],
-  [0, 1],
-  [],
-  [0, 0, 1],
-  [],
-  [0, 1],
-  [4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
-];
-const level2 = [
-  [0, 0, 0, 0, 0],
-  [0, 1, 1, 1, 0],
-  [0, 0, 0, 0, 3],
-  [0, 3, 2, 3, 0],
-  ["p", 0, 0, 0, 0],
-  [1, 1, 1, 1, 1],
+const levels = [
+  [
+    [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
+    [0, 2, 2, 2, 0],
+    [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [],
+    [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+  ],
+  [
+    [0, 0, 0, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 0, 0, 3],
+    [0, 3, 2, 3, 0],
+    ["p", 0, 0, 0, 0],
+    [1, 1, 1, 1, 1],
+  ],
+  [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
+    [0, "p", 0, 0, 2, 2, 2, 0, 3, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [],
+    [0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+  ]
 ];
 
 function gameLoop() {
@@ -232,13 +247,31 @@ function gameLoop() {
     }
   }
   player.gameBoundaryDetection();
-  if (controller["1"]?.pressed) {
-    activeLevelData = convertToObjects(level1);
+  if (controller["ArrowLeft"]?.pressed) {
+    if (!levelSwitchCooldown) {
+      levelSwitchCooldown = true;
+      setTimeout(() => {
+        levelSwitchCooldown = false;
+      }, 500);
+      if (currentLevel > 0) {
+        currentLevel--;
+      }
+      activeLevelData = convertToObjects(levels[currentLevel]);
     player.spawn();
+    }
   }
-  if (controller["2"]?.pressed) {
-    activeLevelData = convertToObjects(level2);
-    player.spawn();
+  if (controller["ArrowRight"]?.pressed) {
+    if (!levelSwitchCooldown) {
+      levelSwitchCooldown = true;
+      setTimeout(() => {
+        levelSwitchCooldown = false;
+      }, 500);
+      if (currentLevel < levels.length - 1) {
+        currentLevel++;
+      }
+      activeLevelData = convertToObjects(levels[currentLevel]);
+      player.spawn();
+    }
   }
   buildLevel(activeLevelData);
   player.drawPlayer();
@@ -248,7 +281,7 @@ function gameLoop() {
 function startGame() {
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
-  activeLevelData = convertToObjects(level1);
+  activeLevelData = convertToObjects(levels[currentLevel]);
   player.spawn();
   gameLoop();
   visualViewport.addEventListener("resize", function () {
