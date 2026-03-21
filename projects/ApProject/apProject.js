@@ -90,7 +90,7 @@ class Player {
     }
 
     this.velX *= this.friction;
-    if (this.x >= gameArea.width / 2) {
+    if (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
         this.globalOffsetX = 0;
@@ -107,11 +107,13 @@ class Player {
 
     this.prevY = this.y;
 
-    this.velY += this.gravity;
-    if (this.velY > this.maxFallSpeed) {
-      this.velY = this.maxFallSpeed;
+    if(!this.grounded) {
+      this.velY += this.gravity;
+      if (this.velY > this.maxFallSpeed) {
+        this.velY = this.maxFallSpeed;
+      }
     }
-    if (this.y >= gameArea.height / 2) {
+    if (this.y >= gameArea.height / 3 || this.globalOffsetY > 0) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
         this.globalOffsetY = 0;
@@ -165,17 +167,17 @@ const level1 = [
   [],
   [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [],
+  [0, 0, 1],
   [],
+  [0, 1],
   [],
+  [0, 0, 1],
   [],
+  [0, 1],
   [],
+  [0, 0, 1],
   [],
-  [],
-  [],
-  [],
-  [],
-  [],
-  [],
+  [0, 1],
   [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 const level2 = [
