@@ -137,9 +137,12 @@ class Player {
     } else {
       this.x += this.velX;
     }
-    if (this.globalOffsetX >= longestHorizontalLength * 50 - gameArea.width && this.x < gameArea.width / 2) {
-      this.globalOffsetX = longestHorizontalLength * 50 - gameArea.width;
-      this.globalOffsetX += this.velX;
+    if (this.globalOffsetX >= longestHorizontalLength * 50 - gameArea.width) {
+      if (this.x >= gameArea.width / 2) {
+        this.globalOffsetX = longestHorizontalLength * 50 - gameArea.width;
+      } else if (this.x < gameArea.width / 2) {
+        this.globalOffsetX += this.velX;
+      }
     }
 
     //scrolling vertically
