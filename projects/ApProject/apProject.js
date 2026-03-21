@@ -20,11 +20,11 @@ function backgroundColor(r, g, b, randomize) {
   for (let i = 0; i < longestHorizontalLength; i ++) {
     for (let j = 0; j < activeLevelData.length; j ++) {
       if (randomize) {
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.max(Math.random(), 0.85)})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.15 + 0.9})`;
       } else {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
       }
-      ctx.fillRect((i * 50) - player.globalOffsetX, (j * 50) - player.globalOffsetY, 50, 50);
+      ctx.fillRect((i * 50) - player.globalOffsetX, (j * 50) - player.globalOffsetY, 50.5, 50.5);
     }
   }
 }
