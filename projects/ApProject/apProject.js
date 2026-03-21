@@ -77,7 +77,14 @@ class Player {
   drawPlayer() {
     if (this.image.complete && this.image.width > 0) {
       this.height = this.size * (this.image.height / this.image.width);
-      ctx.drawImage(this.image, this.x, this.y, this.size, this.height);
+      if (this.velX >= 0) {
+        ctx.drawImage(this.image, this.x, this.y, this.size, this.height);
+      } else {
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(this.image, -this.x - this.size, this.y, this.size, this.height);
+        ctx.restore();
+      }
     }
   }
 
