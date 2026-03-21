@@ -50,7 +50,6 @@ class Player {
     this.velY = 0;
     this.prevY = y;
     this.speed = 0.5;
-    this.friction = 0.92;
     this.gravity = 0.5;
     this.jumpStrength = -11; // perfect 3 block jump (do not touch)
     this.grounded = false;
@@ -59,7 +58,7 @@ class Player {
     this.maxVelY = 15;
     this.acceleration = 0;
     this.currentGroundBlock = null;
-    this.lastTemporaryBlock = null;
+    this.insideBlock = null;
 
     this.globalOffsetX = 0;
     this.globalOffsetY = 0;
@@ -164,6 +163,21 @@ class Player {
       this.spawn();
     }
   }
+
+  insideBlockDetection(block) {
+    if (
+      this.x + this.size > block.x - this.globalOffsetX &&
+      this.x < block.x + block.width - this.globalOffsetX &&
+      this.y + this.height > block.y - this.globalOffsetY &&
+      this.y < block.y + block.height - this.globalOffsetY
+    ) {
+      this.insideBlock = block;
+    } else {
+      if (this.insideBlock === block) {
+        this.insideBlock = null;
+      }
+    }
+  }
 }
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
@@ -212,6 +226,7 @@ function gameLoop() {
           Math.abs(player.y - block.y + player.globalOffsetY) < 100
         ) {
           player.groundedDetection(block);
+          player.insideBlockDetection(block);
         }
       }
     }
