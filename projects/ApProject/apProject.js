@@ -77,23 +77,11 @@ class Player {
     if (this.image.complete && this.image.width > 0) {
       this.height = this.size * (this.image.height / this.image.width);
       if (this.velX >= 0) {
-        ctx.drawImage(
-          this.image,
-          Math.round(this.x),
-          Math.round(this.y),
-          this.size,
-          this.height,
-        );
+        ctx.drawImage(this.image, Math.round(this.x), Math.round(this.y), this.size, this.height);
       } else {
         ctx.save();
         ctx.scale(-1, 1);
-        ctx.drawImage(
-          this.image,
-          Math.round(-this.x - this.size),
-          Math.round(this.y),
-          this.size,
-          this.height,
-        );
+        ctx.drawImage(this.image, Math.round(-this.x - this.size), Math.round(this.y), this.size, this.height);
         ctx.restore();
       }
     }
@@ -127,7 +115,7 @@ class Player {
 
     this.prevY = this.y;
 
-    if (!this.grounded) {
+    if(!this.grounded) {
       this.velY += this.gravity;
       if (this.velY > this.maxFallSpeed) {
         this.velY = this.maxFallSpeed;
@@ -156,10 +144,7 @@ class Player {
     ) {
       this.grounded = true;
       this.currentGroundBlock = object;
-      if (
-        this.currentGroundBlock.temporary &&
-        this.currentGroundBlock.timeToDisappear === undefined
-      ) {
+      if (this.currentGroundBlock.temporary && this.currentGroundBlock.timeToDisappear === undefined) {
         object.startTempDisappear();
       }
       this.velY = 0;
@@ -198,49 +183,12 @@ const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let activeLevelData = [];
 const level1 = [
-  [
-    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1,
-    0, 0, 1, 0, 0, 1,
-  ],
+  [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   [0, 2, 2, 2, 0],
-  [
-    0,
-    "p",
-    0,
-    0,
-    3,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    0,
-    0,
-    1,
-  ],
-  [
-    0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1,
-  ],
+  [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+  [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [],
-  [
-    1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  ],
+  [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [],
   [0, 0, 1],
   [],
@@ -253,10 +201,7 @@ const level1 = [
   [0, 0, 1],
   [],
   [0, 1],
-  [
-    4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-  ],
+  [4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
 ];
 const level2 = [
   [0, 0, 0, 0, 0],
