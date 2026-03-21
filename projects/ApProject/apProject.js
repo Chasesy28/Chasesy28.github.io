@@ -99,7 +99,6 @@ class Player {
       this.velX *= this.currentGroundBlock.friction;
     }
     //Scrolling horizontally
-    let longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
     if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
@@ -131,7 +130,6 @@ class Player {
     if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
-        this.globalOffsetY = 0;
         this.y += this.velY;
       }
     } else {
@@ -202,9 +200,9 @@ const levels = [
   [
     [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
     [0, 2, 2, 2, 0],
-    [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
     [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [],
     [0, 0, 1],
@@ -224,7 +222,7 @@ const levels = [
     [0, 1],
     [],
     [0, 0, 1],
-    [],
+    [0, 0],
     [0, 1],
     [],
     [0, 0, 1],
@@ -276,6 +274,7 @@ const levels = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ]
 ];
+let longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
 
 function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
