@@ -98,7 +98,9 @@ class Player {
     if (this.currentGroundBlock != null) {
       this.velX *= this.currentGroundBlock.friction;
     }
-    if (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) {
+    //Scrolling horizontally
+    let longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
+    if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
         this.globalOffsetX = 0;
@@ -106,6 +108,10 @@ class Player {
       }
     } else {
       this.x += this.velX;
+    }
+    if (this.globalOffsetX >= longestHorizontalLength * 50 - gameArea.width && this.x < gameArea.width / 2) {
+      this.globalOffsetX = longestHorizontalLength * 50 - gameArea.width;
+      this.globalOffsetX += this.velX;
     }
 
     if ((controller.W?.pressed || controller.w?.pressed) && this.grounded) {
@@ -121,7 +127,8 @@ class Player {
         this.velY = this.maxFallSpeed;
       }
     }
-    if (this.y >= gameArea.height / 3 || this.globalOffsetY > 0) {
+    //scrolling vertically
+    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
         this.globalOffsetY = 0;
@@ -129,6 +136,10 @@ class Player {
       }
     } else {
       this.y += this.velY;
+    }
+    if (this.globalOffsetY >= activeLevelData.length * 50 - gameArea.height) {
+      this.globalOffsetY = activeLevelData.length * 50 - gameArea.height;
+      this.globalOffsetY += this.velY;
     }
   }
 
@@ -155,6 +166,9 @@ class Player {
   gameBoundaryDetection() {
     if (this.x < 0) {
       this.x = 0;
+      this.velX = 0;
+    } else if (this.x + this.size > gameArea.width) {
+      this.x = gameArea.width - this.size;
       this.velX = 0;
     } else if (this.y < 0) {
       this.y = 0;
@@ -204,7 +218,32 @@ const levels = [
     [0, 0, 1],
     [],
     [0, 1],
-    [4, 4, 4, 4, 4, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [],
+    [4, 4, 4, 4, 4, 5, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
   ],
   [
     [0, 0, 0, 0, 0],
@@ -224,6 +263,17 @@ const levels = [
     [0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
     [0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+  ],
+  [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    ["p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ]
 ];
 

@@ -25,7 +25,7 @@ const blockTypes = {
     color: "cyan",
     solid: true,
     temporary: false,
-    friction: 1.01,
+    friction: 0.99,
   },
   slow: {
     color: "darkgreen",
