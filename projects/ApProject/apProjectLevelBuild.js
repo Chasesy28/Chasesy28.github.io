@@ -14,6 +14,8 @@ function convertToObjects(levelData) {
         row.push(new Block(j * 50, i * 50, 50, 50, "temporary"));
       } else if (levelData[i][j] === 3) {
         row.push(new Block(j * 50, i * 50, 50, 50, "permanentTemporary"));
+      } else if (levelData[i][j] === 4) {
+        row.push(new Block(j * 50, i * 50, 50, 50, "ice"));
       }
     }
     level.push(row);

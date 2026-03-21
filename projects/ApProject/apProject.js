@@ -96,7 +96,9 @@ class Player {
       if (this.velX > -this.maxVelX) this.velX -= this.speed;
     }
 
-    this.velX *= this.friction;
+    if (this.currentGroundBlock != null) {
+      this.velX *= this.currentGroundBlock.friction;
+    }
     if (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
@@ -185,7 +187,7 @@ const level1 = [
   [0, 0, 1],
   [],
   [0, 1],
-  [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  [1, 1, 1, 1, 1, 2, 1, 1, 1, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 const level2 = [
   [0, 0, 0, 0, 0],

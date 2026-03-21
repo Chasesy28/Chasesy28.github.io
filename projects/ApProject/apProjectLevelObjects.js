@@ -3,6 +3,7 @@ const blockTypes = {
     color: "brown",
     solid: true,
     temporary: false,
+    friction: 0.92,
   },
   temporary: {
     color: "gray",
@@ -10,6 +11,7 @@ const blockTypes = {
     temporary: true,
     disappearTime: 30,
     reappearTime: 120,
+    friction: 0.92,
   },
   permanentTemporary: {
     color: "dimgray",
@@ -17,7 +19,14 @@ const blockTypes = {
     temporary: true,
     disappearTime: 45,
     reappearTime: undefined,
+    friction: 0.92,
   },
+  ice: {
+    color: "cyan",
+    solid: true,
+    temporary: false,
+    friction: 0.99,
+  }
 };
 class Block {
   constructor(x, y, width, height, type) {
@@ -31,6 +40,7 @@ class Block {
     this.temporary = blockTypes[type].temporary;
     this.timeToDisappear;
     this.timeToReappear;
+    this.friction = blockTypes[this.type].friction;
   }
   draw() {
     if (this.temporary && this.timeToDisappear !== undefined) {
