@@ -99,6 +99,7 @@ class Player {
       this.velX *= this.currentGroundBlock.friction;
     }
     //Scrolling horizontally
+    longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
     if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
@@ -196,14 +197,15 @@ const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let currentLevel = 0;
 let levelSwitchCooldown = false;
+let longestHorizontalLength;
 let activeLevelData = [];
 const levels = [
   [
     [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
     [0, 2, 2, 2, 0],
-    [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+    [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
     [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [],
     [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [],
     [0, 0, 1],
@@ -223,7 +225,7 @@ const levels = [
     [0, 1],
     [],
     [0, 0, 1],
-    [0, 0],
+    [],
     [0, 1],
     [],
     [0, 0, 1],
@@ -275,7 +277,6 @@ const levels = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ]
 ];
-let longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
 
 function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
