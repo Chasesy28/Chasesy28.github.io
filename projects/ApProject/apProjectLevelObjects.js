@@ -25,7 +25,13 @@ const blockTypes = {
     color: "cyan",
     solid: true,
     temporary: false,
-    friction: 0.99,
+    friction: 1.01,
+  },
+  slow: {
+    color: "darkgreen",
+    solid: true,
+    temporary: false,
+    friction: 0.75,
   }
 };
 class Block {
