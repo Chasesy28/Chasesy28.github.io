@@ -20,7 +20,7 @@ function backgroundColor(r, g, b, randomize) {
   for (let i = 0; i < longestHorizontalLength; i ++) {
     for (let j = 0; j < activeLevelData.length; j ++) {
       if (randomize) {
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.15 + 0.9})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.1 + 0.85})`;
       } else {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
       }
