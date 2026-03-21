@@ -47,7 +47,7 @@ class Block {
       }
     }
     ctx.fillStyle = this.color;
-    ctx.fillRect(this.x - player.globalOffsetX, this.y, this.width, this.height);
+    ctx.fillRect(this.x - player.globalOffsetX, this.y - player.globalOffsetY, this.width, this.height);
     ctx.globalAlpha = 1;
   }
   startTempDisappear() {

@@ -62,6 +62,7 @@ class Player {
     this.lastTemporaryBlock = null;
 
     this.globalOffsetX = 0;
+    this.globalOffsetY = 0;
   }
 
   spawn() {
@@ -70,6 +71,7 @@ class Player {
     this.velX = 0;
     this.velY = 0;
     this.globalOffsetX = 0;
+    this.globalOffsetY = 0;
   }
 
   drawPlayer() {
@@ -109,7 +111,15 @@ class Player {
     if (this.velY > this.maxFallSpeed) {
       this.velY = this.maxFallSpeed;
     }
-    this.y += this.velY;
+    if (this.y >= gameArea.height / 2) {
+      this.globalOffsetY += this.velY;
+      if (this.globalOffsetY <= 0) {
+        this.globalOffsetY = 0;
+        this.y += this.velY;
+      }
+    } else {
+      this.y += this.velY;
+    }
   }
 
   groundedDetection(object) {
@@ -117,8 +127,8 @@ class Player {
     const currentBottom = this.y + this.height;
 
     if (
-      previousBottom <= object.y &&
-      currentBottom >= object.y &&
+      previousBottom <= object.y - this.globalOffsetY &&
+      currentBottom >= object.y - this.globalOffsetY &&
       this.x + this.size > object.x - this.globalOffsetX &&
       this.x < object.x + object.width - this.globalOffsetX
     ) {
@@ -128,7 +138,7 @@ class Player {
         object.startTempDisappear();
       }
       this.velY = 0;
-      this.y = object.y - this.height;
+      this.y = object.y - this.height - this.globalOffsetY;
     }
   }
 
@@ -152,8 +162,21 @@ const level1 = [
   [0, 2, 2, 2, 0],
   [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
   [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  [0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [],
+  [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 const level2 = [
   [0, 0, 0, 0, 0],
@@ -175,7 +198,7 @@ function gameLoop() {
       if (block.solid) {
         if (
           Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
-          Math.abs(player.y - block.y) < 100
+          Math.abs(player.y - block.y + player.globalOffsetY) < 100
         ) {
           player.groundedDetection(block);
         }
