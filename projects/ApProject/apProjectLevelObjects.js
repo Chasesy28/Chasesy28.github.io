@@ -32,7 +32,7 @@ const blockTypes = {
     solid: true,
     temporary: false,
     friction: 0.75,
-  }
+  },
 };
 class Block {
   constructor(x, y, width, height, type) {
@@ -47,11 +47,14 @@ class Block {
     this.timeToDisappear;
     this.timeToReappear;
     this.friction = blockTypes[this.type].friction;
+    this.visible = true; // Track visibility for rendering optimization
   }
   draw() {
+    const blockTypeData = blockTypes[this.type];
+
     if (this.temporary && this.timeToDisappear !== undefined) {
       this.timeToDisappear -= 1;
-      ctx.globalAlpha = this.timeToDisappear / blockTypes[this.type].disappearTime;
+      ctx.globalAlpha = this.timeToDisappear / blockTypeData.disappearTime;
       if (this.timeToDisappear <= 0) {
         this.tempDisappear();
       }
@@ -62,8 +65,17 @@ class Block {
         this.tempReappear();
       }
     }
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x - player.globalOffsetX, this.y - player.globalOffsetY, this.width, this.height);
+
+    // Skip rendering if not visible or fully transparent
+    if (this.visible && ctx.globalAlpha > 0) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(
+        Math.round(this.x - player.globalOffsetX),
+        Math.round(this.y - player.globalOffsetY),
+        this.width,
+        this.height,
+      );
+    }
     ctx.globalAlpha = 1;
   }
   startTempDisappear() {
@@ -74,10 +86,12 @@ class Block {
     this.color = "rgba(0,0,0,0)";
     this.timeToDisappear = undefined;
     this.timeToReappear = blockTypes[this.type].reappearTime;
+    this.visible = false; // Flag to skip rendering
   }
   tempReappear() {
     this.solid = true;
     this.color = blockTypes[this.type].color;
     this.timeToReappear = undefined;
+    this.visible = true;
   }
 }
