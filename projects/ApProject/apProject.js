@@ -98,6 +98,8 @@ class Player {
 
     if (this.currentGroundBlock != null) {
       this.velX *= this.currentGroundBlock.friction;
+    } else {
+      this.velX *= this.friction;
     }
     if (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) {
       this.globalOffsetX += this.velX;
