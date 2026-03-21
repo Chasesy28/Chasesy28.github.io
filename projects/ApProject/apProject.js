@@ -16,12 +16,21 @@ function toggleFullScreen() {
   }
 }
 
-function backgroundColor(color) {
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, gameArea.width, gameArea.height);
+function backgroundColor(r, g, b, randomize) {
+  for (let i = 0; i < longestHorizontalLength; i ++) {
+    for (let j = 0; j < activeLevelData.length; j ++) {
+      if (randomize) {
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.max(Math.random(), 0.85)})`;
+      } else {
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
+      }
+      ctx.fillRect((i * 50) - player.globalOffsetX, (j * 50) - player.globalOffsetY, 50, 50);
+    }
+  }
 }
 
-backgroundColor("black");
+ctx.fillStyle = "black";
+ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 
 const controller = {
   W: { pressed: false },
@@ -311,7 +320,7 @@ const levels = [
 
 function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
-  backgroundColor("lightblue");
+  backgroundColor(173, 216, 230, true);
   player.move();
   player.grounded = false;
   player.currentGroundBlock = null;
