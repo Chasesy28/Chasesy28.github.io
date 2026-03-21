@@ -49,6 +49,7 @@ class Player {
     this.velX = 0;
     this.velY = 0;
     this.prevY = y;
+    this.prevX = x;
     this.speed = 0.5;
     this.gravity = 0.5;
     this.jumpStrength = -11; // perfect 3 block jump (do not touch)
@@ -62,6 +63,8 @@ class Player {
 
     this.globalOffsetX = 0;
     this.globalOffsetY = 0;
+    this.prevGlobalOffsetX = 0;
+    this.prevGlobalOffsetY = 0;
   }
 
   spawn() {
@@ -98,6 +101,31 @@ class Player {
     if (this.currentGroundBlock != null) {
       this.velX *= this.currentGroundBlock.friction;
     }
+
+    if ((controller.W?.pressed || controller.w?.pressed) && this.grounded) {
+      this.velY = this.jumpStrength;
+      this.grounded = false;
+    }
+
+    this.prevY = this.y;
+    this.prevX = this.x;
+
+    if(!this.grounded) {
+      this.velY += this.gravity;
+      if (this.velY > this.maxFallSpeed) {
+        this.velY = this.maxFallSpeed;
+      }
+    }
+
+    if (this.velX <= 0.1 && this.velX > 0) { this.velX = 0; }
+    if (this.velX >= -0.1 && this.velX < 0) { this.velX = 0; }
+    if (this.velY <= 0.1 && this.velY > 0) { this.velY = 0; }
+    if (this.velY >= -0.1 && this.velY < 0) { this.velY = 0; }
+
+    // Store previous offsets before scrolling
+    this.prevGlobalOffsetX = this.globalOffsetX;
+    this.prevGlobalOffsetY = this.globalOffsetY;
+
     //Scrolling horizontally
     longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
     if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width) {
@@ -114,20 +142,8 @@ class Player {
       this.globalOffsetX += this.velX;
     }
 
-    if ((controller.W?.pressed || controller.w?.pressed) && this.grounded) {
-      this.velY = this.jumpStrength;
-      this.grounded = false;
-    }
-
-    this.prevY = this.y;
-
-    if(!this.grounded) {
-      this.velY += this.gravity;
-      if (this.velY > this.maxFallSpeed) {
-        this.velY = this.maxFallSpeed;
-      }
-    }
     //scrolling vertically
+    let verticalOffsetModifier = 0;
     if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
@@ -138,20 +154,32 @@ class Player {
       this.y += this.velY;
     }
     if (this.globalOffsetY >= activeLevelData.length * 50 - gameArea.height) {
-      this.globalOffsetY = activeLevelData.length * 50 - gameArea.height;
-      this.globalOffsetY += this.velY;
+      if (this.y >= gameArea.height / 2) {
+        this.globalOffsetY = activeLevelData.length * 50 - gameArea.height;
+      }
+      else if (this.y < gameArea.height / 2) {
+        this.globalOffsetY += this.velY;
+      }
     }
   }
 
   groundedDetection(object) {
-    const previousBottom = this.prevY + this.size;
-    const currentBottom = this.y + this.height;
+    // Convert to world space using previous frame offsets
+    const previousBottomWorld = this.prevY + this.prevGlobalOffsetY + this.size;
+    const currentBottomWorld = this.y + this.globalOffsetY + this.height;
+    const blockTopWorld = object.y;
+
+    // Player X in world space
+    const playerLeftWorld = this.x + this.prevGlobalOffsetX;
+    const playerRightWorld = this.x + this.prevGlobalOffsetX + this.size;
+    const blockLeftWorld = object.x;
+    const blockRightWorld = object.x + object.width;
 
     if (
-      previousBottom <= object.y - this.globalOffsetY &&
-      currentBottom >= object.y - this.globalOffsetY &&
-      this.x + this.size > object.x - this.globalOffsetX &&
-      this.x < object.x + object.width - this.globalOffsetX
+      previousBottomWorld <= blockTopWorld &&
+      currentBottomWorld >= blockTopWorld &&
+      playerRightWorld > blockLeftWorld &&
+      playerLeftWorld < blockRightWorld
     ) {
       this.grounded = true;
       this.currentGroundBlock = object;
@@ -179,6 +207,7 @@ class Player {
   }
 
   insideBlockDetection(block) {
+    // Use current offsets for screen-space collision check
     if (
       this.x + this.size > block.x - this.globalOffsetX &&
       this.x < block.x + block.width - this.globalOffsetX &&
