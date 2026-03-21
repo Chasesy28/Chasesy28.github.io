@@ -143,7 +143,6 @@ class Player {
     }
 
     //scrolling vertically
-    let verticalOffsetModifier = 0;
     if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
