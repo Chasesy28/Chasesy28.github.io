@@ -17,6 +17,8 @@ function toggleFullScreen() {
 }
 
 function backgroundColor(r, g, b, randomize) {
+  ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
+  ctx.fillRect
   for (let i = 0; i < Math.max(longestHorizontalLength, gameArea.width / 50); i ++) {
     for (let j = 0; j < Math.max(activeLevelData.length, gameArea.height / 50); j ++) {
       if (randomize) {
