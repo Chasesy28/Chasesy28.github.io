@@ -51,25 +51,6 @@ function convertToObjects(levelData) {
   return level;
 }
 
-const backgroundNumberKey = {
-  0: "sky",
-  1: "darkness",
-}
-function convertToBackground(levelData) {
-  let background = [];
-  for (let i = 0; i < levelData.length; i++) {
-    let row = [];
-    for (let j = 0; j < levelData[i].length; j++) {
-      if (Object.keys(backgroundNumberKey).includes(String(levelData[i][j]))) {
-        row.push(new BackgroundObject(j * 50, i * 50, 50, 50, backgroundNumberKey[levelData[i][j]]));
-      }
-    }
-    background.push(row);
-  }
-  return background;
-
-}
-
 function buildLevel(levelData) {
   for (let i = 0; i < levelData.length; i++) {
     //Builds each column in the row

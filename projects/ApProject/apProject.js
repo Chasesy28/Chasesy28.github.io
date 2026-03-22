@@ -20,7 +20,7 @@ function backgroundColor(r, g, b, randomize) {
   ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
   ctx.fillRect
   for (let i = 0; i < Math.max(longestHorizontalLength, gameArea.width / 50); i ++) {
-    for (let j = 0; j < Math.max(activeLevelData.length, gameArea.height / 50); j ++) {
+    for (let j = 0; j < Math.max(longestVerticalLength, gameArea.height / 50); j ++) {
       if (randomize) {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.1 + 0.85})`;
       } else {
@@ -43,20 +43,25 @@ const controller = {
   d: { pressed: false },
   ArrowLeft: { pressed: false },
   ArrowRight: { pressed: false },
+  ArrowUp: { pressed: false },
+  ArrowDown: { pressed: false },
 };
 
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let currentLevel = 0;
 let levelSwitchCooldown = false;
+let layerSwitchCooldown = false;
 let longestHorizontalLength;
+let longestVerticalLength;
 let activeLevelData = [];
 const levels = [
   [
     [
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
     [
       [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
@@ -103,6 +108,11 @@ const levels = [
       [0, 1],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [4, 4, 4, 4, 4, 5, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    ],
+    [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
   ],
   [
@@ -183,14 +193,27 @@ const levels = [
   ],
 ];
 
+function updateLevelData() {
+  for (let i = 0; i < levels[currentLevel].length; i++) {
+    activeLevelData[i] = convertToObjects(levels[currentLevel][i]);
+  }
+  longestHorizontalLength = Math.max.apply(null, activeLevelData.map(layer => Math.max.apply(null, layer.map(row => row.length))));
+  longestVerticalLength = Math.max.apply(null, activeLevelData.map(layer => layer.length));
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   backgroundColor(173, 216, 230, true);
+  for (let i = 0; i < activeLevelData.length; i++) {
+    buildLevel(activeLevelData[i]);
+  }
+  player.drawPlayer();
   player.move(controller);
   player.grounded = false;
   player.currentGroundBlock = null;
-  for (const row of activeLevelData[1]) {
-    for (const block of row) {
+  for (let i = 0; i < activeLevelData[player.layer].length; i++) {
+    for (let j = 0; j < activeLevelData[player.layer][i].length; j++) {
+      const block = activeLevelData[player.layer][i][j];
       if (block.solid) {
         if (
           Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
@@ -212,8 +235,7 @@ function gameLoop() {
       if (currentLevel > 0) {
         currentLevel--;
       }
-      activeLevelData[0] = convertToBackground(levels[currentLevel][0]);
-      activeLevelData[1] = convertToObjects(levels[currentLevel][1]);
+      updateLevelData();
     player.spawn();
     }
   }
@@ -226,22 +248,42 @@ function gameLoop() {
       if (currentLevel < levels.length - 1) {
         currentLevel++;
       }
-      activeLevelData[0] = convertToBackground(levels[currentLevel][0]);
-      activeLevelData[1] = convertToObjects(levels[currentLevel][1]);
+      updateLevelData();
       player.spawn();
     }
   }
-  buildLevel(activeLevelData[0]);
-  buildLevel(activeLevelData[1]);
-  player.drawPlayer();
+  if (controller["ArrowUp"]?.pressed) {
+    if (!layerSwitchCooldown) {
+      layerSwitchCooldown = true;
+      setTimeout(() => {
+        layerSwitchCooldown = false;
+      }, 250);
+      player.layer++;
+      if (player.layer >= activeLevelData.length) {
+        player.layer = activeLevelData.length - 1;
+      }
+    }
+  }
+  if (controller["ArrowDown"]?.pressed) {
+    if (!layerSwitchCooldown) {
+      layerSwitchCooldown = true;
+      setTimeout(() => {
+        layerSwitchCooldown = false;
+      }, 250);
+      player.layer--;
+      if (player.layer < 0) {
+        player.layer = 0;
+      }
+    }
+  }
+
   requestAnimationFrame(gameLoop);
 }
 
 function startGame() {
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
-  activeLevelData[0] = convertToBackground(levels[currentLevel][0]);
-  activeLevelData[1] = convertToObjects(levels[currentLevel][1]);
+  updateLevelData();
   player.spawn();
   gameLoop();
   visualViewport.addEventListener("resize", function () {

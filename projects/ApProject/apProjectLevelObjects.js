@@ -34,6 +34,8 @@ class Player {
     this.prevGlobalOffsetY = 0;
 
     this.direction = "right";
+
+    this.layer = 0;
   }
 
   spawn() {
@@ -102,7 +104,6 @@ class Player {
 
   scrolling () {
     //Scrolling horizontally
-    longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
     if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width && longestHorizontalLength * 50 > gameArea.width) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
@@ -121,7 +122,7 @@ class Player {
     }
 
     //scrolling vertically
-    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height && activeLevelData.length * 50 > gameArea.height) {
+    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData[this.layer].length * 50 - gameArea.height && activeLevelData[this.layer].length * 50 > gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
         this.globalOffsetY = 0;
@@ -130,9 +131,9 @@ class Player {
     } else {
       this.y += this.velY;
     }
-    if (this.globalOffsetY >= activeLevelData.length * 50 - gameArea.height && activeLevelData.length * 50 > gameArea.height) {
+    if (this.globalOffsetY >= activeLevelData[this.layer].length * 50 - gameArea.height && activeLevelData[this.layer].length * 50 > gameArea.height) {
       if (this.y >= gameArea.height / 2) {
-        this.globalOffsetY = activeLevelData.length * 50 - gameArea.height;
+        this.globalOffsetY = activeLevelData[this.layer].length * 50 - gameArea.height;
       }
       else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
@@ -249,7 +250,7 @@ class Block {
     this.timeToDisappear;
     this.timeToReappear;
     this.friction = blockTypes[this.type].friction;
-    this.visible = true; // Track visibility for rendering optimization
+    this.visible = true;
   }
   draw() {
     const blockTypeData = blockTypes[this.type];
@@ -266,6 +267,12 @@ class Block {
       if (this.timeToReappear <= 0) {
         this.tempReappear();
       }
+    }
+
+    if (Math.round(this.x - player.globalOffsetX + this.width) < 0 || Math.round(this.x - player.globalOffsetX) > gameArea.width || Math.round(this.y - player.globalOffsetY + this.height) < 0 || Math.round(this.y - player.globalOffsetY) > gameArea.height || ctx.globalAlpha <= 0) {
+      this.visible = false;
+    } else {
+      this.visible = true;
     }
 
     // Skip rendering if not visible or fully transparent
@@ -288,40 +295,12 @@ class Block {
     this.color = "rgba(0,0,0,0)";
     this.timeToDisappear = undefined;
     this.timeToReappear = blockTypes[this.type].reappearTime;
-    this.visible = false; // Flag to skip rendering
+    this.visible = false;
   }
   tempReappear() {
     this.solid = true;
     this.color = blockTypes[this.type].color;
     this.timeToReappear = undefined;
     this.visible = true;
-  }
-}
-
-const backgroundTypes = {
-  sky: {
-    color: "lightblue",
-  },
-  darkness: {
-    color: "black",
-  },
-}
-class BackgroundObject {
-  constructor(x, y, width, height, type) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.type = type;
-    this.color = backgroundTypes[type].color;
-  }
-  draw() {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(
-      Math.round(this.x - player.globalOffsetX),
-      Math.round(this.y - player.globalOffsetY),
-      this.width,
-      this.height,
-    );
   }
 }
