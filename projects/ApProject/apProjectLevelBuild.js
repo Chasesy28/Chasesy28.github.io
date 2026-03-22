@@ -1,3 +1,10 @@
+const levelNumberKey = {
+  1: "basic",
+  2: "temporary",
+  3: "permanentTemporary",
+  4: "ice",
+  5: "slow",
+}
 function convertToObjects(levelData) {
   let longestHorizontalLength = Math.max.apply(null, levelData.map(row => row.length));
   let level = [];
@@ -35,16 +42,8 @@ function convertToObjects(levelData) {
             player.spawnOffsetY = levelData.length * 50 - gameArea.height;
           }
         }
-      } else if (levelData[i][j] === 1) {
-        row.push(new Block(j * 50, i * 50, 50, 50, "basic"));
-      } else if (levelData[i][j] === 2) {
-        row.push(new Block(j * 50, i * 50, 50, 50, "temporary"));
-      } else if (levelData[i][j] === 3) {
-        row.push(new Block(j * 50, i * 50, 50, 50, "permanentTemporary"));
-      } else if (levelData[i][j] === 4) {
-        row.push(new Block(j * 50, i * 50, 50, 50, "ice"));
-      } else if (levelData[i][j] === 5) {
-        row.push(new Block(j * 50, i * 50, 50, 50, "slow"));
+      } else if (Object.keys(levelNumberKey).includes(String(levelData[i][j]))) {
+        row.push(new Block(j * 50, i * 50, 50, 50, levelNumberKey[levelData[i][j]]));
       }
     }
     level.push(row);
