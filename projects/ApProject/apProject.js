@@ -17,8 +17,8 @@ function toggleFullScreen() {
 }
 
 function backgroundColor(r, g, b, randomize) {
-  for (let i = 0; i < longestHorizontalLength; i ++) {
-    for (let j = 0; j < activeLevelData.length; j ++) {
+  for (let i = 0; i < Math.max(longestHorizontalLength, gameArea.width / 50); i ++) {
+    for (let j = 0; j < Math.max(activeLevelData.length, gameArea.height / 50); j ++) {
       if (randomize) {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.1 + 0.85})`;
       } else {
@@ -209,13 +209,13 @@ class Player {
   }
 
   gameBoundaryDetection() {
-    if (this.x < 0) {
+    if (this.x <= 0) {
       this.x = 0;
       this.velX = 0;
     } else if (this.x + this.size > gameArea.width) {
       this.x = gameArea.width - this.size;
       this.velX = 0;
-    } else if (this.y < 0) {
+    } else if (this.y <= 0) {
       this.y = 0;
       this.velY = 0;
     } else if (this.y + this.size > gameArea.height) {
