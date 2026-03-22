@@ -149,7 +149,7 @@ class Player {
   scrolling () {
     //Scrolling horizontally
     longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
-    if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width) {
+    if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width && longestHorizontalLength * 50 > gameArea.width) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
         this.globalOffsetX = 0;
@@ -158,7 +158,7 @@ class Player {
     } else {
       this.x += this.velX;
     }
-    if (this.globalOffsetX >= longestHorizontalLength * 50 - gameArea.width) {
+    if (this.globalOffsetX >= longestHorizontalLength * 50 - gameArea.width && longestHorizontalLength * 50 > gameArea.width) {
       if (this.x >= gameArea.width / 2) {
         this.globalOffsetX = longestHorizontalLength * 50 - gameArea.width;
       } else if (this.x < gameArea.width / 2) {
@@ -167,7 +167,7 @@ class Player {
     }
 
     //scrolling vertically
-    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height) {
+    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData.length * 50 - gameArea.height && activeLevelData.length * 50 > gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
         this.globalOffsetY = 0;
@@ -176,7 +176,7 @@ class Player {
     } else {
       this.y += this.velY;
     }
-    if (this.globalOffsetY >= activeLevelData.length * 50 - gameArea.height) {
+    if (this.globalOffsetY >= activeLevelData.length * 50 - gameArea.height && activeLevelData.length * 50 > gameArea.height) {
       if (this.y >= gameArea.height / 2) {
         this.globalOffsetY = activeLevelData.length * 50 - gameArea.height;
       }

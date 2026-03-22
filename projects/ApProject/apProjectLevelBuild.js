@@ -13,7 +13,7 @@ function convertToObjects(levelData) {
         player.globalOffsetY = 0;
         player.spawnOffsetX = 0;
         player.spawnOffsetY = 0;
-        if (player.spawnX > gameArea.width / 2) {
+        if (player.spawnX > gameArea.width / 2 && longestHorizontalLength * 50 > gameArea.width) {
           if (player.spawnX <= longestHorizontalLength * 50 - gameArea.width / 2) {
             player.spawnX = gameArea.width / 2;
             player.spawnOffsetX = j * 50 - gameArea.width / 2;
@@ -24,7 +24,7 @@ function convertToObjects(levelData) {
             player.spawnOffsetX = longestHorizontalLength * 50 - gameArea.width;
           }
         }
-        if (player.spawnY > gameArea.height / 2) {
+        if (player.spawnY > gameArea.height / 2 && levelData.length * 50 > gameArea.height) {
           if (player.spawnY <= levelData.length * 50 - gameArea.height / 2) {
             player.spawnY = gameArea.height / 2;
             player.spawnOffsetY = i * 50 - gameArea.height / 2;
