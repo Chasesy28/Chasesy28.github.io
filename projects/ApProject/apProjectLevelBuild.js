@@ -5,7 +5,7 @@ const levelNumberKey = {
   4: "ice",
   5: "slow",
 }
-function convertToObjects(levelData) {
+function convertToObjects(levelData, layer) {
   let longestHorizontalLength = Math.max.apply(null, levelData.map(row => row.length));
   let level = [];
   //Runs for each row in the level data
@@ -16,6 +16,7 @@ function convertToObjects(levelData) {
       if (levelData[i][j] === "p") {
         player.spawnX = j * 50;
         player.spawnY = i * 50;
+        player.spawnLayer = layer;
         player.globalOffsetX = 0;
         player.globalOffsetY = 0;
         player.spawnOffsetX = 0;

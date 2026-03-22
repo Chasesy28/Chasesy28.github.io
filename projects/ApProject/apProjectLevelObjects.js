@@ -12,6 +12,7 @@ class Player {
     this.spawnY = y;
     this.spawnOffsetX = null;
     this.spawnOffsetY = null;
+    this.spawnLayer = null;
 
     this.velX = 0;
     this.velY = 0;
@@ -41,6 +42,7 @@ class Player {
   spawn() {
     this.x = this.spawnX;
     this.y = this.spawnY;
+    this.layer = this.spawnLayer;
     this.globalOffsetX = this.spawnOffsetX;
     this.globalOffsetY = this.spawnOffsetY;
     this.velX = 0;

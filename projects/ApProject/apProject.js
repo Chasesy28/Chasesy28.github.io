@@ -195,7 +195,7 @@ const levels = [
 
 function updateLevelData() {
   for (let i = 0; i < levels[currentLevel].length; i++) {
-    activeLevelData[i] = convertToObjects(levels[currentLevel][i]);
+    activeLevelData[i] = convertToObjects(levels[currentLevel][i], i);
   }
   longestHorizontalLength = Math.max.apply(null, activeLevelData.map(layer => Math.max.apply(null, layer.map(row => row.length))));
   longestVerticalLength = Math.max.apply(null, activeLevelData.map(layer => layer.length));
@@ -205,8 +205,14 @@ function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   backgroundColor(173, 216, 230, true);
   for (let i = 0; i < activeLevelData.length; i++) {
+    if (player.layer == i) {
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.globalAlpha = Math.max(0.2, 1 - Math.abs(player.layer - i) * 0.5);
+    }
     buildLevel(activeLevelData[i]);
   }
+  ctx.globalAlpha = 1;
   player.drawPlayer();
   player.move(controller);
   player.grounded = false;
