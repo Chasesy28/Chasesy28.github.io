@@ -54,6 +54,8 @@ class Player {
 
     this.spawnX = x;
     this.spawnY = y;
+    this.spawnOffsetX = null;
+    this.spawnOffsetY = null;
 
     this.velX = 0;
     this.velY = 0;
@@ -79,10 +81,10 @@ class Player {
   spawn() {
     this.x = this.spawnX;
     this.y = this.spawnY;
+    this.globalOffsetX = this.spawnOffsetX;
+    this.globalOffsetY = this.spawnOffsetY;
     this.velX = 0;
     this.velY = 0;
-    this.globalOffsetX = 0;
-    this.globalOffsetY = 0;
   }
 
   drawPlayer() {
@@ -135,6 +137,10 @@ class Player {
     this.prevGlobalOffsetX = this.globalOffsetX;
     this.prevGlobalOffsetY = this.globalOffsetY;
 
+    this.scrolling();
+  }
+
+  scrolling () {
     //Scrolling horizontally
     longestHorizontalLength = Math.max.apply(null, activeLevelData.map(row => row.length));
     if ((this.x >= gameArea.width / 2 || this.globalOffsetX > 0) && this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width) {
@@ -243,9 +249,9 @@ const levels = [
   [
     [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
     [0, 2, 2, 2, 0],
-    [0, "p", 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [0, 0, "p", 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
     [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [],
     [0, 0, 1],
@@ -266,24 +272,24 @@ const levels = [
     [],
     [0, 0, 1],
     [],
-    [0, 1],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [],
+    [0, 0, 1],
+    [],
+    [0, 1],
+    [0, 0, 0],
     [0, 0, 1],
     [],
     [0, 1],
     [],
     [0, 0, 1],
-    [],
+    [0],
     [0, 1],
-    [],
+    [0, 0, 0],
     [0, 0, 1],
-    [],
+    [0, 0],
     [0, 1],
-    [],
-    [0, 0, 1],
-    [],
-    [0, 1],
-    [],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [4, 4, 4, 4, 4, 5, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
   ],
   [
