@@ -52,11 +52,11 @@ function convertToObjects(levelData, layer) {
   return level;
 }
 
-function buildLevel(levelData) {
+function buildLevel(levelData, alpha) {
   for (let i = 0; i < levelData.length; i++) {
     //Builds each column in the row
     for (let j = 0; j < levelData[i].length; j++) {
-      levelData[i][j].draw();
+      levelData[i][j].draw(alpha);
     }
   }
 }

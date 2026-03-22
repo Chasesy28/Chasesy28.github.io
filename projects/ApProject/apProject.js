@@ -58,10 +58,10 @@ let activeLevelData = [];
 const levels = [
   [
     [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [],
+      [],
+      [],
+      [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
     [
       [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1],
@@ -110,15 +110,18 @@ const levels = [
       [4, 4, 4, 4, 4, 5, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
     ],
     [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [],
+      [],
+      [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
   ],
   [
     [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [],
+      [],
+      [],
+      [],
+      [],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ],
     [
@@ -153,7 +156,6 @@ const levels = [
       ["p", 0, 0, 0, 0],
       [1, 1, 1, 1, 1],
     ]
-
   ],
   [
     [
@@ -194,6 +196,7 @@ const levels = [
 ];
 
 function updateLevelData() {
+  activeLevelData = [];
   for (let i = 0; i < levels[currentLevel].length; i++) {
     activeLevelData[i] = convertToObjects(levels[currentLevel][i], i);
   }
@@ -202,15 +205,17 @@ function updateLevelData() {
 }
 
 function gameLoop() {
-  ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   backgroundColor(173, 216, 230, true);
   for (let i = 0; i < activeLevelData.length; i++) {
+    let alpha;
     if (player.layer == i) {
-      ctx.globalAlpha = 1;
+      alpha = 1;
     } else {
-      ctx.globalAlpha = Math.max(0.2, 1 - Math.abs(player.layer - i) * 0.5);
+      alpha = Math.max(0.1, 1 - Math.abs(player.layer - i) * 0.85);
+      ctx.filter = "brightness(10%)";
     }
-    buildLevel(activeLevelData[i]);
+    buildLevel(activeLevelData[i], alpha);
+    ctx.filter = "none";
   }
   ctx.globalAlpha = 1;
   player.drawPlayer();
@@ -258,26 +263,30 @@ function gameLoop() {
       player.spawn();
     }
   }
-  if (controller["ArrowUp"]?.pressed) {
-    if (!layerSwitchCooldown) {
-      layerSwitchCooldown = true;
-      setTimeout(() => {
-        layerSwitchCooldown = false;
-      }, 250);
-      player.layer++;
-      if (player.layer >= activeLevelData.length) {
-        player.layer = activeLevelData.length - 1;
-      }
-    }
-  }
   if (controller["ArrowDown"]?.pressed) {
     if (!layerSwitchCooldown) {
       layerSwitchCooldown = true;
       setTimeout(() => {
         layerSwitchCooldown = false;
       }, 250);
-      player.layer--;
-      if (player.layer < 0) {
+      if (player.layer < activeLevelData[player.layer].length - 1) {
+        player.layer++;
+      }
+      if (player.layer >= activeLevelData.length) {
+        player.layer = activeLevelData.length - 1;
+      }
+    }
+  }
+  if (controller["ArrowUp"]?.pressed) {
+    if (!layerSwitchCooldown) {
+      layerSwitchCooldown = true;
+      setTimeout(() => {
+        layerSwitchCooldown = false;
+      }, 250);
+      if (player.layer > 0) {
+        player.layer--;
+      }
+      if (player.layer <= 0) {
         player.layer = 0;
       }
     }

@@ -175,13 +175,16 @@ class Player {
     if (this.x <= 0) {
       this.x = 0;
       this.velX = 0;
-    } else if (this.x + this.size > gameArea.width) {
+    }
+    if (this.x + this.size > gameArea.width) {
       this.x = gameArea.width - this.size;
       this.velX = 0;
-    } else if (this.y <= 0) {
+    }
+    if (this.y <= 0) {
       this.y = 0;
       this.velY = 0;
-    } else if (this.y + this.size > gameArea.height) {
+    }
+    if (this.y + this.size >= gameArea.height) {
       this.spawn();
     }
   }
@@ -254,8 +257,9 @@ class Block {
     this.friction = blockTypes[this.type].friction;
     this.visible = true;
   }
-  draw() {
+  draw(alpha) {
     const blockTypeData = blockTypes[this.type];
+    ctx.globalAlpha = alpha;
 
     if (this.temporary && this.timeToDisappear !== undefined) {
       this.timeToDisappear -= 1;
@@ -287,7 +291,7 @@ class Block {
         this.height,
       );
     }
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = alpha;
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
