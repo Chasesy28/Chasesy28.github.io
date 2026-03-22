@@ -297,3 +297,31 @@ class Block {
     this.visible = true;
   }
 }
+
+const backgroundTypes = {
+  sky: {
+    color: "lightblue",
+  },
+  darkness: {
+    color: "black",
+  },
+}
+class BackgroundObject {
+  constructor(x, y, width, height, type) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.type = type;
+    this.color = backgroundTypes[type].color;
+  }
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(
+      Math.round(this.x - player.globalOffsetX),
+      Math.round(this.y - player.globalOffsetY),
+      this.width,
+      this.height,
+    );
+  }
+}
