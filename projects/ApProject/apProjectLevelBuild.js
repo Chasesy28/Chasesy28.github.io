@@ -11,6 +11,8 @@ function convertToObjects(levelData) {
         player.spawnY = i * 50;
         player.globalOffsetX = 0;
         player.globalOffsetY = 0;
+        player.spawnOffsetX = 0;
+        player.spawnOffsetY = 0;
         if (player.spawnX > gameArea.width / 2) {
           if (player.spawnX <= longestHorizontalLength * 50 - gameArea.width / 2) {
             player.spawnX = gameArea.width / 2;
