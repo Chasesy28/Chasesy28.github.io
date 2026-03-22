@@ -172,7 +172,7 @@ function gameLoop() {
       levelSwitchCooldown = true;
       setTimeout(() => {
         levelSwitchCooldown = false;
-      }, 500);
+      }, 250);
       if (currentLevel > 0) {
         currentLevel--;
       }
@@ -185,7 +185,7 @@ function gameLoop() {
       levelSwitchCooldown = true;
       setTimeout(() => {
         levelSwitchCooldown = false;
-      }, 500);
+      }, 250);
       if (currentLevel < levels.length - 1) {
         currentLevel++;
       }
