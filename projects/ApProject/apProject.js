@@ -76,6 +76,8 @@ class Player {
     this.globalOffsetY = 0;
     this.prevGlobalOffsetX = 0;
     this.prevGlobalOffsetY = 0;
+
+    this.direction = "right";
   }
 
   spawn() {
@@ -90,7 +92,7 @@ class Player {
   drawPlayer() {
     if (this.image.complete && this.image.width > 0) {
       this.height = this.size * (this.image.height / this.image.width);
-      if (this.velX >= 0) {
+      if (this.direction === "right") {
         ctx.drawImage(this.image, Math.round(this.x), Math.round(this.y), this.size, this.height);
       } else {
         ctx.save();
@@ -103,9 +105,11 @@ class Player {
 
   move() {
     if (controller.D?.pressed || controller.d?.pressed) {
+      this.direction = "right";
       if (this.velX < this.maxVelX) this.velX += this.speed;
     }
     if (controller.A?.pressed || controller.a?.pressed) {
+      this.direction = "left";
       if (this.velX > -this.maxVelX) this.velX -= this.speed;
     }
 
@@ -298,7 +302,7 @@ const levels = [
     [],
     [],
     [],
-    [],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [],
     [],
     [],
