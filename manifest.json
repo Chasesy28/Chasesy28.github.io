@@ -6,7 +6,7 @@
     "description": "A creative playground for web development experiments, featuring rain animations, interactive projects, and modern web technologies.",
     "display": "standalone",
     "orientation": "any",
-    "background_color": "#1a1a1a",
+    "background_color": "#fcba36",
     "theme_color": "#4a9eff",
     "categories": ["entertainment", "education", "productivity", "utilities"],
     "lang": "en-US",
