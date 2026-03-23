@@ -216,11 +216,9 @@ function gameLoop() {
     }
     buildLevel(activeLevelData[i], alpha);
     ctx.filter = "none";
-    if (i == player.layer) {
-      player.drawPlayer();
-    }
   }
   ctx.globalAlpha = 1;
+  player.drawPlayer();
   player.move(controller);
   player.grounded = false;
   player.currentGroundBlock = null;
