@@ -228,6 +228,7 @@ function gameLoop() {
           Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
           Math.abs(player.y - block.y + player.globalOffsetY) < 100
         ) {
+          player.sideBlockDetection(block);
           player.groundedDetection(block);
           player.insideBlockDetection(block);
         }
