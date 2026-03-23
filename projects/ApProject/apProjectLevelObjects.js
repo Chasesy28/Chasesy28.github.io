@@ -332,8 +332,18 @@ class Block {
     this.friction = blockTypes[this.type].friction;
     this.visible = true;
     this.drawn = false;
+    this.previousPlayerOffsetX = player.globalOffsetX;
+    this.previousPlayerOffsetY = player.globalOffsetY;
   }
   draw(alpha) {
+    if (this.previousPlayerOffsetX !== player.globalOffsetX) {
+      this.previousPlayerOffsetX = player.globalOffsetX;
+      this.drawn = false;
+    }
+    if (this.previousPlayerOffsetY !== player.globalOffsetY) {
+      this.previousPlayerOffsetY = player.globalOffsetY;
+      this.drawn = false;
+    }
     if (this.drawn == false) {
       this.drawn = true;
       const blockTypeData = blockTypes[this.type];

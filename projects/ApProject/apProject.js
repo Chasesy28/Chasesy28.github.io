@@ -203,15 +203,16 @@ function updateLevelData() {
 }
 
 function gameLoop() {
-  backgroundColor(173, 216, 230, true);
   for (let i = 0; i < activeLevelData.length; i++) {
     let alpha;
     if (player.layer == i) {
       alpha = 1;
     } else {
+      ctx.filter = "grayscale(100%)";
       alpha = Math.max(0.1, 1 - Math.abs(player.layer - i) * 0.85);
     }
     buildLevel(activeLevelData[i], alpha);
+    ctx.filter = "none";
     if (player.layer == i) {player.drawPlayer();}
   }
   ctx.globalAlpha = 1;
@@ -295,6 +296,7 @@ function startGame() {
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
   updateLevelData();
+  backgroundColor(173, 216, 230, true);
   player.spawn();
   gameLoop();
   visualViewport.addEventListener("resize", function () {
