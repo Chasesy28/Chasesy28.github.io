@@ -51,7 +51,7 @@ class Player {
 
   drawPlayer() {
     if (this.image.complete && this.image.width > 0) {
-      this.height = this.size * (this.image.height / this.image.width);
+      this.height = Math.floor(this.size * (this.image.height / this.image.width));
       if (this.direction === "right") {
         ctx.drawImage(this.image, Math.round(this.x), Math.round(this.y), this.size, this.height);
       } else {

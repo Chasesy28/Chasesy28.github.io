@@ -17,8 +17,6 @@ function toggleFullScreen() {
 }
 
 function backgroundColor(r, g, b, randomize) {
-  ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
-  ctx.fillRect
   for (let i = 0; i < Math.max(longestHorizontalLength, gameArea.width / 50); i ++) {
     for (let j = 0; j < Math.max(longestVerticalLength, gameArea.height / 50); j ++) {
       if (randomize) {
@@ -212,13 +210,11 @@ function gameLoop() {
       alpha = 1;
     } else {
       alpha = Math.max(0.1, 1 - Math.abs(player.layer - i) * 0.85);
-      ctx.filter = "brightness(10%)";
     }
     buildLevel(activeLevelData[i], alpha);
-    ctx.filter = "none";
+    if (player.layer == i) {player.drawPlayer();}
   }
   ctx.globalAlpha = 1;
-  player.drawPlayer();
   player.move(controller);
   player.grounded = false;
   player.currentGroundBlock = null;
