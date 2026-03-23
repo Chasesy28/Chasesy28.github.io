@@ -32,6 +32,7 @@ Optimizes images on-the-fly:
    ```
 
 2. Login to Cloudflare:
+
    ```bash
    wrangler login
    ```
