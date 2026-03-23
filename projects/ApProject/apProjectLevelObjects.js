@@ -209,6 +209,43 @@ class Player {
     }
   }
 
+  sideBlockDetection(object) {
+    // Convert to world space using previous frame offsets
+    const playerLeftWorld = this.x + this.prevGlobalOffsetX;
+    const playerRightWorld = this.x + this.prevGlobalOffsetX + this.size;
+    const playerTopWorld = this.y + this.prevGlobalOffsetY;
+    const playerBottomWorld = this.y + this.prevGlobalOffsetY + this.height;
+
+    const blockLeftWorld = object.x;
+    const blockRightWorld = object.x + object.width;
+    const blockTopWorld = object.y;
+    const blockBottomWorld = object.y + object.height;
+
+    // Check for horizontal collision
+    if (
+      playerBottomWorld > blockTopWorld &&
+      playerTopWorld < blockBottomWorld
+    ) {
+      if (
+        playerRightWorld > blockLeftWorld &&
+        playerLeftWorld < blockLeftWorld &&
+        this.velX > 0
+      ) {
+        // Collision on the right side of the block
+        this.x = blockLeftWorld - this.size - this.globalOffsetX;
+        this.velX = 0;
+      } else if (
+        playerLeftWorld < blockRightWorld &&
+        playerRightWorld > blockRightWorld &&
+        this.velX < 0
+      ) {
+        // Collision on the left side of the block
+        this.x = blockRightWorld - this.globalOffsetX;
+        this.velX = 0;
+      }
+    }
+  }
+
   gameBoundaryDetection() {
     if (this.x <= 0) {
       this.x = 0;
