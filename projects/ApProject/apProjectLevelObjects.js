@@ -336,46 +336,46 @@ class Block {
     this.previousPlayerOffsetY = player.globalOffsetY;
   }
   draw(alpha) {
-      const blockTypeData = blockTypes[this.type];
-      ctx.globalAlpha = alpha;
+    const blockTypeData = blockTypes[this.type];
+    ctx.globalAlpha = alpha;
 
-      if (this.temporary && this.timeToDisappear !== undefined) {
-        this.timeToDisappear -= 1;
-        ctx.globalAlpha = this.timeToDisappear / blockTypeData.disappearTime;
-        if (this.timeToDisappear <= 0) {
-          this.tempDisappear();
-        }
+    if (this.temporary && this.timeToDisappear !== undefined) {
+      this.timeToDisappear -= 1;
+      ctx.globalAlpha = this.timeToDisappear / blockTypeData.disappearTime;
+      if (this.timeToDisappear <= 0) {
+        this.tempDisappear();
       }
-      if (this.temporary && this.timeToReappear !== undefined) {
-        this.timeToReappear -= 1;
-        if (this.timeToReappear <= 0) {
-          this.tempReappear();
-        }
+    }
+    if (this.temporary && this.timeToReappear !== undefined) {
+      this.timeToReappear -= 1;
+      if (this.timeToReappear <= 0) {
+        this.tempReappear();
       }
+    }
 
-      if (
-        Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
-        Math.round(this.x - player.globalOffsetX) > gameArea.width ||
-        Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
-        Math.round(this.y - player.globalOffsetY) > gameArea.height ||
-        ctx.globalAlpha <= 0
-      ) {
-        this.visible = false;
-      } else {
-        this.visible = true;
-      }
+    if (
+      Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
+      Math.round(this.x - player.globalOffsetX) > gameArea.width ||
+      Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
+      Math.round(this.y - player.globalOffsetY) > gameArea.height ||
+      ctx.globalAlpha <= 0
+    ) {
+      this.visible = false;
+    } else {
+      this.visible = true;
+    }
 
-      // Skip rendering if not visible or fully transparent
-      if (this.visible && ctx.globalAlpha > 0) {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(
-          Math.round(this.x - player.globalOffsetX),
-          Math.round(this.y - player.globalOffsetY),
-          this.width,
-          this.height,
-        );
-      }
-      ctx.globalAlpha = alpha;
+    // Skip rendering if not visible or fully transparent
+    if (this.visible && ctx.globalAlpha > 0) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(
+        Math.round(this.x - player.globalOffsetX),
+        Math.round(this.y - player.globalOffsetY),
+        this.width,
+        this.height,
+      );
+    }
+    ctx.globalAlpha = alpha;
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
