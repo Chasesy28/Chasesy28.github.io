@@ -203,6 +203,7 @@ function updateLevelData() {
 }
 
 function gameLoop() {
+  backgroundColor(173, 216, 230, true);
   for (let i = 0; i < activeLevelData.length; i++) {
     let alpha;
     if (player.layer == i) {
@@ -296,7 +297,6 @@ function startGame() {
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
   updateLevelData();
-  backgroundColor(173, 216, 230, true);
   player.spawn();
   gameLoop();
   visualViewport.addEventListener("resize", function () {

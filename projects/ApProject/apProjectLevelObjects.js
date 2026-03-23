@@ -336,22 +336,11 @@ class Block {
     this.previousPlayerOffsetY = player.globalOffsetY;
   }
   draw(alpha) {
-    if (this.previousPlayerOffsetX !== player.globalOffsetX) {
-      this.previousPlayerOffsetX = player.globalOffsetX;
-      this.drawn = false;
-    }
-    if (this.previousPlayerOffsetY !== player.globalOffsetY) {
-      this.previousPlayerOffsetY = player.globalOffsetY;
-      this.drawn = false;
-    }
-    if (this.drawn == false) {
-      this.drawn = true;
       const blockTypeData = blockTypes[this.type];
       ctx.globalAlpha = alpha;
 
       if (this.temporary && this.timeToDisappear !== undefined) {
         this.timeToDisappear -= 1;
-        this.drawn = false; // Redraw every frame while disappearing to update alpha
         ctx.globalAlpha = this.timeToDisappear / blockTypeData.disappearTime;
         if (this.timeToDisappear <= 0) {
           this.tempDisappear();
@@ -359,7 +348,6 @@ class Block {
       }
       if (this.temporary && this.timeToReappear !== undefined) {
         this.timeToReappear -= 1;
-        this.drawn = false; // Redraw every frame while reappearing to update alpha
         if (this.timeToReappear <= 0) {
           this.tempReappear();
         }
@@ -388,7 +376,6 @@ class Block {
         );
       }
       ctx.globalAlpha = alpha;
-    }
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
