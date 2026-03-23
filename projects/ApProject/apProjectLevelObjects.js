@@ -124,7 +124,7 @@ class Player {
     }
 
     //scrolling vertically
-    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < activeLevelData[this.layer].length * 50 - gameArea.height && activeLevelData[this.layer].length * 50 > gameArea.height) {
+    if ((this.y >= gameArea.height / 2 || this.globalOffsetY > 0) && this.globalOffsetY < longestVerticalLength * 50 - gameArea.height && longestVerticalLength * 50 > gameArea.height) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
         this.globalOffsetY = 0;
@@ -133,9 +133,9 @@ class Player {
     } else {
       this.y += this.velY;
     }
-    if (this.globalOffsetY >= activeLevelData[this.layer].length * 50 - gameArea.height && activeLevelData[this.layer].length * 50 > gameArea.height) {
+    if (this.globalOffsetY >= longestVerticalLength * 50 - gameArea.height && longestVerticalLength * 50 > gameArea.height) {
       if (this.y >= gameArea.height / 2) {
-        this.globalOffsetY = activeLevelData[this.layer].length * 50 - gameArea.height;
+        this.globalOffsetY = longestVerticalLength * 50 - gameArea.height;
       }
       else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
