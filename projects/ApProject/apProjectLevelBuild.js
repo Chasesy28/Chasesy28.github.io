@@ -44,7 +44,7 @@ function convertToObjects(levelData, layer) {
           }
         }
       } else if (Object.keys(levelNumberKey).includes(String(levelData[i][j]))) {
-        row.push(new Block(j * 50, i * 50, 50, 50, levelNumberKey[levelData[i][j]]));
+        row.push(new Block(j * 50, i * 50, 50, 50, layer, levelNumberKey[levelData[i][j]]));
       }
     }
     level.push(row);
@@ -52,11 +52,11 @@ function convertToObjects(levelData, layer) {
   return level;
 }
 
-function buildLevel(levelData, alpha) {
+function buildLevel(levelData) {
   for (let i = 0; i < levelData.length; i++) {
     //Builds each column in the row
     for (let j = 0; j < levelData[i].length; j++) {
-      levelData[i][j].draw(alpha);
+      levelData[i][j].draw();
     }
   }
 }

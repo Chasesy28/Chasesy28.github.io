@@ -30,6 +30,7 @@ body {
 .play-overlay:hover,
 .fs-button:hover {
 	background: rgba(65, 74, 151, 0.9);
+	color: brown
 }
 
 .play-overlay {

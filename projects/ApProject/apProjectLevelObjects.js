@@ -128,10 +128,11 @@ class Player {
 
   scrolling() {
     //Scrolling horizontally
+    let longestHorizontalLayerLength = Math.max.apply(null, activeLevelData[player.layer].map(layer => layer.length))
     if (
       (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) &&
-      this.globalOffsetX < longestHorizontalLength * 50 - gameArea.width &&
-      longestHorizontalLength * 50 > gameArea.width
+      this.globalOffsetX < longestHorizontalLayerLength * 50 - gameArea.width &&
+      longestHorizontalLayerLength * 50 > gameArea.width
     ) {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
@@ -142,11 +143,11 @@ class Player {
       this.x += this.velX;
     }
     if (
-      this.globalOffsetX >= longestHorizontalLength * 50 - gameArea.width &&
-      longestHorizontalLength * 50 > gameArea.width
+      this.globalOffsetX >= longestHorizontalLayerLength * 50 - gameArea.width &&
+      longestHorizontalLayerLength * 50 > gameArea.width
     ) {
       if (this.x >= gameArea.width / 2) {
-        this.globalOffsetX = longestHorizontalLength * 50 - gameArea.width;
+        this.globalOffsetX = longestHorizontalLayerLength * 50 - gameArea.width;
       } else if (this.x < gameArea.width / 2) {
         this.globalOffsetX += this.velX;
       }
@@ -155,8 +156,8 @@ class Player {
     //scrolling vertically
     if (
       (this.y >= gameArea.height / 2 || this.globalOffsetY > 0) &&
-      this.globalOffsetY < longestVerticalLength * 50 - gameArea.height &&
-      longestVerticalLength * 50 > gameArea.height
+      this.globalOffsetY < activeLevelData[player.layer].length * 50 - gameArea.height &&
+      activeLevelData[player.layer].length * 50 > gameArea.height
     ) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
@@ -167,11 +168,11 @@ class Player {
       this.y += this.velY;
     }
     if (
-      this.globalOffsetY >= longestVerticalLength * 50 - gameArea.height &&
-      longestVerticalLength * 50 > gameArea.height
+      this.globalOffsetY >= activeLevelData[player.layer].length * 50 - gameArea.height &&
+      activeLevelData[player.layer].length * 50 > gameArea.height
     ) {
       if (this.y >= gameArea.height / 2) {
-        this.globalOffsetY = longestVerticalLength * 50 - gameArea.height;
+        this.globalOffsetY = activeLevelData[player.layer].length * 50 - gameArea.height;
       } else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
       }
@@ -283,13 +284,17 @@ class Player {
 
 const blockTypes = {
   basic: {
-    color: "brown",
+    colorR: 165,
+    colorG: 42,
+    colorB: 42,
     solid: true,
     temporary: false,
     friction: 0.92,
   },
   temporary: {
-    color: "gray",
+    colorR: 128,
+    colorG: 128,
+    colorB: 128,
     solid: true,
     temporary: true,
     disappearTime: 30,
@@ -297,7 +302,9 @@ const blockTypes = {
     friction: 0.92,
   },
   permanentTemporary: {
-    color: "dimgray",
+    colorR: 105,
+    colorG: 105,
+    colorB: 105,
     solid: true,
     temporary: true,
     disappearTime: 45,
@@ -305,26 +312,34 @@ const blockTypes = {
     friction: 0.92,
   },
   ice: {
-    color: "cyan",
+    colorR: 0,
+    colorG: 255,
+    colorB: 255,
     solid: true,
     temporary: false,
     friction: 0.99,
   },
   slow: {
-    color: "darkgreen",
+    colorR: 0,
+    colorG: 100,
+    colorB: 0,
     solid: true,
     temporary: false,
     friction: 0.75,
   },
 };
 class Block {
-  constructor(x, y, width, height, type) {
+  constructor(x, y, width, height, layer, type) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    this.layer = layer;
     this.type = type;
-    this.color = blockTypes[type].color;
+    this.colorR = blockTypes[type].colorR;
+    this.colorG = blockTypes[type].colorG;
+    this.colorB = blockTypes[type].colorB;
+    this.color = `rgb(${this.colorR}, ${this.colorG}, ${this.colorB})`;
     this.solid = blockTypes[type].solid;
     this.temporary = blockTypes[type].temporary;
     this.timeToDisappear;
@@ -334,9 +349,9 @@ class Block {
     this.previousPlayerOffsetX = player.globalOffsetX;
     this.previousPlayerOffsetY = player.globalOffsetY;
   }
-  draw(alpha) {
+  draw() {
+    ctx.globalAlpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
     const blockTypeData = blockTypes[this.type];
-    ctx.globalAlpha = alpha;
 
     if (this.temporary && this.timeToDisappear !== undefined) {
       this.timeToDisappear -= 1;
@@ -374,7 +389,7 @@ class Block {
         this.height,
       );
     }
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
@@ -388,7 +403,7 @@ class Block {
   }
   tempReappear() {
     this.solid = true;
-    this.color = blockTypes[this.type].color;
+    this.color = `rgb(${this.colorR}, ${this.colorG}, ${this.colorB})`;
     this.timeToReappear = undefined;
     this.visible = true;
   }
