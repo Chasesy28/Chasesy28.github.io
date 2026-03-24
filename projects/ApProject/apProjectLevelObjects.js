@@ -335,9 +335,6 @@ class Block {
     this.previousPlayerOffsetY = player.globalOffsetY;
   }
   draw(alpha) {
-    if (alpha != 1) {
-      ctx.filter = "blur(2px)";
-    }
     const blockTypeData = blockTypes[this.type];
     ctx.globalAlpha = alpha;
 
@@ -378,7 +375,6 @@ class Block {
       );
     }
     ctx.globalAlpha = alpha;
-    ctx.filter = "none";
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
