@@ -20,7 +20,7 @@ class Player {
     this.prevX = x;
     this.speed = 0.5;
     this.gravity = 0.5;
-    this.jumpStrength = -11; // perfect 3 block jump (do not touch)
+    this.jumpStrength = -12; // perfect 3 block jump (do not touch)
     this.grounded = false;
     this.maxFallSpeed = 15;
     this.maxVelX = 5;
