@@ -54,6 +54,15 @@ let layerSwitchCooldown = false;
 let longestHorizontalLength;
 let longestVerticalLength;
 let activeLevelData = [];
+/* Level Number Key:
+0 = empty (Any empty lists also work for empty space)
+1 = basic block
+2 = temporary
+3 = permanentTemporary (Doesn't reappear after disappearing)
+4 = ice
+5 = slow
+d = area door (Needs a number after it to determine which area it goes to(Based off of the index of the area in the level array), ex: d1 would be an area door that goes to area 1)
+*/
 const levels = [
   //Level 1
   [
