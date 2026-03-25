@@ -39,10 +39,14 @@ const controller = {
   a: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
+  S: { pressed: false },
+  s: { pressed: false },
   ArrowLeft: { pressed: false },
   ArrowRight: { pressed: false },
   ArrowUp: { pressed: false },
   ArrowDown: { pressed: false },
+  K: { pressed: false },
+  k: { pressed: false },
 };
 
 const player = new Player(100, 100, 35, "/images/Mario.png");
@@ -111,11 +115,13 @@ function gameLoop() {
         }
       } else {
         if (player.insideBlockDetection(block)) {
-          if (block.type === "areaDoor") {
-            currentArea = Number(block.doorArea);
-            player.spawn();
-            areaChanged = true;
-            break;
+          if (controller["S"]?.pressed || controller["s"]?.pressed) {
+            if (block.type === "areaDoor") {
+              currentArea = Number(block.doorArea);
+              player.spawn();
+              areaChanged = true;
+              break;
+            }
           }
         }
       }
@@ -175,6 +181,10 @@ function gameLoop() {
         player.layer = 0;
       }
     }
+  }
+
+  if (controller["k"]?.pressed || controller["K"]?.pressed) {
+    player.spawn();
   }
 
   requestAnimationFrame(gameLoop);
