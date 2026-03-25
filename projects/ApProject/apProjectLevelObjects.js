@@ -375,32 +375,44 @@ class Block {
     this.colorR = blockTypes[type].colorR;
     this.colorG = blockTypes[type].colorG;
     this.colorB = blockTypes[type].colorB;
-    this.color = `rgb(${this.colorR}, ${this.colorG}, ${this.colorB})`;
+    this.alpha = 1;
+    this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
     this.solid = blockTypes[type].solid;
     this.temporary = blockTypes[type].temporary;
     this.timeToDisappear;
     this.timeToReappear;
     this.friction = blockTypes[this.type].friction;
     this.visible = true;
-    this.previousPlayerOffsetX = player.globalOffsetX;
-    this.previousPlayerOffsetY = player.globalOffsetY;
+  }
+  colorReset() {
+    this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
   }
   draw() {
-    ctx.globalAlpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
     const blockTypeData = blockTypes[this.type];
 
     if (this.temporary && this.timeToDisappear !== undefined) {
       this.timeToDisappear -= 1;
-      ctx.globalAlpha = this.timeToDisappear / blockTypeData.disappearTime;
+      this.alpha = this.timeToDisappear / blockTypeData.disappearTime;
+      this.colorReset();
       if (this.timeToDisappear <= 0) {
         this.tempDisappear();
       }
     }
     if (this.temporary && this.timeToReappear !== undefined) {
       this.timeToReappear -= 1;
+      this.colorReset();
       if (this.timeToReappear <= 0) {
         this.tempReappear();
       }
+    }
+
+    if (this.layer !== player.layer) {
+      let color = Math.max(this.colorR, this.colorG, this.colorB);
+      color = Math.floor(color * (1 - Math.abs(player.layer - this.layer) * 0.85));
+      this.color = `rgba(${color}, ${color}, ${color}, ${this.alpha})`;
+    } else {
+      this.colorReset();
     }
 
     if (
@@ -408,7 +420,7 @@ class Block {
       Math.round(this.x - player.globalOffsetX) > gameArea.width ||
       Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
       Math.round(this.y - player.globalOffsetY) > gameArea.height ||
-      ctx.globalAlpha <= 0
+      this.alpha <= 0 || this.timeToReappear !== undefined
     ) {
       this.visible = false;
     } else {
@@ -416,7 +428,7 @@ class Block {
     }
 
     // Skip rendering if not visible or fully transparent
-    if (this.visible && ctx.globalAlpha > 0) {
+    if (this.visible && this.alpha > 0) {
       ctx.fillStyle = this.color;
       ctx.fillRect(
         Math.round(this.x - player.globalOffsetX),
@@ -425,21 +437,21 @@ class Block {
         this.height,
       );
     }
-    ctx.globalAlpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
   }
   tempDisappear() {
     this.solid = false;
-    this.color = "rgba(0,0,0,0)";
     this.timeToDisappear = undefined;
     this.timeToReappear = blockTypes[this.type].reappearTime;
     this.visible = false;
   }
   tempReappear() {
     this.solid = true;
-    this.color = `rgb(${this.colorR}, ${this.colorG}, ${this.colorB})`;
+    this.alpha = 1;
+    this.colorReset();
     this.timeToReappear = undefined;
     this.visible = true;
   }
