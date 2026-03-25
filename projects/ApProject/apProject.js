@@ -218,6 +218,7 @@ function gameLoop() {
   player.move(controller);
   player.grounded = false;
   player.currentGroundBlock = null;
+  player.insideBlock = null;
   for (let i = 0; i < activeLevelData[player.layer].length; i++) {
     for (let j = 0; j < activeLevelData[player.layer][i].length; j++) {
       const block = activeLevelData[player.layer][i][j];
@@ -226,9 +227,14 @@ function gameLoop() {
           Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
           Math.abs(player.y - block.y + player.globalOffsetY) < 100
         ) {
-          player.sideBlockDetection(block);
-          player.groundedDetection(block);
-          player.insideBlockDetection(block);
+          const wasInsideThisBlock = player.isOverlappingBlock(block, true);
+          const insideThisBlock = player.insideBlockDetection(block);
+          const shouldIgnoreCollision = wasInsideThisBlock && insideThisBlock;
+
+          if (!shouldIgnoreCollision) {
+            player.sideBlockDetection(block);
+            player.groundedDetection(block);
+          }
         }
       }
     }

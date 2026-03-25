@@ -47,6 +47,8 @@ class Player {
     this.globalOffsetY = this.spawnOffsetY;
     this.velX = 0;
     this.velY = 0;
+    this.prevY = this.y;
+    this.prevX = this.x;
   }
 
   drawPlayer() {
@@ -211,11 +213,14 @@ class Player {
   }
 
   sideBlockDetection(object) {
-    // Convert to world space using previous frame offsets
-    const playerLeftWorld = this.x + this.prevGlobalOffsetX;
-    const playerRightWorld = this.x + this.prevGlobalOffsetX + this.size;
-    const playerTopWorld = this.y + this.prevGlobalOffsetY;
-    const playerBottomWorld = this.y + this.prevGlobalOffsetY + this.height;
+    // Use previous and current world space positions
+    const previousPlayerLeftWorld = this.prevX + this.prevGlobalOffsetX;
+    const previousPlayerRightWorld = previousPlayerLeftWorld + this.size;
+
+    const playerLeftWorld = this.x + this.globalOffsetX;
+    const playerRightWorld = playerLeftWorld + this.size;
+    const playerTopWorld = this.y + this.globalOffsetY;
+    const playerBottomWorld = playerTopWorld + this.height;
 
     const blockLeftWorld = object.x;
     const blockRightWorld = object.x + object.width;
@@ -227,20 +232,33 @@ class Player {
       playerBottomWorld > blockTopWorld &&
       playerTopWorld < blockBottomWorld
     ) {
-      if (
-        playerRightWorld > blockLeftWorld &&
+      const pushingIntoLeftFace =
+        this.velX > 0 &&
         playerLeftWorld < blockLeftWorld &&
-        this.velX > 0
+        playerRightWorld > blockLeftWorld;
+      const pushingIntoRightFace =
+        this.velX < 0 &&
+        playerLeftWorld < blockRightWorld &&
+        playerRightWorld > blockRightWorld;
+
+      if (
+        (previousPlayerRightWorld <= blockLeftWorld &&
+          playerRightWorld > blockLeftWorld &&
+          this.velX > 0) ||
+        pushingIntoLeftFace
       ) {
-        // Collision on the right side of the block
+        // Entered the block from the left this frame.
+        this.globalOffsetX = this.prevGlobalOffsetX;
         this.x = blockLeftWorld - this.size - this.globalOffsetX;
         this.velX = 0;
       } else if (
-        playerLeftWorld < blockRightWorld &&
-        playerRightWorld > blockRightWorld &&
-        this.velX < 0
+        (previousPlayerLeftWorld >= blockRightWorld &&
+          playerLeftWorld < blockRightWorld &&
+          this.velX < 0) ||
+        pushingIntoRightFace
       ) {
-        // Collision on the left side of the block
+        // Entered the block from the right this frame.
+        this.globalOffsetX = this.prevGlobalOffsetX;
         this.x = blockRightWorld - this.globalOffsetX;
         this.velX = 0;
       }
@@ -265,20 +283,38 @@ class Player {
     }
   }
 
+  isOverlappingBlock(block, usePreviousFrame = false) {
+    const offsetX = usePreviousFrame ? this.prevGlobalOffsetX : this.globalOffsetX;
+    const offsetY = usePreviousFrame ? this.prevGlobalOffsetY : this.globalOffsetY;
+    const playerX = usePreviousFrame ? this.prevX : this.x;
+    const playerY = usePreviousFrame ? this.prevY : this.y;
+
+    const playerLeft = playerX + offsetX;
+    const playerRight = playerLeft + this.size;
+    const playerTop = playerY + offsetY;
+    const playerBottom = playerTop + this.height;
+
+    const blockLeft = block.x;
+    const blockRight = block.x + block.width;
+    const blockTop = block.y;
+    const blockBottom = block.y + block.height;
+
+    return (
+      playerRight > blockLeft &&
+      playerLeft < blockRight &&
+      playerBottom > blockTop &&
+      playerTop < blockBottom
+    );
+  }
+
   insideBlockDetection(block) {
-    // Use current offsets for screen-space collision check
-    if (
-      this.x + this.size > block.x - this.globalOffsetX &&
-      this.x < block.x + block.width - this.globalOffsetX &&
-      this.y + this.height > block.y - this.globalOffsetY &&
-      this.y < block.y + block.height - this.globalOffsetY
-    ) {
+    const isInside = this.isOverlappingBlock(block);
+
+    if (isInside) {
       this.insideBlock = block;
-    } else {
-      if (this.insideBlock === block) {
-        this.insideBlock = null;
-      }
     }
+
+    return isInside;
   }
 }
 
