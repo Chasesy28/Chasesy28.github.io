@@ -8,7 +8,7 @@ class Player {
 
     this.height = null;
 
-    this.spawnValues = []
+    this.spawnValues = [];
 
     this.spawnX = x;
     this.spawnY = y;
@@ -22,7 +22,7 @@ class Player {
     this.prevX = x;
     this.speed = 0.5;
     this.gravity = 0.5;
-    this.jumpStrength = -12; // perfect 3 block jump (do not touch)
+    this.jumpStrength = -11; // perfect 3 block jump (do not touch)
     this.grounded = false;
     this.maxFallSpeed = 15;
     this.maxVelX = 5;
@@ -94,6 +94,11 @@ class Player {
     if (this.currentGroundBlock != null) {
       this.velX *= this.currentGroundBlock.friction;
     }
+    if (this.insideBlock !== null) {
+      if (this.insideBlock.type === "cobweb") {
+        this.velX *= this.insideBlock.friction;
+      }
+    }
 
     if ((controller.W?.pressed || controller.w?.pressed) && this.grounded) {
       this.velY = this.jumpStrength;
@@ -105,6 +110,9 @@ class Player {
 
     if (!this.grounded) {
       this.velY += this.gravity;
+      if (this.insideBlock !== null) {
+        this.velY *= this.insideBlock.verticalFriction;
+      }
       if (this.velY > this.maxFallSpeed) {
         this.velY = this.maxFallSpeed;
       }
@@ -132,7 +140,10 @@ class Player {
 
   scrolling() {
     //Scrolling horizontally
-    let longestHorizontalLayerLength = Math.max.apply(null, activeLevelData[currentArea][player.layer].map(layer => layer.length));
+    let longestHorizontalLayerLength = Math.max.apply(
+      null,
+      activeLevelData[currentArea][player.layer].map((layer) => layer.length),
+    );
     if (
       (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) &&
       this.globalOffsetX < longestHorizontalLayerLength * 50 - gameArea.width &&
@@ -147,7 +158,8 @@ class Player {
       this.x += this.velX;
     }
     if (
-      this.globalOffsetX >= longestHorizontalLayerLength * 50 - gameArea.width &&
+      this.globalOffsetX >=
+        longestHorizontalLayerLength * 50 - gameArea.width &&
       longestHorizontalLayerLength * 50 > gameArea.width
     ) {
       if (this.x >= gameArea.width / 2) {
@@ -160,7 +172,9 @@ class Player {
     //scrolling vertically
     if (
       (this.y >= gameArea.height / 2 || this.globalOffsetY > 0) &&
-      this.globalOffsetY < activeLevelData[currentArea][player.layer].length * 50 - gameArea.height &&
+      this.globalOffsetY <
+        activeLevelData[currentArea][player.layer].length * 50 -
+          gameArea.height &&
       activeLevelData[currentArea][player.layer].length * 50 > gameArea.height
     ) {
       this.globalOffsetY += this.velY;
@@ -172,11 +186,15 @@ class Player {
       this.y += this.velY;
     }
     if (
-      this.globalOffsetY >= activeLevelData[currentArea][player.layer].length * 50 - gameArea.height &&
+      this.globalOffsetY >=
+        activeLevelData[currentArea][player.layer].length * 50 -
+          gameArea.height &&
       activeLevelData[currentArea][player.layer].length * 50 > gameArea.height
     ) {
       if (this.y >= gameArea.height / 2) {
-        this.globalOffsetY = activeLevelData[currentArea][player.layer].length * 50 - gameArea.height;
+        this.globalOffsetY =
+          activeLevelData[currentArea][player.layer].length * 50 -
+          gameArea.height;
       } else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
       }
@@ -286,8 +304,12 @@ class Player {
   }
 
   isOverlappingBlock(block, usePreviousFrame = false) {
-    const offsetX = usePreviousFrame ? this.prevGlobalOffsetX : this.globalOffsetX;
-    const offsetY = usePreviousFrame ? this.prevGlobalOffsetY : this.globalOffsetY;
+    const offsetX = usePreviousFrame
+      ? this.prevGlobalOffsetX
+      : this.globalOffsetX;
+    const offsetY = usePreviousFrame
+      ? this.prevGlobalOffsetY
+      : this.globalOffsetY;
     const playerX = usePreviousFrame ? this.prevX : this.x;
     const playerY = usePreviousFrame ? this.prevY : this.y;
 
@@ -328,6 +350,7 @@ const blockTypes = {
     solid: true,
     temporary: false,
     friction: 0.92,
+    verticalFriction: 1,
   },
   temporary: {
     colorR: 128,
@@ -338,6 +361,7 @@ const blockTypes = {
     disappearTime: 30,
     reappearTime: 120,
     friction: 0.92,
+    verticalFriction: 1,
   },
   permanentTemporary: {
     colorR: 105,
@@ -348,6 +372,7 @@ const blockTypes = {
     disappearTime: 45,
     reappearTime: undefined,
     friction: 0.92,
+    verticalFriction: 1,
   },
   ice: {
     colorR: 0,
@@ -356,6 +381,7 @@ const blockTypes = {
     solid: true,
     temporary: false,
     friction: 0.99,
+    verticalFriction: 1,
   },
   slow: {
     colorR: 0,
@@ -364,6 +390,16 @@ const blockTypes = {
     solid: true,
     temporary: false,
     friction: 0.75,
+    verticalFriction: 1,
+  },
+  cobweb: {
+    colorR: 255,
+    colorG: 255,
+    colorB: 255,
+    solid: false,
+    temporary: false,
+    friction: 0.5,
+    verticalFriction: 0.25,
   },
   areaDoor: {
     colorR: 255,
@@ -372,7 +408,8 @@ const blockTypes = {
     solid: false,
     temporary: false,
     friction: 0.92,
-  }
+    verticalFriction: 1,
+  },
 };
 class Block {
   constructor(x, y, width, height, layer, type, doorArea) {
@@ -392,6 +429,7 @@ class Block {
     this.timeToDisappear;
     this.timeToReappear;
     this.friction = blockTypes[this.type].friction;
+    this.verticalFriction = blockTypes[this.type].verticalFriction;
     this.visible = true;
     this.doorArea = null;
     if (this.type === "areaDoor") {
@@ -423,7 +461,9 @@ class Block {
 
     if (this.layer !== player.layer) {
       let color = Math.max(this.colorR, this.colorG, this.colorB);
-      color = Math.floor(color * (1 - Math.abs(player.layer - this.layer) * 0.85));
+      color = Math.floor(
+        color * (1 - Math.abs(player.layer - this.layer) * 0.85),
+      );
       this.color = `rgba(${color}, ${color}, ${color}, ${this.alpha})`;
     } else {
       this.colorReset();
@@ -434,7 +474,8 @@ class Block {
       Math.round(this.x - player.globalOffsetX) > gameArea.width ||
       Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
       Math.round(this.y - player.globalOffsetY) > gameArea.height ||
-      this.alpha <= 0 || this.timeToReappear !== undefined
+      this.alpha <= 0 ||
+      this.timeToReappear !== undefined
     ) {
       this.visible = false;
     } else {

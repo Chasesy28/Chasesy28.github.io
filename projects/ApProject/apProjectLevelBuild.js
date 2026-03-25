@@ -4,6 +4,7 @@ const levelNumberKey = {
   3: "permanentTemporary",
   4: "ice",
   5: "slow",
+  6: "cobweb",
 }
 function convertToObjects(levelData, layer, area) {
   let longestHorizontalLength = Math.max.apply(null, levelData.map(row => row.length));

@@ -89,7 +89,7 @@ const levels = [
         [],
         [0, 0, 1],
         [],
-        [0, 1],
+        [0, 1, 0, 0, 0, 0, 6],
         [],
         [0, 0, 1],
         [],
@@ -174,6 +174,7 @@ const levels = [
 ];
 
 function updateLevelData() {
+  currentArea = 0;
   activeLevelData = [];
   for (let i = 0; i < levels[currentLevel].length; i++) {
     activeLevelData.push([]);
