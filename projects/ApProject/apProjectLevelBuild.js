@@ -5,7 +5,7 @@ const levelNumberKey = {
   4: "ice",
   5: "slow",
 }
-function convertToObjects(levelData, layer) {
+function convertToObjects(levelData, layer, area) {
   let longestHorizontalLength = Math.max.apply(null, levelData.map(row => row.length));
   let level = [];
   //Runs for each row in the level data
@@ -43,8 +43,11 @@ function convertToObjects(levelData, layer) {
             player.spawnOffsetY = levelData.length * 50 - gameArea.height;
           }
         }
+        player.spawnValues[area] = [player.spawnX, player.spawnY, player.spawnLayer, player.spawnOffsetX, player.spawnOffsetY];
       } else if (Object.keys(levelNumberKey).includes(String(levelData[i][j]))) {
         row.push(new Block(j * 50, i * 50, 50, 50, layer, levelNumberKey[levelData[i][j]]));
+      } else if (levelData[i][j][0] === "d") {
+        row.push(new Block(j * 50, i * 50, 50, 50, layer, "areaDoor", levelData[i][j].slice(1)));
       }
     }
     level.push(row);

@@ -48,147 +48,103 @@ const controller = {
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
 let currentLevel = 0;
+let currentArea = 0;
 let levelSwitchCooldown = false;
 let layerSwitchCooldown = false;
 let longestHorizontalLength;
 let longestVerticalLength;
 let activeLevelData = [];
 const levels = [
+  //Level 1
   [
+    //Area 1
     [
-      [],
-      [],
-      [],
-      [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      //Layer 1
+      [
+        [],
+        [],
+        [],
+        [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ],
+      [
+        [],
+        [0, 2, 2, 2, 0],
+        [0, 0, "p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+        [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [],
+        [0, 0, 1],
+        [],
+        [0, 1],
+        [],
+        [0, 0, 1],
+        [],
+        [0, 1],
+        [],
+        [0, 0, 1],
+        [],
+        [0, 1],
+        [],
+        [0, 0, 1],
+        [],
+        [0, 1],
+        [],
+        [0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "d1"],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [],
+        [0, 0, 1],
+        [],
+        [0, 1],
+        [0, 0, 0],
+        [0, 0, 1],
+        [],
+        [0, 1],
+        [],
+        [0, 0, 1],
+        [0],
+        [0, 1],
+        [0, 0, 0],
+        [0, 0, 1],
+        [0, 0],
+        [0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [4, 4, 4, 4, 4, 5, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+      ],
+      [
+        [],
+        [],
+        [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ]
     ],
     [
-      [],
-      [0, 2, 2, 2, 0],
-      [0, 0, "p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-      [0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [],
-      [0, 0, 1],
-      [],
-      [0, 1],
-      [],
-      [0, 0, 1],
-      [],
-      [0, 1],
-      [],
-      [0, 0, 1],
-      [],
-      [0, 1],
-      [],
-      [0, 0, 1],
-      [],
-      [0, 1],
-      [],
-      [0, 0, 1],
-      [],
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [],
-      [0, 0, 1],
-      [],
-      [0, 1],
-      [0, 0, 0],
-      [0, 0, 1],
-      [],
-      [0, 1],
-      [],
-      [0, 0, 1],
-      [0],
-      [0, 1],
-      [0, 0, 0],
-      [0, 0, 1],
-      [0, 0],
-      [0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [4, 4, 4, 4, 4, 5, 4, 4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
-    ],
-    [
-      [],
-      [],
-      [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [0, "p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     ]
   ],
   [
     [
-      [],
-      [],
-      [],
-      [],
-      [],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-    [
-      [],
-      [],
-      [],
-      [],
-      [],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [],
-      [],
-      [],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-      [],
-      [],
-      ["p"],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ]
-  ],
-  [
-    [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-    [
-      [0, 0, 0, 0, 0],
-      [0, 1, 1, 1, 0],
-      [0, 0, 0, 0, 3],
-      [0, 3, 2, 3, 0],
-      ["p", 0, 0, 0, 0],
-      [1, 1, 1, 1, 1],
-    ]
-  ],
-  [
-    [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-    [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 1, 1, 1, 1, 1, 1, 0, 0],
-      [0, "p", 0, 0, 2, 2, 2, 0, 3, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [],
-      [0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-      [0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-      [0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-    ]
-  ],
-  [
-    [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ],
-    [
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      ["p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [],
+        [],
+        [],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+        [],
+        [],
+        ["p"],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ]
     ]
   ],
 ];
@@ -196,22 +152,27 @@ const levels = [
 function updateLevelData() {
   activeLevelData = [];
   for (let i = 0; i < levels[currentLevel].length; i++) {
-    activeLevelData[i] = convertToObjects(levels[currentLevel][i], i);
+    activeLevelData.push([]);
+    for (let j = 0; j < levels[currentLevel][i].length; j++) {
+      activeLevelData[i].push(convertToObjects(levels[currentLevel][i][j], j, i));
+    }
   }
-  longestHorizontalLength = Math.max.apply(null, activeLevelData.map(layer => Math.max.apply(null, layer.map(row => row.length))));
-  longestVerticalLength = Math.max.apply(null, activeLevelData.map(layer => layer.length));
+  longestHorizontalLength = Math.max.apply(null, activeLevelData[currentArea].map(layer => Math.max.apply(null, layer.map(row => row.length))));
+  console.log(longestHorizontalLength);
+  longestVerticalLength = Math.max.apply(null, activeLevelData[currentArea].map(layer => layer.length));
+  console.log(longestVerticalLength);
 }
 
 function gameLoop() {
   backgroundColor(173, 216, 230, true);
-  for (let i = 0; i < activeLevelData.length; i++) {
+  for (let i = 0; i < activeLevelData[currentArea].length; i++) {
     let alpha;
     if (player.layer == i) {
       alpha = 1;
     } else {
       alpha = Math.max(0.1, 1 - Math.abs(player.layer - i) * 0.85);
     }
-    buildLevel(activeLevelData[i], alpha);
+    buildLevel(activeLevelData[currentArea][i], alpha);
     if (player.layer == i) {player.drawPlayer();}
   }
   ctx.globalAlpha = 1;
@@ -219,9 +180,11 @@ function gameLoop() {
   player.grounded = false;
   player.currentGroundBlock = null;
   player.insideBlock = null;
-  for (let i = 0; i < activeLevelData[player.layer].length; i++) {
-    for (let j = 0; j < activeLevelData[player.layer][i].length; j++) {
-      const block = activeLevelData[player.layer][i][j];
+  for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
+    console.log(i);
+    //Error with length being too long
+    for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
+      const block = activeLevelData[currentArea][player.layer][i][j];
       if (block.solid) {
         if (
           Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
@@ -234,6 +197,13 @@ function gameLoop() {
           if (!shouldIgnoreCollision) {
             player.sideBlockDetection(block);
             player.groundedDetection(block);
+          }
+        }
+      } else {
+        if (player.insideBlockDetection(block)) {
+          if (block.type === "areaDoor") {
+            currentArea = Number(block.doorArea);
+            player.spawn();
           }
         }
       }
@@ -272,11 +242,11 @@ function gameLoop() {
       setTimeout(() => {
         layerSwitchCooldown = false;
       }, 250);
-      if (player.layer < activeLevelData[player.layer].length - 1) {
+      if (player.layer < activeLevelData[currentArea][player.layer].length - 1) {
         player.layer++;
       }
-      if (player.layer >= activeLevelData.length) {
-        player.layer = activeLevelData.length - 1;
+      if (player.layer >= activeLevelData[currentArea].length) {
+        player.layer = activeLevelData[currentArea].length - 1;
       }
     }
   }

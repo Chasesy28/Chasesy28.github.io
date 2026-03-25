@@ -8,6 +8,8 @@ class Player {
 
     this.height = null;
 
+    this.spawnValues = []
+
     this.spawnX = x;
     this.spawnY = y;
     this.spawnOffsetX = null;
@@ -40,11 +42,11 @@ class Player {
   }
 
   spawn() {
-    this.x = this.spawnX;
-    this.y = this.spawnY;
-    this.layer = this.spawnLayer;
-    this.globalOffsetX = this.spawnOffsetX;
-    this.globalOffsetY = this.spawnOffsetY;
+    this.x = this.spawnValues[currentArea][0];
+    this.y = this.spawnValues[currentArea][1];
+    this.layer = this.spawnValues[currentArea][2];
+    this.globalOffsetX = this.spawnValues[currentArea][3];
+    this.globalOffsetY = this.spawnValues[currentArea][4];
     this.velX = 0;
     this.velY = 0;
     this.prevY = this.y;
@@ -130,7 +132,7 @@ class Player {
 
   scrolling() {
     //Scrolling horizontally
-    let longestHorizontalLayerLength = Math.max.apply(null, activeLevelData[player.layer].map(layer => layer.length))
+    let longestHorizontalLayerLength = Math.max.apply(null, activeLevelData[currentArea][player.layer].map(layer => layer.length));
     if (
       (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) &&
       this.globalOffsetX < longestHorizontalLayerLength * 50 - gameArea.width &&
@@ -158,8 +160,8 @@ class Player {
     //scrolling vertically
     if (
       (this.y >= gameArea.height / 2 || this.globalOffsetY > 0) &&
-      this.globalOffsetY < activeLevelData[player.layer].length * 50 - gameArea.height &&
-      activeLevelData[player.layer].length * 50 > gameArea.height
+      this.globalOffsetY < activeLevelData[currentArea][player.layer].length * 50 - gameArea.height &&
+      activeLevelData[currentArea][player.layer].length * 50 > gameArea.height
     ) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
@@ -170,11 +172,11 @@ class Player {
       this.y += this.velY;
     }
     if (
-      this.globalOffsetY >= activeLevelData[player.layer].length * 50 - gameArea.height &&
-      activeLevelData[player.layer].length * 50 > gameArea.height
+      this.globalOffsetY >= activeLevelData[currentArea][player.layer].length * 50 - gameArea.height &&
+      activeLevelData[currentArea][player.layer].length * 50 > gameArea.height
     ) {
       if (this.y >= gameArea.height / 2) {
-        this.globalOffsetY = activeLevelData[player.layer].length * 50 - gameArea.height;
+        this.globalOffsetY = activeLevelData[currentArea][player.layer].length * 50 - gameArea.height;
       } else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
       }
@@ -363,9 +365,17 @@ const blockTypes = {
     temporary: false,
     friction: 0.75,
   },
+  areaDoor: {
+    colorR: 255,
+    colorG: 215,
+    colorB: 0,
+    solid: false,
+    temporary: false,
+    friction: 0.92,
+  }
 };
 class Block {
-  constructor(x, y, width, height, layer, type) {
+  constructor(x, y, width, height, layer, type, doorArea) {
     this.x = x;
     this.y = y;
     this.width = width;
@@ -383,6 +393,10 @@ class Block {
     this.timeToReappear;
     this.friction = blockTypes[this.type].friction;
     this.visible = true;
+    this.doorArea = null;
+    if (this.type === "areaDoor") {
+      this.doorArea = doorArea;
+    }
   }
   colorReset() {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
