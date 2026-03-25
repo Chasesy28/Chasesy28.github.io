@@ -91,7 +91,7 @@ const levels = [
         [0, 1],
         [],
         [0, 0, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "d1"],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "d1", 0, 0, "d2"],
         [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [],
         [0, 0, 1],
@@ -119,11 +119,26 @@ const levels = [
       ]
     ],
     [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [0, "p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        ["p", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ]
+    ],
+    [
+      [
+        [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, "p", 1],
+        [1, 1, 1]
+      ]
     ]
   ],
   [
@@ -172,7 +187,7 @@ function gameLoop() {
     } else {
       alpha = Math.max(0.1, 1 - Math.abs(player.layer - i) * 0.85);
     }
-    buildLevel(activeLevelData[currentArea][i], alpha);
+    buildLevel(activeLevelData[currentArea][i]);
     if (player.layer == i) {player.drawPlayer();}
   }
   ctx.globalAlpha = 1;
@@ -180,7 +195,9 @@ function gameLoop() {
   player.grounded = false;
   player.currentGroundBlock = null;
   player.insideBlock = null;
+  let areaChanged = false;
   for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
+    if (areaChanged) {break;}
     console.log(i);
     //Error with length being too long
     for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
@@ -204,6 +221,8 @@ function gameLoop() {
           if (block.type === "areaDoor") {
             currentArea = Number(block.doorArea);
             player.spawn();
+            areaChanged = true;
+            break;
           }
         }
       }
