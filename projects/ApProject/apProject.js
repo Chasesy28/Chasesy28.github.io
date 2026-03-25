@@ -70,9 +70,7 @@ function updateLevelData() {
     }
   }
   longestHorizontalLength = Math.max.apply(null, activeLevelData[currentArea].map(layer => Math.max.apply(null, layer.map(row => row.length))));
-  console.log(longestHorizontalLength);
   longestVerticalLength = Math.max.apply(null, activeLevelData[currentArea].map(layer => layer.length));
-  console.log(longestVerticalLength);
 }
 
 function gameLoop() {
@@ -95,8 +93,6 @@ function gameLoop() {
   let areaChanged = false;
   for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
     if (areaChanged) {break;}
-    console.log(i);
-    //Error with length being too long
     for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
       const block = activeLevelData[currentArea][player.layer][i][j];
       if (block.solid) {
