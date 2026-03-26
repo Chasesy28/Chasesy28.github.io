@@ -77,7 +77,7 @@ function settingsKeybind(buttonId) {
   let key;
   button.textContent = "Press a key...";
   function keyListener(e) {
-    button.textContent = e.key;
+    button.textContent = e.key.toUpperCase();
     e.key = key;
     window.removeEventListener("keydown", keyListener);
   }
