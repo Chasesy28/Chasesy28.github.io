@@ -82,11 +82,11 @@ class Player {
   }
 
   move(controller) {
-    if (controller.D?.pressed || controller.d?.pressed) {
+    if (controller.right.pressed) {
       this.direction = "right";
       if (this.velX < this.maxVelX) this.velX += this.speed;
     }
-    if (controller.A?.pressed || controller.a?.pressed) {
+    if (controller.left.pressed) {
       this.direction = "left";
       if (this.velX > -this.maxVelX) this.velX -= this.speed;
     }
@@ -100,7 +100,7 @@ class Player {
       }
     }
 
-    if ((controller.W?.pressed || controller.w?.pressed) && this.grounded) {
+    if ((controller.jump.pressed) && this.grounded) {
       this.velY = this.jumpStrength;
       this.grounded = false;
     }

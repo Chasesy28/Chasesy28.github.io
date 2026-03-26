@@ -15,7 +15,8 @@ body {
 
 /* Overlay Buttons */
 .play-overlay,
-.fs-button {
+.fs-button,
+.settings-button {
 	position: absolute;
 	cursor: pointer;
 	border: none;
@@ -28,7 +29,8 @@ body {
 }
 
 .play-overlay:hover,
-.fs-button:hover {
+.fs-button:hover,
+.settings-button:hover {
 	background: rgba(65, 74, 151, 0.9);
 }
 
@@ -51,6 +53,50 @@ body {
 	font-size: 1.5rem;
 }
 
+.settings-button {
+	top: 15px;
+	right: 15px;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.5rem;
+}
+
+.settings-menu {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #aaa;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 11;
+    max-width: 300px;
+		bottom: 50%;
+		right: 50%;
+		transform: translateX(50%) translateY(50%);
+		text-align: center;
+}
+
+.settings-menu h2 {
+	margin-top: 0;
+	font-size: 1.5rem;
+}
+
 .hidden {
 	display: none;
+}
+
+.gameTitles {
+	position: absolute;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+
+}
+
+h1.gameTitles {
+	font-size: 2.5rem;
+	color: #e9eeee;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }

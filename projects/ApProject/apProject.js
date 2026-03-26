@@ -16,38 +16,59 @@ function toggleFullScreen() {
   }
 }
 
+function toggleSettings() {
+  const settingsMenu = document.getElementById("settingsMenu");
+  if (settingsMenu.classList.contains("hidden")) {
+    settingsMenu.classList.remove("hidden");
+  } else {
+    settingsMenu.classList.add("hidden");
+  }
+}
+
 function backgroundColor(r, g, b, randomize) {
-  for (let i = 0; i < Math.max(longestHorizontalLength, gameArea.width / 50); i ++) {
-    for (let j = 0; j < Math.max(longestVerticalLength, gameArea.height / 50); j ++) {
+  for (
+    let i = 0;
+    i < Math.max(longestHorizontalLength, gameArea.width / 50);
+    i++
+  ) {
+    for (
+      let j = 0;
+      j < Math.max(longestVerticalLength, gameArea.height / 50);
+      j++
+    ) {
       if (randomize) {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.1 + 0.85})`;
       } else {
         ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
       }
-      ctx.fillRect((i * 50) - player.globalOffsetX, (j * 50) - player.globalOffsetY, 50.5, 50.5);
+      ctx.fillRect(
+        i * 50 - player.globalOffsetX,
+        j * 50 - player.globalOffsetY,
+        50.5,
+        50.5,
+      );
     }
   }
 }
 
-ctx.fillStyle = "black";
+ctx.fillStyle = "dimgray";
 ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 
 const controller = {
-  W: { pressed: false },
-  w: { pressed: false },
-  A: { pressed: false },
-  a: { pressed: false },
-  D: { pressed: false },
-  d: { pressed: false },
-  S: { pressed: false },
-  s: { pressed: false },
-  ArrowLeft: { pressed: false },
-  ArrowRight: { pressed: false },
-  ArrowUp: { pressed: false },
-  ArrowDown: { pressed: false },
-  K: { pressed: false },
-  k: { pressed: false },
+  jump: { pressed: false, key: ["W", "w"] },
+  left: { pressed: false, key: ["A", "a"] },
+  right: { pressed: false, key: ["D", "d"] },
+  interact: { pressed: false, key: ["S", "s"] },
+  previousLevel: { pressed: false, key: ["ArrowLeft"] },
+  nextLevel: { pressed: false, key: ["ArrowRight"] },
+  previousLayer: { pressed: false, key: ["ArrowUp"] },
+  nextLayer: { pressed: false, key: ["ArrowDown"] },
+  respawn: { pressed: false, key: ["K", "k"] },
 };
+
+function updateKeybind(keybind, newKey) {
+  controller[keybind].key = [newKey.toLowerCase(), newKey.toUpperCase()];
+}
 
 const player = new Player(100, 100, 35, "/images/Mario.png");
 
@@ -59,18 +80,30 @@ let longestHorizontalLength;
 let longestVerticalLength;
 let activeLevelData = [];
 
-
 function updateLevelData() {
   currentArea = 0;
   activeLevelData = [];
   for (let i = 0; i < levels[currentLevel].length; i++) {
     activeLevelData.push([]);
     for (let j = 0; j < levels[currentLevel][i].length; j++) {
-      activeLevelData[i].push(convertToObjects(levels[currentLevel][i][j], j, i));
+      activeLevelData[i].push(
+        convertToObjects(levels[currentLevel][i][j], j, i),
+      );
     }
   }
-  longestHorizontalLength = Math.max.apply(null, activeLevelData[currentArea].map(layer => Math.max.apply(null, layer.map(row => row.length))));
-  longestVerticalLength = Math.max.apply(null, activeLevelData[currentArea].map(layer => layer.length));
+  longestHorizontalLength = Math.max.apply(
+    null,
+    activeLevelData[currentArea].map((layer) =>
+      Math.max.apply(
+        null,
+        layer.map((row) => row.length),
+      ),
+    ),
+  );
+  longestVerticalLength = Math.max.apply(
+    null,
+    activeLevelData[currentArea].map((layer) => layer.length),
+  );
 }
 
 function gameLoop() {
@@ -83,7 +116,9 @@ function gameLoop() {
       alpha = Math.max(0.1, 1 - Math.abs(player.layer - i) * 0.85);
     }
     buildLevel(activeLevelData[currentArea][i]);
-    if (player.layer == i) {player.drawPlayer();}
+    if (player.layer == i) {
+      player.drawPlayer();
+    }
   }
   ctx.globalAlpha = 1;
   player.move(controller);
@@ -92,8 +127,14 @@ function gameLoop() {
   player.insideBlock = null;
   let areaChanged = false;
   for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
-    if (areaChanged) {break;}
-    for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
+    if (areaChanged) {
+      break;
+    }
+    for (
+      let j = 0;
+      j < activeLevelData[currentArea][player.layer][i].length;
+      j++
+    ) {
       const block = activeLevelData[currentArea][player.layer][i][j];
       if (block.solid) {
         if (
@@ -111,7 +152,7 @@ function gameLoop() {
         }
       } else {
         if (player.insideBlockDetection(block)) {
-          if (controller["S"]?.pressed || controller["s"]?.pressed) {
+          if (controller.interact.pressed) {
             if (block.type === "areaDoor") {
               currentArea = Number(block.doorArea);
               player.spawn();
@@ -124,7 +165,7 @@ function gameLoop() {
     }
   }
   player.gameBoundaryDetection();
-  if (controller["ArrowLeft"]?.pressed) {
+  if (controller.previousLevel.pressed) {
     if (!levelSwitchCooldown) {
       levelSwitchCooldown = true;
       setTimeout(() => {
@@ -134,10 +175,10 @@ function gameLoop() {
         currentLevel--;
       }
       updateLevelData();
-    player.spawn();
+      player.spawn();
     }
   }
-  if (controller["ArrowRight"]?.pressed) {
+  if (controller.nextLevel.pressed) {
     if (!levelSwitchCooldown) {
       levelSwitchCooldown = true;
       setTimeout(() => {
@@ -150,13 +191,16 @@ function gameLoop() {
       player.spawn();
     }
   }
-  if (controller["ArrowDown"]?.pressed) {
+  if (controller.nextLayer.pressed) {
     if (!layerSwitchCooldown) {
       layerSwitchCooldown = true;
       setTimeout(() => {
         layerSwitchCooldown = false;
       }, 250);
-      if (player.layer < activeLevelData[currentArea][player.layer].length - 1) {
+      if (
+        player.layer <
+        activeLevelData[currentArea][player.layer].length - 1
+      ) {
         player.layer++;
       }
       if (player.layer >= activeLevelData[currentArea].length) {
@@ -164,7 +208,7 @@ function gameLoop() {
       }
     }
   }
-  if (controller["ArrowUp"]?.pressed) {
+  if (controller.previousLayer?.pressed) {
     if (!layerSwitchCooldown) {
       layerSwitchCooldown = true;
       setTimeout(() => {
@@ -179,7 +223,7 @@ function gameLoop() {
     }
   }
 
-  if (controller["k"]?.pressed || controller["K"]?.pressed) {
+  if (controller.respawn.pressed) {
     player.spawn();
   }
 
@@ -187,6 +231,8 @@ function gameLoop() {
 }
 
 function startGame() {
+  const gameTitle = document.getElementById("gameTitle");
+  gameTitle.classList.add("hidden");
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
   updateLevelData();
@@ -202,13 +248,18 @@ function startGame() {
 }
 
 window.document.addEventListener("keydown", function (e) {
-  if (controller[e.key]) {
-    controller[e.key].pressed = true;
+  for (const controllerKey in controller) {
+    if (controller[controllerKey].key.includes(e.key)) {
+      controller[controllerKey].pressed = true;
+    }
   }
 });
 
 window.document.addEventListener("keyup", function (e) {
-  if (controller[e.key]) {
-    controller[e.key].pressed = false;
+  for (const controllerKey in controller) {
+    if (controller[controllerKey].key.includes(e.key)) {
+      controller[controllerKey].pressed = false;
+    }
   }
 });
+

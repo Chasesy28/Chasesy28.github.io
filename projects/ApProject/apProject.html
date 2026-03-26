@@ -14,8 +14,16 @@
 
   <body>
       <canvas id="gameArea">Game Area</canvas>
+      <h1 id="gameTitle" class="gameTitles">AP Project</h1>
       <button id="playButton" class="play-overlay" onclick="startGame()">▶</button>
       <button id="fullscreenButton" class="fs-button" onclick="toggleFullScreen()">⛶</button>
+      <button id="settingsButton" class="settings-button" onclick="toggleSettings()">⚙️</button>
+      <div id="settingsMenu" class="hidden settings-menu">
+        <h2>Settings</h2>
+        <label for="right">Right Keybind:</label>
+        <button id="right"></button>
+      </div>
+      <script src="apProjectSettings.js"></script>
       <script src="apProjectLevelData.js"></script>
       <script src="apProjectLevelObjects.js"></script>
       <script src="apProjectLevelBuild.js"></script>
