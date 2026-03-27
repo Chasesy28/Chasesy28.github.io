@@ -173,10 +173,14 @@ function gameLoop() {
           if (controller.interact.pressed) {
             if (block.type === "areaDoor") {
               currentArea = Number(block.doorArea);
-              player.spawn();
+              player.die();
               areaChanged = true;
               break;
             }
+          }
+          if (block.type === "spike") {
+            player.die();
+            break;
           }
         }
       }
@@ -242,7 +246,7 @@ function gameLoop() {
   }
 
   if (controller.respawn.pressed) {
-    player.spawn();
+    player.die();
   }
 
   requestAnimationFrame(gameLoop);

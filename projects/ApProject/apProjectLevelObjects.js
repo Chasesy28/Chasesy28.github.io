@@ -40,9 +40,12 @@ class Player {
     this.direction = "right";
 
     this.layer = 0;
+
+    this.dead = false;
   }
 
   spawn() {
+    this.dead = false;
     this.x = this.spawnValues[currentArea][0];
     this.y = this.spawnValues[currentArea][1];
     this.layer = this.spawnValues[currentArea][2];
@@ -52,6 +55,10 @@ class Player {
     this.velY = 0;
     this.prevY = this.y;
     this.prevX = this.x;
+  }
+
+  die() {
+    this.dead = true;
   }
 
   drawPlayer() {
@@ -83,60 +90,71 @@ class Player {
   }
 
   move(controller) {
-    if (controller.right.pressed) {
-      this.direction = "right";
-      if (this.velX < this.maxVelX) this.velX += this.speed;
-    }
-    if (controller.left.pressed) {
-      this.direction = "left";
-      if (this.velX > -this.maxVelX) this.velX -= this.speed;
-    }
-
-    if (this.currentGroundBlock != null) {
-      this.velX *= this.currentGroundBlock.friction;
-    }
-    if (this.insideBlock !== null) {
-      if (this.insideBlock.type === "cobweb") {
-        this.velX *= this.insideBlock.friction;
+    if (!this.dead) {
+      if (controller.right.pressed) {
+        this.direction = "right";
+        if (this.velX < this.maxVelX) this.velX += this.speed;
       }
-    }
+      if (controller.left.pressed) {
+        this.direction = "left";
+        if (this.velX > -this.maxVelX) this.velX -= this.speed;
+      }
 
-    if ((controller.jump.pressed) && this.grounded) {
-      this.velY = this.jumpStrength;
-      this.grounded = false;
-    }
-
-    this.prevY = this.y;
-    this.prevX = this.x;
-
-    if (!this.grounded) {
-      this.velY += this.gravity;
+      if (this.currentGroundBlock != null) {
+        this.velX *= this.currentGroundBlock.friction;
+      }
       if (this.insideBlock !== null) {
-        this.velY *= this.insideBlock.verticalFriction;
+        if (this.insideBlock.type === "cobweb") {
+          this.velX *= this.insideBlock.friction;
+        }
       }
+
+      if (controller.jump.pressed && this.grounded) {
+        this.velY = this.jumpStrength;
+        this.grounded = false;
+      }
+
+      this.prevY = this.y;
+      this.prevX = this.x;
+
+      if (!this.grounded) {
+        this.velY += this.gravity;
+        if (this.insideBlock !== null) {
+          this.velY *= this.insideBlock.verticalFriction;
+        }
+        if (this.velY > this.maxFallSpeed) {
+          this.velY = this.maxFallSpeed;
+        }
+      }
+
+      if (this.velX <= 0.1 && this.velX > 0) {
+        this.velX = 0;
+      }
+      if (this.velX >= -0.1 && this.velX < 0) {
+        this.velX = 0;
+      }
+      if (this.velY <= 0.1 && this.velY > 0) {
+        this.velY = 0;
+      }
+      if (this.velY >= -0.1 && this.velY < 0) {
+        this.velY = 0;
+      }
+
+      // Store previous offsets before scrolling
+      this.prevGlobalOffsetX = this.globalOffsetX;
+      this.prevGlobalOffsetY = this.globalOffsetY;
+
+      this.scrolling();
+    } else {
+      this.velY += this.gravity;
       if (this.velY > this.maxFallSpeed) {
         this.velY = this.maxFallSpeed;
       }
+      this.y += this.velY;
+      if (this.y > gameArea.height) {
+        player.spawn();
+      }
     }
-
-    if (this.velX <= 0.1 && this.velX > 0) {
-      this.velX = 0;
-    }
-    if (this.velX >= -0.1 && this.velX < 0) {
-      this.velX = 0;
-    }
-    if (this.velY <= 0.1 && this.velY > 0) {
-      this.velY = 0;
-    }
-    if (this.velY >= -0.1 && this.velY < 0) {
-      this.velY = 0;
-    }
-
-    // Store previous offsets before scrolling
-    this.prevGlobalOffsetX = this.globalOffsetX;
-    this.prevGlobalOffsetY = this.globalOffsetY;
-
-    this.scrolling();
   }
 
   scrolling() {
@@ -402,13 +420,22 @@ const blockTypes = {
     friction: 0.5,
     verticalFriction: 0.25,
   },
+  spike: {
+    colorR: 0,
+    colorG: 0,
+    colorB: 0,
+    solid: false,
+    temporary: false,
+    friction: 1,
+    verticalFriction: 1,
+  },
   areaDoor: {
     colorR: 255,
     colorG: 215,
     colorB: 0,
     solid: false,
     temporary: false,
-    friction: 0.92,
+    friction: 1,
     verticalFriction: 1,
   },
 };
