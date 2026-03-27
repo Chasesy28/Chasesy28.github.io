@@ -54,6 +54,10 @@ function backgroundColor(r, g, b, randomize) {
 ctx.fillStyle = "dimgray";
 ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 
+function isLetter(char) {
+  return /^[a-z]$/i.test(char);
+}
+
 const controller = {
   jump: { pressed: false, key: ["W", "w"] },
   left: { pressed: false, key: ["A", "a"] },
@@ -65,9 +69,14 @@ const controller = {
   nextLayer: { pressed: false, key: ["ArrowDown"] },
   respawn: { pressed: false, key: ["K", "k"] },
 };
+setupControllerSettings();
 
 function updateKeybind(keybind, newKey) {
-  controller[keybind].key = [newKey.toLowerCase(), newKey.toUpperCase()];
+  if (isLetter(newKey)) {
+    controller[keybind].key = [newKey.toUpperCase(), newKey.toLowerCase()];
+  } else {
+    controller[keybind].key = [newKey];
+  }
 }
 
 const player = new Player(100, 100, 35, "/images/Mario.png");

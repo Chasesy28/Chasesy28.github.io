@@ -74,23 +74,38 @@ dragElement(panel);
 
 function settingsKeybind(buttonId) {
   const button = document.getElementById(buttonId);
-  let key;
   button.textContent = "Press a key...";
   function keyListener(e) {
-    button.textContent = e.key.toUpperCase();
-    e.key = key;
+    if (e.key === "Escape") {
+      if (isLetter(controller[buttonId].key[0])) {
+        button.textContent = controller[buttonId].key[0].toUpperCase();
+      } else {
+        button.textContent = controller[buttonId].key[0];
+      }
+      window.removeEventListener("keydown", keyListener);
+      return;
+    }
+    if (isLetter(e.key)) {
+      button.textContent = e.key.toUpperCase();
+    } else {
+      button.textContent = e.key;
+    }
+    updateKeybind(buttonId, e.key);
     window.removeEventListener("keydown", keyListener);
   }
   window.addEventListener("keydown", keyListener);
-  return key;
 }
 
 function attachSettingsListeners(buttonId) {
   const button = document.getElementById(buttonId);
+  button.textContent = controller[buttonId].key[0];
   button.addEventListener("click", () => {
-    let key = settingsKeybind(buttonId);
-    updateKeybind(buttonId, key);
+    settingsKeybind(buttonId);
   });
 }
 
-attachSettingsListeners("right");
+function setupControllerSettings() {
+  for (const controllerKey in controller) {
+    attachSettingsListeners(controllerKey);
+  }
+}
