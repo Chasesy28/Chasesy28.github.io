@@ -76,11 +76,18 @@ body {
 		right: 50%;
 		transform: translateX(50%) translateY(50%);
 		text-align: center;
+		display: flex;
+		flex-direction: column;
 }
 
 .settings-menu h2 {
 	margin-top: 0;
 	font-size: 1.5rem;
+}
+
+.keybind {
+	width: max-content;
+	align-self: center;
 }
 
 .hidden {
