@@ -72,6 +72,14 @@ const controller = {
 setupControllerSettings();
 
 function updateKeybind(keybind, newKey) {
+  for (const controllerKey in controller) {
+    if (controller[controllerKey].key.includes(newKey) && controllerKey !== keybind) {
+      // Clear the conflicting keybind
+      controller[controllerKey].key = [];
+      const button = document.getElementById(controllerKey);
+      button.textContent = "";
+    }
+  }
   if (isLetter(newKey)) {
     controller[keybind].key = [newKey.toUpperCase(), newKey.toLowerCase()];
   } else {
