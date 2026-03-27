@@ -462,7 +462,7 @@ class Block {
     this.x = x;
     this.y = y;
     this.width = width;
-    this.size = height;
+    this.height = height;
     this.layer = layer;
     this.type = type;
     this.colorR = blockTypes[type].colorR;
@@ -518,7 +518,7 @@ class Block {
     if (
       Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
       Math.round(this.x - player.globalOffsetX) > gameArea.width ||
-      Math.round(this.y - player.globalOffsetY + this.size) < 0 ||
+      Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
       Math.round(this.y - player.globalOffsetY) > gameArea.height ||
       this.alpha <= 0 ||
       this.timeToReappear !== undefined
@@ -535,7 +535,7 @@ class Block {
         Math.round(this.x - player.globalOffsetX),
         Math.round(this.y - player.globalOffsetY),
         this.width,
-        this.size,
+        this.height,
       );
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
