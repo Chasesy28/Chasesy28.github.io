@@ -88,7 +88,7 @@ function updateKeybind(keybind, newKey) {
   }
 }
 
-const player = new Player(100, 100, 35, "/images/Mario.png");
+const player = new Player(0, 0, 45, "images/Mario.png");
 
 let currentLevel = 0;
 let currentArea = 0;

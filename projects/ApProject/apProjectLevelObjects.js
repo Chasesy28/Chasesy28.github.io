@@ -7,7 +7,7 @@ class Player {
     this.image = new Image();
     this.image.src = imageSrc;
 
-    this.height = null;
+    this.width = null;
 
     this.spawnValues = [];
 
@@ -24,6 +24,8 @@ class Player {
     this.speed = 0.5;
     this.gravity = 0.5;
     this.jumpStrength = -11; // perfect 3 block jump (do not touch)
+    this.jumps = 0;
+    this.maxAirJumps = 1;
     this.grounded = false;
     this.maxFallSpeed = 15;
     this.maxVelX = 5;
@@ -42,15 +44,20 @@ class Player {
     this.layer = 0;
 
     this.dead = false;
+    this.canMove = true;
   }
 
   spawn() {
     this.dead = false;
+    this.canMove = true;
+    this.alpha = 1;
+
     this.x = this.spawnValues[currentArea][0];
     this.y = this.spawnValues[currentArea][1];
     this.layer = this.spawnValues[currentArea][2];
     this.globalOffsetX = this.spawnValues[currentArea][3];
     this.globalOffsetY = this.spawnValues[currentArea][4];
+
     this.velX = 0;
     this.velY = 0;
     this.prevY = this.y;
@@ -59,38 +66,46 @@ class Player {
 
   die() {
     this.dead = true;
+    this.canMove = false;
   }
 
   drawPlayer() {
+    if (this.dead) {
+      this.alpha -= 0.01;
+      if (this.alpha <= 0) {
+        this.spawn();
+      }
+    }
     if (this.image.complete && this.image.width > 0) {
-      this.height = Math.floor(
-        this.size * (this.image.height / this.image.width),
-      );
+
+      this.width = Math.floor(this.size * (this.image.width / this.image.height));
+      ctx.globalAlpha = this.alpha;
       if (this.direction === "right") {
         ctx.drawImage(
           this.image,
           Math.round(this.x),
           Math.round(this.y),
+          this.width,
           this.size,
-          this.height,
         );
       } else {
         ctx.save();
         ctx.scale(-1, 1);
         ctx.drawImage(
           this.image,
-          Math.round(-this.x - this.size),
+          Math.round(-this.x - this.width),
           Math.round(this.y),
+          this.width,
           this.size,
-          this.height,
         );
         ctx.restore();
       }
+      ctx.globalAlpha = 1;
     }
   }
 
   move(controller) {
-    if (!this.dead) {
+    if (this.canMove) {
       if (controller.right.pressed) {
         this.direction = "right";
         if (this.velX < this.maxVelX) this.velX += this.speed;
@@ -109,9 +124,20 @@ class Player {
         }
       }
 
-      if (controller.jump.pressed && this.grounded) {
+      if (controller.jump.pressed && this.grounded && !this.jumpCooldown) {
         this.velY = this.jumpStrength;
         this.grounded = false;
+        setTimeout(() => {
+          this.jumpCooldown = false;
+        }, 200);
+        this.jumpCooldown = true;
+      } else if (controller.jump.pressed && this.jumps >= 1 && !this.jumpCooldown) {
+        this.velY = this.jumpStrength * 0.75;
+        this.jumps -= 1;
+        setTimeout(() => {
+          this.jumpCooldown = false;
+        }, 200);
+        this.jumpCooldown = true;
       }
 
       this.prevY = this.y;
@@ -145,15 +171,6 @@ class Player {
       this.prevGlobalOffsetY = this.globalOffsetY;
 
       this.scrolling();
-    } else {
-      this.velY += this.gravity;
-      if (this.velY > this.maxFallSpeed) {
-        this.velY = this.maxFallSpeed;
-      }
-      this.y += this.velY;
-      if (this.y > gameArea.height) {
-        player.spawn();
-      }
     }
   }
 
@@ -222,13 +239,13 @@ class Player {
 
   groundedDetection(object) {
     // Convert to world space using previous frame offsets
-    const previousBottomWorld = this.prevY + this.prevGlobalOffsetY + this.size;
-    const currentBottomWorld = this.y + this.globalOffsetY + this.height;
+    const previousBottomWorld = this.prevY + this.prevGlobalOffsetY + this.width;
+    const currentBottomWorld = this.y + this.globalOffsetY + this.size;
     const blockTopWorld = object.y;
 
     // Player X in world space
     const playerLeftWorld = this.x + this.prevGlobalOffsetX;
-    const playerRightWorld = this.x + this.prevGlobalOffsetX + this.size;
+    const playerRightWorld = this.x + this.prevGlobalOffsetX + this.width;
     const blockLeftWorld = object.x;
     const blockRightWorld = object.x + object.width;
 
@@ -239,6 +256,7 @@ class Player {
       playerLeftWorld < blockRightWorld
     ) {
       this.grounded = true;
+      this.jumps = this.maxAirJumps;
       this.currentGroundBlock = object;
       if (
         this.currentGroundBlock.temporary &&
@@ -247,19 +265,19 @@ class Player {
         object.startTempDisappear();
       }
       this.velY = 0;
-      this.y = object.y - this.height - this.globalOffsetY;
+      this.y = object.y - this.size - this.globalOffsetY;
     }
   }
 
   sideBlockDetection(object) {
     // Use previous and current world space positions
     const previousPlayerLeftWorld = this.prevX + this.prevGlobalOffsetX;
-    const previousPlayerRightWorld = previousPlayerLeftWorld + this.size;
+    const previousPlayerRightWorld = previousPlayerLeftWorld + this.width;
 
     const playerLeftWorld = this.x + this.globalOffsetX;
-    const playerRightWorld = playerLeftWorld + this.size;
+    const playerRightWorld = playerLeftWorld + this.width;
     const playerTopWorld = this.y + this.globalOffsetY;
-    const playerBottomWorld = playerTopWorld + this.height;
+    const playerBottomWorld = playerTopWorld + this.size;
 
     const blockLeftWorld = object.x;
     const blockRightWorld = object.x + object.width;
@@ -288,7 +306,7 @@ class Player {
       ) {
         // Entered the block from the left this frame.
         this.globalOffsetX = this.prevGlobalOffsetX;
-        this.x = blockLeftWorld - this.size - this.globalOffsetX;
+        this.x = blockLeftWorld - this.width - this.globalOffsetX;
         this.velX = 0;
       } else if (
         (previousPlayerLeftWorld >= blockRightWorld &&
@@ -309,8 +327,8 @@ class Player {
       this.x = 0;
       this.velX = 0;
     }
-    if (this.x + this.size > gameArea.width) {
-      this.x = gameArea.width - this.size;
+    if (this.x + this.width > gameArea.width) {
+      this.x = gameArea.width - this.width;
       this.velX = 0;
     }
     if (this.y <= 0) {
@@ -333,9 +351,9 @@ class Player {
     const playerY = usePreviousFrame ? this.prevY : this.y;
 
     const playerLeft = playerX + offsetX;
-    const playerRight = playerLeft + this.size;
+    const playerRight = playerLeft + this.width;
     const playerTop = playerY + offsetY;
-    const playerBottom = playerTop + this.height;
+    const playerBottom = playerTop + this.size;
 
     const blockLeft = block.x;
     const blockRight = block.x + block.width;
@@ -444,7 +462,7 @@ class Block {
     this.x = x;
     this.y = y;
     this.width = width;
-    this.height = height;
+    this.size = height;
     this.layer = layer;
     this.type = type;
     this.colorR = blockTypes[type].colorR;
@@ -500,7 +518,7 @@ class Block {
     if (
       Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
       Math.round(this.x - player.globalOffsetX) > gameArea.width ||
-      Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
+      Math.round(this.y - player.globalOffsetY + this.size) < 0 ||
       Math.round(this.y - player.globalOffsetY) > gameArea.height ||
       this.alpha <= 0 ||
       this.timeToReappear !== undefined
@@ -517,7 +535,7 @@ class Block {
         Math.round(this.x - player.globalOffsetX),
         Math.round(this.y - player.globalOffsetY),
         this.width,
-        this.height,
+        this.size,
       );
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
