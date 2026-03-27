@@ -32,12 +32,15 @@ export class AdminAuthManager {
   /**
    * Sign in with Google OAuth
    */
-  async loginWithGoogle(redirectPath: string = '/admin') {
+  async loginWithGoogle(redirectPath?: string) {
     if (!supabase) {
       throw new Error('Supabase is not configured. Google sign-in is unavailable.')
     }
 
-    const redirectTo = `${window.location.origin}${redirectPath}`
+    const currentUrl = new URL(window.location.href)
+    const defaultRedirectPath = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+    const targetRedirect = redirectPath ?? defaultRedirectPath
+    const redirectTo = new URL(targetRedirect, window.location.origin).toString()
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

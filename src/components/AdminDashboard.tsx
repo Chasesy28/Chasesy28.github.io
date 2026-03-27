@@ -78,7 +78,7 @@ export function AdminDashboard() {
     setLoginError('')
 
     try {
-      await authManager.loginWithGoogle('/admin')
+      await authManager.loginWithGoogle()
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Google sign-in failed')
       setIsLoggingIn(false)

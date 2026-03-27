@@ -1,21 +1,27 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const supabaseKey =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  import.meta.env.VITE_SUPABASE_ANON_KEY
 
-const hasSupabaseCredentials = Boolean(supabaseUrl && supabaseAnonKey)
+const hasSupabaseCredentials = Boolean(supabaseUrl && supabaseKey)
 
 if (!hasSupabaseCredentials) {
-  console.warn('Supabase credentials are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local or .env.')
+  console.warn(
+    'Supabase credentials are missing. Set VITE_SUPABASE_URL and either VITE_SUPABASE_PUBLISHABLE_KEY or VITE_SUPABASE_ANON_KEY in .env.local or .env.'
+  )
 }
 
 export const supabase = hasSupabaseCredentials
-  ? createClient(supabaseUrl!, supabaseAnonKey!)
+  ? createClient(supabaseUrl!, supabaseKey!)
   : null
 
 function requireSupabaseClient() {
   if (!supabase) {
-    throw new Error('Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.')
+    throw new Error(
+      'Supabase is not configured. Set VITE_SUPABASE_URL and either VITE_SUPABASE_PUBLISHABLE_KEY or VITE_SUPABASE_ANON_KEY.'
+    )
   }
   return supabase
 }

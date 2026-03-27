@@ -1,8 +1,6 @@
 # Supabase Integration Guide
 
-> **Note:** The live site currently uses a simple localStorage-backed system for authentication and announcements. Supabase plans are documented below but not active.
-
-This document outlines the preparation for Supabase integration and the migration path from the current localStorage-based system.
+>use the supabase mcp tools for an upto date veiw of the curent project.
 
 ## Current Implementation
 

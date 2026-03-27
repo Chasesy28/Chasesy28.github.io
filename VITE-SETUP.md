@@ -29,7 +29,7 @@ The project supports **both** the original static HTML site **and** a modern Rea
 
 ## Project Structure
 
-```
+```md
 /
 ├── src/                          # React application source
 │   ├── components/
