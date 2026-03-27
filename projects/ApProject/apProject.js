@@ -1,3 +1,4 @@
+//apProject.js
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
 

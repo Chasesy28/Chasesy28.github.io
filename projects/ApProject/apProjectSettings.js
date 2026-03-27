@@ -1,3 +1,4 @@
+//apProjectSettings.js
 //Dragging functionality taken from online tutorial for another project then ported here
 const panel = document.getElementById("settingsMenu");
 
