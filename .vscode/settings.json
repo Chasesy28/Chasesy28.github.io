@@ -33,6 +33,8 @@
   "liveServer.settings.donotShowInfoMsg": true,
   "cSpell.words": [
     "AABB",
+    "Bremer",
+    "clickjacking",
     "Cooldown",
     "Cooldowns",
     "darkcyan",
@@ -42,12 +44,15 @@
     "elmnt",
     "exfil",
     "EXFILTRATION",
+    "Fontawesome",
     "Keybind",
     "keybinds",
     "knockback",
     "labop",
     "platformer",
+    "QUIC",
     "Respawn",
-    "threejs"
+    "threejs",
+    "Zimmet"
   ]
 }
