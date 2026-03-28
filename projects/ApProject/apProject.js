@@ -60,34 +60,12 @@ function goBack() {
   window.history.back();
 }
 
-function backgroundColor(r, g, b, randomize) {
-  for (
-    let i = 0;
-    i < Math.max(longestHorizontalLength, gameArea.width / 50);
-    i++
-  ) {
-    for (
-      let j = 0;
-      j < Math.max(longestVerticalLength, gameArea.height / 50);
-      j++
-    ) {
-      if (randomize) {
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.random() * 0.1 + 0.85})`;
-      } else {
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b})`;
-      }
-      ctx.fillRect(
-        i * 50 - player.globalOffsetX,
-        j * 50 - player.globalOffsetY,
-        50.5,
-        50.5,
-      );
-    }
-  }
+function backgroundColor(color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 }
 
-ctx.fillStyle = "dimgray";
-ctx.fillRect(0, 0, gameArea.width, gameArea.height);
+backgroundColor("dimgray");
 
 function isLetter(char) {
   return /^[a-z]$/i.test(char);
@@ -170,7 +148,7 @@ function gameLoop() {
     return;
   }
 
-  backgroundColor(173, 216, 230, true);
+  backgroundColor("lightblue");
   for (let i = 0; i < activeLevelData[currentArea].length; i++) {
     let alpha;
     if (player.layer == i) {
