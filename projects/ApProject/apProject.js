@@ -19,6 +19,11 @@ function toggleFullScreen() {
 
 function toggleSettings() {
   const settingsMenu = document.getElementById("settingsMenu");
+  if (settingsMenu.classList.contains("hidden")) {
+    settingsMenu.classList.remove("hidden");
+  } else {
+    settingsMenu.classList.add("hidden");
+  }
 }
 
 // Game state
@@ -103,7 +108,10 @@ initializeSettings();
 
 function updateKeybind(keybind, newKey) {
   for (const controllerKey in controller) {
-    if (controller[controllerKey].key.includes(newKey) && controllerKey !== keybind) {
+    if (
+      controller[controllerKey].key.includes(newKey) &&
+      controllerKey !== keybind
+    ) {
       // Clear the conflicting keybind
       controller[controllerKey].key = [];
       const button = document.getElementById(controllerKey);
@@ -180,14 +188,7 @@ function gameLoop() {
   player.insideBlock = null;
   let areaChanged = false;
   for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
-    if (areaChanged) {
-      break;
-    }
-    for (
-      let j = 0;
-      j < activeLevelData[currentArea][player.layer][i].length;
-      j++
-    ) {
+    for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
       const block = activeLevelData[currentArea][player.layer][i][j];
       if (block.solid) {
         if (
@@ -208,8 +209,9 @@ function gameLoop() {
           if (controller.interact.pressed) {
             if (block.type === "areaDoor") {
               currentArea = Number(block.doorArea);
-              player.die();
+              player.spawn();
               areaChanged = true;
+              console.log(`Entered door to area ${currentArea}`);
               break;
             }
           }
@@ -219,6 +221,11 @@ function gameLoop() {
           }
         }
       }
+    }
+    if (areaChanged) {
+      console.log("Area changed, breaking out of loops");
+      console.log(`Current area: ${currentArea}`);
+      break;
     }
   }
   player.gameBoundaryDetection();
@@ -327,4 +334,3 @@ window.document.addEventListener("keyup", function (e) {
     }
   }
 });
-

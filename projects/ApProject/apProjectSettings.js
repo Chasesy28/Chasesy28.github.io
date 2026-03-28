@@ -1,6 +1,5 @@
 //apProjectSettings.js
-//Dragging functionality taken from online tutorial for another project then ported here
-//PS curently the settings menu has features like framerate and rendering type witch i havnt figured out how to do yet so they just send consule.logs when changed, but the keybind changing works and saves to local storage so you can change your keybinds and they will be there when you refresh the page
+//PS currently the settings menu has features like framerate and rendering type which I haven't figured out how to do yet so they just send console.logs when changed, but the keybind changing works and saves to local storage so you can change your keybinds and they will be there when you refresh the page
 const panel = document.getElementById("settingsMenu");
 
 // Game Settings Object
@@ -107,6 +106,7 @@ function updateVolumeDisplay() {
 	}
 }
 
+//Dragging functionality taken from online tutorial for another project then ported here
 function dragElement(elmnt) {
   var pos1 = 0,
     pos2 = 0,
