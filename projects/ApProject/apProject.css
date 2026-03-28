@@ -1,5 +1,4 @@
 /* apProject.css */
-/* Body and HTML Reset */
 html,
 body {
 	margin: 0;
@@ -14,33 +13,69 @@ body {
 	display: flex;
 }
 
+/* Font Import */
+.cherry-bomb-one-regular {
+	font-family: "Cherry Bomb One", system-ui;
+	font-display: swap;
+	font-weight: 400;
+	font-style: normal;
+}
+
 /* Overlay Buttons */
 .play-overlay,
 .fs-button,
-.settings-button {
+.settings-button,
+.pause-button,
+.back-button {
 	position: absolute;
 	cursor: pointer;
 	border: none;
-	border-radius: 3px;
-	background: rgba(65, 74, 151, 0.6);
+	border-radius: 8px;
+	background: rgba(255, 189, 52, 0.85);
 	z-index: 10;
-	color: #e9eeee;
-	transition: background 0.2s ease-in-out;
-	/*smooth hover transition */
+	color: #333;
+	transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+	font-weight: bold;
+	box-shadow: 0 4px 6px rgba(149, 57, 0, 0.2);
 }
 
 .play-overlay:hover,
 .fs-button:hover,
-.settings-button:hover {
-	background: rgba(65, 74, 151, 0.9);
+.settings-button:hover,
+.pause-button:hover,
+.back-button:hover {
+	background: rgba(255, 189, 52, 1);
+	transform: scale(1.05);
+	box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
 }
 
 .play-overlay {
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%);
 	padding: 20px 30px;
 	font-size: 2rem;
+}
+
+.pause-button {
+	top: 15px;
+	left: 50%;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.5rem;
+}
+
+.back-button {
+	top: 15px;
+	left: 15px;
+	padding: 8px 16px;
+	font-size: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 6px;
 }
 
 .fs-button {
@@ -66,33 +101,151 @@ body {
 }
 
 .settings-menu {
-    position: fixed;
-    background: #fff;
-    border: 1px solid #aaa;
-    padding: 1rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 11;
-    max-width: 300px;
-		bottom: 50%;
-		right: 50%;
-		transform: translateX(50%) translateY(50%);
-		text-align: center;
-		display: flex;
-		flex-direction: column;
+	position: fixed;
+	background: #fffaf0;
+	border: 3px dashed #ffe77b;
+	padding: 1.5rem;
+	box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
+	z-index: 11;
+	max-width: 380px;
+	max-height: 80vh;
+	overflow-y: auto;
+	bottom: 50%;
+	right: 50%;
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	border-radius: 8px;
+	color: #333;
 }
 
 .settings-menu h2 {
 	margin-top: 0;
+	margin-bottom: 1rem;
 	font-size: 1.5rem;
+	color: var(--h2-light-mode-text-color);
+	text-align: center;
+	text-shadow: 1px 1px 2px rgba(149, 57, 0, 0.2);
+}
+
+.settings-section {
+	margin-bottom: 1.5rem;
+	padding-bottom: 1.5rem;
+	border-bottom: 2px dashed #ffe77b;
+}
+
+.settings-section:last-child {
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.settings-section h3 {
+	margin-top: 0;
+	margin-bottom: 1rem;
+	font-size: 1.1rem;
+	color: #333;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	text-shadow: none;
+}
+
+.settings-label {
+	display: block;
+	margin-top: 0.75rem;
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+	color: #333;
+	font-size: 0.95rem;
+}
+
+.settings-label::first-letter {
+	text-transform: uppercase;
+}
+
+.settings-select {
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	margin-bottom: 0.75rem;
+	border: 2px solid #ffe77b;
+	border-radius: 6px;
+	background: white;
+	color: #333;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: border-color 0.2s ease, background 0.2s ease;
+	box-sizing: border-box;
+}
+
+.settings-select:hover {
+	border-color: #ffb003;
+	background: #fffef5;
+}
+
+.settings-select:focus {
+	outline: none;
+	border-color: #ff9800;
+	box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.settings-slider-container {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+}
+
+.settings-slider {
+	flex: 1;
+	height: 8px;
+	border-radius: 4px;
+	background: linear-gradient(to right, #ff9800, #ffb74d);
+	border: 1px solid #ffe77b;
+	outline: none;
+	-webkit-appearance: none;
+	appearance: none;
+	cursor: pointer;
+}
+
+.settings-value {
+	min-width: 45px;
+	text-align: right;
+	font-weight: 600;
+	color: #ff9800;
+	font-size: 0.9rem;
 }
 
 .keybind {
-	width: max-content;
-	align-self: center;
+	width: 100%;
+	padding: 0.6rem;
+	margin-bottom: 0.75rem;
+	border: 2px solid #ff9800;
+	border-radius: 6px;
+	background: white;
+	color: #ff9800;
+	font-weight: 600;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	box-sizing: border-box;
+	text-transform: uppercase;
+	font: optional;
+}
+
+.keybind:hover {
+	background: #fff8e7;
+	border-color: #ffb74d;
+	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+}
+
+.keybind:active {
+	background: #ffb74d;
+	color: white;
+	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 .gameTitles {
@@ -100,10 +253,6 @@ body {
 	top: 20px;
 	left: 50%;
 	transform: translateX(-50%);
-
-}
-
-h1.gameTitles {
 	font-size: 2.5rem;
 	color: #e9eeee;
 	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);

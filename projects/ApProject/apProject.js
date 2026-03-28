@@ -19,11 +19,40 @@ function toggleFullScreen() {
 
 function toggleSettings() {
   const settingsMenu = document.getElementById("settingsMenu");
-  if (settingsMenu.classList.contains("hidden")) {
-    settingsMenu.classList.remove("hidden");
+}
+
+// Game state
+let gamePaused = false;
+let gameRunning = false;
+
+function togglePause() {
+  gamePaused = !gamePaused;
+  const pauseButton = document.getElementById("pauseButton");
+  if (gamePaused) {
+    pauseButton.textContent = "▶";
+    pauseButton.title = "Resume Game";
   } else {
-    settingsMenu.classList.add("hidden");
+    pauseButton.textContent = "⏸";
+    pauseButton.title = "Pause Game";
   }
+}
+
+function goBack() {
+  // Hide the game UI
+  const gameTitle = document.getElementById("gameTitle");
+  const playButton = document.getElementById("playButton");
+  const pauseButton = document.getElementById("pauseButton");
+
+  if (gameTitle) gameTitle.classList.remove("hidden");
+  if (playButton) playButton.classList.remove("hidden");
+  if (pauseButton) pauseButton.classList.add("hidden");
+
+  // Reset game state
+  gamePaused = false;
+  gameRunning = false;
+
+  // Go back to previous page
+  window.history.back();
 }
 
 function backgroundColor(r, g, b, randomize) {
@@ -70,7 +99,7 @@ const controller = {
   nextLayer: { pressed: false, key: ["ArrowDown"] },
   respawn: { pressed: false, key: ["K", "k"] },
 };
-setupControllerSettings();
+initializeSettings();
 
 function updateKeybind(keybind, newKey) {
   for (const controllerKey in controller) {
@@ -125,6 +154,12 @@ function updateLevelData() {
 }
 
 function gameLoop() {
+  // Skip game logic if paused, but still update the display
+  if (gamePaused) {
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+
   backgroundColor(173, 216, 230, true);
   for (let i = 0; i < activeLevelData[currentArea].length; i++) {
     let alpha;
@@ -257,6 +292,14 @@ function startGame() {
   gameTitle.classList.add("hidden");
   const playButton = document.getElementById("playButton");
   playButton.classList.add("hidden");
+  const pauseButton = document.getElementById("pauseButton");
+  pauseButton.classList.remove("hidden");
+
+  gameRunning = true;
+  gamePaused = false;
+  pauseButton.textContent = "⏸";
+  pauseButton.title = "Pause Game";
+
   updateLevelData();
   player.spawn();
   gameLoop();

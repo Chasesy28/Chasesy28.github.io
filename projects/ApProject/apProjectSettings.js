@@ -1,6 +1,111 @@
 //apProjectSettings.js
 //Dragging functionality taken from online tutorial for another project then ported here
+//PS curently the settings menu has features like framerate and rendering type witch i havnt figured out how to do yet so they just send consule.logs when changed, but the keybind changing works and saves to local storage so you can change your keybinds and they will be there when you refresh the page
 const panel = document.getElementById("settingsMenu");
+
+// Game Settings Object
+const gameSettings = {
+	framerate: 60,
+	renderMode: "cpu", // "cpu" or "gpu"
+	audioVolume: 70,
+	audioOutput: "speakers" // "speakers", "headphones", or "mute"
+};
+
+// Make gameSettings globally accessible
+window.gameSettings = gameSettings;
+
+// Load settings from localStorage
+function loadSettings() {
+	const saved = localStorage.getItem("apProjectSettings");
+	if (saved) {
+		const loaded = JSON.parse(saved);
+		Object.assign(gameSettings, loaded);
+	}
+	applySettings();
+}
+
+// Save settings to localStorage
+function saveSettings() {
+	localStorage.setItem("apProjectSettings", JSON.stringify(gameSettings));
+}
+
+// Apply settings to the game
+function applySettings() {
+	// Apply framerate
+	const framerateSelect = document.getElementById("framerate");
+	if (framerateSelect) {
+		framerateSelect.value = gameSettings.framerate;
+	}
+
+	// Apply render mode
+	const renderModeSelect = document.getElementById("renderMode");
+	if (renderModeSelect) {
+		renderModeSelect.value = gameSettings.renderMode;
+	}
+
+	// Apply audio volume
+	const volumeSlider = document.getElementById("audioVolume");
+	if (volumeSlider) {
+		volumeSlider.value = gameSettings.audioVolume;
+		updateVolumeDisplay();
+	}
+
+	// Apply audio output
+	const audioOutputSelect = document.getElementById("audioOutput");
+	if (audioOutputSelect) {
+		audioOutputSelect.value = gameSettings.audioOutput;
+	}
+}
+
+// Setup performance settings listeners
+function setupPerformanceSettings() {
+	const framerateSelect = document.getElementById("framerate");
+	if (framerateSelect) {
+		framerateSelect.addEventListener("change", (e) => {
+			gameSettings.framerate = parseInt(e.target.value);
+			saveSettings();
+			console.log(`Framerate set to ${gameSettings.framerate} FPS`);
+		});
+	}
+
+	const renderModeSelect = document.getElementById("renderMode");
+	if (renderModeSelect) {
+		renderModeSelect.addEventListener("change", (e) => {
+			gameSettings.renderMode = e.target.value;
+			saveSettings();
+			console.log(`Render mode set to ${gameSettings.renderMode.toUpperCase()}`);
+		});
+	}
+}
+
+// Setup audio settings listeners
+function setupAudioSettings() {
+	const volumeSlider = document.getElementById("audioVolume");
+	if (volumeSlider) {
+		volumeSlider.addEventListener("input", (e) => {
+			gameSettings.audioVolume = parseInt(e.target.value);
+			updateVolumeDisplay();
+			saveSettings();
+		});
+	}
+
+	const audioOutputSelect = document.getElementById("audioOutput");
+	if (audioOutputSelect) {
+		audioOutputSelect.addEventListener("change", (e) => {
+			gameSettings.audioOutput = e.target.value;
+			saveSettings();
+			console.log(`Audio output set to ${gameSettings.audioOutput}`);
+		});
+	}
+}
+
+// Update volume display value
+function updateVolumeDisplay() {
+	const volumeValue = document.getElementById("volumeValue");
+	if (volumeValue) {
+		volumeValue.textContent = gameSettings.audioVolume + "%";
+	}
+}
 
 function dragElement(elmnt) {
   var pos1 = 0,
@@ -20,7 +125,9 @@ function dragElement(elmnt) {
 
     // 1. Define which element(s) should NOT trigger a drag
     // This checks if the clicked element has the class "no-drag"
-    if (e.target.closest(".rain-slider-container")) {
+    if (e.target.closest(".settings-slider-container") ||
+        e.target.closest(".settings-select") ||
+        e.target.closest(".keybind")) {
       return; // Exit the function early so dragging never starts
     }
 
@@ -109,4 +216,12 @@ function setupControllerSettings() {
   for (const controllerKey in controller) {
     attachSettingsListeners(controllerKey);
   }
+}
+
+// Initialize all settings when the page loads
+function initializeSettings() {
+	loadSettings();
+	setupPerformanceSettings();
+	setupAudioSettings();
+	setupControllerSettings();
 }

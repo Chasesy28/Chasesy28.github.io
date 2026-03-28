@@ -1,26 +1,79 @@
 <!--apProject.html-->
+<!-- Font taken from google fonts, icons just base UTF-8 text or google icons-->
+<!-- Notification BAr js file seperate sitewide notfication system.-->
 <!DOCTYPE html>
 <html lang="en">
 
   <head>
     <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AP Project Tam High 2026-Chase and Benjamin</title>
-    <!--link to the CSS file-->
+    <!--link to the CSS files-->
     <link rel="stylesheet" href="/projects/ApProject/apProject.css">
+    <link rel="stylesheet" href="/notification-bars.css">
     <!--Use shared site manifest so all app metadata is centralized in one file.-->
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icons/icon-192x192.png">
+    <!-- Font Import -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap" rel="stylesheet">
   </head>
 
-  <body>
-      <canvas id="gameArea">Game Area</canvas>
-      <h1 id="gameTitle" class="gameTitles">AP Project</h1>
-      <button id="playButton" class="play-overlay" onclick="startGame()">▶</button>
-      <button id="fullscreenButton" class="fs-button" onclick="toggleFullScreen()">⛶</button>
-      <button id="settingsButton" class="settings-button" onclick="toggleSettings()">⚙️</button>
-      <div id="settingsMenu" class="hidden settings-menu">
-        <h2>Settings</h2>
+  <body class="cherry-bomb-one-regular">
+    <canvas id="gameArea">Game Area</canvas>
+    <h1 id="gameTitle" class="gameTitles">AP Project</h1>
+    <button id="playButton" class="play-overlay" onclick="startGame()">▶</button>
+    <button id="pauseButton" class="pause-button hidden" onclick="togglePause()">⏸</button>
+    <button id="backButton" class="back-button" onclick="goBack()">Back</button>
+    <button id="fullscreenButton" class="fs-button" onclick="toggleFullScreen()">⛶</button>
+    <button id="settingsButton" class="settings-button" onclick="toggleSettings()">⚙️</button>
+    <div id="settingsMenu" class="hidden settings-menu">
+      <h2>Settings</h2>
+
+      <!-- Performance Settings -->
+      <div class="settings-section">
+        <h3>Performance</h3>
+
+        <label for="framerate" class="settings-label">Framerate:</label>
+        <select id="framerate" class="settings-select">
+          <option value="30">30 FPS</option>
+          <option value="60" selected>60 FPS</option>
+          <option value="120">120 FPS</option>
+          <option value="144">144 FPS</option>
+        </select>
+
+        <label for="renderMode" class="settings-label">Render Mode:</label>
+        <select id="renderMode" class="settings-select">
+          <option value="cpu" selected>CPU</option>
+          <option value="gpu">GPU</option>
+        </select>
+      </div>
+
+      <!-- Audio Settings -->
+      <div class="settings-section">
+        <h3>Audio</h3>
+
+        <label for="audioVolume" class="settings-label">Volume:</label>
+        <div class="settings-slider-container">
+          <input id="audioVolume" type="range" min="0" max="100" value="70" class="settings-slider">
+          <span id="volumeValue" class="settings-value">70%</span>
+        </div>
+
+        <label for="audioOutput" class="settings-label">Output:</label>
+        <select id="audioOutput" class="settings-select">
+          <option value="speakers" selected>Speakers</option>
+          <option value="headphones">Headphones</option>
+          <option value="mute">Mute</option>
+        </select>
+      </div>
+
+      <!-- Control Settings -->
+      <div class="settings-section">
+        <h3>Controls</h3>
+
         <label for="jump" class="settings-label">Jump Keybind:</label>
         <button id="jump" class="keybind"></button>
         <label for="left" class="settings-label">Left Keybind:</label>
@@ -39,12 +92,14 @@
         <button id="nextLayer" class="keybind"></button>
         <label for="respawn" class="settings-label">Respawn Keybind:</label>
         <button id="respawn" class="keybind"></button>
+
       </div>
-      <script src="apProjectSettings.js"></script>
-      <script src="apProjectLevelData.js"></script>
-      <script src="apProjectLevelObjects.js"></script>
-      <script src="apProjectLevelBuild.js"></script>
-      <script src="apProject.js"></script>
+    </div>
+    <script src="apProjectSettings.js"></script>
+    <script src="apProjectLevelData.js"></script>
+    <script src="apProjectLevelObjects.js"></script>
+    <script src="apProjectLevelBuild.js"></script>
+    <script src="apProject.js"></script>
   </body>
 
 </html>
