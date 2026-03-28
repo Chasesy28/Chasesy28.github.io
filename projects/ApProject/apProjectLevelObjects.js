@@ -1,8 +1,8 @@
 //apProjectLevelObjects.js
 class Player {
-  constructor(x, y, size, imageSrc) {
-    this.x = x;
-    this.y = y;
+  constructor(size, imageSrc) {
+    this.x;
+    this.y;
     this.size = size;
     this.image = new Image();
     this.image.src = imageSrc;
@@ -11,16 +11,16 @@ class Player {
 
     this.spawnValues = [];
 
-    this.spawnX = x;
-    this.spawnY = y;
+    this.spawnX;
+    this.spawnY;
     this.spawnOffsetX = null;
     this.spawnOffsetY = null;
     this.spawnLayer = null;
 
     this.velX = 0;
     this.velY = 0;
-    this.prevY = y;
-    this.prevX = x;
+    this.prevY;
+    this.prevX;
     this.speed = 0.5;
     this.gravity = 0.5;
     this.jumpStrength = -11; // perfect 3 block jump (do not touch)
