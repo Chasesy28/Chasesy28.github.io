@@ -7,7 +7,7 @@ This document describes the Vite + TypeScript + React + Tailwind CSS configurati
 The project supports **both** the original static HTML site **and** a modern React development environment:
 
 - **Original Site**: `index.html` - The main site using static HTML with local Tailwind CSS
-- **React App**: `index-vite.html` - Optional TypeScript/React application with Vite
+- **React App**: `vite.html` - Optional TypeScript/React application with Vite
 
 ## Tech Stack
 
