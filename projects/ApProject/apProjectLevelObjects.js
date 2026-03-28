@@ -11,12 +11,6 @@ class Player {
 
     this.spawnValues = [];
 
-    this.spawnX;
-    this.spawnY;
-    this.spawnOffsetX = null;
-    this.spawnOffsetY = null;
-    this.spawnLayer = null;
-
     this.velX = 0;
     this.velY = 0;
     this.prevY;
