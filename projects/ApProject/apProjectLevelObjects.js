@@ -39,6 +39,8 @@ class Player {
 
     this.dead = false;
     this.canMove = true;
+
+    this.alpha = 1;
   }
 
   spawn() {
