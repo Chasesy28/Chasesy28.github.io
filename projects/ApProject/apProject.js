@@ -103,6 +103,8 @@ const controller = {
   previousLayer: { pressed: false, key: ["ArrowUp"] },
   nextLayer: { pressed: false, key: ["ArrowDown"] },
   respawn: { pressed: false, key: ["K", "k"] },
+  grow: { pressed: false, key: ["G", "g"] },
+  shrink: { pressed: false, key: ["H", "h"] },
 };
 initializeSettings();
 

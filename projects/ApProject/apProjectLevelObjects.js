@@ -3,6 +3,7 @@ class Player {
   constructor(size, imageSrc) {
     this.x;
     this.y;
+    this.baseSize = size;
     this.size = size;
     this.image = new Image();
     this.image.src = imageSrc;
@@ -41,6 +42,9 @@ class Player {
     this.canMove = true;
 
     this.alpha = 1;
+
+    this.sizeChangeCooldown = false;
+    this.state = 0;
   }
 
   spawn() {
@@ -50,6 +54,11 @@ class Player {
 
     this.x = this.spawnValues[currentArea][0];
     this.y = this.spawnValues[currentArea][1];
+    if (this.state === 1) {
+      this.y -= this.baseSize * 1.5;
+    } else if (this.state === -1) {
+      this.y += this.baseSize * 0.5;
+    }
     this.layer = this.spawnValues[currentArea][2];
     this.globalOffsetX = this.spawnValues[currentArea][3];
     this.globalOffsetY = this.spawnValues[currentArea][4];
@@ -167,6 +176,37 @@ class Player {
       this.prevGlobalOffsetY = this.globalOffsetY;
 
       this.scrolling();
+
+      if (controller.grow.pressed && !this.sizeChangeCooldown) {
+        if (this.size == this.baseSize) {
+          this.size = this.baseSize * 1.5;
+          this.y -= this.baseSize * 0.5;
+          this.state = 1;
+        } else if (this.size == this.baseSize * 0.5) {
+          this.size = this.baseSize;
+          this.y -= this.baseSize * 0.5;
+          this.state = 0;
+        }
+        setTimeout(() => {
+          this.sizeChangeCooldown = false;
+        }, 250);
+        this.sizeChangeCooldown = true;
+      }
+      if (controller.shrink.pressed && !this.sizeChangeCooldown) {
+        if (this.size == this.baseSize * 1.5) {
+          this.size = this.baseSize;
+          this.y += this.baseSize * 0.5;
+          this.state = 0;
+        } else if (this.size == this.baseSize) {
+          this.size = this.baseSize * 0.5;
+          this.y += this.baseSize * 0.5;
+          this.state = -1;
+        }
+        setTimeout(() => {
+          this.sizeChangeCooldown = false;
+        }, 250);
+        this.sizeChangeCooldown = true;
+      }
     }
   }
 
