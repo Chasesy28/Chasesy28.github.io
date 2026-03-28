@@ -18,7 +18,7 @@ class Player {
     this.prevX;
     this.speed = 0.5;
     this.gravity = 0.5;
-    this.jumpStrength = -11; // perfect 3 block jump (do not touch)
+    this.jumpStrength = -11;
     this.jumps = 0;
     this.maxAirJumps = 1;
     this.grounded = false;
@@ -376,7 +376,7 @@ class Player {
     }
   }
 
-  isOverlappingBlock(block, usePreviousFrame = false) {
+  isOverlappingObject(object, usePreviousFrame = false) {
     const offsetX = usePreviousFrame
       ? this.prevGlobalOffsetX
       : this.globalOffsetX;
@@ -391,21 +391,21 @@ class Player {
     const playerTop = playerY + offsetY;
     const playerBottom = playerTop + this.size;
 
-    const blockLeft = block.x;
-    const blockRight = block.x + block.width;
-    const blockTop = block.y;
-    const blockBottom = block.y + block.height;
+    const objectLeft = object.x;
+    const objectRight = object.x + object.width;
+    const objectTop = object.y;
+    const objectBottom = object.y + object.height;
 
     return (
-      playerRight > blockLeft &&
-      playerLeft < blockRight &&
-      playerBottom > blockTop &&
-      playerTop < blockBottom
+      playerRight > objectLeft &&
+      playerLeft < objectRight &&
+      playerBottom > objectTop &&
+      playerTop < objectBottom
     );
   }
 
   insideBlockDetection(block) {
-    const isInside = this.isOverlappingBlock(block);
+    const isInside = this.isOverlappingObject(block);
 
     if (isInside) {
       this.insideBlock = block;
@@ -517,6 +517,9 @@ class Block {
     if (this.type === "areaDoor") {
       this.doorArea = doorArea;
     }
+
+    this.isBlock = true;
+    this.isEnemy = false;
   }
   colorReset() {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
@@ -591,5 +594,80 @@ class Block {
     this.colorReset();
     this.timeToReappear = undefined;
     this.visible = true;
+  }
+}
+
+const enemyTypes = {
+  0: {
+    width: 50,
+    height: 50,
+    speed: 1,
+    colorR: 255,
+    colorG: 0,
+    colorB: 0,
+  }
+}
+class Enemy {
+  constructor(x, y, type, layer) {
+    this.x = x;
+    this.y = y;
+    this.layer = layer;
+    this.type = type;
+    this.width = enemyTypes[type].width;
+    this.height = enemyTypes[type].height;
+    this.speed = enemyTypes[type].speed;
+    /*this.image = new Image();
+    this.image.src = enemyTypes[type].imageSrc;*/
+
+    this.colorR = enemyTypes[type].colorR;
+    this.colorG = enemyTypes[type].colorG;
+    this.colorB = enemyTypes[type].colorB;
+    this.alpha = 1;
+    this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
+
+    this.isBlock = false;
+    this.isEnemy = true;
+  }
+
+  colorReset() {
+    this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
+  }
+
+  draw() {
+    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+
+    if (this.layer !== player.layer) {
+      let color = Math.max(this.colorR, this.colorG, this.colorB);
+      color = Math.floor(
+        color * (1 - Math.abs(player.layer - this.layer) * 0.85),
+      );
+      this.color = `rgba(${color}, ${color}, ${color}, ${this.alpha})`;
+    } else {
+      this.colorReset();
+    }
+
+    if (
+      Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
+      Math.round(this.x - player.globalOffsetX) > gameArea.width ||
+      Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
+      Math.round(this.y - player.globalOffsetY) > gameArea.height ||
+      this.alpha <= 0
+    ) {
+      this.visible = false;
+    } else {
+      this.visible = true;
+    }
+
+    // Skip rendering if not visible or fully transparent
+    if (this.visible && this.alpha > 0) {
+      ctx.fillStyle = this.color;
+      ctx.fillRect(
+        Math.round(this.x - player.globalOffsetX),
+        Math.round(this.y - player.globalOffsetY),
+        this.width,
+        this.height,
+      );
+    }
+    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
 }

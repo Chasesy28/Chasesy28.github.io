@@ -51,6 +51,8 @@ function convertToObjects(levelData, layer, area) {
         row.push(new Block(j * 50, i * 50, 50, 50, layer, levelNumberKey[levelData[i][j]]));
       } else if (levelData[i][j][0] === "d") {
         row.push(new Block(j * 50, i * 50, 50, 50, layer, "areaDoor", levelData[i][j].slice(1)));
+      } else if (levelData[i][j][0] === "e") {
+        row.push(new Enemy(j * 50, i * 50, levelData[i][j].slice(1), layer));
       }
     }
     level.push(row);
