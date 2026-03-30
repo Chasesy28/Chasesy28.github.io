@@ -82,8 +82,9 @@ class Player {
       }
     }
     if (this.image.complete && this.image.width > 0) {
-
-      this.width = Math.floor(this.size * (this.image.width / this.image.height));
+      this.width = Math.floor(
+        this.size * (this.image.width / this.image.height),
+      );
       ctx.globalAlpha = this.alpha;
       if (this.direction === "right") {
         ctx.drawImage(
@@ -136,7 +137,11 @@ class Player {
           this.jumpCooldown = false;
         }, 200);
         this.jumpCooldown = true;
-      } else if (controller.jump.pressed && this.jumps >= 1 && !this.jumpCooldown) {
+      } else if (
+        controller.jump.pressed &&
+        this.jumps >= 1 &&
+        !this.jumpCooldown
+      ) {
         this.velY = this.jumpStrength * 0.75;
         this.jumps -= 1;
         setTimeout(() => {
@@ -275,7 +280,8 @@ class Player {
 
   groundedDetection(object) {
     // Convert to world space using previous frame offsets
-    const previousBottomWorld = this.prevY + this.prevGlobalOffsetY + this.width;
+    const previousBottomWorld =
+      this.prevY + this.prevGlobalOffsetY + this.width;
     const currentBottomWorld = this.y + this.globalOffsetY + this.size;
     const blockTopWorld = object.y;
 
@@ -602,11 +608,12 @@ const enemyTypes = {
     width: 50,
     height: 50,
     speed: 1,
+    movement: "horizontalPatrol",
     colorR: 255,
     colorG: 0,
     colorB: 0,
-  }
-}
+  },
+};
 class Enemy {
   constructor(x, y, type, layer) {
     this.x = x;
@@ -616,6 +623,8 @@ class Enemy {
     this.width = enemyTypes[type].width;
     this.height = enemyTypes[type].height;
     this.speed = enemyTypes[type].speed;
+    this.direction = 1;
+    this.movement = enemyTypes[type].movement;
     /*this.image = new Image();
     this.image.src = enemyTypes[type].imageSrc;*/
 
@@ -634,6 +643,7 @@ class Enemy {
   }
 
   draw() {
+    this.update();
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
 
     if (this.layer !== player.layer) {
@@ -669,5 +679,66 @@ class Enemy {
       );
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+  }
+  update() {
+    if (this.movement === "horizontalPatrol") {
+      this.horizontalPatrol();
+    }
+  }
+
+  getSolidBlocksOnLayer() {
+    const solids = [];
+    const layerData = activeLevelData[currentArea][this.layer];
+    for (let i = 0; i < layerData.length; i++) {
+      for (let j = 0; j < layerData[i].length; j++) {
+        const object = layerData[i][j];
+        if (object.isBlock && object.solid) {
+          solids.push(object);
+        }
+      }
+    }
+    return solids;
+  }
+
+  collidesWithSolid(nextX, nextY, solids) {
+    for (let i = 0; i < solids.length; i++) {
+      const block = solids[i];
+      const overlapX = nextX < block.x + block.width && nextX + this.width > block.x;
+      const overlapY = nextY < block.y + block.height && nextY + this.height > block.y;
+      if (overlapX && overlapY) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  hasGroundAhead(nextX, solids) {
+    const lookAheadX = nextX + (this.direction > 0 ? this.width : 0);
+    const feetY = this.y + this.height + 2;
+
+    for (let i = 0; i < solids.length; i++) {
+      const block = solids[i];
+      const overBlockX = lookAheadX >= block.x && lookAheadX <= block.x + block.width;
+      const nearTopSurface = feetY >= block.y && feetY <= block.y + block.height;
+      if (overBlockX && nearTopSurface) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  horizontalPatrol() {
+    const solids = this.getSolidBlocksOnLayer();
+    const nextX = this.x + this.speed * this.direction;
+
+    const willHitWall = this.collidesWithSolid(nextX, this.y, solids);
+    const hasFloorAhead = this.hasGroundAhead(nextX, solids);
+
+    if (willHitWall || !hasFloorAhead) {
+      this.direction *= -1;
+    }
+
+    this.x += this.speed * this.direction;
   }
 }
