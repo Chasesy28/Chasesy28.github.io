@@ -11,3 +11,4 @@ if (!gl) {
 }
 
 backgroundColor(gl, [0.0, 0.0, 0.0, 1.0]); // Set background color to black
+line(gl, -0.5, -0.5, 0.5, 0.5); // Draw a diagonal line from bottom-left to top-right
