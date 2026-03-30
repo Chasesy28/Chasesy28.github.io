@@ -1,11 +1,11 @@
 //apProject.js
-const gameArea = document.getElementById("gameArea");
-const ctx = gameArea.getContext("2d");
+const canvas = document.getElementById("gameArea");
+const ctx = canvas.getContext("2d");
 
-gameArea.style.width = "100dvw";
-gameArea.style.height = "100dvh";
-gameArea.width = gameArea.offsetWidth;
-gameArea.height = gameArea.offsetHeight;
+canvas.style.width = "100dvw";
+canvas.style.height = "100dvh";
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
 
 function toggleFullScreen() {
   if (!document.fullscreenElement) {
@@ -62,7 +62,7 @@ function goBack() {
 
 function backgroundColor(color) {
   ctx.fillStyle = color;
-  ctx.fillRect(0, 0, gameArea.width, gameArea.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 backgroundColor("dimgray");
@@ -291,10 +291,10 @@ function startGame() {
   gameLoop();
   visualViewport.addEventListener("resize", function () {
     //just in case the user changes orientation or something
-    gameArea.style.width = "100dvw";
-    gameArea.style.height = "100dvh";
-    gameArea.width = gameArea.offsetWidth;
-    gameArea.height = gameArea.offsetHeight;
+    canvas.style.width = "100dvw";
+    canvas.style.height = "100dvh";
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
   });
 }
 
