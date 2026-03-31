@@ -470,7 +470,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.99,
     verticalFriction: 1,
-    textureIndex: 208,
+    textureIndex: 570,
   },
   slow: {
     colorR: 0,
