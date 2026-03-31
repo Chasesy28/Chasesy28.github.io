@@ -18,12 +18,16 @@
         touch-action: none;
         /* Prevents pull-to-refresh and pinch-zoom on touchscreens */
         display: flex;
+        background-color: dimgray;
+      }
+      canvas {
+        background-color: #da6052;
       }
     </style>
   </head>
 
   <body>
-    <canvas id="webglCanvas" width="640" height="480"></canvas>
+    <canvas id="webglCanvas"></canvas>
     <script src="webglLibrary.js"></script>
     <script src="webgl.js"></script>
   </body>

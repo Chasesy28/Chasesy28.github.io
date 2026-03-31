@@ -3,232 +3,103 @@ function backgroundColor(gl, color) {
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
-function line(gl, x1, y1, x2, y2) {
-  // Vertex shader source:
-  // - Receives 2D line endpoints from JavaScript.
-  // - Converts them into clip-space 4D coordinates for the GPU pipeline.
-  const vertexShaderSource = `
-    attribute vec2 a_position;
-    void main() {
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-  `;
+//Made with a lot of help from a tutorial
+function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
+  const triangleVertices = [
+    //Top middle
+    x1, y1,
+    //Bottom left
+    x2, y2,
+    //Bottom right
+    x3, y3
+  ];
+  const triangleVerticesCPUBuffer = new Float32Array(triangleVertices);
 
-  // Fragment shader source:
-  // - Runs for each pixel that makes up the line.
-  // - Outputs white RGBA color for all pixels along the line.
-  const fragmentShaderSource = `
-    precision mediump float;
-    void main() {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-  `;
+  const triangleGeoBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeoBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, triangleVerticesCPUBuffer, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  // Helper function to compile a shader from source code.
-  // Returns the compiled shader object or null if compilation fails.
-  function createShader(shaderType, source) {
-    // Create a shader object of the requested type (VERTEX_SHADER or FRAGMENT_SHADER).
-    const shader = gl.createShader(shaderType);
+  const vertexShaderSourceCode = `#version 300 es
+  precision mediump float;
 
-    // Attach the GLSL source code string to the shader object.
-    gl.shaderSource(shader, source);
+  in vec2 vertexPosition;
 
-    // Compile the GLSL source into GPU machine instructions.
-    gl.compileShader(shader);
+  void main() {
+    gl_Position = vec4(vertexPosition, 0.0, 1.0);
+  }`;
 
-    // Validate compilation: check if any errors occurred during compilation.
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      // If compilation failed, log the error message and clean up.
-      console.error(gl.getShaderInfoLog(shader));
-      gl.deleteShader(shader);
-      return null;
-    }
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, vertexShaderSourceCode);
+  gl.compileShader(vertexShader);
 
-    // Return the successfully compiled shader.
-    return shader;
-  }
-
-  // Compile both required shaders: vertex and fragment.
-  const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderSource);
-  const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-  // Abort if either shader failed to compile (return early to avoid errors).
-  if (!vertexShader || !fragmentShader) {
+  if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+    console.error("Vertex shader compilation error: " + gl.getShaderInfoLog(vertexShader));
     return;
   }
 
-  // Create a program object that will hold the linked shader pipeline.
-  const program = gl.createProgram();
+  const fragmentShaderSourceCode = `#version 300 es
+  precision mediump float;
 
-  // Attach the compiled vertex shader to the program.
-  gl.attachShader(program, vertexShader);
+  out vec4 outputColor;
 
-  // Attach the compiled fragment shader to the program.
-  gl.attachShader(program, fragmentShader);
+  void main() {
+    outputColor = vec4(${r/255.0}, ${g/255.0}, ${b/255.0}, ${a});
+  }`;
 
-  // Link the two shaders together into a complete, executable GPU program.
-  gl.linkProgram(program);
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, fragmentShaderSourceCode);
+  gl.compileShader(fragmentShader);
 
-  // Check if linking succeeded; log errors and abort if it failed.
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error(gl.getProgramInfoLog(program));
-    gl.deleteProgram(program);
+  if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+    console.error("Fragment shader compilation error: " + gl.getShaderInfoLog(fragmentShader));
     return;
   }
 
-  // Create a Float32Array containing the two endpoints of the line.
-  // Each endpoint is a 2D point (x, y) in clip space [-1.0, 1.0].
-  // Parameters x1, y1, x2, y2 are the line segment start and end points.
-  const vertices = new Float32Array([
-    x1, y1,  // Start point of the line
-    x2, y2,  // End point of the line
-  ]);
+  const triangleShaderProgram = gl.createProgram();
+  gl.attachShader(triangleShaderProgram, vertexShader);
+  gl.attachShader(triangleShaderProgram, fragmentShader);
+  gl.linkProgram(triangleShaderProgram);
+  if (!gl.getProgramParameter(triangleShaderProgram, gl.LINK_STATUS)) {
+    console.error("Shader program linking error: " + gl.getProgramInfoLog(triangleShaderProgram));
+    return;
+  }
+  const vertexPositionAttributeLocation = gl.getAttribLocation(triangleShaderProgram, "vertexPosition");
+  if (vertexPositionAttributeLocation < 0) {
+    console.error("Failed to get the attribute location for vertexPosition");
+    return;
+  }
 
-  // Create a GPU buffer object to hold vertex data on the graphics card.
-  const buffer = gl.createBuffer();
+  // Output merger - how to merge the shaded pixel fragment with the existing output image
+  /*canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;*/
+  gl.clearColor(0.08, 0.08, 0.08, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  // Bind this buffer as the current ARRAY_BUFFER target for subsequent operations.
-  // This tells WebGL where to store the vertex data.
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-
-  // Copy the vertex data from CPU memory (JavaScript) to GPU memory.
-  // gl.STATIC_DRAW hints that this data will not change frequently.
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-  // Retrieve the memory location of the `a_position` attribute in the shader program.
-  // This location is used to connect CPU vertex data to the GPU shader.
-  const positionLocation = gl.getAttribLocation(program, "a_position");
-
-  // Set up the viewport to map clip space coordinates to canvas pixel coordinates.
-  // Maps the entire canvas area for rendering.
+  // Rasterizer - what pixels are part of a triangle
   gl.viewport(0, 0, canvas.width, canvas.height);
 
-  // Direct WebGL to use this program for all subsequent drawing operations.
-  gl.useProgram(program);
+  // Set GPU program (vertex and fragment shader)
+  gl.useProgram(triangleShaderProgram);
+  gl.enableVertexAttribArray(vertexPositionAttributeLocation);
 
-  // Enable the vertex attribute array so the shader can read data from the buffer.
-  gl.enableVertexAttribArray(positionLocation);
+  // Input assembler - how to read vertices from our GPU triangle buffer
+  gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeoBuffer);
+  gl.vertexAttribPointer(
+    /*index=: which attribute to use*/
+    vertexPositionAttributeLocation,
+    /*size=: how many components in that attribute*/
+    2,
+    /*type=: what is the data type stored in the GPU buffer for this attribute*/
+    gl.FLOAT,
+    /*normalized=: determines how to convert ints to floats*/
+    false,
+    /*stride=: how many bytes to move forward into the buffer to find the same attribute for the next vertex*/
+    0, //0 is automatic
+    /*offset=: how many bytes should the input assembler skip into the buffer when reading attributes*/
+    0
+  );
 
-  // Specify how the vertex data in the buffer is formatted:
-  // - 2: Each vertex has 2 components (x and y).
-  // - gl.FLOAT: Each component is a 32-bit floating-point number.
-  // - false: Do not normalize the values.
-  // - 0: No stride (tightly packed, no gap between vertices).
-  // - 0: Start reading from byte offset 0 in the buffer.
-  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-  // Draw the line using the two vertices in the buffer.
-  // gl.LINE_STRIP connects consecutive vertices with line segments.
-  // Starting from vertex 0, drawing 2 vertices total (the start and end points).
-  gl.drawArrays(gl.LINE_STRIP, 0, 2);
-}
-
-function square(gl) {
-  // Vertex shader source:
-  // - Receives each 2D vertex position from JavaScript.
-  // - Converts it into clip-space 4D coordinates for the GPU pipeline.
-  const vertexShaderSource = `
-    attribute vec2 a_position;
-    void main() {
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-  `;
-
-  // Fragment shader source:
-  // - Runs for each pixel covered by the square.
-  // - Outputs solid white RGBA color.
-  const fragmentShaderSource = `
-    precision mediump float;
-    void main() {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-  `;
-
-  // Helper to compile a shader and return it.
-  // Returns null if compilation fails.
-  function createShader(shaderType, source) {
-    // Create a shader object of the requested type.
-    const shader = gl.createShader(shaderType);
-
-    // Attach GLSL source code to the shader object.
-    gl.shaderSource(shader, source);
-
-    // Compile the shader source into GPU-understandable instructions.
-    gl.compileShader(shader);
-
-    // Check for compile errors so we can fail gracefully with diagnostics.
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error(gl.getShaderInfoLog(shader));
-      gl.deleteShader(shader);
-      return null;
-    }
-
-    // Shader compiled successfully.
-    return shader;
-  }
-
-  // Compile both shaders needed by the graphics pipeline.
-  const vertexShader = createShader(gl.VERTEX_SHADER, vertexShaderSource);
-  const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
-
-  // Stop if either shader failed to compile.
-  if (!vertexShader || !fragmentShader) {
-    return;
-  }
-
-  // Create a shader program and attach compiled shaders.
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-
-  // Link shaders into an executable GPU program.
-  gl.linkProgram(program);
-
-  // Check link status and report errors if program creation failed.
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error(gl.getProgramInfoLog(program));
-    gl.deleteProgram(program);
-    return;
-  }
-
-  // Define four 2D corners of a centered square in clip space.
-  // Coordinates in clip space range from -1.0 to 1.0.
-  const vertices = new Float32Array([
-    -0.5, -0.5,
-    0.5, -0.5,
-    0.5, 0.5,
-    -0.5, 0.5,
-  ]);
-
-  // Create a GPU buffer to store vertex data.
-  const buffer = gl.createBuffer();
-
-  // Bind it as the current ARRAY_BUFFER target.
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-
-  // Upload vertex data from CPU memory to GPU memory.
-  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-  // Find the location of `a_position` in the linked shader program.
-  const positionLocation = gl.getAttribLocation(program, "a_position");
-
-  // Map clip space output to the full canvas size.
-  gl.viewport(0, 0, canvas.width, canvas.height);
-
-  // Tell WebGL to use this linked program for subsequent draw calls.
-  gl.useProgram(program);
-
-  // Enable the vertex attribute so the shader can read from the bound buffer.
-  gl.enableVertexAttribArray(positionLocation);
-
-  // Describe how buffer data is laid out for `a_position`:
-  // - 2 components per vertex (x, y)
-  // - Data type float
-  // - No normalization
-  // - No stride/padding between vertices
-  // - Start at byte offset 0
-  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-  // Draw the square as a fan of triangles using 4 vertices.
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+  // Draw call (Primitive assembler - how to make triangles from those vertices)
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
