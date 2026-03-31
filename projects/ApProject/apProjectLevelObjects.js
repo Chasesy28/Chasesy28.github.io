@@ -1,4 +1,10 @@
 //apProjectLevelObjects.js
+const BLOCK_TEXTURE_COUNT = 609; //yes i know
+
+function getBlockTexturePath(index) {
+  return `images/Block-assets/texture_16px ${index}.png`;
+}
+
 class Player {
   constructor(size, imageSrc) {
     this.x;
@@ -430,6 +436,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.92,
     verticalFriction: 1,
+    textureIndex: 66,
   },
   temporary: {
     colorR: 128,
@@ -441,6 +448,7 @@ const blockTypes = {
     reappearTime: 120,
     friction: 0.92,
     verticalFriction: 1,
+    textureIndex: 113,
   },
   permanentTemporary: {
     colorR: 105,
@@ -452,6 +460,7 @@ const blockTypes = {
     reappearTime: undefined,
     friction: 0.92,
     verticalFriction: 1,
+    textureIndex: 144,
   },
   ice: {
     colorR: 0,
@@ -461,6 +470,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.99,
     verticalFriction: 1,
+    textureIndex: 208,
   },
   slow: {
     colorR: 0,
@@ -470,6 +480,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.75,
     verticalFriction: 1,
+    textureIndex: 266,
   },
   cobweb: {
     colorR: 255,
@@ -479,6 +490,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.5,
     verticalFriction: 0.25,
+    textureIndex: 339,
   },
   spike: {
     colorR: 0,
@@ -488,6 +500,7 @@ const blockTypes = {
     temporary: false,
     friction: 1,
     verticalFriction: 1,
+    textureIndex: 487,
   },
   areaDoor: {
     colorR: 255,
@@ -497,10 +510,30 @@ const blockTypes = {
     temporary: false,
     friction: 1,
     verticalFriction: 1,
+    textureIndex: 590,
   },
 };
 class Block {
+  static texturePool = [];
+  static texturesLoaded = false;
+
+  static initializeTextures() {
+    if (Block.texturesLoaded) {
+      return;
+    }
+
+    for (let i = 1; i <= BLOCK_TEXTURE_COUNT; i++) {
+      const image = new Image();
+      image.src = getBlockTexturePath(i);
+      Block.texturePool.push(image);
+    }
+
+    Block.texturesLoaded = true;
+  }
+
   constructor(x, y, width, height, layer, type, doorArea) {
+    Block.initializeTextures();
+
     this.x = x;
     this.y = y;
     this.width = width;
@@ -518,6 +551,7 @@ class Block {
     this.timeToReappear;
     this.friction = blockTypes[this.type].friction;
     this.verticalFriction = blockTypes[this.type].verticalFriction;
+    this.textureIndex = blockTypes[this.type].textureIndex || 1;
     this.visible = true;
     this.doorArea = null;
     if (this.type === "areaDoor") {
@@ -573,15 +607,31 @@ class Block {
       this.visible = true;
     }
 
+    const shouldUseTextures =
+      window.gameSettings && window.gameSettings.blockImages !== false;
+
     // Skip rendering if not visible or fully transparent
     if (this.visible && this.alpha > 0) {
-      ctx.fillStyle = this.color;
-      ctx.fillRect(
-        Math.round(this.x - player.globalOffsetX),
-        Math.round(this.y - player.globalOffsetY),
-        this.width,
-        this.height,
-      );
+      const renderX = Math.round(this.x - player.globalOffsetX);
+      const renderY = Math.round(this.y - player.globalOffsetY);
+
+      if (shouldUseTextures && this.solid && this.textureIndex > 0) {
+        const texture = Block.texturePool[this.textureIndex - 1];
+        if (texture && texture.complete && texture.naturalWidth > 0) {
+          const previousSmoothing = ctx.imageSmoothingEnabled;
+          ctx.imageSmoothingEnabled = false;
+          ctx.globalAlpha = this.alpha;
+          ctx.drawImage(texture, renderX, renderY, this.width, this.height);
+          ctx.globalAlpha = 1;
+          ctx.imageSmoothingEnabled = previousSmoothing;
+        } else {
+          ctx.fillStyle = this.color;
+          ctx.fillRect(renderX, renderY, this.width, this.height);
+        }
+      } else {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(renderX, renderY, this.width, this.height);
+      }
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }

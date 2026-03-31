@@ -6,6 +6,7 @@ const panel = document.getElementById("settingsMenu");
 const gameSettings = {
 	framerate: 60,
 	renderMode: "cpu", // "cpu" or "gpu"
+  blockImages: true,
 	audioVolume: 70,
 	audioOutput: "speakers" // "speakers", "headphones", or "mute"
 };
@@ -42,6 +43,11 @@ function applySettings() {
 		renderModeSelect.value = gameSettings.renderMode;
 	}
 
+  const blockImagesSelect = document.getElementById("blockImages");
+  if (blockImagesSelect) {
+    blockImagesSelect.value = gameSettings.blockImages ? "on" : "off";
+  }
+
 	// Apply audio volume
 	const volumeSlider = document.getElementById("audioVolume");
 	if (volumeSlider) {
@@ -56,8 +62,7 @@ function applySettings() {
 	}
 }
 
-// Setup performance settings listeners
-function setupPerformanceSettings() {
+// I still need to fix this so that it actually changes the framerate and render mode instead of just sending console logs
 	const framerateSelect = document.getElementById("framerate");
 	if (framerateSelect) {
 		framerateSelect.addEventListener("change", (e) => {
@@ -75,7 +80,15 @@ function setupPerformanceSettings() {
 			console.log(`Render mode set to ${gameSettings.renderMode.toUpperCase()}`);
 		});
 	}
-}
+
+  const blockImagesSelect = document.getElementById("blockImages");
+  if (blockImagesSelect) {
+    blockImagesSelect.addEventListener("change", (e) => {
+      gameSettings.blockImages = e.target.value === "on";
+      saveSettings();
+    });
+  }
+
 
 // Setup audio settings listeners
 function setupAudioSettings() {
@@ -122,17 +135,13 @@ function dragElement(elmnt) {
 
   function dragMouseDown(e) {
     e = e || window.event;
-
-    // 1. Define which element(s) should NOT trigger a drag
-    // This checks if the clicked element has the class "no-drag"
     if (e.target.closest(".settings-slider-container") ||
         e.target.closest(".settings-select") ||
         e.target.closest(".keybind")) {
-      return; // Exit the function early so dragging never starts
+      return;
     }
 
     e.preventDefault();
-    // get the mouse cursor position at startup:
     pos3 = e.clientX;
     pos4 = e.clientY;
     document.onmouseup = closeDragElement;
@@ -144,18 +153,13 @@ function dragElement(elmnt) {
     e = e || window.event;
     e.preventDefault();
 
-    // Calculate how much the mouse moved
     pos1 = pos3 - e.clientX;
     pos2 = pos4 - e.clientY;
     pos3 = e.clientX;
     pos4 = e.clientY;
 
-    // Get the parent dimensions (usually the window)
     var parentWidth = window.innerWidth;
     var parentHeight = window.innerHeight;
-
-    // Calculate new Right and Bottom positions
-    // We use (Parent Dimension - Offset - Element Dimension) to find the distance from the edge
     var newRight = parentWidth - (elmnt.offsetLeft + elmnt.offsetWidth) + pos1;
     var newBottom =
       parentHeight - (elmnt.offsetTop + elmnt.offsetHeight) + pos2;
@@ -221,7 +225,6 @@ function setupControllerSettings() {
 // Initialize all settings when the page loads
 function initializeSettings() {
 	loadSettings();
-	setupPerformanceSettings();
 	setupAudioSettings();
 	setupControllerSettings();
 }
