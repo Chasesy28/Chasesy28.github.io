@@ -517,6 +517,7 @@ const blockTypes = {
     textureIndex: 590,
   },
 };
+
 class Block {
   static texturePool = [];
   static texturesLoaded = false;
@@ -668,6 +669,7 @@ const enemyTypes = {
     colorB: 0,
   },
 };
+
 class Enemy {
   constructor(x, y, type, layer) {
     this.x = x;
