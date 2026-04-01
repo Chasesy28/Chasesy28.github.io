@@ -73,8 +73,7 @@ function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
   // Output merger - how to merge the shaded pixel fragment with the existing output image
   /*canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;*/
-  gl.clearColor(0.08, 0.08, 0.08, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
 
   // Rasterizer - what pixels are part of a triangle
   gl.viewport(0, 0, canvas.width, canvas.height);
