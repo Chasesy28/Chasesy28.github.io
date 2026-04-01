@@ -105,7 +105,7 @@ function updateKeybind(keybind, newKey) {
   }
 }
 
-const player = new Player(45, "images/Mario.png");
+const player = newPlayer();
 
 let currentLevel = 0;
 let currentArea = 0;
@@ -122,7 +122,7 @@ function updateLevelData() {
     activeLevelData.push([]);
     for (let j = 0; j < levels[currentLevel][i].length; j++) {
       activeLevelData[i].push(
-        convertToObjects(levels[currentLevel][i][j], j, i),
+        convertToObjects(levels[currentLevel][i][j], j, i, player),
       );
     }
   }

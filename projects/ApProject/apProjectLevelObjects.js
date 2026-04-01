@@ -427,6 +427,10 @@ class Player {
   }
 }
 
+function newPlayer () {
+  return new Player(45, "images/Mario.png");
+}
+
 const blockTypes = {
   basic: {
     colorR: 165,
