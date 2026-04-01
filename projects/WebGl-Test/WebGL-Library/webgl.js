@@ -13,7 +13,7 @@ if (!gl) {
 backgroundColor(gl, 0.08, 0.08, 0.08, 1.0);
 
 //Stuff from tutorials
-function helloTriangle() {
+function triangleShader() {
   const vertexShaderSourceCode = `#version 300 es
   precision mediump float;
 
@@ -136,7 +136,7 @@ function loop() {
   let y2 = Math.cos(time + 3) * 0.5 * Math.cos((time + 3) * 0.5);
   let x3 = Math.sin(time + 4) * 0.5 * Math.cos((time + 4) * 0.5);
   let y3 = Math.cos(time + 5) * 0.5 * Math.cos((time + 5) * 0.5);
-  let shapes = helloTriangle();
+  let shapes = triangleShader();
   drawTriangle([
     x1, y1,
     x2, y2,
