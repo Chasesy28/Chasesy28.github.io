@@ -428,7 +428,7 @@ class Player {
 }
 
 function newPlayer () {
-  return new Player(45, "images/Mario.png");
+  return new Player(50, "images/Mario.png");
 }
 
 const blockTypes = {
