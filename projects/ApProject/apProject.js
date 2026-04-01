@@ -141,7 +141,20 @@ function updateLevelData() {
   );
 }
 
+let times = [];
+
 function gameLoop() {
+  // FPS calculation
+  const currentTime = performance.now();
+
+  while (times.length > 0 && times[0] <= currentTime - 1000) {
+    times.shift();
+  }
+  times.push(currentTime);
+  fps = times.length;
+  console.log("FPS: " + fps);
+  console.log()
+
   // Skip game logic if paused, but still update the display
   if (gamePaused) {
     requestAnimationFrame(gameLoop);
