@@ -420,6 +420,7 @@ h2 {
     text-shadow: 1px 1px 3px rgba(149, 57, 0, 0.3);
     position: relative;
     z-index: 1;
+    scroll-margin-top: 25px;
 }
 
 .cherry-bomb-one-regular {

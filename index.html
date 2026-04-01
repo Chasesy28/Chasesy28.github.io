@@ -110,6 +110,7 @@
                <a href="#about-me">About Me</a>
                <a href="#projects">Projects</a>
                <a href="#games">Games</a>
+               <a href="#webgl">WebGL</a>
                <a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
                   rel="noopener noreferrer">GitHub</a>
                <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
@@ -293,6 +294,57 @@
          <div class="swiper-button-next"></div>
          <div class="swiper-button-prev"></div>
       </div>
+      <!-- WebGL Section -->
+      <h2 id="webgl" class="cherry-bomb-one-regular">WebGL Projects</h2>
+      <div class="swiper" id="webgl-swiper">
+         <div class="swiper-wrapper">
+            <div class="swiper-slide">
+               <a href="/projects/WebGl-Test/gl.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
+                     <h3>WebGL Test</h3>
+                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
+                        capabilities.</p>
+                  </div>
+               </a>
+            </div>
+            <div class="swiper-slide">
+               <a href="/projects/WebGl-Test/WebGL-Library/webglLibrary.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
+                     <h3>WebGL Library Test</h3>
+                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
+                        capabilities.</p>
+                  </div>
+               </a>
+            </div>
+            <div class="swiper-slide">
+               <a href="/projects/WebGl-Test/threejs-test.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-192x192.png" alt="Three.js Test Icon" class="project-icon">
+                     <h3>Three.js Test</h3>
+                     <p class="project-description">Advanced 3D modeling and rendering with Three.js featuring real-time
+                        lighting and materials.</p>
+                  </div>
+               </a>
+            </div>
+            <div class="swiper-slide">
+               <a href="/projects/WebGl-Test/blender-app.html">
+                  <div class="slide-content cherry-bomb-one-regular">
+                     <img src="/icons/icon-192x192.png" alt="3D Modeling Studio Icon" class="project-icon">
+                     <h3>3D Modeling Studio</h3>
+                     <p class="project-description">Blender-inspired 3D modeling web app with local storage, transform
+                        controls, and multiple workspaces.</p>
+                  </div>
+               </a>
+            </div>
+         </div>
+         <!-- Optional Pagination -->
+         <div class="swiper-pagination"></div>
+         <!-- Optional Navigation -->
+         <div class="swiper-button-next"></div>
+         <div class="swiper-button-prev"></div>
+      </div>
       <!-- About Me Section -->
       <div class="about-me-section cherry-bomb-one-regular" id="about-me">
          <h2>About Me</h2>
@@ -333,6 +385,7 @@
          };
          const projectsSwiper = new Swiper('#projects-swiper', swiperConfig);
          const gamesSwiper = new Swiper('#games-swiper', swiperConfig);
+         const webGLSwiper = new Swiper('#webgl-swiper', swiperConfig);
       </script>
       <script src="scripts.js"></script>
       <!-- Site-wide announcements system -->
