@@ -745,7 +745,7 @@ class Enemy {
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
-  
+
   update() {
     if (this.movement === "horizontalPatrol") {
       this.horizontalPatrol();
