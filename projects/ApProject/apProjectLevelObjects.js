@@ -470,7 +470,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.99,
     verticalFriction: 1,
-    textureIndex: 570,
+    textureIndex: 201,
   },
   slow: {
     colorR: 0,
@@ -480,7 +480,7 @@ const blockTypes = {
     temporary: false,
     friction: 0.75,
     verticalFriction: 1,
-    textureIndex: 266,
+    textureIndex: 206,
   },
   cobweb: {
     colorR: 255,
