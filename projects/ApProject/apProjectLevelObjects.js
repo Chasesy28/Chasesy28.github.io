@@ -668,6 +668,15 @@ const enemyTypes = {
     colorG: 0,
     colorB: 0,
   },
+  1: {
+    width: 50,
+    height: 50,
+    speed: 1,
+    movement: "verticalPatrol",
+    colorR: 0,
+    colorG: 0,
+    colorB: 255,
+  }
 };
 
 class Enemy {
@@ -736,6 +745,7 @@ class Enemy {
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
+  
   update() {
     if (this.movement === "horizontalPatrol") {
       this.horizontalPatrol();
