@@ -152,8 +152,6 @@ function gameLoop() {
   }
   times.push(currentTime);
   fps = times.length;
-  console.log("FPS: " + fps);
-  console.log()
 
   // Skip game logic if paused, but still update the display
   if (gamePaused) {
