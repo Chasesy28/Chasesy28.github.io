@@ -1,9 +1,5 @@
 let levelDataInput = null;
 
-function importLevel() {
-  levelDataInput = prompt("Paste the level data (4D array in JSON format):");
-}
-
 function loadLevel() {
   if (levelDataInput) {
     try {
@@ -21,3 +17,14 @@ function loadLevel() {
     }
   }
 }
+
+async function exportLevel() {
+  const levelData = JSON.stringify(levels[currentLevel]);
+  const clipboardItem = new ClipboardItem({ "text/plain": new Blob([levelData], { type: "text/plain" }) });
+  await navigator.clipboard.write([clipboardItem]);
+}
+
+function importLevel() {
+  levelDataInput = prompt("Paste the level data (4D array in JSON format):");
+}
+
