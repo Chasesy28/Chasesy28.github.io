@@ -251,6 +251,11 @@ function loop() {
     x2, y2,
     x3, y3
   ], 255, 0, 255, 1.0);
+  triangle([
+    x1 + 0.1, y1 + 0.1,
+    x2 + 0.1, y2 + 0.1,
+    x3 + 0.1, y3 + 0.1
+  ], 255, 255, 0, 1.0);
   requestAnimationFrame(loop);
 }
 loop();
