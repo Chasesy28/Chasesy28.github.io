@@ -26,7 +26,8 @@ body {
 .fs-button,
 .settings-button,
 .pause-button,
-.back-button {
+.back-button,
+.level-editor-button {
 	position: absolute;
 	cursor: pointer;
 	border: none;
@@ -41,8 +42,8 @@ body {
 
 .fs-button:hover,
 .settings-button:hover,
-.pause-button:hover,
-.back-button:hover {
+.back-button:hover,
+.level-editor-button:hover {
 	background: rgba(255, 189, 52, 1);
 	transform: scale(1.05);
 	box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
@@ -71,6 +72,13 @@ body {
 	justify-content: center;
 	align-items: center;
 	font-size: 1.5rem;
+	transform: translateX(-50%);
+}
+
+.pause-button:hover {
+	background: rgba(255, 189, 52, 1);
+	transform: scale(1.05) translateX(-50%);
+	box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
 }
 
 .back-button {
@@ -95,6 +103,17 @@ body {
 	font-size: 1.5rem;
 }
 
+.level-editor-button {
+	bottom: 15px;
+	left: 15px;
+	padding: 8px 16px;
+	font-size: 1rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 6px;
+}
+
 .settings-button {
 	top: 15px;
 	right: 15px;
@@ -106,7 +125,8 @@ body {
 	font-size: 1.5rem;
 }
 
-.settings-menu {
+.settings-menu,
+.level-editor-menu {
 	position: fixed;
 	background: #fffaf0;
 	border: 3px dashed #ffe77b;
@@ -126,7 +146,8 @@ body {
 	color: #333;
 }
 
-.settings-menu h2 {
+.settings-menu h2,
+.level-editor-menu h2 {
 	margin-top: 0;
 	margin-bottom: 1rem;
 	font-size: 1.5rem;
@@ -222,7 +243,8 @@ body {
 	font-size: 0.9rem;
 }
 
-.keybind {
+.keybind,
+.level-editor-menu button {
 	width: 100%;
 	padding: 0.6rem;
 	margin-bottom: 0.75rem;
@@ -239,13 +261,15 @@ body {
 	font: optional;
 }
 
-.keybind:hover {
+.keybind:hover,
+.level-editor-menu button:hover {
 	background: #fff8e7;
 	border-color: #ffb74d;
 	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
 }
 
-.keybind:active {
+.keybind:active,
+.level-editor-menu button:active {
 	background: #ffb74d;
 	color: white;
 	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);

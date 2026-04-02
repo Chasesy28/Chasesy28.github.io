@@ -26,6 +26,15 @@ function toggleSettings() {
   }
 }
 
+function toggleLevelEditor() {
+  const levelEditorMenu = document.getElementById("levelEditorMenu");
+  if (levelEditorMenu.classList.contains("hidden")) {
+    levelEditorMenu.classList.remove("hidden");
+  } else {
+    levelEditorMenu.classList.add("hidden");
+  }
+}
+
 // Game state
 let gamePaused = false;
 let gameRunning = false;
@@ -37,7 +46,7 @@ function togglePause() {
     pauseButton.textContent = "▶";
     pauseButton.title = "Resume Game";
   } else {
-    pauseButton.textContent = "⏸";
+    pauseButton.textContent = "Ⅱ";
     pauseButton.title = "Pause Game";
   }
 }
@@ -221,28 +230,28 @@ function gameLoop() {
   player.gameBoundaryDetection();
   if (controller.previousLevel.pressed) {
     if (!levelSwitchCooldown) {
-      levelSwitchCooldown = true;
-      setTimeout(() => {
-        levelSwitchCooldown = false;
-      }, 250);
       if (currentLevel > 0) {
         currentLevel--;
+        levelSwitchCooldown = true;
+        setTimeout(() => {
+          levelSwitchCooldown = false;
+        }, 250);
+        updateLevelData();
+        player.spawn();
       }
-      updateLevelData();
-      player.spawn();
     }
   }
   if (controller.nextLevel.pressed) {
     if (!levelSwitchCooldown) {
-      levelSwitchCooldown = true;
-      setTimeout(() => {
-        levelSwitchCooldown = false;
-      }, 250);
       if (currentLevel < levels.length - 1) {
         currentLevel++;
+        levelSwitchCooldown = true;
+        setTimeout(() => {
+          levelSwitchCooldown = false;
+        }, 250);
+        updateLevelData();
+        player.spawn();
       }
-      updateLevelData();
-      player.spawn();
     }
   }
   if (controller.nextLayer.pressed) {
@@ -294,7 +303,7 @@ function startGame() {
 
   gameRunning = true;
   gamePaused = false;
-  pauseButton.textContent = "⏸";
+  pauseButton.textContent = "Ⅱ";
   pauseButton.title = "Pause Game";
 
   updateLevelData();
