@@ -11,7 +11,7 @@ if (!gl) {
 }
 
 //Stuff from tutorials
-function triangleShader(vertices, r, g, b, a) {
+function triangle(vertices, r, g, b, a) {
   const triangleVerticesCPUBuffer = new Float32Array(vertices);
 
   const triangleGeoBuffer = gl.createBuffer();
@@ -119,7 +119,7 @@ function triangleShader(vertices, r, g, b, a) {
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
 
-function triangle() {
+function helloTriangle() {
   const triangleVertices = [
     //Top middle
     0.0, 0.5,
@@ -245,25 +245,8 @@ function loop() {
   let y2 = Math.cos(time + 3) * 0.5 * Math.cos((time + 3) * 0.5);
   let x3 = Math.sin(time + 4) * 0.5 * Math.cos((time + 4) * 0.5);
   let y3 = Math.cos(time + 5) * 0.5 * Math.cos((time + 5) * 0.5);
-  /*let shapes = triangleShader(255, 0, 255, 1.0);
-  drawTriangle([
-    x1, y1,
-    x2, y2,
-    x3, y3
-  ], shapes[0], shapes[1], shapes[2]);
-  shapes = triangleShader(0, 255, 255, 1.0);
-  drawTriangle([
-    x1, y2,
-    x2, y3,
-    x3, y1
-  ], shapes[0], shapes[1], shapes[2]);
-  shapes = triangleShader(255, 255, 0, 1.0);
-  drawTriangle([
-    x2, y1,
-    x3, y2,
-    x1, y3
-  ], shapes[0], shapes[1], shapes[2]);*/
-  triangleShader([
+
+  triangle([
     x1, y1,
     x2, y2,
     x3, y3
