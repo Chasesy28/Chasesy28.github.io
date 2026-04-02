@@ -42,7 +42,6 @@ body {
 
 .fs-button:hover,
 .settings-button:hover,
-.pause-button:hover,
 .back-button:hover,
 .level-editor-button:hover {
 	background: rgba(255, 189, 52, 1);
@@ -73,6 +72,13 @@ body {
 	justify-content: center;
 	align-items: center;
 	font-size: 1.5rem;
+	transform: translateX(-50%);
+}
+
+.pause-button:hover {
+	background: rgba(255, 189, 52, 1);
+	transform: scale(1.05) translateX(-50%);
+	box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
 }
 
 .back-button {
