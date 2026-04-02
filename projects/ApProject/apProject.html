@@ -26,7 +26,7 @@
     <canvas id="gameArea">Game Area</canvas>
     <h1 id="gameTitle" class="gameTitles">AP Project</h1>
     <button id="playButton" class="play-overlay" onclick="startGame()">▶</button>
-    <button id="pauseButton" class="pause-button hidden" onclick="togglePause()">⏸</button>
+    <button id="pauseButton" class="pause-button hidden" onclick="togglePause()">Ⅱ</button>
     <button id="backButton" class="back-button" onclick="goBack()">Back</button>
     <button id="fullscreenButton" class="fs-button" onclick="toggleFullScreen()">⛶</button>
     <button id="settingsButton" class="settings-button" onclick="toggleSettings()">⚙️</button>
@@ -112,6 +112,8 @@
 
       </div>
     </div>
+    <button id="levelEditorButton" class="level-editor-button" onclick="openLevelEditor()">Level Editor</button>
+    <div id="levelEditorMenu" class="hidden level-editor-menu"></div>
     <script src="apProjectSettings.js"></script>
     <script src="apProjectLevelData.js"></script>
     <script src="apProjectLevelObjects.js"></script>
