@@ -119,7 +119,8 @@ body {
 	font-size: 1.5rem;
 }
 
-.settings-menu {
+.settings-menu,
+.level-editor-menu {
 	position: fixed;
 	background: #fffaf0;
 	border: 3px dashed #ffe77b;
@@ -139,7 +140,8 @@ body {
 	color: #333;
 }
 
-.settings-menu h2 {
+.settings-menu h2,
+.level-editor-menu h2 {
 	margin-top: 0;
 	margin-bottom: 1rem;
 	font-size: 1.5rem;
@@ -235,78 +237,7 @@ body {
 	font-size: 0.9rem;
 }
 
-.keybind {
-	width: 100%;
-	padding: 0.6rem;
-	margin-bottom: 0.75rem;
-	border: 2px solid #ff9800;
-	border-radius: 6px;
-	background: white;
-	color: #ff9800;
-	font-weight: 600;
-	font-size: 0.95rem;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	box-sizing: border-box;
-	text-transform: uppercase;
-	font: optional;
-}
-
-.keybind:hover {
-	background: #fff8e7;
-	border-color: #ffb74d;
-	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
-}
-
-.keybind:active {
-	background: #ffb74d;
-	color: white;
-	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
-}
-
-.hidden {
-	display: none !important;
-}
-
-.gameTitles {
-	position: absolute;
-	top: 20px;
-	left: 50%;
-	transform: translateX(-50%);
-	font-size: 2.5rem;
-	color: #e9eeee;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-}
-
-.level-editor-menu {
-	position: fixed;
-	background: #fffaf0;
-	border: 3px dashed #ffe77b;
-	padding: 1.5rem;
-	box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
-	z-index: 11;
-	max-width: 380px;
-	max-height: 80vh;
-	overflow-y: auto;
-	bottom: 50%;
-	right: 50%;
-	transform: translate(50%, 50%);
-	text-align: left;
-	display: flex;
-	flex-direction: column;
-	border-radius: 8px;
-	color: #333;
-}
-
-.level-editor-menu h2 {
-	margin-top: 0;
-	margin-bottom: 1rem;
-	font-size: 1.5rem;
-	color: var(--h2-light-mode-text-color);
-	text-align: center;
-	text-shadow: 1px 1px 2px rgba(149, 57, 0, 0.2);
-}
-
+.keybind,
 .level-editor-menu button {
 	width: 100%;
 	padding: 0.6rem;
@@ -324,8 +255,30 @@ body {
 	font: optional;
 }
 
+.keybind:hover,
 .level-editor-menu button:hover {
 	background: #fff8e7;
 	border-color: #ffb74d;
 	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+}
+
+.keybind:active,
+.level-editor-menu button:active {
+	background: #ffb74d;
+	color: white;
+	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.hidden {
+	display: none !important;
+}
+
+.gameTitles {
+	position: absolute;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 2.5rem;
+	color: #e9eeee;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }

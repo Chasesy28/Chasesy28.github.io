@@ -1,5 +1,9 @@
 let levelDataInput = null;
 
+function createNewLevel() {
+  
+}
+
 function loadLevel() {
   if (levelDataInput) {
     try {
