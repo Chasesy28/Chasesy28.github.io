@@ -26,6 +26,15 @@ function toggleSettings() {
   }
 }
 
+function toggleLevelEditor() {
+  const levelEditorMenu = document.getElementById("levelEditorMenu");
+  if (levelEditorMenu.classList.contains("hidden")) {
+    levelEditorMenu.classList.remove("hidden");
+  } else {
+    levelEditorMenu.classList.add("hidden");
+  }
+}
+
 // Game state
 let gamePaused = false;
 let gameRunning = false;
