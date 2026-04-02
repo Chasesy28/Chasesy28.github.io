@@ -1,17 +1,13 @@
-function backgroundColor(gl, color) {
-  gl.clearColor(color[0], color[1], color[2], color[3]);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+function backgroundColor(gl, r, g, b, a) {
+  gl.clearColor(r/255, g/255, b/255, a);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
-//Made with a lot of help from a tutorial
 function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
   const triangleVertices = [
-    //Top middle
-    x1, y1,
-    //Bottom left
-    x2, y2,
-    //Bottom right
-    x3, y3
+    (x1 / canvas.width) * 2 - 1, ((y1 / canvas.height) * 2 - 1) / 2,
+    (x2 / canvas.width) * 2 - 1, ((y2 / canvas.height) * 2 - 1) / 2,
+    (x3 / canvas.width) * 2 - 1, ((y3 / canvas.height) * 2 - 1) / 2
   ];
   const triangleVerticesCPUBuffer = new Float32Array(triangleVertices);
 
@@ -25,8 +21,15 @@ function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
 
   in vec2 vertexPosition;
 
+  uniform vec2 canvasSize;
+  uniform vec2 shapeLocation;
+  uniform float shapeSize;
+
   void main() {
-    gl_Position = vec4(vertexPosition, 0.0, 1.0);
+    vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
+    vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
+
+    gl_Position = vec4(clipPosition, 0.0, 1.0);
   }`;
 
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
@@ -44,7 +47,7 @@ function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
   out vec4 outputColor;
 
   void main() {
-    outputColor = vec4(${r/255.0}, ${g/255.0}, ${b/255.0}, ${a});
+    outputColor = vec4(${r/255}, ${g/255}, ${b/255}, ${a});
   }`;
 
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -64,22 +67,29 @@ function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
     console.error("Shader program linking error: " + gl.getProgramInfoLog(triangleShaderProgram));
     return;
   }
-  const vertexPositionAttributeLocation = gl.getAttribLocation(triangleShaderProgram, "vertexPosition");
-  if (vertexPositionAttributeLocation < 0) {
-    console.error("Failed to get the attribute location for vertexPosition");
+
+  const shapeLocationUniform = gl.getUniformLocation(triangleShaderProgram, "shapeLocation");
+  const shapeSizeUniform = gl.getUniformLocation(triangleShaderProgram, "shapeSize");
+  const canvasSizeUniform = gl.getUniformLocation(triangleShaderProgram, "canvasSize");
+  if (shapeLocationUniform === null || shapeSizeUniform === null || canvasSizeUniform === null) {
+    console.error("Failed to get uniform locations");
     return;
   }
 
   // Output merger - how to merge the shaded pixel fragment with the existing output image
-  /*canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;*/
-
 
   // Rasterizer - what pixels are part of a triangle
   gl.viewport(0, 0, canvas.width, canvas.height);
 
   // Set GPU program (vertex and fragment shader)
   gl.useProgram(triangleShaderProgram);
+
+  const vertexPositionAttributeLocation = gl.getAttribLocation(triangleShaderProgram, "vertexPosition");
+  if (vertexPositionAttributeLocation < 0) {
+    console.error("Failed to get the attribute location for vertexPosition");
+    return;
+  }
+
   gl.enableVertexAttribArray(vertexPositionAttributeLocation);
 
   // Input assembler - how to read vertices from our GPU triangle buffer
@@ -99,6 +109,9 @@ function triangle(x1, y1, x2, y2, x3, y3, r, g, b, a) {
     0
   );
 
-  // Draw call (Primitive assembler - how to make triangles from those vertices)
+  gl.uniform2f(canvasSizeUniform, canvas.width / 2, canvas.height / 2);
+
+  gl.uniform1f(shapeSizeUniform, canvas.height);
+  gl.uniform2f(shapeLocationUniform, canvas.width, canvas.height);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
