@@ -122,9 +122,12 @@
     </div>
     <div id="editLevelMenu" class="hidden edit-level-menu">
       <button id="closeEditLevelMenu" class="editor-button" onclick="closeEditLevelMenu()">🗙</button>
-      <h2>Edit Level</h2>
-      <label for="newAreaButton">New Area:</label>
-      <button id="newAreaButton" class="editor-button" onclick="newArea()">+</button>
+      <h2>New Level</h2>
+      <label for="newAreaButton">New Area:
+        <button id="newAreaButton" class="editor-button" onclick="newArea()">+</button>
+      </label>
+      <div id="areasContainer"></div>
+      <button id="submitButton" class="editor-button" onclick="submitLevel()">Submit</button>
     </div>
     <script src="apProjectSettings.js"></script>
     <script src="apProjectLevelEditor.js"></script>

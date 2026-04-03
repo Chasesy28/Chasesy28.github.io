@@ -343,3 +343,78 @@ body {
 	align-items: center;
 	border-radius: 50%;
 }
+
+.area {
+	padding: 0.5rem;
+	margin-bottom: 0.5rem;
+	border: 4px dashed #ffe77b;
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
+}
+.area h3 {
+	margin: 0;
+}
+
+.room {
+	padding: 0.5rem;
+	margin-bottom: 0.5rem;
+	border: 3px dashed #ffe77b;
+	border-radius: 8px;
+	box-shadow: 0 6px 18px rgba(149, 57, 0, 0.15);
+}
+.room h4 {
+	margin: 0;
+}
+
+.row {
+	padding: 0.5rem;
+	margin-bottom: 0.5rem;
+	border: 2px dashed #ffe77b;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(149, 57, 0, 0.1);
+}
+.row h5 {
+	margin: 0;
+	font-size: 0.9rem;
+}
+
+.tile {
+	padding: 0.5rem;
+	margin-bottom: 0.5rem;
+	border: 1px dashed #ffe77b;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(149, 57, 0, 0.05);
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+.tile h6 {
+	margin: 0;
+	font-size: 0.85rem;
+	color: #333;
+}
+
+.tileInput {
+	width: auto;
+	padding: 0.25rem;
+	border: 1px solid #ffe77b;
+	border-radius: 4px;
+	background: white;
+	color: #333;
+	font-size: 0.85rem;
+	transition: border-color 0.2s ease, background 0.2s ease;
+	box-sizing: border-box;
+}
+
+#submitButton {
+	align-self: center;
+	width: fit-content;
+	padding: 0.5rem 1rem;
+	margin: 0 auto;
+	font-size: 1rem;
+	bottom: 0px;
+}
+
+#areasContainer {
+	margin-bottom: 1.5rem;
+}

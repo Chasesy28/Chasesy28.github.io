@@ -137,7 +137,10 @@ function dragElement(elmnt) {
     e = e || window.event;
     if (e.target.closest(".settings-slider-container") ||
         e.target.closest(".settings-select") ||
-        e.target.closest(".keybind")) {
+        e.target.closest(".keybind") ||
+        e.target.closest(".editor-button") ||
+        e.target.closest("input[type='text']") ||
+        e.target.closest("button")) {
       return;
     }
 
