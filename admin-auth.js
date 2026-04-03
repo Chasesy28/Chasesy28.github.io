@@ -1,9 +1,3 @@
-/**
- * Admin Authentication System
- * Simple session-based authentication using localStorage
- * Prepared for future Supabase integration
- */
-
 const ADMIN_AUTH_KEY = "admin_session";
 const ADMIN_SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -11,9 +5,7 @@ const ADMIN_SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
  * Simple authentication - checks for hardcoded credentials
  *
  * ⚠️ SECURITY WARNING ⚠️
- * These hardcoded credentials are for DEMO/DEVELOPMENT ONLY.
- * NEVER use this in production without replacing with proper authentication.
- * CHANGE THESE CREDENTIALS BEFORE ANY PUBLIC DEPLOYMENT.
+ * These are hardcoded credentials, fix soon.
  *
  * (stub) Replace with real backend authentication when ready
  * @param {string} username - Admin username

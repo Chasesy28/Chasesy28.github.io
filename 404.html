@@ -4,7 +4,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="robots" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-status-bar-style" content="default">
     <title>
@@ -39,21 +39,25 @@
       </div>
     </div>
     <!-- accessibility settings trigger and panel -->
-    <button id="accessibility-toggle" aria-label="Accessibility settings" class="accessibility-button">⚙️</button>
-    <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true" aria-label="Accessibility options"
-      aria-hidden="true">
-      <h2>Accessibility</h2>
-      <button id="increase-font">A+</button>
-      <button id="decrease-font">A-</button>
-      <button id="toggle-contrast">High contrast</button>
-      <button id="toggle-reduced-motion">Reduce motion</button>
-      <button id="close-accessibility">Close</button>
+    <button id="accessibility-toggle" aria-label="Accessibility settings" aria-controls="accessibility-settings"
+      aria-expanded="false" class="accessibility-button">⚙️</button>
+    <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true"
+      aria-labelledby="accessibility-title" aria-hidden="true" tabindex="-1">
+      <h2 id="accessibility-title">Accessibility</h2>
+      <button id="close-accessibility" class="accessibility-close-btn" aria-label="Close accessibility settings">×</button>
+      <div class="accessibility-actions">
+        <button id="increase-font">Increase Font</button>
+        <button id="decrease-font">Decrease Font</button>
+        <button id="toggle-contrast">High contrast</button>
+        <button id="toggle-reduced-motion">Reduce motion</button>
+        <button id="toggle-font-style">Disable custom font</button>
+      </div>
     </div>
     <header id="header">
       <div class="site-title cherry-bomb-one-regular">
         <a href="/">Silly Site</a>
       </div>
-      <nav>
+      <nav aria-label="Primary">
         <ul class="cherry-bomb-one-regular">
           <li><a href="/">Home</a></li>
           <li><a href="/#about-me">About Me</a></li>
@@ -69,7 +73,7 @@
         </ul>
       </nav>
     </header>
-    <div class="rain">
+    <div class="rain" aria-hidden="true">
       <div class="ground"></div>
     </div>
     <div class="cherry-bomb-one-regular">

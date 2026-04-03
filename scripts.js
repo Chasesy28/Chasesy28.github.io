@@ -21,6 +21,10 @@ function initThemeToggle() {
   const moonIcon = document.querySelector(".moon-icon");
 
   const updateIcons = (theme) => {
+    if (!sunIcon || !moonIcon) {
+      return;
+    }
+
     if (theme === "dark") {
       sunIcon.style.display = "none";
       moonIcon.style.display = "inline";
@@ -37,11 +41,9 @@ function initThemeToggle() {
 
   darkModeToggle.addEventListener("click", () => {
     const isDark = html.classList.contains("dark");
-    html.classList.replace(
-      isDark ? "dark" : "light",
-      isDark ? "light" : "dark",
-    );
     const newTheme = isDark ? "light" : "dark";
+    html.classList.remove("light", "dark");
+    html.classList.add(newTheme);
     localStorage.setItem("theme", newTheme);
     updateIcons(newTheme);
   });
@@ -51,10 +53,16 @@ function initThemeToggle() {
 function initAccessibility() {
   const panel = document.getElementById("accessibility-settings");
   const toggleBtn = document.getElementById("accessibility-toggle");
+  const closeBtn = document.getElementById("close-accessibility");
   const inc = document.getElementById("increase-font");
   const dec = document.getElementById("decrease-font");
   const contrastBtn = document.getElementById("toggle-contrast");
   const motionBtn = document.getElementById("toggle-reduced-motion");
+  const fontBtn = document.getElementById("toggle-font-style");
+
+  if (!panel || !toggleBtn) {
+    return;
+  }
 
   const apply = () => {
     const size = parseFloat(localStorage.getItem("fontSize") || "1");
@@ -67,30 +75,47 @@ function initAccessibility() {
       "reduce-motion",
       localStorage.getItem("reduceMotion") === "true",
     );
+
+    const useDefaultFont = localStorage.getItem("defaultFont") === "true";
+    document.documentElement.classList.toggle("default-font-mode", useDefaultFont);
+    if (fontBtn) {
+      fontBtn.textContent = useDefaultFont
+        ? "Use custom font"
+        : "Disable custom font";
+    }
   };
 
-  toggleBtn?.addEventListener("click", () => {
-    if (panel) {
-      const isHidden = panel.classList.toggle("hidden");
-      panel.setAttribute("aria-hidden", isHidden);
-      if (!isHidden) {
-        // focus first control
-        const first = panel.querySelector("button:not(#close-accessibility)");
-        first?.focus();
-      } else {
-        toggleBtn.focus();
-      }
+  const setPanelOpen = (isOpen) => {
+    panel.classList.toggle("hidden", !isOpen);
+    panel.setAttribute("aria-hidden", String(!isOpen));
+    toggleBtn.setAttribute("aria-expanded", String(isOpen));
+
+    if (isOpen) {
+      const first = panel.querySelector("button:not(#close-accessibility)");
+      first?.focus();
+    } else {
+      toggleBtn.focus();
     }
-    panel.style.bottom = "10%";
-    panel.style.right = "10%";
+  };
+
+  if (toggleBtn) {
+    toggleBtn.setAttribute("aria-expanded", "false");
+    if (panel) {
+      toggleBtn.setAttribute("aria-controls", panel.id);
+    }
+  }
+
+  toggleBtn?.addEventListener("click", () => {
+    const shouldOpen = panel.classList.contains("hidden");
+    setPanelOpen(shouldOpen);
   });
+
+  closeBtn?.addEventListener("click", () => setPanelOpen(false));
 
   // close on Escape key
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && panel && !panel.classList.contains("hidden")) {
-      panel.classList.add("hidden");
-      panel.setAttribute("aria-hidden", "true");
-      toggleBtn?.focus();
+      setPanelOpen(false);
     }
   });
 
@@ -100,11 +125,9 @@ function initAccessibility() {
       panel &&
       !panel.classList.contains("hidden") &&
       !panel.contains(e.target) &&
-      e.target !== toggleBtn
+      !toggleBtn.contains(e.target)
     ) {
-      panel.classList.add("hidden");
-      panel.setAttribute("aria-hidden", "true");
-      toggleBtn?.focus();
+      setPanelOpen(false);
     }
   });
 
@@ -133,12 +156,20 @@ function initAccessibility() {
     apply();
   });
 
+  fontBtn?.addEventListener("click", () => {
+    const current = localStorage.getItem("defaultFont") === "true";
+    localStorage.setItem("defaultFont", String(!current));
+    apply();
+  });
+
   apply();
-  if (panel) {
-    panel.setAttribute("aria-hidden", panel.classList.contains("hidden"));
-  }
+  setPanelOpen(false);
 
   function dragElement(elmnt) {
+    if (!elmnt) {
+      return;
+    }
+
     var pos1 = 0,
       pos2 = 0,
       pos3 = 0,
@@ -156,7 +187,7 @@ function initAccessibility() {
 
       // 1. Define which element(s) should NOT trigger a drag
       // This checks if the clicked element has the class "no-drag"
-      if (e.target.closest(".rain-slider-container")) {
+      if (e.target.closest("button, input, select, textarea, label, a")) {
         return; // Exit the function early so dragging never starts
       }
 
@@ -376,6 +407,10 @@ const createDrop = () => {
  * Maintains consistent drop density across different screen sizes
  */
 const handleResize = () => {
+  if (!rainContainer) {
+    return;
+  }
+
   const newNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
   const currentDrops = rainContainer.querySelectorAll(".drop");
   const diff = newNumberOfDrops - currentDrops.length;
@@ -401,6 +436,10 @@ const handleResize = () => {
  * Number of drops is proportional to screen width
  */
 const initRain = () => {
+  if (!rainContainer) {
+    return;
+  }
+
   const initialNumberOfDrops = Math.floor(window.innerWidth / dropDensity);
   for (let i = 0; i < initialNumberOfDrops; i++) {
     createDrop();
@@ -435,21 +474,25 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", handleResize);
 
   // Start observing the rain container for child node removals
-  sharedObserver.observe(rainContainer, { childList: true });
+  if (rainContainer) {
+    sharedObserver.observe(rainContainer, { childList: true });
+  }
 });
 
 const rainSlider = document.getElementById("rain-slider");
 const rainNumber = document.getElementById("rain-number");
 
-rainSlider.addEventListener("input", function () {
-  dropDensity = rainSlider.value;
-  rainNumber.value = String(dropDensity);
-  console.log("[Test Page] Drop density changed to:", dropDensity);
-  handleResize(); // Recalculate drop count with new density
-});
-rainNumber.addEventListener("input", function () {
-  dropDensity = rainNumber.value;
-  rainSlider.value = String(dropDensity);
-  console.log("[Test Page] Drop density changed to:", dropDensity);
-  handleResize(); // Recalculate drop count with new density
-});
+if (rainSlider && rainNumber) {
+  rainSlider.addEventListener("input", function () {
+    dropDensity = rainSlider.value;
+    rainNumber.value = String(dropDensity);
+    console.log("[Test Page] Drop density changed to:", dropDensity);
+    handleResize(); // Recalculate drop count with new density
+  });
+  rainNumber.addEventListener("input", function () {
+    dropDensity = rainNumber.value;
+    rainSlider.value = String(dropDensity);
+    console.log("[Test Page] Drop density changed to:", dropDensity);
+    handleResize(); // Recalculate drop count with new density
+  });
+}

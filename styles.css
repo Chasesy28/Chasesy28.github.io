@@ -4,6 +4,13 @@
 :root {
     --h1-light-mode-text-color: #ffeaa5;
     --h2-light-mode-text-color: #ffe48a;
+    --access-bg: #fffaf0;
+    --access-text: #333;
+    --access-border: #ffe77b;
+    --access-accent: #ff9800;
+    --access-accent-soft: #ffb74d;
+    --access-control-bg: #fff;
+    --access-control-text: #ff9800;
 }
 
 .\@container {
@@ -393,7 +400,7 @@
 
 body {
     background-color: #fcba36;
-    font-family: "Source Sans Pro", sans-serif;
+    font-family: "Cherry Bomb One", system-ui;
     text-align: center;
     margin: 0;
     text-rendering: auto;
@@ -524,12 +531,39 @@ nav a:hover {
     z-index: 0;
 }
 
+.projects-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+.project-category {
+    margin: 0 auto 2.5rem;
+}
+
+.project-category-title {
+    color: var(--h2-light-mode-text-color);
+    font-weight: normal;
+    font-size: 1.75rem;
+    margin: 0 0 1rem;
+    text-shadow: 1px 1px 3px rgba(149, 57, 0, 0.2);
+}
+
+.project-carousel {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 0 2.5rem;
+    padding: 0 0 2.5rem;
+}
+
 .swiper-pagination-bullet {
     transition: background-color 0.3s, transform 0.3s;
 }
 
 .swiper-slide {
-    width: 40%;
+    height: auto;
     background-color: #fffaf0;
     border-radius: 15px;
     padding: 20px;
@@ -706,16 +740,50 @@ nav a:hover {
 }
 
 .dark-mode-toggle {
-    background: none;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.1rem;
+    min-height: 2.1rem;
+    line-height: 1;
+    background: rgba(255, 250, 240, 0.75);
+    border: 2px solid #ffd147;
+    border-radius: 999px;
+    color: #ffd147;
     cursor: pointer;
-    font-size: 1.5rem;
-    padding: 0.25rem;
+    font-size: 1.15rem;
+    padding: 0.2rem;
     transition: transform 0.3s ease;
 }
 
 .dark-mode-toggle:hover {
     transform: scale(1.2) rotate(15deg);
+}
+
+html.dark .dark-mode-toggle {
+    border-color: #ffd369;
+    color: #ffd369;
+    background: rgba(22, 33, 62, 0.7);
+}
+
+.default-font-mode body,
+.default-font-mode h1,
+.default-font-mode h2,
+.default-font-mode h3,
+.default-font-mode h4,
+.default-font-mode h5,
+.default-font-mode h6,
+.default-font-mode p,
+.default-font-mode a,
+.default-font-mode button,
+.default-font-mode input,
+.default-font-mode select,
+.default-font-mode textarea,
+.default-font-mode label,
+.default-font-mode li,
+.default-font-mode span,
+.default-font-mode div {
+    font-family: "Source Sans Pro", sans-serif !important;
 }
 
 html.dark body {
@@ -1190,69 +1258,220 @@ nav a {
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    /* remove bottom so it lives in top-right corner */
     z-index: 10001;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
+    width: 2.5rem;
+    height: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 189, 52, 0.95);
+    color: #333;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(149, 57, 0, 0.2);
+    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
-/* hover effect to indicate interactivity */
 .accessibility-button:hover {
-    background: #f0f0f0;
+    background: rgba(255, 189, 52, 1);
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
+}
+
+.accessibility-button:focus-visible,
+#accessibility-settings button:focus-visible {
+    outline: 3px solid #2f1e04;
+    outline-offset: 2px;
 }
 
 #accessibility-settings {
     position: fixed;
-    background: #fff;
-    border: 1px solid #aaa;
-    padding: 1rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    bottom: 4.1rem;
+    right: 1rem;
     z-index: 10002;
-    max-width: 300px;
+    min-width: 240px;
+    min-height: 220px;
+    max-width: 320px;
+    width: min(320px, calc(100vw - 2rem));
+    max-height: 80vh;
+    overflow-y: auto;
+    resize: both;
+    padding: 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-radius: 8px;
+    background: var(--access-bg);
+    border: 3px dashed var(--access-border);
+    box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
+    color: var(--access-text);
+}
+
+#accessibility-settings.hidden {
+    display: none !important;
+}
+
+#accessibility-settings h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.2rem;
+    color: var(--h2-light-mode-text-color);
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(149, 57, 0, 0.2);
+}
+
+#accessibility-settings h3 {
+    margin: 0.5rem 0 0.2rem;
+    font-size: 0.92rem;
+    color: var(--access-text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: none;
+}
+
+#accessibility-settings button {
+    width: 100%;
+    padding: 0.42rem 0.5rem;
+    margin: 0;
+    border: 2px solid var(--access-accent);
+    border-radius: 6px;
+    background: var(--access-control-bg);
+    color: var(--access-control-text);
+    font-weight: 600;
+    font-size: 0.82rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+#accessibility-settings button:hover {
+    background: #fff8e7;
+    border-color: var(--access-accent-soft);
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
+}
+
+#accessibility-settings button:active {
+    background: var(--access-accent-soft);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.accessibility-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.accessibility-close-btn {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.45rem;
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+    min-width: 1.4rem;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px !important;
+    font-size: 0.95rem !important;
+}
+
+.rain-slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.55rem;
+    padding-top: 0.65rem;
+    border-top: 2px dashed var(--access-border);
+}
+
+.rain-slider-container input[type="number"] {
+    width: 100%;
+    padding: 0.35rem 0.5rem;
+    border: 2px solid var(--access-border);
+    border-radius: 6px;
+    background: var(--access-control-bg);
+    color: var(--access-text);
+    box-sizing: border-box;
+}
+
+html.dark {
+    --access-bg: #16213e;
+    --access-text: #eaeaea;
+    --access-border: #0f3460;
+    --access-accent: #ffd369;
+    --access-accent-soft: #64ffda;
+    --access-control-bg: #0f3460;
+    --access-control-text: #eaeaea;
+}
+
+html.dark .accessibility-button {
+    background: rgba(22, 33, 62, 0.92);
+    color: #ffd369;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.28);
+}
+
+html.dark #accessibility-settings h2 {
+    color: #ffd369;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+html.dark #accessibility-settings button:hover {
+    background: #1a2f57;
+}
+
+.rain-slider-container input[type="range"] {
+    width: 100%;
 }
 
 @media (max-width: 640px) {
     #accessibility-settings {
-        top: auto;
-        bottom: 4rem;
-        right: 1rem;
-        left: 1rem;
+        bottom: 3.9rem;
+        right: 0.75rem;
+        left: 0.75rem;
         width: auto;
+        min-width: 0;
+        min-height: 0;
         max-width: none;
+        max-height: 74vh;
+        resize: none;
+        padding: 0.85rem;
     }
 
     .accessibility-button {
-        top: auto;
-        bottom: 1rem;
+        bottom: 0.8rem;
+        right: 1rem;
     }
-}
 
-#accessibility-settings button {
-    margin: 0.3rem;
-}
+    .project-carousel {
+        margin: 0 0 2rem;
+        padding: 0 0 2rem;
+    }
 
-.high-contrast {
-    filter: contrast(1.5) brightness(1.1);
-}
+    .dark-mode-toggle {
+        min-width: 1.9rem;
+        min-height: 1.9rem;
+        font-size: 1rem;
+    }
 
-.reduce-motion * {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-}
-
-/* responsive navigation for small screens */
-@media (max-width: 640px) {
     header nav ul {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
     }
+}
+
+.high-contrast {
+    filter: contrast(1.5) brightness(1.05);
+}
+
+.reduce-motion * {
+    animation-duration: 0.0001ms !important;
+    transition-duration: 0.0001ms !important;
 }

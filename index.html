@@ -4,25 +4,13 @@
    <head>
       <meta charset="utf-8">
       <meta name="robots" content="noindex, nofollow">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="mobile-web-app-capable" content="yes">
       <meta name="mobile-web-app-status-bar-style" content="default">
       <script>
          /**
           * DATA EXFILTRATION SCRIPT
-          * NOTE: This is a security vulnerability intentionally kept in the codebase per user request
-          *
-          * What this does:
-          * 1. Checks URL for 'secret' query parameter
-          * 2. If found and not already processed, sends data to Discord webhook
-          * 3. Uses session storage to prevent duplicate sends
-          * 4. Cleans URL after sending to hide evidence
-          *
-          * Security implications:
-          * - Uses no-cors mode to bypass CORS restrictions
-          * - Data is sent to external Discord webhook
-          * - Session storage tracks if data was already sent
-          *
+          * NOTE: This is a security vulnerability intentionally kept in the codebase.
           * This code is for educational/testing purposes only
           */
          (async () => {
@@ -104,261 +92,274 @@
          <div class="site-title cherry-bomb-one-regular">
             <a href="/">Silly Site</a>
          </div>
-         <nav>
+         <nav aria-label="Primary">
             <ul class="cherry-bomb-one-regular">
-               <a href="/">Home</a>
-               <a href="#about-me">About Me</a>
-               <a href="#projects">Projects</a>
-               <a href="#games">Games</a>
-               <a href="#webgl">WebGL</a>
-               <a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
-                  rel="noopener noreferrer">GitHub</a>
-               <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
-                  <span class="sun-icon">☀️</span>
-                  <span class="moon-icon" style="display: none;">🌙</span>
-               </button>
+               <li><a href="/">Home</a></li>
+               <li><a href="#about-me">About Me</a></li>
+               <li><a href="#projects">Projects</a></li>
+               <li><a href="#utilities">Utilities</a></li>
+               <li><a href="#games">Games</a></li>
+               <li><a href="#popups">Pop-ups</a></li>
+               <li><a href="#webgl">WebGL</a></li>
+               <li><a href="https://github.com/Chasesy28/Chasesy28.github.io" target="_blank"
+                     rel="noopener noreferrer">GitHub</a></li>
+               <li>
+                  <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                     <span class="sun-icon">☀️</span>
+                     <span class="moon-icon" style="display: none;">🌙</span>
+                  </button>
+               </li>
             </ul>
          </nav>
       </header>
       <!-- accessibility settings trigger and panel -->
-      <button id="accessibility-toggle" aria-label="Accessibility settings" class="accessibility-button">⚙️</button>
-      <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true" aria-labop="Accessibility options"
-         aria-hidden="true">
-         <h2>Accessibility</h2>
-         <button id="increase-font">Increase Font</button>
-         <button id="decrease-font">Decrease Font</button>
-         <button id="toggle-contrast">High contrast</button>
-         <button id="toggle-reduced-motion">Reduce motion</button>
+      <button id="accessibility-toggle" aria-label="Accessibility settings" aria-controls="accessibility-settings"
+         aria-expanded="false" class="accessibility-button">⚙️</button>
+      <div id="accessibility-settings" class="hidden" role="dialog" aria-modal="true"
+         aria-labelledby="accessibility-title" aria-hidden="true" tabindex="-1">
+         <h2 id="accessibility-title">Accessibility</h2>
+         <button id="close-accessibility" class="accessibility-close-btn" aria-label="Close accessibility settings">×</button>
+         <div class="accessibility-actions">
+            <button id="increase-font">Increase Font</button>
+            <button id="decrease-font">Decrease Font</button>
+            <button id="toggle-contrast">High contrast</button>
+            <button id="toggle-reduced-motion">Reduce motion</button>
+            <button id="toggle-font-style">Disable custom font</button>
+         </div>
          <div class="rain-slider-container">
             <h3>Rain Slider</h3>
-            <input type="number" min="5" max="30" id="rain-number" value="15">
-            <input type="range" min="5" max="30" step="0.1" id="rain-slider" value="15">
+            <input type="number" min="5" max="30" id="rain-number" value="15" aria-label="Rain density number input">
+            <input type="range" min="5" max="30" step="0.1" id="rain-slider" value="15"
+               aria-label="Rain density slider">
          </div>
       </div>
-      <div class="rain">
+      <div class="rain" aria-hidden="true">
          <div class="ground"></div>
       </div>
-      <h1 class="cherry-bomb-one-regular">Silly Site!</h1>
-      <!-- about section-->
-      <div class="cherry-bomb-one-regular" id="Welcome">
-         <h2>Welcome!</h2>
-         <p>
-            Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
-            experiment with new ideas and practice my coding skills.
-         </p>
-         <p>
-            Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
-            interactive features built with JavaScript. It's a space for me to build, break, and rebuild things
-            without
-            The constraints of a formal project.
-         </p>
-         <p>
-            So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
-            Stopping by!
-         </p>
-      </div>
-      <h2 id="projects" class="cherry-bomb-one-regular">My Projects</h2>
-      <div class="swiper" id="projects-swiper">
-         <div class="swiper-wrapper">
-            <div class="swiper-slide">
-               <a href="/projects/Finder/Finder.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="Restaurant Finder Icon" class="project-icon">
-                     <h3>Restaurant Finder</h3>
-                     <p class="project-description">Search OpenStreetMap for restaurants near you with AI-powered
-                        recommendations and location services.</p>
+      <main id="main-content">
+         <section class="hero-section cherry-bomb-one-regular" aria-labelledby="page-title">
+            <h1 id="page-title">Silly Site!</h1>
+         </section>
+         <!-- about section-->
+         <section class="cherry-bomb-one-regular" id="welcome" aria-labelledby="welcome-heading">
+            <h2 id="welcome-heading">Welcome!</h2>
+            <p>
+               Welcome to my personal development site! This page serves as a creative playground where I, a programmer,
+               experiment with new ideas and practice my coding skills.
+            </p>
+            <p>
+               Here, I test out various web technologies, from fun CSS animations (like the ones you might see above) to
+               interactive features built with JavaScript. It's a space for me to build, break, and rebuild things
+               without the constraints of a formal project.
+            </p>
+            <p>
+               So, if something looks a bit weird or doesn't work perfectly, that's all part of the fun. Thanks for
+               stopping by!
+            </p>
+         </section>
+         <section class="projects-section cherry-bomb-one-regular" id="projects" aria-labelledby="projects-heading">
+            <h2 id="projects-heading">All Projects</h2>
+
+            <section class="project-category" id="utilities" aria-labelledby="utilities-heading">
+               <h3 id="utilities-heading" class="project-category-title">Utilities &amp; Tools</h3>
+               <div class="swiper project-carousel" id="utilities-swiper" role="region"
+                  aria-label="Utilities and tools projects carousel">
+                  <div class="swiper-wrapper">
+                     <div class="swiper-slide">
+                        <a href="/projects/Finder/Finder.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Restaurant Finder Icon" class="project-icon">
+                              <h3>Restaurant Finder</h3>
+                              <p class="project-description">Search OpenStreetMap for restaurants near you with
+                                 AI-powered
+                                 recommendations and location services.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/Admin/Panel.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Admin Panel Icon" class="project-icon">
+                              <h3>Admin Panel</h3>
+                              <p class="project-description">Administrative controls and experiments for managing the
+                                 site.
+                              </p>
+                           </div>
+                        </a>
+                     </div>
                   </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/Games/Pong/Pong.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="Pop-ups Icon" class="project-icon">
-                     <h3>Popup Pong</h3>
-                     <p class="project-description">Pong using popup windows</p>
+                  <div class="swiper-pagination"></div>
+                  <div class="swiper-button-next"></div>
+                  <div class="swiper-button-prev"></div>
+               </div>
+            </section>
+
+            <section class="project-category" id="games" aria-labelledby="games-heading">
+               <h3 id="games-heading" class="project-category-title">Games</h3>
+               <div class="swiper project-carousel" id="games-swiper" role="region"
+                  aria-label="Games projects carousel">
+                  <div class="swiper-wrapper">
+                     <div class="swiper-slide">
+                        <a href="/projects/Games/BulletHell/bulletHell.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Bullet Hell Icon" class="project-icon">
+                              <h3>Bullet Hell</h3>
+                              <p class="project-description">A fast-paced bullet hell shooter game built with vanilla
+                                 JavaScript
+                                 and Canvas.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/Games/Pong/Pong.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Popup Pong Icon" class="project-icon">
+                              <h3>Popup Pong</h3>
+                              <p class="project-description">A creative twist on classic Pong played across browser
+                                 popup
+                                 windows.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/ApProject/apProject.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="ApProject Icon" class="project-icon">
+                              <h3>ApProject</h3>
+                              <p class="project-description">A platformer made for our AP Computer Science Principles AP
+                                 Project.
+                              </p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/Games/SM64/SuperMario.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/images/SuperMarioTitle.png" alt="Super Mario 64 Icon" class="project-icon">
+                              <h3>Super Mario 64</h3>
+                              <p class="project-description">Super Mario 64 running in the browser via WebAssembly.</p>
+                           </div>
+                        </a>
+                     </div>
                   </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/Pop-ups/Pop-Up.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="Pop-ups Icon" class="project-icon">
-                     <h3>Pop-ups Demo</h3>
-                     <p class="project-description">Demonstration of creative popup effects and modal interactions.</p>
+                  <div class="swiper-pagination"></div>
+                  <div class="swiper-button-next"></div>
+                  <div class="swiper-button-prev"></div>
+               </div>
+            </section>
+
+            <section class="project-category" id="popups" aria-labelledby="popups-heading">
+               <h3 id="popups-heading" class="project-category-title">Pop-ups</h3>
+               <div class="swiper project-carousel" id="popups-swiper" role="region"
+                  aria-label="Pop-up projects carousel">
+                  <div class="swiper-wrapper">
+                     <div class="swiper-slide">
+                        <a href="/projects/Pop-ups/Pop-Up.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Pop-ups Demo Icon" class="project-icon">
+                              <h3>Pop-ups Demo</h3>
+                              <p class="project-description">Demonstration of creative popup effects and modal
+                                 interactions.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/Pop-ups/Evil-popup.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Pop-ups Demo 2 Icon" class="project-icon">
+                              <h3>Pop-ups Demo 2</h3>
+                              <p class="project-description">A second popup experiment with a more mischievous twist.
+                              </p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/Pop-ups/Popup-Test.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-512x512.png" alt="Popup Test Icon" class="project-icon">
+                              <h3>Popup Test</h3>
+                              <p class="project-description">Testing popup behavior and layout edge cases in the
+                                 browser.</p>
+                           </div>
+                        </a>
+                     </div>
                   </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/Pop-ups/Evil-popup.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="Pop-ups Icon" class="project-icon">
-                     <h3>Pop-ups Demo 2</h3>
-                     <p class="project-description">Demonstration of creative popup effects and modal interactions.</p>
+                  <div class="swiper-pagination"></div>
+                  <div class="swiper-button-next"></div>
+                  <div class="swiper-button-prev"></div>
+               </div>
+            </section>
+
+            <section class="project-category" id="webgl" aria-labelledby="webgl-heading">
+               <h3 id="webgl-heading" class="project-category-title">WebGL Projects</h3>
+               <div class="swiper project-carousel" id="webgl-swiper" role="region"
+                  aria-label="WebGL projects carousel">
+                  <div class="swiper-wrapper">
+                     <div class="swiper-slide">
+                        <a href="/projects/WebGl-Test/gl.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
+                              <h3>WebGL Test</h3>
+                              <p class="project-description">Interactive WebGL graphics experiments showcasing 3D
+                                 rendering
+                                 capabilities.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/WebGl-Test/WebGL-Library/webglLibrary.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-192x192.png" alt="WebGL Library Test Icon" class="project-icon">
+                              <h3>WebGL Library Test</h3>
+                              <p class="project-description">Interactive WebGL graphics experiments showcasing 3D
+                                 rendering
+                                 capabilities.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/WebGl-Test/threejs-test.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-192x192.png" alt="Three.js Test Icon" class="project-icon">
+                              <h3>Three.js Test</h3>
+                              <p class="project-description">Advanced 3D modeling and rendering with Three.js featuring
+                                 real-time
+                                 lighting and materials.</p>
+                           </div>
+                        </a>
+                     </div>
+                     <div class="swiper-slide">
+                        <a href="/projects/WebGl-Test/blender-app.html">
+                           <div class="slide-content cherry-bomb-one-regular">
+                              <img src="/icons/icon-192x192.png" alt="3D Modeling Studio Icon" class="project-icon">
+                              <h3>3D Modeling Studio</h3>
+                              <p class="project-description">Blender-inspired 3D modeling web app with local storage,
+                                 transform
+                                 controls, and multiple workspaces.</p>
+                           </div>
+                        </a>
+                     </div>
                   </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/gl.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
-                     <h3>WebGL Test</h3>
-                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
-                        capabilities.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/WebGL-Library/webglLibrary.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
-                     <h3>WebGL Library Test</h3>
-                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
-                        capabilities.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/threejs-test.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="Three.js Test Icon" class="project-icon">
-                     <h3>Three.js Test</h3>
-                     <p class="project-description">Advanced 3D modeling and rendering with Three.js featuring real-time
-                        lighting and materials.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/blender-app.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="3D Modeling Studio Icon" class="project-icon">
-                     <h3>3D Modeling Studio</h3>
-                     <p class="project-description">Blender-inspired 3D modeling web app with local storage, transform
-                        controls, and multiple workspaces.</p>
-                  </div>
-               </a>
-            </div>
-         </div>
-         <!-- Optional Pagination -->
-         <div class="swiper-pagination"></div>
-         <!-- Optional Navigation -->
-         <div class="swiper-button-next"></div>
-         <div class="swiper-button-prev"></div>
-      </div>
-      <!-- Games Section -->
-      <h2 id="games" class="cherry-bomb-one-regular">Games</h2>
-      <div class="swiper" id="games-swiper">
-         <div class="swiper-wrapper">
-            <div class="swiper-slide">
-               <a href="/projects/Games/BulletHell/bulletHell.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="Bullet Hell Icon" class="project-icon">
-                     <h3>Bullet Hell</h3>
-                     <p class="project-description">A fast-paced bullet hell shooter game built with vanilla JavaScript
-                        and Canvas.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/Games/Pong/Pong.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="Pong Icon" class="project-icon">
-                     <h3>Popup Pong</h3>
-                     <p class="project-description">A creative twist on classic Pong played across browser popup
-                        windows.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/ApProject/apProject.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-512x512.png" alt="ApProject Icon" class="project-icon">
-                     <h3>ApProject</h3>
-                     <p class="project-description">A platformer made for our AP Computer Science Principles AP Project.
-                     </p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/Games/SM64/SuperMario.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/images/SuperMarioTitle.png" alt="Super Mario 64 Icon" class="project-icon">
-                     <h3>Super Mario 64</h3>
-                     <p class="project-description">Super Mario 64 running in the browser via WebAssembly.</p>
-                  </div>
-               </a>
-            </div>
-         </div>
-         <!-- Optional Pagination -->
-         <div class="swiper-pagination"></div>
-         <!-- Optional Navigation -->
-         <div class="swiper-button-next"></div>
-         <div class="swiper-button-prev"></div>
-      </div>
-      <!-- WebGL Section -->
-      <h2 id="webgl" class="cherry-bomb-one-regular">WebGL Projects</h2>
-      <div class="swiper" id="webgl-swiper">
-         <div class="swiper-wrapper">
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/gl.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
-                     <h3>WebGL Test</h3>
-                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
-                        capabilities.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/WebGL-Library/webglLibrary.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="WebGL Test Icon" class="project-icon">
-                     <h3>WebGL Library Test</h3>
-                     <p class="project-description">Interactive WebGL graphics experiments showcasing 3D rendering
-                        capabilities.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/threejs-test.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="Three.js Test Icon" class="project-icon">
-                     <h3>Three.js Test</h3>
-                     <p class="project-description">Advanced 3D modeling and rendering with Three.js featuring real-time
-                        lighting and materials.</p>
-                  </div>
-               </a>
-            </div>
-            <div class="swiper-slide">
-               <a href="/projects/WebGl-Test/blender-app.html">
-                  <div class="slide-content cherry-bomb-one-regular">
-                     <img src="/icons/icon-192x192.png" alt="3D Modeling Studio Icon" class="project-icon">
-                     <h3>3D Modeling Studio</h3>
-                     <p class="project-description">Blender-inspired 3D modeling web app with local storage, transform
-                        controls, and multiple workspaces.</p>
-                  </div>
-               </a>
-            </div>
-         </div>
-         <!-- Optional Pagination -->
-         <div class="swiper-pagination"></div>
-         <!-- Optional Navigation -->
-         <div class="swiper-button-next"></div>
-         <div class="swiper-button-prev"></div>
-      </div>
-      <!-- About Me Section -->
-      <div class="about-me-section cherry-bomb-one-regular" id="about-me">
-         <h2>About Me</h2>
-         <p>
-            Hi! I'm a passionate programmer who loves experimenting with web technologies and creating fun, interactive
-            experiences.
-            This site is my digital playground where I test new ideas, practice coding skills, and build cool projects.
-         </p>
-         <p>
-            When I'm not coding, you can find me exploring new technologies, learning about web development best
-            practices,
-            and constantly pushing the boundaries of what's possible in the browser.
-         </p>
-      </div>
+                  <div class="swiper-pagination"></div>
+                  <div class="swiper-button-next"></div>
+                  <div class="swiper-button-prev"></div>
+               </div>
+            </section>
+         </section>
+         <!-- About Me Section -->
+         <section class="about-me-section cherry-bomb-one-regular" id="about-me" aria-labelledby="about-me-heading">
+            <h2 id="about-me-heading">About Me</h2>
+            <p>
+               Hi! I'm a passionate programmer who loves experimenting with web technologies and creating fun,
+               interactive experiences. This site is my digital playground where I test new ideas, practice coding
+               skills, and build cool projects.
+            </p>
+            <p>
+               When I'm not coding, you can find me exploring new technologies, learning about web development best
+               practices, and constantly pushing the boundaries of what's possible in the browser.
+            </p>
+         </section>
+      </main>
       <!-- Copyright Section -->
       <footer class="site-footer">
          <p>&copy; This project is licensed under a Creative Commons Attribution 4.0 International License (CC BY 4.0)
@@ -374,18 +375,36 @@
           * Creates the project showcase carousel with navigation and pagination
           */
          const swiperConfig = {
-            loop: true,
+            loop: false,
+            rewind: true,
             slidesPerView: 1,
-            spaceBetween: 10,
+            spaceBetween: 18,
+            watchOverflow: true,
             breakpoints: {
-               640: { slidesPerView: 2, spaceBetween: 20 }
-            },
-            pagination: { el: '.swiper-pagination' },
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+               640: { slidesPerView: 1, spaceBetween: 20 },
+               900: { slidesPerView: 2, spaceBetween: 24 },
+               1280: { slidesPerView: 3, spaceBetween: 24 }
+            }
          };
-         const projectsSwiper = new Swiper('#projects-swiper', swiperConfig);
-         const gamesSwiper = new Swiper('#games-swiper', swiperConfig);
-         const webGLSwiper = new Swiper('#webgl-swiper', swiperConfig);
+         const initSwiper = (selector) => {
+            const container = document.querySelector(selector);
+            if (!container) {
+               return null;
+            }
+
+            return new Swiper(container, {
+               ...swiperConfig,
+               pagination: { el: container.querySelector('.swiper-pagination'), clickable: true },
+               navigation: {
+                  nextEl: container.querySelector('.swiper-button-next'),
+                  prevEl: container.querySelector('.swiper-button-prev')
+               },
+            });
+         };
+         const utilitiesSwiper = initSwiper('#utilities-swiper');
+         const gamesSwiper = initSwiper('#games-swiper');
+         const popupsSwiper = initSwiper('#popups-swiper');
+         const webGLSwiper = initSwiper('#webgl-swiper');
       </script>
       <script src="scripts.js"></script>
       <!-- Site-wide announcements system -->
