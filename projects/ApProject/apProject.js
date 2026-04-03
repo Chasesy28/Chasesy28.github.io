@@ -76,6 +76,7 @@ function backgroundColor(color) {
 
 backgroundColor("dimgray");
 
+// Code found online on detecting if a character is a letter
 function isLetter(char) {
   return /^[a-z]$/i.test(char);
 }
