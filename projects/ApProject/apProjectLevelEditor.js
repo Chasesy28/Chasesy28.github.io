@@ -36,13 +36,29 @@ function importLevel() {
   levelDataInput = prompt("Paste the level data (4D array in JSON format):");
 }
 
+function closeEditLevelMenu() {
+  document.getElementById("editLevelMenu").classList.add("hidden");
+}
+
 function newArea() {
   const newArea = document.createElement("div");
+  newArea.id = `area${areas}`;
   newArea.innerHTML = `
     <h3>Area ${areas + 1}</h3>
     <label for="newRoomButton${areas}">New Room:</label>
     <button id="newRoomButton${areas}" class="editor-button" onclick="newRoom(${areas})">+</button>
   `;
   document.getElementById("editLevelMenu").appendChild(newArea);
+  areas++;
 }
 
+function newRoom(areaIndex) {
+  const newRoom = document.createElement("div");
+  newRoom.id = `area${areaIndex}-room${document.querySelectorAll(`#area${areaIndex} > div`).length}`;
+  newRoom.innerHTML = `
+    <h4>Room ${areaIndex + 1}.${document.querySelectorAll(`#area${areaIndex} > div`).length + 1}</h4>
+    <label for="newTileButton${areaIndex}">New Tile:</label>
+    <button id="newTileButton${areaIndex}" class="editor-button" onclick="newTile(${areaIndex})">+</button>
+  `;
+  document.getElementById(`area${areaIndex}`).appendChild(newRoom);
+}
