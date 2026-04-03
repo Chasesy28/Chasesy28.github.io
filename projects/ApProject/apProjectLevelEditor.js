@@ -1,7 +1,11 @@
 let levelDataInput = null;
+let areas = 0;
 
 function createNewLevel() {
-  
+  const editLevelMenu = document.getElementById("editLevelMenu");
+  if (editLevelMenu.classList.contains("hidden")) {
+    editLevelMenu.classList.remove("hidden");
+  }
 }
 
 function loadLevel() {
@@ -30,5 +34,15 @@ async function exportLevel() {
 
 function importLevel() {
   levelDataInput = prompt("Paste the level data (4D array in JSON format):");
+}
+
+function newArea() {
+  const newArea = document.createElement("div");
+  newArea.innerHTML = `
+    <h3>Area ${areas + 1}</h3>
+    <label for="newRoomButton${areas}">New Room:</label>
+    <button id="newRoomButton${areas}" class="editor-button" onclick="newRoom(${areas})">+</button>
+  `;
+  document.getElementById("editLevelMenu").appendChild(newArea);
 }
 

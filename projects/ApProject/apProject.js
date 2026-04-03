@@ -46,7 +46,7 @@ function togglePause() {
     pauseButton.textContent = "▶";
     pauseButton.title = "Resume Game";
   } else {
-    pauseButton.textContent = "Ⅱ";
+    pauseButton.textContent = "| |";
     pauseButton.title = "Pause Game";
   }
 }
@@ -303,7 +303,7 @@ function startGame() {
 
   gameRunning = true;
   gamePaused = false;
-  pauseButton.textContent = "Ⅱ";
+  pauseButton.textContent = "| |";
   pauseButton.title = "Pause Game";
 
   updateLevelData();

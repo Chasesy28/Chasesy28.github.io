@@ -147,7 +147,8 @@ body {
 }
 
 .settings-menu h2,
-.level-editor-menu h2 {
+.level-editor-menu h2,
+.edit-level-menu h2 {
 	margin-top: 0;
 	margin-bottom: 1rem;
 	font-size: 1.5rem;
@@ -168,7 +169,8 @@ body {
 	padding-bottom: 0;
 }
 
-.settings-section h3 {
+.settings-section h3,
+.edit-level-menu h3 {
 	margin-top: 0;
 	margin-bottom: 1rem;
 	font-size: 1.1rem;
@@ -244,7 +246,7 @@ body {
 }
 
 .keybind,
-.level-editor-menu button {
+.level-editor-menu button{
 	width: 100%;
 	padding: 0.6rem;
 	margin-bottom: 0.75rem;
@@ -262,14 +264,16 @@ body {
 }
 
 .keybind:hover,
-.level-editor-menu button:hover {
+.level-editor-menu button:hover,
+.edit-level-menu button:hover {
 	background: #fff8e7;
 	border-color: #ffb74d;
 	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15);
 }
 
 .keybind:active,
-.level-editor-menu button:active {
+.level-editor-menu button:active,
+.edit-level-menu button:active {
 	background: #ffb74d;
 	color: white;
 	box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
@@ -287,4 +291,41 @@ body {
 	font-size: 2.5rem;
 	color: #e9eeee;
 	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.edit-level-menu {
+	position: fixed;
+	background: #fffaf0;
+	border: 3px dashed #ffe77b;
+	padding: 1.5rem;
+	box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
+	z-index: 11;
+	max-height: 80vh;
+	overflow-y: auto;
+	bottom: 50%;
+	right: 50%;
+	transform: translate(50%, 50%);
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	border-radius: 8px;
+	color: #333;
+}
+
+.edit-level-menu button {
+	width: fit-content;
+	height: fit-content;
+	padding: 0.15rem;
+	margin-bottom: 0.75rem;
+	border: 2px solid #ff9800;
+	border-radius: 6px;
+	background: white;
+	color: #ff9800;
+	font-weight: 600;
+	font-size: 0.8rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	box-sizing: border-box;
+	text-transform: uppercase;
+	font: optional;
 }

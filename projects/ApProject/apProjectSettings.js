@@ -186,6 +186,8 @@ dragElement(panel);
 
 const levelEditor = document.getElementById("levelEditorMenu");
 dragElement(levelEditor);
+const editLevelMenu = document.getElementById("editLevelMenu");
+dragElement(editLevelMenu);
 
 function settingsKeybind(buttonId) {
   const button = document.getElementById(buttonId);
