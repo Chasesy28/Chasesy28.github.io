@@ -94,7 +94,19 @@ function newTile(areaIndex, roomIndex, rowIndex) {
   <h6 onClick="hide('area${areaIndex}-room${roomIndex}-row${rowIndex}-tile${tileCount}-controls')">Tile ${areaIndex + 1}.${roomIndex + 1}.${rowIndex + 1}.${tileCount + 1}</h6>
   <div id="area${areaIndex}-room${roomIndex}-row${rowIndex}-tile${tileCount}-controls">
     <label for="tileTypeInput${areaIndex}-${roomIndex}-${rowIndex}-${tileCount}">Tile:</label>
-    <input type="text" placeholder="Tile Type" size="3" class="tileInput" id="tileTypeInput${areaIndex}-${roomIndex}-${rowIndex}-${tileCount}">
+    <select class="tileInput" id="tileTypeInput${areaIndex}-${roomIndex}-${rowIndex}-${tileCount}">
+      <option value="0">Empty</option>
+      <option value="1">Basic</option>
+      <option value="2">Temporary</option>
+      <option value="3">Permanent Temporary</option>
+      <option value="4">Ice</option>
+      <option value="5">Slow</option>
+      <option value="6">Cobweb</option>
+      <option value="7">Spike</option>
+      <option value="p">Player Start</option>
+      <option value="d0">Door to Area 1</option>
+      <option value="e0">Enemy 1</option>
+    </select>
   </div>
   `;
   document.getElementById(`area${areaIndex}-room${roomIndex}-row${rowIndex}-controls`).appendChild(newTile);
@@ -121,7 +133,7 @@ function submitLevel() {
         const rowData = [];
         const tiles = row.querySelectorAll(`.tile`);
         tiles.forEach((tile, t) => {
-          const tileType = tile.querySelector("input").value || "0";
+          const tileType = tile.querySelector("select").value || "0";
           rowData.push(tileType);
         });
         roomData.push(rowData);
@@ -133,4 +145,6 @@ function submitLevel() {
   levels.push(levelData);
   currentLevel = levels.length - 1;
   updateLevelData();
+  player.spawn();
+  closeEditLevelMenu();
 }

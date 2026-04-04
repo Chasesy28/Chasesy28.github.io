@@ -139,7 +139,7 @@ function dragElement(elmnt) {
         e.target.closest(".settings-select") ||
         e.target.closest(".keybind") ||
         e.target.closest(".editor-button") ||
-        e.target.closest("input[type='text']") ||
+        e.target.closest("select") ||
         e.target.closest("button")) {
       return;
     }

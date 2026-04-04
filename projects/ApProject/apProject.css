@@ -318,7 +318,7 @@ body {
 	padding: 0.15rem;
 	margin-bottom: 0.75rem;
 	border: 2px solid #ff9800;
-	border-radius: 6px;
+	border-radius: 16px;
 	background: white;
 	color: #ff9800;
 	font-weight: 600;
@@ -410,7 +410,7 @@ body {
 	align-self: center;
 	width: fit-content;
 	padding: 0.5rem 1rem;
-	margin: 0 auto;
+	margin: 0;
 	font-size: 1rem;
 	bottom: 0px;
 }
