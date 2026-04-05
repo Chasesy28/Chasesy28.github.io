@@ -355,14 +355,14 @@ body {
 	margin: 0;
 }
 
-.room {
+.layer {
 	padding: 0.5rem;
 	margin-bottom: 0.5rem;
 	border: 3px dashed #ffe77b;
 	border-radius: 8px;
 	box-shadow: 0 6px 18px rgba(149, 57, 0, 0.15);
 }
-.room h4 {
+.layer h4 {
 	margin: 0;
 }
 

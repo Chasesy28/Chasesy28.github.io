@@ -47,54 +47,54 @@ function newArea() {
   newArea.innerHTML = `
     <h3 onClick="hide('area${areas}-controls')">Area ${areas + 1}</h3>
     <div id="area${areas}-controls">
-      <label for="newRoomButton${areas}">New Room:</label>
-      <button id="newRoomButton${areas}" class="editor-button" onclick="newRoom(${areas})">+</button>
+      <label for="newLayerButton${areas}">New Layer:</label>
+      <button id="newLayerButton${areas}" class="editor-button" onclick="newLayer(${areas})">+</button>
     </div>
   `;
   document.getElementById("areasContainer").appendChild(newArea);
   areas++;
 }
 
-function newRoom(areaIndex) {
-  const newRoom = document.createElement("div");
-  const roomCount = document.querySelectorAll(`#area${areaIndex}-controls > div`).length;
-  newRoom.id = `area${areaIndex}-room${roomCount}`;
-  newRoom.classList.add("room");
-  newRoom.innerHTML = `
-    <h4 onClick="hide('area${areaIndex}-room${roomCount}-controls')">Room ${areaIndex + 1}.${roomCount + 1}</h4>
-    <div id="area${areaIndex}-room${roomCount}-controls">
+function newLayer(areaIndex) {
+  const newLayer = document.createElement("div");
+  const layerCount = document.querySelectorAll(`#area${areaIndex}-controls > div`).length;
+  newLayer.id = `area${areaIndex}-layer${layerCount}`;
+  newLayer.classList.add("layer");
+  newLayer.innerHTML = `
+    <h4 onClick="hide('area${areaIndex}-layer${layerCount}-controls')">Layer ${areaIndex + 1}.${layerCount + 1}</h4>
+    <div id="area${areaIndex}-layer${layerCount}-controls">
       <label for="newRowButton${areaIndex}">New Row:</label>
-      <button id="newRowButton${areaIndex}" class="editor-button" onclick="newRow(${areaIndex}, ${roomCount})">+</button>
+      <button id="newRowButton${areaIndex}" class="editor-button" onclick="newRow(${areaIndex}, ${layerCount})">+</button>
     </div>
   `;
-  document.getElementById(`area${areaIndex}-controls`).appendChild(newRoom);
+  document.getElementById(`area${areaIndex}-controls`).appendChild(newLayer);
 }
 
-function newRow(areaIndex, roomIndex) {
+function newRow(areaIndex, layerIndex) {
   const newRow = document.createElement("div");
-  const rowCount = document.querySelectorAll(`#area${areaIndex}-room${roomIndex}-controls > div`).length;
-  newRow.id = `area${areaIndex}-room${roomIndex}-row${rowCount}`;
+  const rowCount = document.querySelectorAll(`#area${areaIndex}-layer${layerIndex}-controls > div`).length;
+  newRow.id = `area${areaIndex}-layer${layerIndex}-row${rowCount}`;
   newRow.classList.add("row");
   newRow.innerHTML = `
-    <h5 onClick="hide('area${areaIndex}-room${roomIndex}-row${rowCount}-controls')">Row ${areaIndex + 1}.${roomIndex + 1}.${rowCount + 1}</h5>
-    <div id="area${areaIndex}-room${roomIndex}-row${rowCount}-controls">
+    <h5 onClick="hide('area${areaIndex}-layer${layerIndex}-row${rowCount}-controls')">Row ${areaIndex + 1}.${layerIndex + 1}.${rowCount + 1}</h5>
+    <div id="area${areaIndex}-layer${layerIndex}-row${rowCount}-controls">
       <label for="newTileButton${areaIndex}">New Tile:</label>
-      <button id="newTileButton${areaIndex}" class="editor-button" onclick="newTile(${areaIndex}, ${roomIndex}, ${rowCount})">+</button>
+      <button id="newTileButton${areaIndex}" class="editor-button" onclick="newTile(${areaIndex}, ${layerIndex}, ${rowCount})">+</button>
     </div>
   `;
-  document.getElementById(`area${areaIndex}-room${roomIndex}-controls`).appendChild(newRow);
+  document.getElementById(`area${areaIndex}-layer${layerIndex}-controls`).appendChild(newRow);
 }
 
-function newTile(areaIndex, roomIndex, rowIndex) {
+function newTile(areaIndex, layerIndex, rowIndex) {
   const newTile = document.createElement("div");
-  const tileCount = document.querySelectorAll(`#area${areaIndex}-room${roomIndex}-row${rowIndex}-controls > div`).length;
-  newTile.id = `area${areaIndex}-room${roomIndex}-row${rowIndex}-tile${tileCount}`;
+  const tileCount = document.querySelectorAll(`#area${areaIndex}-layer${layerIndex}-row${rowIndex}-controls > div`).length;
+  newTile.id = `area${areaIndex}-layer${layerIndex}-row${rowIndex}-tile${tileCount}`;
   newTile.classList.add("tile");
   newTile.innerHTML = `
-  <h6 onClick="hide('area${areaIndex}-room${roomIndex}-row${rowIndex}-tile${tileCount}-controls')">Tile ${areaIndex + 1}.${roomIndex + 1}.${rowIndex + 1}.${tileCount + 1}</h6>
-  <div id="area${areaIndex}-room${roomIndex}-row${rowIndex}-tile${tileCount}-controls">
-    <label for="tileTypeInput${areaIndex}-${roomIndex}-${rowIndex}-${tileCount}">Tile:</label>
-    <select class="tileInput" id="tileTypeInput${areaIndex}-${roomIndex}-${rowIndex}-${tileCount}">
+  <h6 onClick="hide('area${areaIndex}-layer${layerIndex}-row${rowIndex}-tile${tileCount}-controls')">Tile ${areaIndex + 1}.${layerIndex + 1}.${rowIndex + 1}.${tileCount + 1}</h6>
+  <div id="area${areaIndex}-layer${layerIndex}-row${rowIndex}-tile${tileCount}-controls">
+    <label for="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">Tile:</label>
+    <select class="tileInput" id="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">
       <option value="0">Empty</option>
       <option value="1">Basic</option>
       <option value="2">Temporary</option>
@@ -109,7 +109,7 @@ function newTile(areaIndex, roomIndex, rowIndex) {
     </select>
   </div>
   `;
-  document.getElementById(`area${areaIndex}-room${roomIndex}-row${rowIndex}-controls`).appendChild(newTile);
+  document.getElementById(`area${areaIndex}-layer${layerIndex}-row${rowIndex}-controls`).appendChild(newTile);
 }
 
 function hide(id) {
@@ -125,10 +125,10 @@ function submitLevel() {
   const levelData = [];
   for (let a = 0; a < areas; a++) {
     const areaData = [];
-    const rooms = document.querySelectorAll(`#area${a}-controls > .room`);
-    rooms.forEach((room, r) => {
-      const roomData = [];
-      const rows = room.querySelectorAll(`.row`);
+    const layers = document.querySelectorAll(`#area${a}-controls > .layer`);
+    layers.forEach((layer, l) => {
+      const layerData = [];
+      const rows = layer.querySelectorAll(`.row`);
       rows.forEach((row, ro) => {
         const rowData = [];
         const tiles = row.querySelectorAll(`.tile`);
@@ -136,9 +136,9 @@ function submitLevel() {
           const tileType = tile.querySelector("select").value || "0";
           rowData.push(tileType);
         });
-        roomData.push(rowData);
+        layerData.push(rowData);
       });
-      areaData.push(roomData);
+      areaData.push(layerData);
     });
     levelData.push(areaData);
   }
