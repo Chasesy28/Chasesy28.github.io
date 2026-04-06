@@ -38,7 +38,11 @@ function importLevel() {
 
 function closeEditLevelMenu() {
   document.getElementById("editLevelMenu").classList.add("hidden");
+  clearEditLevelMenu();
 }
+
+function clearEditLevelMenu() {
+  document.getElementById("editLevelMenu").innerHTML = "";
 
 function newArea() {
   const newArea = document.createElement("div");
