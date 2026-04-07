@@ -31,6 +31,7 @@
     <button id="fullscreenButton" class="fs-button" onclick="toggleFullScreen()">⛶</button>
     <button id="settingsButton" class="settings-button" onclick="toggleSettings()">⚙️</button>
     <div id="settingsMenu" class="hidden settings-menu">
+      <button id="closeSettingsMenu" class="close-menu" onclick="toggleSettings()">×</button>
       <h2>Settings</h2>
 
       <!-- Performance Settings -->
@@ -114,6 +115,7 @@
     </div>
     <button id="levelEditorButton" class="level-editor-button" onclick="toggleLevelEditor()">Level Editor</button>
     <div id="levelEditorMenu" class="hidden level-editor-menu">
+      <button id="closeLevelEditorMenu" class="editor-button close-menu" onclick="toggleLevelEditor()">×</button>
       <h2>Level Editor</h2>
       <button id="newLevelButton" class="editor-button" onclick="createNewLevel()">New Level</button>
       <button id="loadLevelButton" class="editor-button" onclick="loadLevel()">Load Level</button>
@@ -121,13 +123,16 @@
       <button id="importLevelButton" class="editor-button" onclick="importLevel()">Import Level</button>
     </div>
     <div id="editLevelMenu" class="hidden edit-level-menu">
-      <button id="closeEditLevelMenu" class="editor-button" onclick="closeEditLevelMenu()">×</button>
+      <button class="close-menu" onclick="closeEditLevelMenu()">×</button>
       <h2>New Level</h2>
       <label for="newAreaButton">New Area:
         <button id="newAreaButton" class="editor-button" onclick="newArea()">+</button>
       </label>
       <div id="areasContainer"></div>
-      <button id="submitButton" class="editor-button" onclick="submitLevel()">Submit</button>
+      <div id="finalizeButtons">
+        <button id="clearButton" class="editor-button" onclick="clearEditLevelMenu()">Clear</button>
+        <button id="submitButton" class="editor-button" onclick="submitLevel()">Submit</button>
+      </div>
     </div>
     <script src="apProjectSettings.js"></script>
     <script src="apProjectLevelEditor.js"></script>

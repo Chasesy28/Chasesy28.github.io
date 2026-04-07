@@ -127,7 +127,7 @@ class Player {
         if (this.velX > -this.maxVelX) this.velX -= this.speed;
       }
 
-      if (this.currentGroundBlock != null) {
+      if (this.currentGroundBlock != null && !controller.right.pressed && !controller.left.pressed) {
         this.velX *= this.currentGroundBlock.friction;
       }
       if (this.insideBlock !== null) {
@@ -431,6 +431,8 @@ function newPlayer () {
   return new Player(50, "images/Mario.png");
 }
 
+let defaultFriction = 0.8;
+
 const blockTypes = {
   basic: {
     colorR: 165,
@@ -438,7 +440,7 @@ const blockTypes = {
     colorB: 42,
     solid: true,
     temporary: false,
-    friction: 0.92,
+    friction: defaultFriction,
     verticalFriction: 1,
     textureIndex: 66,
   },
@@ -450,7 +452,7 @@ const blockTypes = {
     temporary: true,
     disappearTime: 30,
     reappearTime: 120,
-    friction: 0.92,
+    friction: defaultFriction,
     verticalFriction: 1,
     textureIndex: 113,
   },
@@ -462,7 +464,7 @@ const blockTypes = {
     temporary: true,
     disappearTime: 45,
     reappearTime: undefined,
-    friction: 0.92,
+    friction: defaultFriction,
     verticalFriction: 1,
     textureIndex: 144,
   },

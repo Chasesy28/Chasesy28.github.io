@@ -42,7 +42,7 @@ function closeEditLevelMenu() {
 }
 
 function clearEditLevelMenu() {
-  document.getElementById("editLevelMenu").innerHTML = "";
+  document.getElementById("areasContainer").innerHTML = "";
 }
 
 function newArea() {
