@@ -1,10 +1,10 @@
 let levelDataInput = null;
-let areas = 0;
 
 function createNewLevel() {
   const editLevelMenu = document.getElementById("editLevelMenu");
   if (editLevelMenu.classList.contains("hidden")) {
     editLevelMenu.classList.remove("hidden");
+    clearEditLevelMenu();
   }
 }
 
@@ -43,10 +43,15 @@ function closeEditLevelMenu() {
 
 function clearEditLevelMenu() {
   document.getElementById("areasContainer").innerHTML = "";
+  newArea();
+  newLayer(0);
+  newRow(0, 0);
+  newTile(0, 0, 0);
 }
 
 function newArea() {
   const newArea = document.createElement("div");
+  const areas = document.querySelectorAll(`#areasContainer > .area`).length;
   newArea.id = `area${areas}`;
   newArea.classList.add("area");
   newArea.innerHTML = `
@@ -57,7 +62,6 @@ function newArea() {
     </div>
   `;
   document.getElementById("areasContainer").appendChild(newArea);
-  areas++;
 }
 
 function newLayer(areaIndex) {
@@ -128,7 +132,7 @@ function hide(id) {
 
 function submitLevel() {
   const levelData = [];
-  for (let a = 0; a < areas; a++) {
+  for (let a = 0; a < document.querySelectorAll(`#areasContainer > .area`).length; a++) {
     const areaData = [];
     const layers = document.querySelectorAll(`#area${a}-controls > .layer`);
     layers.forEach((layer, l) => {
