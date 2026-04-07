@@ -43,6 +43,7 @@ function closeEditLevelMenu() {
 
 function clearEditLevelMenu() {
   document.getElementById("editLevelMenu").innerHTML = "";
+}
 
 function newArea() {
   const newArea = document.createElement("div");
