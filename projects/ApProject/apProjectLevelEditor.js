@@ -62,6 +62,11 @@ function newArea() {
     </div>
   `;
   document.getElementById("areasContainer").appendChild(newArea);
+  if (areas !== 0) {
+    newLayer(areas);
+    newRow(areas, 0);
+    newTile(areas, 0, 0);
+  }
 }
 
 function newLayer(areaIndex) {
@@ -77,6 +82,10 @@ function newLayer(areaIndex) {
     </div>
   `;
   document.getElementById(`area${areaIndex}-controls`).appendChild(newLayer);
+  if (layerCount !== 0) {
+    newRow(areaIndex, layerCount);
+    newTile(areaIndex, layerCount, 0);
+  }
 }
 
 function newRow(areaIndex, layerIndex) {
@@ -92,6 +101,9 @@ function newRow(areaIndex, layerIndex) {
     </div>
   `;
   document.getElementById(`area${areaIndex}-layer${layerIndex}-controls`).appendChild(newRow);
+  if (rowCount !== 0) {
+    newTile(areaIndex, layerIndex, rowCount);
+  }
 }
 
 function newTile(areaIndex, layerIndex, rowIndex) {
@@ -103,7 +115,7 @@ function newTile(areaIndex, layerIndex, rowIndex) {
   <h6 onClick="hide('area${areaIndex}-layer${layerIndex}-row${rowIndex}-tile${tileCount}-controls')">Tile ${areaIndex + 1}.${layerIndex + 1}.${rowIndex + 1}.${tileCount + 1}</h6>
   <div id="area${areaIndex}-layer${layerIndex}-row${rowIndex}-tile${tileCount}-controls">
     <label for="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">Tile:</label>
-    <select class="tileInput" id="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">
+    <select onclick="tileOptions(this)" class="tileInput" id="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">
       <option value="0">Empty</option>
       <option value="1">Basic</option>
       <option value="2">Temporary</option>
@@ -112,13 +124,32 @@ function newTile(areaIndex, layerIndex, rowIndex) {
       <option value="5">Slow</option>
       <option value="6">Cobweb</option>
       <option value="7">Spike</option>
-      <option value="p">Player Start</option>
+      <option value="p">Player Spawn</option>
       <option value="d0">Door to Area 1</option>
       <option value="e0">Enemy 1</option>
     </select>
   </div>
   `;
   document.getElementById(`area${areaIndex}-layer${layerIndex}-row${rowIndex}-controls`).appendChild(newTile);
+}
+
+function tileOptions(selectElement) {
+  selectElement.innerHTML = `
+    <option value="0">Empty</option>
+    <option value="1">Basic</option>
+    <option value="2">Temporary</option>
+    <option value="3">Permanent Temporary</option>
+    <option value="4">Ice</option>
+    <option value="5">Slow</option>
+    <option value="6">Cobweb</option>
+    <option value="7">Spike</option>
+    <option value="p">Player Spawn</option>`;
+  for (let a = 0; a < document.querySelectorAll(`#areasContainer > .area`).length; a++) {
+    const areaOption = document.createElement("option");
+    areaOption.value = `d${a}`;
+    areaOption.textContent = `Door to Area ${a + 1}`;
+    selectElement.appendChild(areaOption);
+  }
 }
 
 function hide(id) {
