@@ -320,10 +320,6 @@
     transition-duration: 300ms;
 }
 
-.\[xml\:lang\] {
-    xml: lang;
-}
-
 .hover\:underline {
     &:hover {
         @media (hover: hover) {
