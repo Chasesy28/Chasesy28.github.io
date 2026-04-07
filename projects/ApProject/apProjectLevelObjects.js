@@ -443,6 +443,7 @@ const blockTypes = {
     friction: defaultFriction,
     verticalFriction: 1,
     textureIndex: 66,
+    texture: "images/Block-assets/texture_16px 66.png",
   },
   temporary: {
     colorR: 128,
@@ -455,6 +456,7 @@ const blockTypes = {
     friction: defaultFriction,
     verticalFriction: 1,
     textureIndex: 113,
+    texture: "images/Block-assets/texture_16px 113.png",
   },
   permanentTemporary: {
     colorR: 105,
@@ -467,6 +469,7 @@ const blockTypes = {
     friction: defaultFriction,
     verticalFriction: 1,
     textureIndex: 144,
+    texture: "images/Block-assets/texture_16px 144.png",
   },
   ice: {
     colorR: 0,
@@ -477,6 +480,7 @@ const blockTypes = {
     friction: 0.99,
     verticalFriction: 1,
     textureIndex: 201,
+    texture: "images/Block-assets/texture_16px 201.png",
   },
   slow: {
     colorR: 0,
@@ -487,6 +491,7 @@ const blockTypes = {
     friction: 0.75,
     verticalFriction: 1,
     textureIndex: 206,
+    texture: "images/Block-assets/texture_16px 206.png",
   },
   cobweb: {
     colorR: 255,
@@ -497,6 +502,7 @@ const blockTypes = {
     friction: 0.5,
     verticalFriction: 0.25,
     textureIndex: 339,
+    texture: "images/Block-assets/texture_16px 339.png",
   },
   spike: {
     colorR: 0,
@@ -507,6 +513,7 @@ const blockTypes = {
     friction: 1,
     verticalFriction: 1,
     textureIndex: 487,
+    texture: "images/Block-assets/texture_16px 487.png",
   },
   areaDoor: {
     colorR: 255,
@@ -517,6 +524,7 @@ const blockTypes = {
     friction: 1,
     verticalFriction: 1,
     textureIndex: 590,
+    texture: "images/Block-assets/texture_16px 590.png",
   },
 };
 
@@ -567,6 +575,8 @@ class Block {
 
     this.isBlock = true;
     this.isEnemy = false;
+    this.texture = new Image();
+    this.texture.src = blockTypes[type].texture;
   }
   colorReset() {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
@@ -621,8 +631,19 @@ class Block {
     if (this.visible && this.alpha > 0) {
       const renderX = Math.round(this.x - player.globalOffsetX);
       const renderY = Math.round(this.y - player.globalOffsetY);
+      if (shouldUseTextures && this.texture) {
+        const previousSmoothing = ctx.imageSmoothingEnabled;
+        ctx.imageSmoothingEnabled = false;
+        ctx.globalAlpha = this.alpha;
+        ctx.drawImage(this.texture, renderX, renderY, this.width, this.height);
+        ctx.globalAlpha = 1;
+        ctx.imageSmoothingEnabled = previousSmoothing;
+      } else {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(renderX, renderY, this.width, this.height);
+      }
 
-      if (shouldUseTextures && this.solid && this.textureIndex > 0) {
+      /*if (shouldUseTextures && this.solid && this.textureIndex > 0) {
         const texture = Block.texturePool[this.textureIndex - 1];
         if (texture && texture.complete && texture.naturalWidth > 0) {
           const previousSmoothing = ctx.imageSmoothingEnabled;
@@ -638,7 +659,7 @@ class Block {
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
-      }
+      }*/
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
