@@ -496,3 +496,23 @@ if (rainSlider && rainNumber) {
     handleResize(); // Recalculate drop count with new density
   });
 }
+
+const projects = document.getElementById("projects");
+const project = document.getElementById("project");
+const dropdown = document.getElementById("projects-dropdown");
+
+projects?.addEventListener("mouseenter", () => {
+  dropdown?.classList.remove("hidden");
+});
+
+projects?.addEventListener("mouseleave", () => {
+  dropdown?.classList.add("hidden");
+});
+
+dropdown?.addEventListener("mouseenter", () => {
+  dropdown.classList.remove("hidden");
+});
+
+dropdown?.addEventListener("mouseleave", () => {
+  dropdown.classList.add("hidden");
+});

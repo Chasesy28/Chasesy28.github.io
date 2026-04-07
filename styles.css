@@ -82,7 +82,7 @@
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .inline {
@@ -482,6 +482,24 @@ nav a:hover {
     transform: rotate(5deg) scale(1.1);
 }
 
+#projects {
+    position: relative;
+}
+
+#projects-dropdown {
+    position: absolute;
+    top: 100%;
+    background-color: #fffaf0;
+    border: 2px dashed #ffe77b;
+    border-radius: 8px;
+    padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+    transform: translateX(-25%);
+}
+
 .rain {
     position: fixed;
     top: 0;
@@ -806,6 +824,11 @@ html.dark nav a {
 
 html.dark nav a:hover {
     color: #64ffda;
+}
+
+html.dark #projects-dropdown {
+    background-color: #16213e;
+    border: 2px dashed #0f3460;
 }
 
 html.dark h1 {
