@@ -772,6 +772,8 @@ class Enemy {
   update() {
     if (this.movement === "horizontalPatrol") {
       this.horizontalPatrol();
+    } else if (this.movement === "verticalPatrol") {
+      this.verticalPatrol();
     }
   }
 
@@ -829,5 +831,18 @@ class Enemy {
     }
 
     this.x += this.speed * this.direction;
+  }
+
+  verticalPatrol() {
+    const solids = this.getSolidBlocksOnLayer();
+    const nextY = this.y + this.speed * this.direction;
+
+    const willHitWall = this.collidesWithSolid(this.x, nextY, solids);
+
+    if (willHitWall) {
+      this.direction *= -1;
+    }
+
+    this.y += this.speed * this.direction;
   }
 }
