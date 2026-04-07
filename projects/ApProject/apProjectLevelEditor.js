@@ -117,16 +117,6 @@ function newTile(areaIndex, layerIndex, rowIndex) {
     <label for="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">Tile:</label>
     <select onclick="tileOptions(this)" class="tileInput" id="tileTypeInput${areaIndex}-${layerIndex}-${rowIndex}-${tileCount}">
       <option value="0">Empty</option>
-      <option value="1">Basic</option>
-      <option value="2">Temporary</option>
-      <option value="3">Permanent Temporary</option>
-      <option value="4">Ice</option>
-      <option value="5">Slow</option>
-      <option value="6">Cobweb</option>
-      <option value="7">Spike</option>
-      <option value="p">Player Spawn</option>
-      <option value="d0">Door to Area 1</option>
-      <option value="e0">Enemy 1</option>
     </select>
   </div>
   `;
@@ -134,6 +124,7 @@ function newTile(areaIndex, layerIndex, rowIndex) {
 }
 
 function tileOptions(selectElement) {
+  const value = selectElement.value;
   selectElement.innerHTML = `
     <option value="0">Empty</option>
     <option value="1">Basic</option>
@@ -157,6 +148,7 @@ function tileOptions(selectElement) {
     areaOption.textContent = `Door to Area ${a + 1}`;
     selectElement.appendChild(areaOption);
   }
+  selectElement.value = value;
 }
 
 function hide(id) {
