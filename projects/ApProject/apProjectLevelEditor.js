@@ -143,7 +143,14 @@ function tileOptions(selectElement) {
     <option value="5">Slow</option>
     <option value="6">Cobweb</option>
     <option value="7">Spike</option>
-    <option value="p">Player Spawn</option>`;
+    <option value="p">Player Spawn</option>`
+  ;
+  for (let e = 0; e < Object.keys(enemyTypes).length; e++) {
+    const enemyOption = document.createElement("option");
+    enemyOption.value = `e${e}`;
+    enemyOption.textContent = enemyTypes[e].name;
+    selectElement.appendChild(enemyOption);
+  }
   for (let a = 0; a < document.querySelectorAll(`#areasContainer > .area`).length; a++) {
     const areaOption = document.createElement("option");
     areaOption.value = `d${a}`;

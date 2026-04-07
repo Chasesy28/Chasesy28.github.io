@@ -690,6 +690,7 @@ const enemyTypes = {
     colorR: 255,
     colorG: 0,
     colorB: 0,
+    name: "Horizontal Patroller",
   },
   1: {
     width: 50,
@@ -699,6 +700,7 @@ const enemyTypes = {
     colorR: 0,
     colorG: 0,
     colorB: 255,
+    name: "Vertical Patroller",
   }
 };
 
