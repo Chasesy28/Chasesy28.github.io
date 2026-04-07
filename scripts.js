@@ -498,21 +498,30 @@ if (rainSlider && rainNumber) {
 }
 
 const projects = document.getElementById("projects");
-const project = document.getElementById("project");
+let leftProjects = false;
 const dropdown = document.getElementById("projects-dropdown");
+let leftDropdown = null;
 
 projects?.addEventListener("mouseenter", () => {
   dropdown?.classList.remove("hidden");
+  leftProjects = false;
 });
 
 projects?.addEventListener("mouseleave", () => {
-  dropdown?.classList.add("hidden");
+  if (leftDropdown || leftDropdown === null) {
+    dropdown?.classList.add("hidden");
+  }
+  leftProjects = true;
 });
 
 dropdown?.addEventListener("mouseenter", () => {
   dropdown.classList.remove("hidden");
+  leftDropdown = false;
 });
 
 dropdown?.addEventListener("mouseleave", () => {
-  dropdown.classList.add("hidden");
+  if(leftProjects){
+    dropdown.classList.add("hidden");
+  }
+  leftDropdown = true;
 });
