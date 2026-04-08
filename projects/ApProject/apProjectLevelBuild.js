@@ -50,7 +50,9 @@ function convertToObjects(levelData, layer, area, player) {
       } else if (Object.keys(levelNumberKey).includes(String(levelData[i][j]))) {
         row.push(new Block(j * 50, i * 50, 50, 50, layer, levelNumberKey[levelData[i][j]]));
       } else if (levelData[i][j][0] === "d") {
-        row.push(new Block(j * 50, i * 50, 50, 50, layer, "areaDoor", levelData[i][j].slice(1)));
+        row.push(new Block(j * 50, i * 50, 50, 50, layer, "areaDoorBottom", levelData[i][j].slice(1)));
+      } else if (levelData[i][j][0] === "t") {
+        row.push(new Block(j * 50, i * 50, 50, 50, layer, "areaDoorTop", levelData[i][j].slice(1)));
       } else if (levelData[i][j][0] === "e") {
         row.push(new Enemy(j * 50, i * 50, levelData[i][j].slice(1), layer));
       }

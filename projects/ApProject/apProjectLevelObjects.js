@@ -1,6 +1,4 @@
 //apProjectLevelObjects.js
-const BLOCK_TEXTURE_COUNT = 609; //yes i know
-
 function getBlockTexturePath(index) {
   return `images/Block-assets/texture_16px ${index}.png`;
 }
@@ -515,7 +513,7 @@ const blockTypes = {
     textureIndex: 487,
     texture: "images/Block-assets/texture_16px 487.png",
   },
-  areaDoor: {
+  areaDoorBottom: {
     colorR: 255,
     colorG: 215,
     colorB: 0,
@@ -524,6 +522,17 @@ const blockTypes = {
     friction: 1,
     verticalFriction: 1,
     textureIndex: 590,
+    texture: "images/Block-assets/texture_16px 591.png",
+  },
+  areaDoorTop: {
+    colorR: 255,
+    colorG: 215,
+    colorB: 0,
+    solid: false,
+    temporary: false,
+    friction: 1,
+    verticalFriction: 1,
+    textureIndex: 591,
     texture: "images/Block-assets/texture_16px 590.png",
   },
 };
@@ -532,16 +541,30 @@ class Block {
   static texturePool = [];
   static texturesLoaded = false;
 
+  static getTexture(index) {
+    if (!Block.texturePool[index - 1]) {
+      const image = new Image();
+      image.src = getBlockTexturePath(index);
+      Block.texturePool[index - 1] = image;
+    }
+
+    return Block.texturePool[index - 1];
+  }
+
   static initializeTextures() {
     if (Block.texturesLoaded) {
       return;
     }
 
-    for (let i = 1; i <= BLOCK_TEXTURE_COUNT; i++) {
-      const image = new Image();
-      image.src = getBlockTexturePath(i);
-      Block.texturePool.push(image);
-    }
+    const textureIndexes = [...new Set(
+      Object.values(blockTypes)
+        .map((blockType) => blockType.textureIndex)
+        .filter((textureIndex) => Number.isInteger(textureIndex)),
+    )];
+
+    textureIndexes.forEach((index) => {
+      Block.getTexture(index);
+    });
 
     Block.texturesLoaded = true;
   }
@@ -569,14 +592,13 @@ class Block {
     this.textureIndex = blockTypes[this.type].textureIndex || 1;
     this.visible = true;
     this.doorArea = null;
-    if (this.type === "areaDoor") {
+    if (this.type === "areaDoorBottom" || this.type === "areaDoorTop") {
       this.doorArea = doorArea;
     }
 
     this.isBlock = true;
     this.isEnemy = false;
-    this.texture = new Image();
-    this.texture.src = blockTypes[type].texture;
+    this.texture = Block.getTexture(this.textureIndex);
   }
   colorReset() {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
