@@ -12,6 +12,36 @@ if (!gl) {
 
 //Stuff from tutorials
 
+const vertexShaderSourceCode = `#version 300 es
+precision mediump float;
+
+in vec2 vertexPosition;
+in vec3 vertexColor;
+
+out vec3 fragmentColor;
+
+uniform vec2 canvasSize;
+uniform vec2 shapeLocation;
+uniform float shapeSize;
+
+void main() {
+  fragmentColor = vertexColor;
+  vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
+  vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
+
+  gl_Position = vec4(clipPosition, 0.0, 1.0);
+}`;
+
+const fragmentShaderSourceCode = `#version 300 es
+precision mediump float;
+
+in vec3 fragmentColor;
+out vec4 outputColor;
+
+void main() {
+  outputColor = vec4(fragmentColor, 1.0);
+}`;
+
 const triangleVertices = new Float32Array([0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
 const rgbTriangleColors = new Uint8Array([
   255, 0, 0,
@@ -24,38 +54,52 @@ const fireyTriangleColors = new Uint8Array([
   233, 154, 26
 ]);
 
+function createStaticVertexBuffer(gl = WebGL2RenderingContext, data = ArrayBuffer) {
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  return buffer;
+}
+
+function createTwoBufferVAO(gl = WebGL2RenderingContext, positionBuffer = WebGLBuffer, colorBuffer = WebGLBuffer, positionAttribLocation = number, colorAttribLocation = number) {
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  gl.enableVertexAttribArray(positionAttribLocation);
+  gl.enableVertexAttribArray(colorAttribLocation);
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.vertexAttribPointer(positionAttribLocation, 2, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  gl.vertexAttribPointer(colorAttribLocation, 3, gl.UNSIGNED_BYTE, true, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  gl.bindVertexArray(null);
+
+  return vao;
+}
+
+class MovingShape {
+  constructor() {
+    this.position = [number, number];
+    this.velocity = [number, number];
+    this.size = number;
+    this.vao = WebGLVertexArrayObject;
+  }
+
+  update(dt = number) {
+    this.position[0] += this.velocity[0] * dt;
+    this.position[1] += this.velocity[1] * dt;
+  }
+}
+
 function helloTriangle() {
-  const triangleGeoBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeoBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, triangleVertices, gl.STATIC_DRAW);
+  const triangleGeoBuffer = createStaticVertexBuffer(gl, triangleVertices);
+  const rgbTriangleColorBuffer = createStaticVertexBuffer(gl, rgbTriangleColors);
+  const fireyTriangleColorBuffer = createStaticVertexBuffer(gl, fireyTriangleColors);
 
-  const rgbTriangleColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, rgbTriangleColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, rgbTriangleColors, gl.STATIC_DRAW);
-
-  const fireyTriangleColorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, fireyTriangleColorBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, fireyTriangleColors, gl.STATIC_DRAW);
-
-  const vertexShaderSourceCode = `#version 300 es
-  precision mediump float;
-
-  in vec2 vertexPosition;
-  in vec3 vertexColor;
-
-  out vec3 fragmentColor;
-
-  uniform vec2 canvasSize;
-  uniform vec2 shapeLocation;
-  uniform float shapeSize;
-
-  void main() {
-    fragmentColor = vertexColor;
-    vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
-    vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
-
-    gl_Position = vec4(clipPosition, 0.0, 1.0);
-  }`;
+  if (!triangleGeoBuffer || !rgbTriangleColorBuffer || !fireyTriangleColorBuffer) {
+    console.error("Failed to create buffers");
+    return;
+  }
 
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertexShader, vertexShaderSourceCode);
@@ -65,16 +109,6 @@ function helloTriangle() {
     console.error("Vertex shader compilation error: " + gl.getShaderInfoLog(vertexShader));
     return;
   }
-
-  const fragmentShaderSourceCode = `#version 300 es
-  precision mediump float;
-
-  in vec3 fragmentColor;
-  out vec4 outputColor;
-
-  void main() {
-    outputColor = vec4(fragmentColor, 1.0);
-  }`;
 
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragmentShader, fragmentShaderSourceCode);
@@ -108,41 +142,40 @@ function helloTriangle() {
     return;
   }
 
-  // Output merger - how to merge the shaded pixel fragment with the existing output image
-  /*canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;*/
+  const rgbTriangleVAO = createTwoBufferVAO(gl, triangleGeoBuffer, rgbTriangleColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
+  const fireyTriangleVAO = createTwoBufferVAO(gl, triangleGeoBuffer, fireyTriangleColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
 
+  if (!rgbTriangleVAO || !fireyTriangleVAO) {
+    console.error("Failed to create VAOs");
+    return;
+  }
 
-  // Rasterizer - what pixels are part of a triangle
-  gl.viewport(0, 0, canvas.width, canvas.height);
+  const frame = function() {
+    backgroundColor(gl, 20, 20, 20, 1.0);
+    gl.viewport(0, 0, canvas.width, canvas.height);
 
-  // Set GPU program (vertex and fragment shader)
-  gl.useProgram(triangleShaderProgram);
-  gl.enableVertexAttribArray(vertexPositionAttributeLocation);
+    // Set GPU program (vertex and fragment shader)
+    gl.useProgram(triangleShaderProgram);
 
-  // Input assembler - how to read vertices from our GPU triangle buffer
-  gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeoBuffer);
-  gl.vertexAttribPointer(
-    /*index=: which attribute to use*/
-    vertexPositionAttributeLocation,
-    /*size=: how many components in that attribute*/
-    2,
-    /*type=: what is the data type stored in the GPU buffer for this attribute*/
-    gl.FLOAT,
-    /*normalized=: determines how to convert ints to floats*/
-    false,
-    /*stride=: how many bytes to move forward into the buffer to find the same attribute for the next vertex*/
-    0, //0 is automatic
-    /*offset=: how many bytes should the input assembler skip into the buffer when reading attributes*/
-    0
-  );
+    // Draw call (Primitive assembler - how to make triangles from those vertices)
+    gl.uniform2f(canvasSizeUniform, canvas.width, canvas.height);
 
-  // Draw call (Primitive assembler - how to make triangles from those vertices)
-  gl.uniform2f(canvasSizeUniform, canvas.width, canvas.height);
+    // First triangle
+    gl.uniform1f(shapeSizeUniform, 100.0);
+    gl.uniform2f(shapeLocationUniform, 300, 600);
+    gl.bindVertexArray(rgbTriangleVAO);
 
-  gl.uniform1f(shapeSizeUniform, 300.0);
-  gl.uniform2f(shapeLocationUniform, canvas.width, canvas.height);
-  gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    // Second triangle
+    gl.uniform1f(shapeSizeUniform, 150.0);
+    gl.uniform2f(shapeLocationUniform, 600, 300);
+    gl.bindVertexArray(fireyTriangleVAO);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
 function loop() {
@@ -167,5 +200,4 @@ function loop() {
   requestAnimationFrame(loop);
 }
 //loop();
-backgroundColor(gl, 20, 20, 20, 1.0);
 helloTriangle();
