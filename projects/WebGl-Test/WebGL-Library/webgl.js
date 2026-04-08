@@ -11,32 +11,46 @@ if (!gl) {
 }
 
 //Stuff from tutorials
-function helloTriangle() {
-  const triangleVertices = [
-    //Top middle
-    0.0, 0.5,
-    //Bottom left
-    -0.5, -0.5,
-    //Bottom right
-    0.5, -0.5
-  ];
-  const triangleVerticesCPUBuffer = new Float32Array(triangleVertices);
 
+const triangleVertices = new Float32Array([0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+const rgbTriangleColors = new Uint8Array([
+  255, 0, 0,
+  0, 255, 0,
+  0, 0, 255
+]);
+const fireyTriangleColors = new Uint8Array([
+  229, 47, 15,
+  246, 206, 29,
+  233, 154, 26
+]);
+
+function helloTriangle() {
   const triangleGeoBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeoBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, triangleVerticesCPUBuffer, gl.STATIC_DRAW);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  gl.bufferData(gl.ARRAY_BUFFER, triangleVertices, gl.STATIC_DRAW);
+
+  const rgbTriangleColorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, rgbTriangleColorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, rgbTriangleColors, gl.STATIC_DRAW);
+
+  const fireyTriangleColorBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, fireyTriangleColorBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, fireyTriangleColors, gl.STATIC_DRAW);
 
   const vertexShaderSourceCode = `#version 300 es
   precision mediump float;
 
   in vec2 vertexPosition;
+  in vec3 vertexColor;
+
+  out vec3 fragmentColor;
 
   uniform vec2 canvasSize;
   uniform vec2 shapeLocation;
   uniform float shapeSize;
 
   void main() {
+    fragmentColor = vertexColor;
     vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
     vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
 
@@ -55,10 +69,11 @@ function helloTriangle() {
   const fragmentShaderSourceCode = `#version 300 es
   precision mediump float;
 
+  in vec3 fragmentColor;
   out vec4 outputColor;
 
   void main() {
-    outputColor = vec4(0.294, 0.0, 0.51, 1.0);
+    outputColor = vec4(fragmentColor, 1.0);
   }`;
 
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -79,8 +94,9 @@ function helloTriangle() {
     return;
   }
   const vertexPositionAttributeLocation = gl.getAttribLocation(triangleShaderProgram, "vertexPosition");
-  if (vertexPositionAttributeLocation < 0) {
-    console.error("Failed to get the attribute location for vertexPosition");
+  const vertexColorAttributeLocation = gl.getAttribLocation(triangleShaderProgram, "vertexColor");
+  if (vertexPositionAttributeLocation < 0 || vertexColorAttributeLocation < 0) {
+    console.error("Failed to get the attribute location for vertexPosition or vertexColor");
     return;
   }
 
@@ -150,4 +166,6 @@ function loop() {
 
   requestAnimationFrame(loop);
 }
-loop();
+//loop();
+backgroundColor(gl, 20, 20, 20, 1.0);
+helloTriangle();
