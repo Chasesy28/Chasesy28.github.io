@@ -203,7 +203,11 @@ function gameLoop() {
         } else {
           if (player.insideBlockDetection(block)) {
             if (controller.interact.pressed) {
-              if (block.type === "areaDoor") {
+              if (
+                block.type === "areaDoor" ||
+                block.type === "areaDoorBottom" ||
+                block.type === "areaDoorTop"
+              ) {
                 currentArea = Number(block.doorArea);
                 player.spawn();
                 areaChanged = true;
