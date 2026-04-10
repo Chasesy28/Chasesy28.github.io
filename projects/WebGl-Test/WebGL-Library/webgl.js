@@ -11,6 +11,14 @@ if (!gl) {
 }
 
 //Stuff from tutorials
+const SPAWN_RATE = 0.08;
+const MIN_SHAPE_TIME = 0.25;
+const MAX_SHAPE_TIME = 6;
+const MIN_SHAPE_SPEED = 125;
+const MAX_SHAPE_SPEED = 300;
+const MIN_SHAPE_SIZE = 2;
+const MAX_SHAPE_SIZE = 50;
+const MAX_SHAPE_COUNT = 250;
 
 const vertexShaderSourceCode = `#version 300 es
 precision mediump float;
@@ -42,7 +50,8 @@ void main() {
   outputColor = vec4(fragmentColor, 1.0);
 }`;
 
-const triangleVertices = new Float32Array([0.0, 0.5, -0.5, -0.5, 0.5, -0.5]);
+const triangleVertices = new Float32Array([0, 1, -1, -1, 1, -1]);
+const squareVertices = new Float32Array([-1, 1, -1, -1, 1, -1, -1, 1, 1, -1, 1, 1]);
 const rgbTriangleColors = new Uint8Array([
   255, 0, 0,
   0, 255, 0,
@@ -52,6 +61,22 @@ const fireyTriangleColors = new Uint8Array([
   229, 47, 15,
   246, 206, 29,
   233, 154, 26
+]);
+const indigoGradientSquareColors = new Uint8Array([
+  167, 153, 255,
+  88, 62, 122,
+  88, 62, 122,
+  167, 153, 255,
+  88, 62, 122,
+  167, 153, 255
+]);
+const graySquareColors = new Uint8Array([
+  45, 45, 45,
+  45, 45, 45,
+  45, 45, 45,
+  45, 45, 45,
+  45, 45, 45,
+  45, 45, 45
 ]);
 
 function createStaticVertexBuffer(gl = WebGL2RenderingContext, data = ArrayBuffer) {
@@ -77,17 +102,36 @@ function createTwoBufferVAO(gl = WebGL2RenderingContext, positionBuffer = WebGLB
   return vao;
 }
 
+function getRandomInRange(min = number, max = number) {
+  return Math.random() * (max - min) + min;
+}
+
 class MovingShape {
-  constructor() {
-    this.position = [number, number];
-    this.velocity = [number, number];
-    this.size = number;
-    this.vao = WebGLVertexArrayObject;
+  constructor(
+    position = [number, number],
+    velocity = [number, number],
+    size = number,
+    timeRemaining = number,
+    vao = WebGLVertexArrayObject,
+    numVertices = number
+  ) {
+    this.position = position;
+    this.velocity = velocity;
+    this.size = size;
+    this.timeRemaining = timeRemaining;
+    this.vao = vao;
+    this.numVertices = numVertices;
   }
 
   update(dt = number) {
     this.position[0] += this.velocity[0] * dt;
     this.position[1] += this.velocity[1] * dt;
+
+    this.timeRemaining -= dt;
+  }
+
+  isAlive() {
+    return this.timeRemaining > 0;
   }
 }
 
@@ -96,7 +140,11 @@ function helloTriangle() {
   const rgbTriangleColorBuffer = createStaticVertexBuffer(gl, rgbTriangleColors);
   const fireyTriangleColorBuffer = createStaticVertexBuffer(gl, fireyTriangleColors);
 
-  if (!triangleGeoBuffer || !rgbTriangleColorBuffer || !fireyTriangleColorBuffer) {
+  const squareGeoBuffer = createStaticVertexBuffer(gl, squareVertices);
+  const indigoGradientSquareColorBuffer = createStaticVertexBuffer(gl, indigoGradientSquareColors);
+  const graySquareColorBuffer = createStaticVertexBuffer(gl, graySquareColors);
+
+  if (!triangleGeoBuffer || !rgbTriangleColorBuffer || !fireyTriangleColorBuffer || !squareGeoBuffer || !indigoGradientSquareColorBuffer || !graySquareColorBuffer) {
     console.error("Failed to create buffers");
     return;
   }
@@ -144,13 +192,58 @@ function helloTriangle() {
 
   const rgbTriangleVAO = createTwoBufferVAO(gl, triangleGeoBuffer, rgbTriangleColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
   const fireyTriangleVAO = createTwoBufferVAO(gl, triangleGeoBuffer, fireyTriangleColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
+  const indigoGradientSquareVAO = createTwoBufferVAO(gl, squareGeoBuffer, indigoGradientSquareColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
+  const graySquareVAO = createTwoBufferVAO(gl, squareGeoBuffer, graySquareColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
 
-  if (!rgbTriangleVAO || !fireyTriangleVAO) {
+  if (!rgbTriangleVAO || !fireyTriangleVAO || !indigoGradientSquareVAO || !graySquareVAO) {
     console.error("Failed to create VAOs");
     return;
   }
 
+  const geometryList = [
+    { vao: rgbTriangleVAO, numVertices: 3 },
+    { vao: fireyTriangleVAO, numVertices: 3 },
+    { vao: indigoGradientSquareVAO, numVertices: 6 },
+    { vao: graySquareVAO, numVertices: 6 }
+  ]
+
+  // Set up logical objects
+  let shapes = [];
+  let timeToNextSpawn = SPAWN_RATE;
+
+  let lastFrameTime = performance.now();
   const frame = function() {
+    const thisFrameTime = performance.now();
+    const dt = (thisFrameTime - lastFrameTime) / 1000;
+    lastFrameTime = thisFrameTime;
+
+    timeToNextSpawn -= dt;
+    while (timeToNextSpawn < 0) {
+      timeToNextSpawn += SPAWN_RATE;
+
+      const movementAngle = getRandomInRange(0, 2 * Math.PI);
+      const movementSpeed = getRandomInRange(MIN_SHAPE_SPEED, MAX_SHAPE_SPEED);
+
+      const position = [canvas.width / 2, canvas.height / 2];
+      const velocity = [Math.sin(movementAngle) * movementSpeed, Math.cos(movementAngle) * movementSpeed];
+      const size = getRandomInRange(MIN_SHAPE_SIZE, MAX_SHAPE_SIZE);
+      const timeRemaining = getRandomInRange(MIN_SHAPE_TIME, MAX_SHAPE_TIME);
+
+      const geometryIdx = Math.floor(Math.random() * geometryList.length);
+      const geometry = geometryList[geometryIdx];
+
+      const shape = new MovingShape(position, velocity, size, timeRemaining, geometry.vao, geometry.numVertices);
+
+      if (shapes.length < MAX_SHAPE_COUNT) {
+        shapes.push(shape);
+      }
+    }
+
+    for (let shape of shapes) {
+      shape.update(dt);
+    }
+    shapes = shapes.filter(shape => shape.isAlive());
+
     backgroundColor(gl, 20, 20, 20, 1.0);
     gl.viewport(0, 0, canvas.width, canvas.height);
 
@@ -160,19 +253,13 @@ function helloTriangle() {
     // Draw call (Primitive assembler - how to make triangles from those vertices)
     gl.uniform2f(canvasSizeUniform, canvas.width, canvas.height);
 
-    // First triangle
-    gl.uniform1f(shapeSizeUniform, 100.0);
-    gl.uniform2f(shapeLocationUniform, 300, 600);
-    gl.bindVertexArray(rgbTriangleVAO);
+    for (let shape of shapes) {
+      gl.uniform1f(shapeSizeUniform, shape.size);
+      gl.uniform2f(shapeLocationUniform, shape.position[0], shape.position[1]);
+      gl.bindVertexArray(shape.vao);
+      gl.drawArrays(gl.TRIANGLES, 0, shape.numVertices);
+    }
 
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-    // Second triangle
-    gl.uniform1f(shapeSizeUniform, 150.0);
-    gl.uniform2f(shapeLocationUniform, 600, 300);
-    gl.bindVertexArray(fireyTriangleVAO);
-
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
