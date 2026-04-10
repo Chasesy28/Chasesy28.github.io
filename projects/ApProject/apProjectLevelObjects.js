@@ -705,6 +705,7 @@ class Block {
 
 const enemyTypes = {
   0: {
+    name: "Horizontal Patroller",
     width: 50,
     height: 50,
     speed: 1,
@@ -712,9 +713,9 @@ const enemyTypes = {
     colorR: 255,
     colorG: 0,
     colorB: 0,
-    name: "Horizontal Patroller",
   },
   1: {
+    name: "Vertical Patroller",
     width: 50,
     height: 50,
     speed: 1,
@@ -722,7 +723,6 @@ const enemyTypes = {
     colorR: 0,
     colorG: 0,
     colorB: 255,
-    name: "Vertical Patroller",
   }
 };
 
