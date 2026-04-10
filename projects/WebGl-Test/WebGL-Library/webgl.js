@@ -11,14 +11,18 @@ if (!gl) {
 }
 
 //Stuff from tutorials
+const SPAWNER_CHANGE_TIME = 5;
 const SPAWN_RATE = 0.08;
-const MIN_SHAPE_TIME = 0.25;
+const MIN_SHAPE_TIME = 0.5;
 const MAX_SHAPE_TIME = 6;
 const MIN_SHAPE_SPEED = 125;
 const MAX_SHAPE_SPEED = 300;
-const MIN_SHAPE_SIZE = 2;
+const MIN_SHAPE_FORCE = 100;
+const MAX_SHAPE_FORCE = 300;
+const MIN_SHAPE_SIZE = 5;
 const MAX_SHAPE_SIZE = 50;
 const MAX_SHAPE_COUNT = 250;
+const CIRCLE_SEGMENT_COUNT = 40;
 
 const vertexShaderSourceCode = `#version 300 es
 precision mediump float;
@@ -49,6 +53,31 @@ out vec4 outputColor;
 void main() {
   outputColor = vec4(fragmentColor, 1.0);
 }`;
+
+function buildCircleVertexBufferData() {
+  const vertexData = [];
+
+  for (let i = 0; i < CIRCLE_SEGMENT_COUNT; i++) {
+    vertex1Angle = i * Math.PI * 2 / CIRCLE_SEGMENT_COUNT;
+    vertex2Angle = (i + 1) * Math.PI * 2 / CIRCLE_SEGMENT_COUNT;
+
+    const x1 = Math.cos(vertex1Angle);
+    const y1 = Math.sin(vertex1Angle);
+    const x2 = Math.cos(vertex2Angle);
+    const y2 = Math.sin(vertex2Angle);
+
+    vertexData.push(
+      // Position
+      0, 0,
+      // Color
+      0.678, 0.851, 0.957
+    );
+    vertexData.push(x1, y1, 0.251, 0.353, 0.856);
+    vertexData.push(x2, y2, 0.251, 0.353, 0.856);
+  }
+
+  return new Float32Array(vertexData);
+}
 
 const triangleVertices = new Float32Array([0, 1, -1, -1, 1, -1]);
 const squareVertices = new Float32Array([-1, 1, -1, -1, 1, -1, -1, 1, 1, -1, 1, 1]);
@@ -102,6 +131,20 @@ function createTwoBufferVAO(gl = WebGL2RenderingContext, positionBuffer = WebGLB
   return vao;
 }
 
+function createInterleavedBufferVAO(gl = WebGL2RenderingContext, interleavedBuffer = WebGLBuffer, positionAttribLocation = number, colorAttribLocation = number) {
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  gl.enableVertexAttribArray(positionAttribLocation);
+  gl.enableVertexAttribArray(colorAttribLocation);
+  gl.bindBuffer(gl.ARRAY_BUFFER, interleavedBuffer);
+  gl.vertexAttribPointer(positionAttribLocation, 2, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
+  gl.vertexAttribPointer(colorAttribLocation, 3, gl.UNSIGNED_BYTE, true, 5 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
+  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  gl.bindVertexArray(null);
+
+  return vao;
+}
+
 function getRandomInRange(min = number, max = number) {
   return Math.random() * (max - min) + min;
 }
@@ -110,6 +153,7 @@ class MovingShape {
   constructor(
     position = [number, number],
     velocity = [number, number],
+    force = [number, number],
     size = number,
     timeRemaining = number,
     vao = WebGLVertexArrayObject,
@@ -117,6 +161,7 @@ class MovingShape {
   ) {
     this.position = position;
     this.velocity = velocity;
+    this.force = force;
     this.size = size;
     this.timeRemaining = timeRemaining;
     this.vao = vao;
@@ -124,6 +169,9 @@ class MovingShape {
   }
 
   update(dt = number) {
+    this.velocity[0] += this.force[0] * dt;
+    this.velocity[1] += this.force[1] * dt;
+
     this.position[0] += this.velocity[0] * dt;
     this.position[1] += this.velocity[1] * dt;
 
@@ -144,7 +192,9 @@ function helloTriangle() {
   const indigoGradientSquareColorBuffer = createStaticVertexBuffer(gl, indigoGradientSquareColors);
   const graySquareColorBuffer = createStaticVertexBuffer(gl, graySquareColors);
 
-  if (!triangleGeoBuffer || !rgbTriangleColorBuffer || !fireyTriangleColorBuffer || !squareGeoBuffer || !indigoGradientSquareColorBuffer || !graySquareColorBuffer) {
+  const circleInterleavedBuffer = createStaticVertexBuffer(gl, buildCircleVertexBufferData());
+
+  if (!triangleGeoBuffer || !rgbTriangleColorBuffer || !fireyTriangleColorBuffer || !squareGeoBuffer || !indigoGradientSquareColorBuffer || !graySquareColorBuffer || !circleInterleavedBuffer) {
     console.error("Failed to create buffers");
     return;
   }
@@ -194,8 +244,9 @@ function helloTriangle() {
   const fireyTriangleVAO = createTwoBufferVAO(gl, triangleGeoBuffer, fireyTriangleColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
   const indigoGradientSquareVAO = createTwoBufferVAO(gl, squareGeoBuffer, indigoGradientSquareColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
   const graySquareVAO = createTwoBufferVAO(gl, squareGeoBuffer, graySquareColorBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
+  const circleVAO = createInterleavedBufferVAO(gl, circleInterleavedBuffer, vertexPositionAttributeLocation, vertexColorAttributeLocation);
 
-  if (!rgbTriangleVAO || !fireyTriangleVAO || !indigoGradientSquareVAO || !graySquareVAO) {
+  if (!rgbTriangleVAO || !fireyTriangleVAO || !indigoGradientSquareVAO || !graySquareVAO || !circleVAO) {
     console.error("Failed to create VAOs");
     return;
   }
@@ -204,12 +255,16 @@ function helloTriangle() {
     { vao: rgbTriangleVAO, numVertices: 3 },
     { vao: fireyTriangleVAO, numVertices: 3 },
     { vao: indigoGradientSquareVAO, numVertices: 6 },
-    { vao: graySquareVAO, numVertices: 6 }
+    { vao: graySquareVAO, numVertices: 6 },
+    { vao: circleVAO, numVertices: CIRCLE_SEGMENT_COUNT * 3 }
+
   ]
 
   // Set up logical objects
   let shapes = [];
   let timeToNextSpawn = SPAWN_RATE;
+  let spawnPosition = [getRandomInRange(canvas.width * 0.1, canvas.width * 0.9), getRandomInRange(canvas.height * 0.1, canvas.height * 0.9)];
+  let timeToSpawnerChange = SPAWNER_CHANGE_TIME;
 
   let lastFrameTime = performance.now();
   const frame = function() {
@@ -217,22 +272,35 @@ function helloTriangle() {
     const dt = (thisFrameTime - lastFrameTime) / 1000;
     lastFrameTime = thisFrameTime;
 
+    timeToSpawnerChange -= dt;
+    if (timeToSpawnerChange < 0) {
+      timeToSpawnerChange = SPAWNER_CHANGE_TIME;
+      spawnPosition = [getRandomInRange(canvas.width * 0.1, canvas.width * 0.9), getRandomInRange(canvas.height * 0.1, canvas.height * 0.9)];
+    }
+
     timeToNextSpawn -= dt;
     while (timeToNextSpawn < 0) {
       timeToNextSpawn += SPAWN_RATE;
 
       const movementAngle = getRandomInRange(0, 2 * Math.PI);
       const movementSpeed = getRandomInRange(MIN_SHAPE_SPEED, MAX_SHAPE_SPEED);
+      const forceAngle = getRandomInRange(0, 2 * Math.PI);
+      const forceSpeed = getRandomInRange(MIN_SHAPE_FORCE, MAX_SHAPE_FORCE);
 
-      const position = [canvas.width / 2, canvas.height / 2];
+      const position = [spawnPosition[0], spawnPosition[1]];
       const velocity = [Math.sin(movementAngle) * movementSpeed, Math.cos(movementAngle) * movementSpeed];
+      const force = [Math.sin(forceAngle) * forceSpeed, Math.cos(forceAngle) * forceSpeed];
       const size = getRandomInRange(MIN_SHAPE_SIZE, MAX_SHAPE_SIZE);
       const timeRemaining = getRandomInRange(MIN_SHAPE_TIME, MAX_SHAPE_TIME);
 
       const geometryIdx = Math.floor(Math.random() * geometryList.length);
       const geometry = geometryList[geometryIdx];
 
-      const shape = new MovingShape(position, velocity, size, timeRemaining, geometry.vao, geometry.numVertices);
+      if (geometry.vao === circleVAO) {
+        console.log("Spawning circle");
+      }
+
+      const shape = new MovingShape(position, velocity, force, size, timeRemaining, geometry.vao, geometry.numVertices);
 
       if (shapes.length < MAX_SHAPE_COUNT) {
         shapes.push(shape);
