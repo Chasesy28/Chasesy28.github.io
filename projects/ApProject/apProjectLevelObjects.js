@@ -12,6 +12,10 @@ class Player {
     this.image = new Image();
     this.image.src = imageSrc;
 
+    this.r = 255;
+    this.g = 0;
+    this.b = 255;
+
     this.width = null;
 
     this.spawnValues = [];

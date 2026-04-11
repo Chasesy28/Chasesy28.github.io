@@ -29,6 +29,8 @@ function saveSettings() {
 	localStorage.setItem("apProjectSettings", JSON.stringify(gameSettings));
 }
 
+let webGl = false;
+
 // Apply settings to the game
 function applySettings() {
 	// Apply framerate
@@ -41,6 +43,15 @@ function applySettings() {
 	const renderModeSelect = document.getElementById("renderMode");
 	if (renderModeSelect) {
 		renderModeSelect.value = gameSettings.renderMode;
+    if (gameSettings.renderMode === "gpu") {
+      canvas.style.display = "none";
+      webGlCanvas.style.display = "block";
+      webGl = true;
+    } else {
+      canvas.style.display = "block";
+      webGlCanvas.style.display = "none";
+      webGl = false;
+    }
 	}
 
   const blockImagesSelect = document.getElementById("blockImages");
@@ -77,7 +88,15 @@ function applySettings() {
 		renderModeSelect.addEventListener("change", (e) => {
 			gameSettings.renderMode = e.target.value;
 			saveSettings();
-			console.log(`Render mode set to ${gameSettings.renderMode.toUpperCase()}`);
+      if (gameSettings.renderMode === "gpu") {
+        canvas.style.display = "none";
+        webGlCanvas.style.display = "block";
+        webGl = true;
+      } else {
+        canvas.style.display = "block";
+        webGlCanvas.style.display = "none";
+        webGl = false;
+      }
 		});
 	}
 

@@ -2,10 +2,18 @@
 const canvas = document.getElementById("gameArea");
 const ctx = canvas.getContext("2d");
 
-canvas.style.width = "100dvw";
-canvas.style.height = "100dvh";
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
+const webGlCanvas = document.getElementById("webGlGameArea");
+const gl = webGlCanvas.getContext("webgl2");
+
+function canvasDimensions(canvas) {
+  canvas.style.width = "100dvw";
+  canvas.style.height = "100dvh";
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+
+canvasDimensions(canvas);
+canvasDimensions(webGlCanvas);
 
 function toggleFullScreen() {
   if (!document.fullscreenElement) {
@@ -169,14 +177,16 @@ function gameLoop() {
     return;
   }
 
-  backgroundColor("lightblue");
-  for (let i = 0; i < activeLevelData[currentArea].length; i++) {
-    buildLevel(activeLevelData[currentArea][i]);
-    if (player.layer == i) {
-      player.drawPlayer();
+  if (!webGl){
+    backgroundColor("lightblue");
+    for (let i = 0; i < activeLevelData[currentArea].length; i++) {
+      buildLevel(activeLevelData[currentArea][i]);
+      if (player.layer == i) {
+        player.drawPlayer();
+      }
     }
+    ctx.globalAlpha = 1;
   }
-  ctx.globalAlpha = 1;
   player.move(controller);
   player.grounded = false;
   player.currentGroundBlock = null;
@@ -296,6 +306,13 @@ function gameLoop() {
   }
 
   requestAnimationFrame(gameLoop);
+  if (webGl) {
+    if (!shadersInitialized) {
+      initializeWebGL();
+      shadersInitialized = true;
+    }
+    requestAnimationFrame(webGLRender2D);
+  }
 }
 
 function startGame() {
