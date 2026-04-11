@@ -89,7 +89,7 @@ class Player {
         this.spawn();
       }
     }
-    if (this.image.complete && this.image.width > 0) {
+    if (this.image.complete && this.image.width > 0 && !webGl) {
       this.width = Math.floor(
         this.size * (this.image.width / this.image.height),
       );
@@ -115,6 +115,8 @@ class Player {
         ctx.restore();
       }
       ctx.globalAlpha = 1;
+    } else if (webGl) {
+      renderSquare(Math.round(this.x), Math.round(this.y), this.size, shaderProgramInfo.vaos.length - 1);
     }
   }
 
@@ -657,17 +659,21 @@ class Block {
     if (this.visible && this.alpha > 0) {
       const renderX = Math.round(this.x - player.globalOffsetX);
       const renderY = Math.round(this.y - player.globalOffsetY);
-      if (shouldUseTextures && this.texture) {
+      if (shouldUseTextures && this.texture && !webGl) {
         const previousSmoothing = ctx.imageSmoothingEnabled;
         ctx.imageSmoothingEnabled = false;
         ctx.globalAlpha = this.alpha;
         ctx.drawImage(this.texture, renderX, renderY, this.width, this.height);
         ctx.globalAlpha = 1;
         ctx.imageSmoothingEnabled = previousSmoothing;
+      } else if (webGl) {
+          let index = Object.keys(blockTypes).indexOf(this.type);
+          renderSquare(renderX, renderY, this.width, index);
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
       }
+
 
       /*if (shouldUseTextures && this.solid && this.textureIndex > 0) {
         const texture = Block.texturePool[this.textureIndex - 1];
@@ -680,13 +686,15 @@ class Block {
           ctx.imageSmoothingEnabled = previousSmoothing;
         } else {
           ctx.fillStyle = this.color;
-          ctx.fillRect(renderX, renderY, this.width, this.height);
-        }
-      } else {
-        ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
+        }
+        } else {
+        ctx.fillStyle = this.color;
+      ctx.fillRect(renderX, renderY, this.width, this.height);
       }*/
     }
+
+
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
   startTempDisappear() {

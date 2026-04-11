@@ -3,7 +3,7 @@ const canvas = document.getElementById("gameArea");
 const ctx = canvas.getContext("2d");
 
 const webGlCanvas = document.getElementById("webGlGameArea");
-const gl = webGlCanvas.getContext("webgl2");
+const gl = webGlCanvas.getContext("webgl2", { alpha: false});
 
 function canvasDimensions(canvas) {
   canvas.style.width = "100dvw";
@@ -179,14 +179,20 @@ function gameLoop() {
 
   if (!webGl){
     backgroundColor("lightblue");
-    for (let i = 0; i < activeLevelData[currentArea].length; i++) {
-      buildLevel(activeLevelData[currentArea][i]);
-      if (player.layer == i) {
-        player.drawPlayer();
-      }
+  } else {
+    if (!shadersInitialized) {
+      initializeWebGL();
+      shadersInitialized = true;
     }
-    ctx.globalAlpha = 1;
+    requestAnimationFrame(webGLRender2D);
   }
+  for (let i = 0; i < activeLevelData[currentArea].length; i++) {
+    buildLevel(activeLevelData[currentArea][i]);
+    if (player.layer == i) {
+      player.drawPlayer();
+    }
+  }
+  ctx.globalAlpha = 1;
   player.move(controller);
   player.grounded = false;
   player.currentGroundBlock = null;
@@ -306,13 +312,6 @@ function gameLoop() {
   }
 
   requestAnimationFrame(gameLoop);
-  if (webGl) {
-    if (!shadersInitialized) {
-      initializeWebGL();
-      shadersInitialized = true;
-    }
-    requestAnimationFrame(webGLRender2D);
-  }
 }
 
 function startGame() {
@@ -333,10 +332,8 @@ function startGame() {
   gameLoop();
   visualViewport.addEventListener("resize", function () {
     //just in case the user changes orientation or something
-    canvas.style.width = "100dvw";
-    canvas.style.height = "100dvh";
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    canvasDimensions(canvas);
+    canvasDimensions(webGlCanvas);
   });
 }
 

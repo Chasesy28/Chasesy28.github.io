@@ -179,7 +179,6 @@ function createShaderProgram() {
 function webGLRender2D() {
   webGlBackgroundColor(173, 216, 230, 1);
   gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
-  renderSquare(player.x, player.y, 50, shaderProgramInfo.vaos.length - 1);
 }
 
 shaderProgramInfo = null;
@@ -200,7 +199,6 @@ function renderSquare(x, y, size, vaoIndex) {
   gl.bindVertexArray(shaderProgramInfo.vaos[vaoIndex]);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   gl.bindVertexArray(null);
-  console.log("Rendered square at", x, y, "with size", size);
 }
 
 if (webGl) {
