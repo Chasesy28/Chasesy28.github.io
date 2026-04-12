@@ -668,7 +668,11 @@ class Block {
         ctx.imageSmoothingEnabled = previousSmoothing;
       } else if (webGl) {
           let index = Object.keys(blockTypes).indexOf(this.type);
-          renderSquare(renderX, renderY, this.width, index);
+          if (this.layer == player.layer) {
+            renderSquare(renderX, renderY, this.width, index);
+          } else {
+            renderSquare(renderX, renderY, this.width, index, true);
+          }
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
@@ -794,13 +798,18 @@ class Enemy {
 
     // Skip rendering if not visible or fully transparent
     if (this.visible && this.alpha > 0) {
-      ctx.fillStyle = this.color;
-      ctx.fillRect(
-        Math.round(this.x - player.globalOffsetX),
-        Math.round(this.y - player.globalOffsetY),
-        this.width,
-        this.height,
-      );
+      if (webGl) {
+        let index = Object.keys(enemyTypes).indexOf(this.type) + Object.keys(blockTypes).length;
+        renderSquare(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, index);
+      } else {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(
+          Math.round(this.x - player.globalOffsetX),
+          Math.round(this.y - player.globalOffsetY),
+          this.width,
+          this.height
+        );
+      }
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }

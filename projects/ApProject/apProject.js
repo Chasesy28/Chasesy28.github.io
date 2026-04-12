@@ -3,7 +3,7 @@ const canvas = document.getElementById("gameArea");
 const ctx = canvas.getContext("2d");
 
 const webGlCanvas = document.getElementById("webGlGameArea");
-const gl = webGlCanvas.getContext("webgl2", { alpha: false});
+const gl = webGlCanvas.getContext("webgl2", { alpha: false}, {premultipliedAlpha: false});
 
 function canvasDimensions(canvas) {
   canvas.style.width = "100dvw";

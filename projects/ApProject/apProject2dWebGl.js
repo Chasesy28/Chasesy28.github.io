@@ -32,6 +32,16 @@ void main() {
   outputColor = vec4(fragmentColor, 1.0);
 }`;
 
+const transparentFragmentShaderSourceCode = `#version 300 es
+precision mediump float;
+
+in vec3 fragmentColor;
+out vec4 outputColor;
+
+void main() {
+  outputColor = vec4(fragmentColor, 0.5);
+}`;
+
 const squareVertices = new Float32Array([
   // Bottom left
   0, 1,
@@ -137,6 +147,14 @@ function createShaderProgram() {
     return null;
   }
 
+  const transparentFragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(transparentFragmentShader, transparentFragmentShaderSourceCode);
+  gl.compileShader(transparentFragmentShader);
+  if (!gl.getShaderParameter(transparentFragmentShader, gl.COMPILE_STATUS)) {
+    console.error("Transparent fragment shader compilation error:", gl.getShaderInfoLog(transparentFragmentShader));
+    return null;
+  }
+
   const shaderProgram = gl.createProgram();
   gl.attachShader(shaderProgram, vertexShader);
   gl.attachShader(shaderProgram, fragmentShader);
@@ -146,6 +164,14 @@ function createShaderProgram() {
     return null;
   }
 
+  const transparentShaderProgram = gl.createProgram();
+  gl.attachShader(transparentShaderProgram, vertexShader);
+  gl.attachShader(transparentShaderProgram, transparentFragmentShader);
+  gl.linkProgram(transparentShaderProgram);
+  if (!gl.getProgramParameter(transparentShaderProgram, gl.LINK_STATUS)) {
+    console.error("Transparent shader program linking error:", gl.getProgramInfoLog(transparentShaderProgram));
+    return null;
+  }
 
   const positionAttribLocation = gl.getAttribLocation(shaderProgram, "vertexPosition");
   const colorAttribLocation = gl.getAttribLocation(shaderProgram, "vertexColor");
@@ -162,6 +188,24 @@ function createShaderProgram() {
     return null;
   }
 
+  const transparentPositionAttribLocation = gl.getAttribLocation(transparentShaderProgram, "vertexPosition");
+  const transparentColorAttribLocation = gl.getAttribLocation(transparentShaderProgram, "vertexColor");
+  if (transparentPositionAttribLocation === -1 || transparentColorAttribLocation === -1) {
+    console.error("Failed to get attribute locations for transparent shader");
+    return null;
+  }
+
+  const transparentShapeLocationUniform = gl.getUniformLocation(transparentShaderProgram, "shapeLocation");
+  const transparentShapeSizeUniform = gl.getUniformLocation(transparentShaderProgram, "shapeSize");
+  const transparentCanvasSizeUniform = gl.getUniformLocation(transparentShaderProgram, "canvasSize");
+  if (!transparentShapeLocationUniform || !transparentShapeSizeUniform || !transparentCanvasSizeUniform) {
+    console.error("Failed to get uniform locations for transparent shader");
+    return null;
+  }
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
   const vaos = [];
   for (let i = 0; i < squareColorBuffers.length; i++) {
     vaos.push(createTwoBufferVAO(gl, squareGeoBuffer, squareColorBuffers[i], positionAttribLocation, colorAttribLocation));
@@ -169,11 +213,15 @@ function createShaderProgram() {
 
   return {
     shaderProgram,
+    transparentShaderProgram,
     vaos,
     shapeLocationUniform,
     shapeSizeUniform,
-    canvasSizeUniform
-  };
+    canvasSizeUniform,
+    transparentShapeLocationUniform,
+    transparentShapeSizeUniform,
+    transparentCanvasSizeUniform
+  }
 }
 
 function webGLRender2D() {
@@ -191,11 +239,20 @@ function initializeWebGL() {
   } else {shadersInitialized = true;}
 }
 
-function renderSquare(x, y, size, vaoIndex) {
-  gl.useProgram(shaderProgramInfo.shaderProgram);
-  gl.uniform2f(shaderProgramInfo.canvasSizeUniform, webGlCanvas.width, webGlCanvas.height);
-  gl.uniform2f(shaderProgramInfo.shapeLocationUniform, x, y);
-  gl.uniform1f(shaderProgramInfo.shapeSizeUniform, size);
+function renderSquare(x, y, size, vaoIndex, transparent = false) {
+  if (transparent) {
+    gl.useProgram(shaderProgramInfo.transparentShaderProgram);
+    gl.uniform2f(shaderProgramInfo.transparentCanvasSizeUniform, webGlCanvas.width, webGlCanvas.height);
+    gl.uniform2f(shaderProgramInfo.transparentShapeLocationUniform, x, y);
+    gl.uniform1f(shaderProgramInfo.transparentShapeSizeUniform, size);
+
+  } else {
+    gl.useProgram(shaderProgramInfo.shaderProgram);
+    gl.uniform2f(shaderProgramInfo.canvasSizeUniform, webGlCanvas.width, webGlCanvas.height);
+    gl.uniform2f(shaderProgramInfo.shapeLocationUniform, x, y);
+    gl.uniform1f(shaderProgramInfo.shapeSizeUniform, size);
+
+  }
   gl.bindVertexArray(shaderProgramInfo.vaos[vaoIndex]);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   gl.bindVertexArray(null);
