@@ -171,11 +171,6 @@ function gameLoop() {
   times.push(currentTime);
   fps = times.length;
 
-  // Skip game logic if paused, but still update the display
-  if (gamePaused) {
-    requestAnimationFrame(gameLoop);
-    return;
-  }
 
   if (!webGl){
     backgroundColor("lightblue");
@@ -192,62 +187,71 @@ function gameLoop() {
       player.drawPlayer();
     }
   }
-  ctx.globalAlpha = 1;
-  player.move(controller);
-  player.grounded = false;
-  player.currentGroundBlock = null;
-  player.insideBlock = null;
-  let areaChanged = false;
-  for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
-    for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
-      if (activeLevelData[currentArea][player.layer][i][j].isBlock) {
-        const block = activeLevelData[currentArea][player.layer][i][j];
-        if (block.solid) {
-          if (
-            Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
-            Math.abs(player.y - block.y + player.globalOffsetY) < 100
-          ) {
-            const wasInsideThisBlock = player.isOverlappingObject(block, true);
-            const insideThisBlock = player.insideBlockDetection(block);
-            const shouldIgnoreCollision = wasInsideThisBlock && insideThisBlock;
 
-            if (!shouldIgnoreCollision) {
-              player.sideBlockDetection(block);
-              player.groundedDetection(block);
+  // Skip game logic if paused, but still update the display
+  if (gamePaused) {
+    requestAnimationFrame(gameLoop);
+    return;
+  } else {
+    ctx.globalAlpha = 1;
+    player.move(controller);
+    player.grounded = false;
+    player.currentGroundBlock = null;
+    player.insideBlock = null;
+    let areaChanged = false;
+    for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
+      for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
+        if (activeLevelData[currentArea][player.layer][i][j].isBlock) {
+          const block = activeLevelData[currentArea][player.layer][i][j];
+          if (block.solid) {
+            if (
+              Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
+              Math.abs(player.y - block.y + player.globalOffsetY) < 100
+            ) {
+              const wasInsideThisBlock = player.isOverlappingObject(block, true);
+              const insideThisBlock = player.insideBlockDetection(block);
+              const shouldIgnoreCollision = wasInsideThisBlock && insideThisBlock;
+
+              if (!shouldIgnoreCollision) {
+                player.sideBlockDetection(block);
+                player.groundedDetection(block);
+              }
             }
-          }
-        } else {
-          if (player.insideBlockDetection(block)) {
-            if (controller.interact.pressed) {
-              if (
-                block.type === "areaDoor" ||
-                block.type === "areaDoorBottom" ||
-                block.type === "areaDoorTop"
-              ) {
-                currentArea = Number(block.doorArea);
-                player.spawn();
-                areaChanged = true;
+          } else {
+            if (player.insideBlockDetection(block)) {
+              if (controller.interact.pressed) {
+                if (
+                  block.type === "areaDoor" ||
+                  block.type === "areaDoorBottom" ||
+                  block.type === "areaDoorTop"
+                ) {
+                  currentArea = Number(block.doorArea);
+                  player.spawn();
+                  areaChanged = true;
+                  break;
+                }
+              }
+              if (block.type === "spike") {
+                player.die();
                 break;
               }
             }
-            if (block.type === "spike") {
-              player.die();
-              break;
-            }
+          }
+        } else if (activeLevelData[currentArea][player.layer][i][j].isEnemy) {
+          const enemy = activeLevelData[currentArea][player.layer][i][j];
+          enemy.update();
+          if (player.isOverlappingObject(enemy, true)) {
+            player.die();
+            break;
           }
         }
-      } else if (activeLevelData[currentArea][player.layer][i][j].isEnemy) {
-        const enemy = activeLevelData[currentArea][player.layer][i][j];
-        if (player.isOverlappingObject(enemy, true)) {
-          player.die();
+        if (areaChanged) {
           break;
         }
       }
-      if (areaChanged) {
-        break;
-      }
     }
   }
+
   player.gameBoundaryDetection();
   if (controller.previousLevel.pressed) {
     if (!levelSwitchCooldown) {
@@ -334,6 +338,7 @@ function startGame() {
     //just in case the user changes orientation or something
     canvasDimensions(canvas);
     canvasDimensions(webGlCanvas);
+    gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
   });
 }
 

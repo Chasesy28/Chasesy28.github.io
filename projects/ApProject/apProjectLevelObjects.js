@@ -767,7 +767,6 @@ class Enemy {
   }
 
   draw() {
-    this.update();
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
 
     if (this.layer !== player.layer) {
