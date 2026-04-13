@@ -93,6 +93,7 @@ class Player {
       this.width = Math.floor(
         this.size * (this.image.width / this.image.height),
       );
+      console.log(this.width);
       ctx.globalAlpha = this.alpha;
       if (this.direction === "right") {
         ctx.drawImage(

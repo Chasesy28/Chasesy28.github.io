@@ -50,6 +50,21 @@ const squareVertices = new Float32Array([
   1, 1
 ]);
 
+const playerVertices = new Float32Array([
+  // Bottom left
+  0, 1,
+  // Top left
+  0, 0,
+  // Top right
+  0.74, 0,
+  // Bottom left
+  0, 1,
+  // Top right
+  0.74, 0,
+  // Bottom right
+  0.74, 1
+]);
+
 function createMonochromeSquareColors(r, g, b) {
   const colors = new Uint8Array([
     r, g, b,
@@ -94,6 +109,11 @@ function webGlBackgroundColor(r, g, b, a) {
 function createShaderProgram() {
   const squareGeoBuffer = createStaticVertexBuffer(gl, squareVertices);
   if (!squareGeoBuffer) {
+    console.error("Failed to create buffers");
+    return null;
+  }
+  const playerGeoBuffer = createStaticVertexBuffer(gl, playerVertices);
+  if (!playerGeoBuffer) {
     console.error("Failed to create buffers");
     return null;
   }
@@ -170,6 +190,10 @@ function createShaderProgram() {
 
   const vaos = [];
   for (let i = 0; i < squareColorBuffers.length; i++) {
+    if (i === squareColorBuffers.length - 1) {
+      vaos.push(createTwoBufferVAO(gl, playerGeoBuffer, squareColorBuffers[i], positionAttribLocation, colorAttribLocation));
+      break;
+    }
     vaos.push(createTwoBufferVAO(gl, squareGeoBuffer, squareColorBuffers[i], positionAttribLocation, colorAttribLocation));
   }
 
