@@ -2,36 +2,38 @@ let shadersInitialized = false;
 
 // Shader code adapted from tutorial and other online references
 const vertexShaderSourceCode = `#version 300 es
-precision mediump float;
+  precision mediump float;
 
-in vec2 vertexPosition;
-in vec3 vertexColor;
+  in vec2 vertexPosition;
+  in vec3 vertexColor;
 
-out vec3 fragmentColor;
+  out vec3 fragmentColor;
 
-uniform vec2 canvasSize;
-uniform vec2 shapeLocation;
-uniform float shapeSize;
+  uniform vec2 canvasSize;
+  uniform vec2 shapeLocation;
+  uniform float shapeSize;
 
-void main() {
-  fragmentColor = vertexColor;
+  void main() {
+    fragmentColor = vertexColor;
 
-  vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
-  vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
+    vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
+    vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
 
-  gl_Position = vec4(clipPosition * vec2(1.0, -1.0), 0.0, 1.0);
-}`;
+    gl_Position = vec4(clipPosition * vec2(1.0, -1.0), 0.0, 1.0);
+  }
+`;
 
 const fragmentShaderSourceCode = `#version 300 es
-precision mediump float;
+  precision mediump float;
 
-in vec3 fragmentColor;
-out vec4 outputColor;
-uniform float uAlpha;
+  in vec3 fragmentColor;
+  out vec4 outputColor;
+  uniform float uAlpha;
 
-void main() {
-  outputColor = vec4(fragmentColor, uAlpha);
-}`;
+  void main() {
+    outputColor = vec4(fragmentColor, uAlpha);
+  }
+`;
 
 const squareVertices = new Float32Array([
   // Bottom left
