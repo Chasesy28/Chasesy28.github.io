@@ -394,6 +394,8 @@
     }
 }
 
+/* Custom styles for the Silly Site */
+
 body {
     background-color: #fcba36;
     font-family: "Cherry Bomb One", system-ui;
@@ -428,7 +430,6 @@ h2 {
 
 .cherry-bomb-one-regular {
     font-family: "Cherry Bomb One", system-ui;
-    font-display: swap;
     font-weight: 400;
     font-style: normal;
 }
@@ -478,6 +479,7 @@ nav a:hover {
     transform: rotate(5deg) scale(1.1);
 }
 
+/* Keep the projects nav item as the dropdown positioning context. */
 #projects {
     position: relative;
 }
@@ -570,6 +572,10 @@ nav a:hover {
     max-width: 100%;
     margin: 0 0 2.5rem;
     padding: 0 0 2.5rem;
+}
+
+.project-carousel .swiper-slide:last-child {
+    margin-right: 0 !important;
 }
 
 .swiper-pagination-bullet {
@@ -685,6 +691,24 @@ nav a:hover {
     }
 }
 
+@keyframes jump {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes loadBar {
+    to {
+        width: 100%;
+    }
+}
+
 .slide-splash {
     position: absolute;
     width: 20px;
@@ -693,64 +717,6 @@ nav a:hover {
     background: radial-gradient(circle, rgba(149, 57, 0, 0.6), rgba(149, 57, 0, 0));
     animation: splash-slide 0.4s ease-out forwards;
     pointer-events: none;
-}
-
-@media (max-width: 768px) {
-    body {
-        overflow-y: auto;
-    }
-
-    h1 {
-        font-size: 2em;
-        margin-top: 1em;
-    }
-
-    h2 {
-        font-size: 1.5em;
-    }
-
-    header {
-        display: flex;
-        flex-direction: column;
-        padding: 1rem;
-        gap: 1rem;
-
-    }
-
-    .site-title {
-        font-size: 1.5rem;
-    }
-
-    nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-        font-size: 1rem;
-    }
-
-    .drop {
-        width: 3px;
-        height: 20px;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.5em;
-    }
-
-    header {
-        padding: 0.75rem;
-    }
-
-    .site-title {
-        font-size: 1.25rem;
-    }
-
-    nav ul {
-        gap: 0.75rem;
-        font-size: 0.9rem;
-    }
 }
 
 .dark-mode-toggle {
@@ -877,14 +843,6 @@ html.dark .slide-splash {
     background: radial-gradient(circle, rgba(255, 211, 105, 0.5), rgba(255, 211, 105, 0));
 }
 
-html.dark #about {
-    color: #eaeaea;
-}
-
-html.dark #about p {
-    color: #d1d1d1;
-}
-
 .about-me-section {
     position: relative;
     z-index: 1;
@@ -952,7 +910,9 @@ header,
 .swiper-slide,
 .project-description,
 .ground,
-.site-footer .about-me-section h1,
+.site-footer,
+.about-me-section,
+h1,
 h2,
 nav a {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.4s ease;
@@ -1255,24 +1215,6 @@ nav a {
     animation: loadBar 2.5s forwards;
 }
 
-@keyframes jump {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-15px);
-    }
-}
-
-@keyframes loadBar {
-    to {
-        width: 100%;
-    }
-}
-
 .accessibility-button {
     position: fixed;
     bottom: 1rem;
@@ -1328,10 +1270,6 @@ nav a {
     border: 3px dashed var(--access-border);
     box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
     color: var(--access-text);
-}
-
-#accessibility-settings.hidden {
-    display: none !important;
 }
 
 #accessibility-settings h2 {
@@ -1448,6 +1386,44 @@ html.dark #accessibility-settings button:hover {
     width: 100%;
 }
 
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+    }
+
+    h1 {
+        font-size: 2em;
+        margin-top: 1em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    header {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .site-title {
+        font-size: 1.5rem;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        font-size: 1rem;
+    }
+
+    .drop {
+        width: 3px;
+        height: 20px;
+    }
+}
+
 @media (max-width: 640px) {
     #accessibility-settings {
         bottom: 3.9rem;
@@ -1483,6 +1459,25 @@ html.dark #accessibility-settings button:hover {
         flex-wrap: wrap;
         justify-content: center;
         gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+
+    header {
+        padding: 0.75rem;
+    }
+
+    .site-title {
+        font-size: 1.25rem;
+    }
+
+    nav ul {
+        gap: 0.75rem;
+        font-size: 0.9rem;
     }
 }
 

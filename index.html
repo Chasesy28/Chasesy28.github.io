@@ -96,7 +96,7 @@
             <ul class="cherry-bomb-one-regular">
                <li><a href="/">Home</a></li>
                <li><a href="#about-me">About Me</a></li>
-               <li id="projects"><a href="#projects">Projects</a>
+               <li id="projects"><a href="#all-projects">Projects</a>
                   <ul id="projects-dropdown" class="dropdown hidden" aria-label="Projects submenu">
                      <li><a href="#utilities">Utilities</a></li>
                      <li><a href="#games">Games</a></li>
@@ -160,7 +160,7 @@
                stopping by!
             </p>
          </section>
-         <section class="projects-section cherry-bomb-one-regular" id="projects" aria-labelledby="projects-heading">
+         <section class="projects-section cherry-bomb-one-regular" id="all-projects" aria-labelledby="projects-heading">
             <h2 id="projects-heading">All Projects</h2>
 
             <section class="project-category" id="utilities" aria-labelledby="utilities-heading">
@@ -378,11 +378,14 @@
           * Creates the project showcase carousel with navigation and pagination
           */
          const swiperConfig = {
-            loop: false,
-            rewind: true,
+            loop: true,
+            rewind: false,
             slidesPerView: 1,
             spaceBetween: 18,
-            watchOverflow: true,
+            slidesOffsetBefore: 0,
+            slidesOffsetAfter: 0,
+            centeredSlides: true,
+            watchOverflow: false,
             breakpoints: {
                640: { slidesPerView: 1, spaceBetween: 20 },
                900: { slidesPerView: 2, spaceBetween: 24 },
