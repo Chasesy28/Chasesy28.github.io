@@ -116,7 +116,7 @@ class Player {
       }
       ctx.globalAlpha = 1;
     } else if (webGl) {
-      renderSquare(Math.round(this.x), Math.round(this.y), this.size, shaderProgramInfo.vaos.length - 1);
+      renderSquare(Math.round(this.x), Math.round(this.y), this.size, shaderProgramInfo.vaos.length - 1, this.alpha);
     }
   }
 
@@ -668,11 +668,7 @@ class Block {
         ctx.imageSmoothingEnabled = previousSmoothing;
       } else if (webGl) {
           let index = Object.keys(blockTypes).indexOf(this.type);
-          if (this.layer == player.layer) {
-            renderSquare(renderX, renderY, this.width, index);
-          } else {
-            renderSquare(renderX, renderY, this.width, index, true);
-          }
+          renderSquare(renderX, renderY, this.width, index, this.alpha);
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
@@ -800,7 +796,7 @@ class Enemy {
     if (this.visible && this.alpha > 0) {
       if (webGl) {
         let index = Object.keys(enemyTypes).indexOf(this.type) + Object.keys(blockTypes).length;
-        renderSquare(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, index);
+        renderSquare(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, index, this.alpha);
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(
