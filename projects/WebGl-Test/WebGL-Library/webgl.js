@@ -25,34 +25,36 @@ const MAX_SHAPE_COUNT = 250;
 const CIRCLE_SEGMENT_COUNT = 40;
 
 const vertexShaderSourceCode = `#version 300 es
-precision mediump float;
+  precision mediump float;
 
-in vec2 vertexPosition;
-in vec3 vertexColor;
+  in vec2 vertexPosition;
+  in vec3 vertexColor;
 
-out vec3 fragmentColor;
+  out vec3 fragmentColor;
 
-uniform vec2 canvasSize;
-uniform vec2 shapeLocation;
-uniform float shapeSize;
+  uniform vec2 canvasSize;
+  uniform vec2 shapeLocation;
+  uniform float shapeSize;
 
-void main() {
-  fragmentColor = vertexColor;
-  vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
-  vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
+  void main() {
+    fragmentColor = vertexColor;
+    vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
+    vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
 
-  gl_Position = vec4(clipPosition, 0.0, 1.0);
-}`;
+    gl_Position = vec4(clipPosition, 0.0, 1.0);
+  }
+`;
 
 const fragmentShaderSourceCode = `#version 300 es
-precision mediump float;
+  precision mediump float;
 
-in vec3 fragmentColor;
-out vec4 outputColor;
+  in vec3 fragmentColor;
+  out vec4 outputColor;
 
-void main() {
-  outputColor = vec4(fragmentColor, 1.0);
-}`;
+  void main() {
+    outputColor = vec4(fragmentColor, 1.0);
+  }
+`;
 
 function buildCircleVertexBufferData() {
   const vertexData = [];
