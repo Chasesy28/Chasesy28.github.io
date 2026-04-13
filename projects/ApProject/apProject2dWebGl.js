@@ -208,8 +208,8 @@ function createShaderProgram() {
 }
 
 function webGLRender2D() {
-  webGlBackgroundColor(173, 216, 230, 1);
   gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
+  webGlBackgroundColor(173, 216, 230, 1);
 }
 
 shaderProgramInfo = null;

@@ -357,4 +357,103 @@ function loop() {
   requestAnimationFrame(loop);
 }
 //loop();
-helloTriangle();
+//helloTriangle();
+
+function imageProcessing() {
+  const vertexShaderSourceCode = `#version 300 es
+    precision mediump float;
+
+    in vec2 vertexPosition;
+    in vec2 texCoord;
+
+    out vec2 v_texCoord;
+
+    uniform vec2 canvasSize;
+    uniform vec2 shapeLocation;
+    uniform float shapeSize;
+
+    void main() {
+      v_texCoord = texCoord;
+
+      vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
+      vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
+
+      gl_Position = vec4(clipPosition, 0.0, 1.0);
+    }
+  `;
+
+  const fragmentShaderSourceCode = `#version 300 es
+    precision highp float;
+
+    uniform sampler2D uTexture;
+
+    in vec2 v_texCoord;
+
+    out vec4 outputColor;
+
+    void main() {
+      outputColor = texture(uTexture, v_texCoord);
+    }
+  `;
+
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, vertexShaderSourceCode);
+  gl.compileShader(vertexShader);
+  if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+    console.error("Vertex shader compilation error: " + gl.getShaderInfoLog(vertexShader));
+    return;
+  }
+
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, fragmentShaderSourceCode);
+  gl.compileShader(fragmentShader);
+  if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+    console.error("Fragment shader compilation error: " + gl.getShaderInfoLog(fragmentShader));
+    return;
+  }
+
+  const shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    console.error("Shader program linking error: " + gl.getProgramInfoLog(shaderProgram));
+    return;
+  }
+
+  const vertexPositionAttributeLocation = gl.getAttribLocation(shaderProgram, "vertexPosition");
+  const texCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "texCoord");
+  if (vertexPositionAttributeLocation < 0 || texCoordAttributeLocation < 0) {
+    console.error("Failed to get the attribute location for vertexPosition or texCoord");
+    return;
+  }
+
+  const shapeLocationUniform = gl.getUniformLocation(shaderProgram, "shapeLocation");
+  const shapeSizeUniform = gl.getUniformLocation(shaderProgram, "shapeSize");
+  const canvasSizeUniform = gl.getUniformLocation(shaderProgram, "canvasSize");
+  const uTextureUniform = gl.getUniformLocation(shaderProgram, "uTexture");
+  if (shapeLocationUniform === null || shapeSizeUniform === null || canvasSizeUniform === null || uTextureUniform === null) {
+    console.error("Failed to get uniform locations");
+    return;
+  }
+
+  // Texture coordinate buffer
+  var texCoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    0, 0,
+    0, 1,
+    1, 1,
+    0, 0,
+    1, 1,
+    1, 0
+  ]), gl.STATIC_DRAW);
+  if (!texCoordBuffer) {
+    console.error("Failed to create texture coordinate buffer");
+    return;
+  }
+  gl.enableVertexAttribArray(texCoordAttributeLocation);
+  gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+  //Texture stuff
+}
