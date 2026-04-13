@@ -8,12 +8,45 @@ const gl = webGlCanvas.getContext("webgl2", { alpha: false}, {premultipliedAlpha
 function canvasDimensions(canvas) {
   canvas.style.width = "100dvw";
   canvas.style.height = "100dvh";
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+
+  // display:none canvases report 0 client size; keep a valid render size on resize.
+  const fallbackWidth = Math.floor(
+    window.visualViewport?.width || window.innerWidth || 1,
+  );
+  const fallbackHeight = Math.floor(
+    window.visualViewport?.height || window.innerHeight || 1,
+  );
+  const nextWidth = Math.max(1, canvas.clientWidth || fallbackWidth);
+  const nextHeight = Math.max(1, canvas.clientHeight || fallbackHeight);
+
+  if (canvas.width !== nextWidth) {
+    canvas.width = nextWidth;
+  }
+  if (canvas.height !== nextHeight) {
+    canvas.height = nextHeight;
+  }
 }
 
-canvasDimensions(canvas);
-canvasDimensions(webGlCanvas);
+function resizeGameCanvases() {
+  canvasDimensions(canvas);
+  canvasDimensions(webGlCanvas);
+
+  if (gl) {
+    gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
+  }
+}
+
+resizeGameCanvases();
+
+const handleResize = function () {
+  resizeGameCanvases();
+};
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", handleResize);
+}
+window.addEventListener("resize", handleResize);
+window.addEventListener("orientationchange", handleResize);
 
 function toggleFullScreen() {
   if (!document.fullscreenElement) {
@@ -334,12 +367,6 @@ function startGame() {
   updateLevelData();
   player.spawn();
   gameLoop();
-  visualViewport.addEventListener("resize", function () {
-    //just in case the user changes orientation or something
-    canvasDimensions(canvas);
-    canvasDimensions(webGlCanvas);
-    gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
-  });
 }
 
 window.document.addEventListener("keydown", function (e) {
