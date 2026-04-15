@@ -6,21 +6,29 @@
 
 ### Authentication
 
-- **Current**: localStorage-based session with hardcoded credentials
-- **Location**: `/admin-auth.js`
+- **React app (current production path)**: Supabase-backed admin auth
+- **Location**: `/src/lib/admin-auth.ts`, `/src/lib/supabase.ts`, `/src/components/AdminDashboard.tsx`
 - **Features**:
-  - Simple username/password check
-  - 24-hour session duration
-  - Session refresh capability
+  - Google OAuth sign-in via Supabase Auth
+  - Admin allow-list check against `admin_users`
+  - 24-hour local session mirror for UI state
+
+- **Legacy admin panel (still present)**: localStorage session with hardcoded credentials
+- **Location**: `/admin-auth.js`, `/projects/Admin/Panel.html`
+- **Status**: legacy/testing only; not recommended for production auth
 
 ### Announcements
 
-- **Current**: localStorage for announcement storage
-- **Location**: `/announcements.js`
+- **React app (current production path)**: Supabase-backed announcements
+- **Location**: `/src/lib/announcements.ts`, `/src/lib/supabase.ts`, `/src/components/AnnouncementBar.tsx`
 - **Features**:
-  - Create, read, delete announcements
-  - User dismissal tracking
-  - Type-based styling (info, success, warning, error)
+  - Active announcement fetch from `announcements`
+  - Per-user dismissal tracking via `announcement_dismissals`
+  - Admin create/delete support from dashboard
+
+- **Legacy site path**: localStorage-backed announcements
+- **Location**: `/announcements.js`
+- **Status**: kept for non-React pages and experiments
 
 ## Supabase Migration Plan
 
@@ -71,7 +79,9 @@ Create a `.env` file (add to `.gitignore`):
 
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+# Optional fallback for older setups:
+# VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### 3. Installation
@@ -126,6 +136,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 #### Phase 3: Migrate Announcements
 
 1. Update `announcements.js` to use Supabase Database:
+
    ```javascript
    async function saveAnnouncement(announcement) {
      const { data, error } = await supabase.from("announcements").insert({

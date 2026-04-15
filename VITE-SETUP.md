@@ -45,7 +45,7 @@ The project supports **both** the original static HTML site **and** a modern Rea
 ├── public/                       # Static assets for Vite
 ├── dist/                         # Build output (gitignored)
 ├── index.html                    # Original static site (preserved)
-├── index-vite.html              # Vite/React app entry
+├── vite.html                    # Vite/React app entry
 ├── vite.config.ts               # Vite configuration
 ├── tsconfig.json                # TypeScript configuration
 ├── tsconfig.node.json           # TypeScript config for Node scripts
@@ -167,7 +167,7 @@ shadcn/ui provides 40+ accessible components:
 - **Data Display**: Table, Avatar, Badge, Tooltip
 - And many more...
 
-See full list at: https://ui.shadcn.com/docs/components
+See full list at: <https://ui.shadcn.com/docs/components>
 
 ## TypeScript Usage
 
@@ -286,7 +286,7 @@ npm run preview
 The React app is completely separate from the original site:
 
 - **Original Site**: Access via `index.html` (root of GitHub Pages)
-- **React App**: Access via `index-vite.html` (after building, available at `/dist/index-vite.html`)
+- **React App**: Access via `vite.html` (after building, available at `/dist/vite.html`)
 
 Both can coexist and be deployed together.
 
@@ -302,13 +302,11 @@ To deploy the React app to GitHub Pages alongside the existing site:
    npm run build
    ```
 
-2. The `dist/` directory will contain:
-   - `index-vite.html` - React app entry
-   - `assets/` - Bundled JS and CSS
+2. The `dist/` directory will contain `vite.html` as the React app entry and an `assets/` directory for bundled JS and CSS.
 
-3. Commit and push the `dist/` directory (or configure GitHub Actions)
+3. Commit and push the `dist/` directory (or configure GitHub Actions).
 
-4. Access at: `https://yourdomain.com/dist/index-vite.html`
+4. Access at `https://yourdomain.com/dist/vite.html`.
 
 ### Cloudflare Pages
 
@@ -333,7 +331,7 @@ The project is already configured with Cloudflare Workers. The React app can be 
 - Create component variants with `class-variance-authority`
 - Use the `cn()` utility to merge classes conditionally
 
-### Type Safety
+### Type Safety Best Practices
 
 - Define prop types with TypeScript interfaces
 - Use React.FC or explicit return types

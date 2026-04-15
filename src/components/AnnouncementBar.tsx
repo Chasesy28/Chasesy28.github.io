@@ -46,18 +46,18 @@ export function AnnouncementBar() {
     loadAnnouncements()
 
     // Listen for announcement events
-    announcementsManager.on('announcement:created', () => {
+    const handleAnnouncementChange = () => {
       loadAnnouncements()
-    })
-    announcementsManager.on('announcement:deleted', () => {
-      loadAnnouncements()
-    })
-    announcementsManager.on('announcement:dismissed', () => {
-      loadAnnouncements()
-    })
+    }
+
+    const unsubscribeCreated = announcementsManager.on('announcement:created', handleAnnouncementChange)
+    const unsubscribeDeleted = announcementsManager.on('announcement:deleted', handleAnnouncementChange)
+    const unsubscribeDismissed = announcementsManager.on('announcement:dismissed', handleAnnouncementChange)
 
     return () => {
-      // Clean up listeners if needed
+      unsubscribeCreated()
+      unsubscribeDeleted()
+      unsubscribeDismissed()
     }
   }, [])
 
@@ -101,14 +101,14 @@ export function AnnouncementBar() {
             role="alert"
           >
             <div className="flex items-start gap-3 flex-1">
-              <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <Icon className="w-5 h-5 shrink-0 mt-0.5" />
               <p className="text-sm font-medium">{announcement.message}</p>
             </div>
             {announcement.dismissible && (
               <button
                 onClick={() => handleDismiss(announcement.id)}
                 className={cn(
-                  'flex-shrink-0 p-1 rounded transition-colors',
+                  'shrink-0 p-1 rounded transition-colors',
                   buttonColorMap[announcement.type]
                 )}
                 aria-label="Dismiss announcement"

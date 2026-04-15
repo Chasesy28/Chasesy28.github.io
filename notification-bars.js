@@ -46,7 +46,12 @@ function createUpdateBanner() {
 
   // Attach event listener programmatically
   updateButton.addEventListener("click", () => {
-    window.postMessage("CLEAR_CACHED_FILES");
+    const controller = navigator.serviceWorker?.controller;
+
+    if (controller) {
+      controller.postMessage({ type: "CLEAR_CACHED_FILES" });
+    }
+
     window.location.reload();
   });
 

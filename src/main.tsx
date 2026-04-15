@@ -12,8 +12,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route element={<App />}>
           <Route path="/" element={<Home />} />
+          <Route path="/vite" element={<Home />} />
           <Route path="/vite.html" element={<Home />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/vite/admin" element={<Admin />} />
           <Route path="/vite.html/admin" element={<Admin />} />
         </Route>
       </Routes>

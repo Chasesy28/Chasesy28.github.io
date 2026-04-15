@@ -41,6 +41,7 @@ function getUserIdentifier() {
 
 export class AnnouncementsManager {
   private userIdentifier = getUserIdentifier()
+  private listenerMap = new Map<string, Map<(detail: any) => void, EventListener>>()
 
   /**
    * Get all active announcements
@@ -150,17 +151,40 @@ export class AnnouncementsManager {
    * Listen to announcement events
    */
   on(eventName: string, callback: (detail: any) => void) {
-    window.addEventListener(eventName, (event) => {
+    const wrappedCallback: EventListener = (event) => {
       const customEvent = event as CustomEvent
       callback(customEvent.detail)
-    })
+    }
+
+    let callbacks = this.listenerMap.get(eventName)
+    if (!callbacks) {
+      callbacks = new Map()
+      this.listenerMap.set(eventName, callbacks)
+    }
+
+    callbacks.set(callback, wrappedCallback)
+    window.addEventListener(eventName, wrappedCallback)
+
+    return () => this.off(eventName, callback)
   }
 
   /**
    * Stop listening to announcement events
    */
   off(eventName: string, callback: (detail: any) => void) {
-    window.removeEventListener(eventName, callback)
+    const callbacks = this.listenerMap.get(eventName)
+    const wrappedCallback = callbacks?.get(callback)
+
+    if (!wrappedCallback) {
+      return
+    }
+
+    window.removeEventListener(eventName, wrappedCallback)
+    callbacks?.delete(callback)
+
+    if (callbacks && callbacks.size === 0) {
+      this.listenerMap.delete(eventName)
+    }
   }
 
   /**

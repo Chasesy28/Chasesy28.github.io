@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a testing/experimentation site combining a Vite + React + TypeScript frontend with Cloudflare Workers for serverless edge computing. The codebase spans multiple independent systems: a modern React component library, legacy testing projects (vanilla JS/HTML), and edge worker deployments. The React is primarily for the main page and not for any of the other projects.
+This is a testing/experimentation site combining a Vite + React + TypeScript frontend with Cloudflare Workers for serverless edge computing. The codebase spans multiple independent systems: a modern React component library, legacy testing projects (vanilla JS/HTML), and edge worker deployments. The main page is Index.html, while the React app is served from vite.html. The project also includes a variety of experiments in the projects/ directory.
 
 ## Architecture Patterns
 
@@ -17,7 +17,7 @@ This is a testing/experimentation site combining a Vite + React + TypeScript fro
 
 ### Utility Functions
 
-- `cn()` in [src/lib/utils.ts](src/lib/utils.ts) - use for all className merging (twMerge + clsx)
+- `cn()` in src/lib/utils.ts - use for all className merging (twMerge + clsx)
 - Always import from `@/lib/utils` to maintain consistency
 
 ## Developer Workflows
@@ -52,7 +52,8 @@ npm run preview  # Preview built site locally
 
 - `emptyOutDir: false` in vite.config.ts - preserves existing dist files during builds
 - Source maps enabled (`sourcemap: true`)
-- Entry point: `index-vite.html` (distinct from static `index.html`)
+- Entry point: `vite.html` (distinct from static `index.html`)
+- Worker routing serves React routes through `/`, `/vite`, `/admin`, and `/vite/admin`
 
 ## Critical Patterns
 
@@ -62,9 +63,9 @@ Located in `workers/` directory:
 
 - `index.js` - main worker: security headers (CSP, X-Frame-Options), intelligent caching by content type
 - `image-optimizer.js` - edge-based image transformation (WebP/AVIF conversion, dynamic resize, quality optimization)
-- See [workers/README.md](workers/README.md) for deployment details
+- See workers/README.md for deployment details
 
-**Configuration**: [wrangler.toml](wrangler.toml) excludes build artifacts and source code from edge deployment; only static assets uploaded via KV.
+**Configuration**: wrangler.toml excludes build artifacts and source code from edge deployment; only static assets uploaded via KV.
 
 ### Project Structure (Mixed Codebases)
 
@@ -89,6 +90,9 @@ Located in `workers/` directory:
 - **Cloudflare**: DNS, Workers, KV storage, R2 buckets (configured in wrangler.toml)
 - **GitHub**: Static site hosting via Pages (CNAME: chasesy28.github.io)
 - **Package Managers**: lucide-react (icons), tailwind-merge, class-variance-authority
+- **Testing Tools**: Chrome DevTools MCP for live DOM inspection and debugging
+- **Supabase**: For authentication and announcements (see SUPABASE-INTEGRATION.md for details (you have access to the Supabase MCP tools, use them for an current view of the current project.))
+
 
 ### TypeScript Configuration
 
@@ -97,7 +101,7 @@ Located in `workers/` directory:
 
 ## File References
 
-- Component library: [src/components/ui/](src/components/ui/)
-- App entry: [src/App.tsx](src/App.tsx), [src/main.tsx](src/main.tsx)
-- Config: [vite.config.ts](vite.config.ts), [tailwind.config.js](tailwind.config.js), [wrangler.toml](wrangler.toml)
-- Package info: [package.json](package.json)
+- Component library: src/components/ui/
+- App entry: src/App.tsx, src/main.tsx
+- Config: vite.config.ts, tailwind.config.js, wrangler.toml
+- Package info: package.json
