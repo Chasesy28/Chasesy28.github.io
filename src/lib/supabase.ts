@@ -146,13 +146,33 @@ export async function createAnnouncement(
 export async function deleteAnnouncement(announcementId: string) {
   try {
     const client = requireSupabaseClient()
-    const { error } = await client
+    const { data: softDeletedRows, error: softDeleteError } = await client
       .from('announcements')
       .update({ active: false })
+      .select('id')
       .eq('id', announcementId)
 
-    if (error) throw error
-    return true
+    if (softDeleteError) throw softDeleteError
+
+    if (softDeletedRows && softDeletedRows.length > 0) {
+      return true
+    }
+
+    // Some RLS setups may block updates but allow deletes. Try a hard delete fallback.
+    const { data: hardDeletedRows, error: hardDeleteError } = await client
+      .from('announcements')
+      .delete()
+      .eq('id', announcementId)
+      .select('id')
+
+    if (hardDeleteError) throw hardDeleteError
+
+    if (hardDeletedRows && hardDeletedRows.length > 0) {
+      return true
+    }
+
+    console.warn('Delete announcement affected 0 rows. Check RLS policies for update/delete access.')
+    return false
   } catch (error) {
     console.error('Error deleting announcement:', error)
     return false

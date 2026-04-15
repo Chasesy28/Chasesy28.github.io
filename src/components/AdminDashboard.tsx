@@ -19,6 +19,7 @@ interface Announcement {
 export function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loginError, setLoginError] = useState('')
+  const [actionError, setActionError] = useState('')
   const [isLoggingIn, setIsLoggingIn] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -102,14 +103,20 @@ export function AdminDashboard() {
     if (!newMessage.trim()) return
 
     setIsCreating(true)
+    setActionError('')
     try {
-      await announcementsManager.create(newMessage, newType, newDismissible, sessionAdminId)
+      const created = await announcementsManager.create(newMessage, newType, newDismissible, sessionAdminId)
+      if (!created) {
+        setActionError('Unable to create announcement. Check your admin permissions and Supabase policies.')
+        return
+      }
       setNewMessage('')
       setNewType('info')
       setNewDismissible(true)
       await loadAnnouncements()
     } catch (err) {
       console.error('Failed to create announcement:', err)
+      setActionError('Unable to create announcement right now. Please try again.')
     } finally {
       setIsCreating(false)
     }
@@ -118,11 +125,17 @@ export function AdminDashboard() {
   const handleDeleteAnnouncement = async (id: string) => {
     if (!confirm('Are you sure you want to delete this announcement?')) return
 
+    setActionError('')
     try {
-      await announcementsManager.delete(id)
+      const deleted = await announcementsManager.delete(id)
+      if (!deleted) {
+        setActionError('Unable to delete announcement. Check your admin permissions and Supabase RLS policies.')
+        return
+      }
       await loadAnnouncements()
     } catch (err) {
       console.error('Failed to delete announcement:', err)
+      setActionError('Unable to delete announcement right now. Please try again.')
     }
   }
 
@@ -298,6 +311,12 @@ export function AdminDashboard() {
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Announcements {announcements.length > 0 && `(${announcements.length})`}
                 </h2>
+
+                {actionError && (
+                  <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-lg text-red-800 dark:text-red-300 text-sm">
+                    {actionError}
+                  </div>
+                )}
 
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
