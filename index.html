@@ -384,8 +384,8 @@
                return null;
             }
             const slideCount = container.querySelectorAll('.swiper-slide').length;
-            const canShowTwo = slideCount >= 3;
-            const canShowThree = slideCount >= 4;
+            const hasEnoughForTwoColumns = slideCount >= 3;
+            const hasEnoughForThreeColumns = slideCount >= 4;
             const shouldLoop = slideCount > 1;
 
             return new Swiper(container, {
@@ -399,8 +399,8 @@
                watchOverflow: true,
                breakpoints: {
                   640: { slidesPerView: 1, spaceBetween: 20 },
-                  900: { slidesPerView: canShowTwo ? 2 : 1, spaceBetween: 24 },
-                  1280: { slidesPerView: canShowThree ? 3 : (canShowTwo ? 2 : 1), spaceBetween: 24 }
+                  900: { slidesPerView: hasEnoughForTwoColumns ? 2 : 1, spaceBetween: 24 },
+                  1280: { slidesPerView: hasEnoughForThreeColumns ? 3 : (hasEnoughForTwoColumns ? 2 : 1), spaceBetween: 24 }
                },
                pagination: { el: container.querySelector('.swiper-pagination'), clickable: true },
                navigation: {
