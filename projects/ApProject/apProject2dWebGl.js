@@ -1,6 +1,6 @@
 let shadersInitialized = false;
 
-// Shader code adapted from tutorial and other online references
+// Shader code adapted from online tutorials
 const vertexShaderSourceCode = `#version 300 es
   precision mediump float;
 
@@ -105,8 +105,7 @@ function webGlBackgroundColor(r, g, b, a) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
-
-function createShaderProgram() {
+function createShapeShaderProgram() {
   const squareGeoBuffer = createStaticVertexBuffer(gl, squareVertices);
   if (!squareGeoBuffer) {
     console.error("Failed to create buffers");
@@ -207,31 +206,181 @@ function createShaderProgram() {
   }
 }
 
+const imageVertexShaderSourceCode = `#version 300 es
+  precision mediump float;
+
+  in vec2 vertexPosition;
+  in vec2 texCoord;
+
+  out vec2 v_texCoord;
+
+  uniform vec2 canvasSize;
+  uniform vec2 shapeLocation;
+  uniform float shapeSize;
+
+  void main() {
+    v_texCoord = texCoord;
+    vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
+    vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
+
+    gl_Position = vec4(clipPosition * vec2(1.0, -1.0), 0.0, 1.0);
+  }
+`;
+
+const imageFragmentShaderSourceCode = `#version 300 es
+  precision highp float;
+
+  uniform sampler2D uTexture;
+  uniform float uAlpha;
+
+  in vec2 v_texCoord;
+
+  out vec4 outputColor;
+
+  void main() {
+    color = texture(uTexture, v_texCoord);
+    outputColor = vec4(color.rgb, color.a * uAlpha);
+  }
+`;
+
+function createImageShaderProgram() {
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, vertexShaderSourceCode);
+  gl.compileShader(vertexShader);
+  if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+    console.error("Vertex shader compilation error: " + gl.getShaderInfoLog(vertexShader));
+    return;
+  }
+
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, fragmentShaderSourceCode);
+  gl.compileShader(fragmentShader);
+  if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+    console.error("Fragment shader compilation error: " + gl.getShaderInfoLog(fragmentShader));
+    return;
+  }
+
+  const shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    console.error("Shader program linking error: " + gl.getProgramInfoLog(shaderProgram));
+    return;
+  }
+
+  const vertexPositionAttributeLocation = gl.getAttribLocation(shaderProgram, "vertexPosition");
+  const texCoordAttributeLocation = gl.getAttribLocation(shaderProgram, "texCoord");
+  if (vertexPositionAttributeLocation < 0 || texCoordAttributeLocation < 0) {
+    console.error("Failed to get the attribute location for vertexPosition or texCoord");
+    return;
+  }
+
+  const canvasSizeUniform = gl.getUniformLocation(shaderProgram, "canvasSize");
+  const shapeLocationUniform = gl.getUniformLocation(shaderProgram, "shapeLocation");
+  const shapeSizeUniform = gl.getUniformLocation(shaderProgram, "shapeSize");
+  const uTextureUniform = gl.getUniformLocation(shaderProgram, "uTexture");
+  const uAlphaUniform = gl.getUniformLocation(shaderProgram, "uAlpha");
+  if (canvasSizeUniform === null || shapeLocationUniform === null || shapeSizeUniform === null || uTextureUniform === null || uAlphaUniform === null) {
+    console.error("Failed to get uniform locations");
+    return;
+  }
+
+  // Vertex position buffer
+  var vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+     0, 0,
+     1, 0,
+     0, 1,
+     0, 1,
+     1, 0,
+     1, 1
+  ]), gl.STATIC_DRAW);
+  if (!vertexBuffer) {
+    console.error("Failed to create vertex buffer");
+    return;
+  }
+  gl.enableVertexAttribArray(vertexPositionAttributeLocation);
+  gl.vertexAttribPointer(vertexPositionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+  // Texture coordinate buffer
+  var texCoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    0, 0,
+    1, 0,
+    0, 1,
+    0, 1,
+    1, 0,
+    1, 1
+  ]), gl.STATIC_DRAW);
+  if (!texCoordBuffer) {
+    console.error("Failed to create texture coordinate buffer");
+    return;
+  }
+  gl.enableVertexAttribArray(texCoordAttributeLocation);
+  gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+  return {
+    shaderProgram,
+    canvasSizeUniform,
+    shapeLocationUniform,
+    shapeSizeUniform,
+    uTextureUniform,
+    uAlphaUniform
+  };
+}
+
 function webGLRender2D() {
   gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
   webGlBackgroundColor(173, 216, 230, 1);
 }
 
-shaderProgramInfo = null;
+shapeShaderProgramInfo = null;
+imageShaderProgramInfo = null;
 
 function initializeWebGL() {
-  shaderProgramInfo = createShaderProgram();
-  if (!shaderProgramInfo) {
+  shapeShaderProgramInfo = createShapeShaderProgram();
+  imageShaderProgramInfo = createImageShaderProgram();
+  if (!shapeShaderProgramInfo || !imageShaderProgramInfo) {
     console.error("Failed to initialize shader program");
     return;
   } else {shadersInitialized = true;}
 }
 
 function renderSquare(x, y, size, vaoIndex, alpha = 1.0) {
-  gl.useProgram(shaderProgramInfo.shaderProgram);
-  gl.uniform2f(shaderProgramInfo.canvasSizeUniform, webGlCanvas.width, webGlCanvas.height);
-  gl.uniform2f(shaderProgramInfo.shapeLocationUniform, x, y);
-  gl.uniform1f(shaderProgramInfo.shapeSizeUniform, size);
-  gl.uniform1f(shaderProgramInfo.uAlphaUniform, alpha);
+  gl.useProgram(shapeShaderProgramInfo.shaderProgram);
+  gl.uniform2f(shapeShaderProgramInfo.canvasSizeUniform, webGlCanvas.width, webGlCanvas.height);
+  gl.uniform2f(shapeShaderProgramInfo.shapeLocationUniform, x, y);
+  gl.uniform1f(shapeShaderProgramInfo.shapeSizeUniform, size);
+  gl.uniform1f(shapeShaderProgramInfo.uAlphaUniform, alpha);
 
-  gl.bindVertexArray(shaderProgramInfo.vaos[vaoIndex]);
+  gl.bindVertexArray(shapeShaderProgramInfo.vaos[vaoIndex]);
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   gl.bindVertexArray(null);
+}
+
+function renderImage(image, x, y, size, alpha = 1.0) {
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+  gl.useProgram(imageShaderProgramInfo.shaderProgram);
+
+  gl.uniform2f(imageShaderProgramInfo.canvasSizeUniform, canvas.width, canvas.height);
+  gl.uniform2f(imageShaderProgramInfo.shapeLocationUniform, x, y);
+  gl.uniform1f(imageShaderProgramInfo.shapeSizeUniform, size);
+  gl.uniform1f(imageShaderProgramInfo.uAlphaUniform, alpha);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 if (webGl) {

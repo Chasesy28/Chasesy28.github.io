@@ -117,7 +117,11 @@ class Player {
       }
       ctx.globalAlpha = 1;
     } else if (webGl) {
-      renderSquare(Math.round(this.x), Math.round(this.y), this.size, shaderProgramInfo.vaos.length - 1, this.alpha);
+      try {
+        renderImage(this.image, Math.round(this.x), Math.round(this.y), this.size, this.alpha);
+      } catch (error) {
+        alert(error);
+      }
     }
   }
 

@@ -359,7 +359,7 @@ function loop() {
 //loop();
 //helloTriangle();
 
-function imageProcessing() {
+function imageProcessing(image, x, y, alpha = 1.0, size) {
   const vertexShaderSourceCode = `#version 300 es
     precision mediump float;
 
@@ -374,11 +374,10 @@ function imageProcessing() {
 
     void main() {
       v_texCoord = texCoord;
-
       vec2 finalVertexPosition = vertexPosition * shapeSize + shapeLocation;
       vec2 clipPosition = (finalVertexPosition / canvasSize) * 2.0 - 1.0;
 
-      gl_Position = vec4(clipPosition, 0.0, 1.0);
+      gl_Position = vec4(clipPosition * vec2(1.0, -1.0), 0.0, 1.0);
     }
   `;
 
@@ -386,13 +385,15 @@ function imageProcessing() {
     precision highp float;
 
     uniform sampler2D uTexture;
+    uniform float uAlpha;
 
     in vec2 v_texCoord;
 
     out vec4 outputColor;
 
     void main() {
-      outputColor = texture(uTexture, v_texCoord);
+      vec4 color = texture(uTexture, v_texCoord);
+      outputColor = vec4(color.rgb, color.a * uAlpha);
     }
   `;
 
@@ -428,25 +429,44 @@ function imageProcessing() {
     return;
   }
 
+  const canvasSizeUniform = gl.getUniformLocation(shaderProgram, "canvasSize");
   const shapeLocationUniform = gl.getUniformLocation(shaderProgram, "shapeLocation");
   const shapeSizeUniform = gl.getUniformLocation(shaderProgram, "shapeSize");
-  const canvasSizeUniform = gl.getUniformLocation(shaderProgram, "canvasSize");
   const uTextureUniform = gl.getUniformLocation(shaderProgram, "uTexture");
-  if (shapeLocationUniform === null || shapeSizeUniform === null || canvasSizeUniform === null || uTextureUniform === null) {
+  const uAlphaUniform = gl.getUniformLocation(shaderProgram, "uAlpha");
+  if (canvasSizeUniform === null || shapeLocationUniform === null || shapeSizeUniform === null || uTextureUniform === null || uAlphaUniform === null) {
     console.error("Failed to get uniform locations");
     return;
   }
+
+  // Vertex position buffer
+  var vertexBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+     0, 0,
+     1, 0,
+     0, 1,
+     0, 1,
+     1, 0,
+     1, 1
+  ]), gl.STATIC_DRAW);
+  if (!vertexBuffer) {
+    console.error("Failed to create vertex buffer");
+    return;
+  }
+  gl.enableVertexAttribArray(vertexPositionAttributeLocation);
+  gl.vertexAttribPointer(vertexPositionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   // Texture coordinate buffer
   var texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
     0, 0,
+    1, 0,
     0, 1,
-    1, 1,
-    0, 0,
-    1, 1,
-    1, 0
+    0, 1,
+    1, 0,
+    1, 1
   ]), gl.STATIC_DRAW);
   if (!texCoordBuffer) {
     console.error("Failed to create texture coordinate buffer");
@@ -456,4 +476,29 @@ function imageProcessing() {
   gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
   //Texture stuff
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+  gl.useProgram(shaderProgram);
+
+  gl.uniform2f(canvasSizeUniform, canvas.width, canvas.height);
+  gl.uniform2f(shapeLocationUniform, x, y);
+  gl.uniform1f(shapeSizeUniform, size);
+  gl.uniform1f(uAlphaUniform, alpha);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+var image = new Image();
+image.src = "/images/SuperMarioTitle.png";
+image.onload = function() {
+  imageProcessing(image, 50, 50, 1, 50);
 }
