@@ -378,29 +378,30 @@
           * SWIPER CAROUSEL INITIALIZATION
           * Creates the project showcase carousel with navigation and pagination
           */
-         const swiperConfig = {
-            loop: true,
-            rewind: false,
-            slidesPerView: 1,
-            spaceBetween: 18,
-            slidesOffsetBefore: 0,
-            slidesOffsetAfter: 0,
-            centeredSlides: true,
-            watchOverflow: false,
-            breakpoints: {
-               640: { slidesPerView: 1, spaceBetween: 20 },
-               900: { slidesPerView: 2, spaceBetween: 24 },
-               1280: { slidesPerView: 3, spaceBetween: 24 }
-            }
-         };
          const initSwiper = (selector) => {
             const container = document.querySelector(selector);
             if (!container) {
                return null;
             }
+            const slideCount = container.querySelectorAll('.swiper-slide').length;
+            const canShowTwo = slideCount >= 3;
+            const canShowThree = slideCount >= 4;
+            const shouldLoop = slideCount > 1;
 
             return new Swiper(container, {
-               ...swiperConfig,
+               loop: shouldLoop,
+               rewind: !shouldLoop,
+               slidesPerView: 1,
+               spaceBetween: 18,
+               slidesOffsetBefore: 0,
+               slidesOffsetAfter: 0,
+               centeredSlides: false,
+               watchOverflow: true,
+               breakpoints: {
+                  640: { slidesPerView: 1, spaceBetween: 20 },
+                  900: { slidesPerView: canShowTwo ? 2 : 1, spaceBetween: 24 },
+                  1280: { slidesPerView: canShowThree ? 3 : (canShowTwo ? 2 : 1), spaceBetween: 24 }
+               },
                pagination: { el: container.querySelector('.swiper-pagination'), clickable: true },
                navigation: {
                   nextEl: container.querySelector('.swiper-button-next'),

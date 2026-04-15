@@ -11,6 +11,13 @@
     --access-accent-soft: #ffb74d;
     --access-control-bg: #fff;
     --access-control-text: #ff9800;
+    --project-card-bg: #fffaf0;
+    --project-title-color: #eba518;
+    --project-text-color: #333;
+    --project-description-bg: #ffeaa5;
+    --project-icon-size: 120px;
+    --project-carousel-nav-color: #eba518;
+    --project-carousel-nav-bg: rgba(255, 250, 240, 0.9);
 }
 
 .\@container {
@@ -572,10 +579,7 @@ nav a:hover {
     max-width: 100%;
     margin: 0 0 2.5rem;
     padding: 0 0 2.5rem;
-}
-
-.project-carousel .swiper-slide:last-child {
-    margin-right: 0 !important;
+    overflow: hidden;
 }
 
 .swiper-pagination-bullet {
@@ -584,7 +588,7 @@ nav a:hover {
 
 .swiper-slide {
     height: auto;
-    background-color: #fffaf0;
+    background-color: var(--project-card-bg);
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -605,8 +609,8 @@ nav a:hover {
 }
 
 .project-icon {
-    width: 120px;
-    height: 120px;
+    width: var(--project-icon-size);
+    height: var(--project-icon-size);
     -o-object-fit: contain;
     object-fit: contain;
     border-radius: 10px;
@@ -614,22 +618,44 @@ nav a:hover {
 }
 
 .slide-content h3 {
-    color: #eba518;
+    color: var(--project-title-color);
     font-size: 1.8em;
     margin: 0;
     text-shadow: 1px 1px 2px rgba(149, 57, 0, 0.2);
 }
 
 .project-description {
-    color: #333;
+    color: var(--project-text-color);
     font-size: 1em;
     line-height: 1.5;
     margin: 0;
     padding: 10px 15px;
-    background-color: #ffeaa5;
+    background-color: var(--project-description-bg);
     border-radius: 8px;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     max-width: 90%;
+}
+
+.project-carousel .swiper-button-next,
+.project-carousel .swiper-button-prev {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background-color: var(--project-carousel-nav-bg);
+    border: 2px solid var(--project-carousel-nav-color);
+    color: var(--project-carousel-nav-color);
+    z-index: 5;
+}
+
+.project-carousel .swiper-button-next::after,
+.project-carousel .swiper-button-prev::after {
+    font-size: 0.95rem;
+    font-weight: 900;
+}
+
+.project-carousel .swiper-button-disabled {
+    opacity: 0.45;
+    pointer-events: none;
 }
 
 @keyframes rain-fall {
@@ -771,6 +797,15 @@ html.dark body {
     color: #eaeaea;
 }
 
+html.dark {
+    --project-card-bg: #16213e;
+    --project-title-color: #ffd369;
+    --project-text-color: #eaeaea;
+    --project-description-bg: #0f3460;
+    --project-carousel-nav-color: #ffd369;
+    --project-carousel-nav-bg: rgba(22, 33, 62, 0.9);
+}
+
 html.dark header {
     background-color: #16213e;
     border-bottom: 3px dashed #0f3460;
@@ -805,18 +840,15 @@ html.dark h3 {
 }
 
 html.dark .swiper-slide {
-    background-color: #16213e;
     color: #eaeaea;
 }
 
 html.dark .slide-content h3 {
-    color: #ffd369;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 html.dark .project-description {
-    color: #eaeaea;
-    background-color: #0f3460;
+    color: var(--project-text-color);
 }
 
 html.dark .swiper-pagination-bullet {
