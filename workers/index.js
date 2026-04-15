@@ -1,9 +1,9 @@
 /**
  * CLOUDFLARE WORKERS MAIN HANDLER
- * 
+ *
  * This worker serves the GitHub Pages static site through Cloudflare's edge network
  * Provides security headers, caching, and SPA routing support
- * 
+ *
  * Key features:
  * - Serves files from Workers Sites (KV-based asset storage)
  * - Adds security headers (CSP, X-Frame-Options, etc.)
@@ -21,19 +21,19 @@ import { getAssetFromKV } from '@cloudflare/kv-asset-handler';
 const SECURITY_HEADERS = {
   // Content Security Policy - Restricts resource loading to prevent XSS
   'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://nominatim.openstreetmap.org https://overpass-api.de https://tile.openstreetmap.org; worker-src 'self';",
-  
+
   // Prevent MIME type sniffing
   'X-Content-Type-Options': 'nosniff',
-  
+
   // Prevent clickjacking by disallowing iframe embedding from other origins
   'X-Frame-Options': 'SAMEORIGIN',
-  
+
   // Enable browser XSS protection
   'X-XSS-Protection': '1; mode=block',
-  
+
   // Control referrer information sent with requests
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  
+
   // Restrict access to browser features
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
@@ -72,10 +72,24 @@ function getCacheTime(contentType, pathname) {
  * @returns {string} HTML file path to serve
  */
 function resolveHtmlEntry(pathname) {
+  if (pathname === '/admin' || pathname === '/admin/') {
+    return '/vite.html';
+  }
   if (pathname === '/vite' || pathname.startsWith('/vite/')) {
     return '/vite.html';
   }
   return '/index.html';
+}
+
+function isSpaRoute(pathname) {
+  return (
+    pathname === '/' ||
+    pathname === '/admin' ||
+    pathname === '/admin/' ||
+    pathname === '/vite' ||
+    pathname === '/vite/' ||
+    pathname.startsWith('/vite/')
+  );
 }
 
 /**
@@ -88,7 +102,7 @@ export default {
   async fetch(request, env, ctx) {
     try {
       const url = new URL(request.url);
-      
+
       /**
        * SPECIAL HANDLING FOR SERVICE WORKER
        * Service worker file needs special treatment:
@@ -101,16 +115,16 @@ export default {
         const options = {};
         const assetResponse = await getAssetFromKV({ request }, options);
         const resp = new Response(assetResponse.body, assetResponse);
-        
+
         // Set proper headers for service worker
         resp.headers.set('Content-Type', 'application/javascript');
         resp.headers.set('Service-Worker-Allowed', '/'); // Explicitly set SW scope to root path (redundant when sw.js is served from '/')
         resp.headers.set('Cache-Control', 'no-cache'); // Always validate with server for updates
-        
+
         // Add security headers
         Object.entries(SECURITY_HEADERS).forEach(([k, v]) => resp.headers.set(k, v));
         resp.headers.set('X-Worker', 'silly-site-worker');
-        
+
         console.log('[Worker] Service worker response prepared and ready to return');
         return resp;
       }
@@ -126,8 +140,8 @@ export default {
          */
         mapRequestToAsset: (req) => {
           const reqUrl = new URL(req.url);
-          // Serve the appropriate HTML entry for SPA-style routes
-          if (reqUrl.pathname.endsWith('/') || !reqUrl.pathname.includes('.')) {
+          // Serve the appropriate HTML entry only for known SPA routes.
+          if (isSpaRoute(reqUrl.pathname)) {
             const htmlEntry = resolveHtmlEntry(reqUrl.pathname);
             console.log('[Worker] SPA route detected, serving', htmlEntry, 'for:', reqUrl.pathname);
             return new Request(`${reqUrl.origin}${htmlEntry}`, req);
@@ -155,7 +169,7 @@ export default {
       return resp;
     } catch (err) {
       console.error('[Worker] Asset fetch error:', err.message);
-      
+
       /**
        * FALLBACK ERROR HANDLING
        * If asset not found or error occurs, try serving the appropriate HTML entry
@@ -165,11 +179,21 @@ export default {
         console.log('[Worker] Attempting fallback');
         const origin = new URL(request.url).origin;
         const pathname = new URL(request.url).pathname;
-        const fallback = await getAssetFromKV({ request: new Request(origin + resolveHtmlEntry(pathname)) });
+        const fallbackPath = isSpaRoute(pathname) ? resolveHtmlEntry(pathname) : '/404.html';
+        const fallback = await getAssetFromKV({ request: new Request(origin + fallbackPath) });
         const fr = new Response(fallback.body, fallback);
         Object.entries(SECURITY_HEADERS).forEach(([k, v]) => fr.headers.set(k, v));
         fr.headers.set('Cache-Control', `public, max-age=${CACHE_TIMES.html}`);
+        if (!isSpaRoute(pathname)) {
+          fr.headers.set('x-not-found', 'true');
+        }
         console.log('[Worker] Fallback successful');
+        if (!isSpaRoute(pathname)) {
+          return new Response(fr.body, {
+            status: 404,
+            headers: fr.headers,
+          });
+        }
         return fr;
       } catch (e) {
         console.error('[Worker] Fallback failed:', e.message);

@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+set -e
+
+ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+DIST_DIR="$ROOT_DIR/dist"
+
+mkdir -p "$DIST_DIR"
+
+# Copy legacy assets required by the static homepage and projects.
+for entry in \
+  404.html \
+  admin-auth.js \
+  announcements.js \
+  CNAME \
+  manifest.json \
+  notification-bars.css \
+  notification-bars.js \
+  scripts.js \
+  SERVICE-WORKER-CACHE.md \
+  styles.css \
+  SUPABASE-INTEGRATION.md \
+  sw.js \
+  icons \
+  images \
+  projects
+do
+  if [ -e "$ROOT_DIR/$entry" ]; then
+    cp -R "$ROOT_DIR/$entry" "$DIST_DIR/"
+  fi
+done
+
+echo "Copied legacy assets into dist/."

@@ -1187,6 +1187,15 @@ nav a {
     align-items: center;
     justify-content: center;
     z-index: 10000;
+    animation: loaderFailsafeHide 0.35s ease 6s forwards;
+}
+
+@keyframes loaderFailsafeHide {
+    to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
 }
 
 .loader {
@@ -1213,6 +1222,13 @@ nav a {
     height: 100%;
     background: #4a9eff;
     animation: loadBar 2.5s forwards;
+}
+
+#loading-screen:not(.hidden)~.accessibility-button,
+#loading-screen:not(.hidden)~#accessibility-settings {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .accessibility-button {

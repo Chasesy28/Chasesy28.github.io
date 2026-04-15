@@ -2,6 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
+function isKnownAppRoute(url: string) {
+  return ['/', '/vite', '/vite/', '/admin', '/admin/', '/vite/admin', '/vite/admin/'].includes(url)
+}
+
+function shouldServeCustom404(url: string) {
+  return !url.includes('.') && !isKnownAppRoute(url)
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
@@ -11,9 +19,18 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, _res, next) => {
           const url = req.url ?? ''
-          const viteRoutes = ['/', '/admin', '/admin/', '/vite', '/vite/', '/vite/admin', '/vite/admin/']
+          const viteRoutes = ['/vite', '/vite/', '/admin', '/admin/', '/vite/admin', '/vite/admin/']
           if (viteRoutes.includes(url)) {
             req.url = '/vite.html'
+          }
+          next()
+        })
+
+        server.middlewares.use((req, res, next) => {
+          const url = req.url ?? ''
+          if (shouldServeCustom404(url)) {
+            res.statusCode = 404
+            req.url = '/404.html'
           }
           next()
         })
@@ -21,9 +38,18 @@ export default defineConfig({
       configurePreviewServer(server) {
         server.middlewares.use((req, _res, next) => {
           const url = req.url ?? ''
-          const viteRoutes = ['/', '/admin', '/admin/', '/vite', '/vite/', '/vite/admin', '/vite/admin/']
+          const viteRoutes = ['/vite', '/vite/', '/admin', '/admin/', '/vite/admin', '/vite/admin/']
           if (viteRoutes.includes(url)) {
             req.url = '/vite.html'
+          }
+          next()
+        })
+
+        server.middlewares.use((req, res, next) => {
+          const url = req.url ?? ''
+          if (shouldServeCustom404(url)) {
+            res.statusCode = 404
+            req.url = '/404.html'
           }
           next()
         })
@@ -35,7 +61,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  appType: 'spa',
+  appType: 'mpa',
   build: {
     outDir: 'dist',
     // Generate source maps for better debugging

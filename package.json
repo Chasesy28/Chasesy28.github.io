@@ -5,8 +5,10 @@
   "main": "Finder.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && sh scripts/copy-legacy-assets.sh",
     "preview": "vite preview",
+    "preview:fresh": "sh -c 'if command -v fuser >/dev/null 2>&1; then fuser -k 4173/tcp >/dev/null 2>&1 || true; fi; npm run build && vite preview --host 0.0.0.0 --port 4173'",
+    "build:preview": "npm run build && vite preview",
     "test": "echo \"No automated tests configured yet\""
   },
   "repository": {

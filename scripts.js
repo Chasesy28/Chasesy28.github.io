@@ -3,14 +3,43 @@
  * Handles rain drop creation, collision detection with slides, and ground splashes
  */
 
-// hide full‑screen loader when the window has fully loaded
-window.addEventListener("load", () => {
-  const loader = document.getElementById("loading-screen");
-  if (loader) {
-    loader.classList.add("hidden");
-    setTimeout(() => loader.remove(), 500);
+// hide full-screen loader with load and DOM-ready fallback
+let loaderHidden = false;
+
+function hideLoadingScreen() {
+  if (loaderHidden) {
+    return;
   }
-});
+
+  const loader = document.getElementById("loading-screen");
+  if (!loader) {
+    loaderHidden = true;
+    return;
+  }
+
+  loaderHidden = true;
+  loader.classList.add("hidden");
+  loader.style.display = "none";
+  loader.setAttribute("aria-hidden", "true");
+  setTimeout(() => loader.remove(), 500);
+}
+
+window.addEventListener("load", hideLoadingScreen, { once: true });
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    // Fallback in case some assets delay or block the full window load event.
+    setTimeout(hideLoadingScreen, 1500);
+  },
+  { once: true },
+);
+
+if (document.readyState === "complete") {
+  hideLoadingScreen();
+} else if (document.readyState === "interactive") {
+  setTimeout(hideLoadingScreen, 1500);
+}
 
 // theme toggle utilities (shared across pages)
 function initThemeToggle() {
