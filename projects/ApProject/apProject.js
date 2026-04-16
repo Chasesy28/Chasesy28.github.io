@@ -116,6 +116,7 @@ function backgroundColor(color) {
 }
 
 backgroundColor("dimgray");
+webGlBackgroundColor(105, 105, 105, 1);
 
 // Code found online on detecting if a character is a letter
 function isLetter(char) {
@@ -363,6 +364,12 @@ function startGame() {
   gamePaused = false;
   pauseButton.textContent = "| |";
   pauseButton.title = "Pause Game";
+
+  if (webGl) {
+    initializeWebGL();
+    canvas.style.display = "none";
+    webGlCanvas.style.display = "block";
+  }
 
   updateLevelData();
   player.spawn();

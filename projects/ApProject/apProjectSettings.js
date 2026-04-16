@@ -73,7 +73,7 @@ function applySettings() {
 	}
 }
 
-// I still need to fix this so that it actually changes the framerate and render mode instead of just sending console logs
+// I still need to fix this so that it actually changes the framerate instead of just sending console logs
 	const framerateSelect = document.getElementById("framerate");
 	if (framerateSelect) {
 		framerateSelect.addEventListener("change", (e) => {

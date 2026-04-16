@@ -83,6 +83,9 @@ class Player {
   }
 
   drawPlayer() {
+    this.width = Math.floor(
+      this.size * (this.image.width / this.image.height),
+    );
     if (this.dead) {
       this.alpha -= 0.01;
       if (this.alpha <= 0) {
@@ -90,9 +93,6 @@ class Player {
       }
     }
     if (this.image.complete && this.image.width > 0 && !webGl) {
-      this.width = Math.floor(
-        this.size * (this.image.width / this.image.height),
-      );
       console.log(this.width);
       ctx.globalAlpha = this.alpha;
       if (this.direction === "right") {
@@ -117,11 +117,7 @@ class Player {
       }
       ctx.globalAlpha = 1;
     } else if (webGl) {
-      try {
-        renderImage(this.image, Math.round(this.x), Math.round(this.y), this.size, this.alpha);
-      } catch (error) {
-        alert(error);
-      }
+      renderImage(this.image, Math.round(this.x), Math.round(this.y), this.width, this.size, this.alpha);
     }
   }
 
@@ -671,9 +667,11 @@ class Block {
         ctx.drawImage(this.texture, renderX, renderY, this.width, this.height);
         ctx.globalAlpha = 1;
         ctx.imageSmoothingEnabled = previousSmoothing;
+      } else if (webGl && shouldUseTextures && this.texture) {
+        renderImage(this.texture, renderX, renderY, this.width, this.height, this.alpha);
       } else if (webGl) {
           let index = Object.keys(blockTypes).indexOf(this.type);
-          renderSquare(renderX, renderY, this.width, index, this.alpha);
+          renderRect(renderX, renderY, this.width, this.height, index, this.alpha);
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
@@ -800,7 +798,7 @@ class Enemy {
     if (this.visible && this.alpha > 0) {
       if (webGl) {
         let index = Object.keys(enemyTypes).indexOf(this.type) + Object.keys(blockTypes).length;
-        renderSquare(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, index, this.alpha);
+        renderRect(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, this.height, index, this.alpha);
       } else {
         ctx.fillStyle = this.color;
         ctx.fillRect(
