@@ -41,7 +41,7 @@
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.4.2",
     "@radix-ui/react-slot": "^1.2.4",
-    "@supabase/supabase-js": "^2.103.0",
+    "@supabase/supabase-js": "^2.103.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.8.0",
