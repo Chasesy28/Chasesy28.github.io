@@ -69,7 +69,7 @@ jobs:
           mkdir -p dist/vite
           cp dist/vite.html dist/vite/index.html
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
