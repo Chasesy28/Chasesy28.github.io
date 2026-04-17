@@ -390,8 +390,8 @@ function renderImage(image, x, y, width, height, alpha = 1.0) {
     gl.hint(gl.GENERATE_MIPMAP_HINT, gl.NICEST);
     gl.generateMipmap(gl.TEXTURE_2D);
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
     imageTextureCache.set(image, texture);
   }
