@@ -1,3 +1,5 @@
+// https://aerotwist.com/tutorials/getting-started-with-three-js/
+
 // Set the scene size.
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
