@@ -93,7 +93,6 @@ class Player {
       }
     }
     if (this.image.complete && this.image.width > 0 && !webGl) {
-      console.log(this.width);
       ctx.globalAlpha = this.alpha;
       if (this.direction === "right") {
         ctx.drawImage(
@@ -116,8 +115,10 @@ class Player {
         ctx.restore();
       }
       ctx.globalAlpha = 1;
-    } else if (webGl) {
+    } else if (webGl && this.direction === "right") {
       renderImage(this.image, Math.round(this.x), Math.round(this.y), this.width, this.size, this.alpha);
+    } else if (webGl && this.direction === "left") {
+      renderImage(this.image, Math.round(this.x) + this.width, Math.round(this.y), this.width * -1, this.size, this.alpha);
     }
   }
 
