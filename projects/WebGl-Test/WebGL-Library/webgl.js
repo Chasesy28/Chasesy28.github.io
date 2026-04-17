@@ -500,5 +500,5 @@ function imageProcessing(image, x, y, alpha = 1.0, size) {
 var image = new Image();
 image.src = "/images/SuperMarioTitle.png";
 image.onload = function() {
-  imageProcessing(image, 50, 50, 1, 50);
+  //imageProcessing(image, 50, 50, 1, 50);
 }
