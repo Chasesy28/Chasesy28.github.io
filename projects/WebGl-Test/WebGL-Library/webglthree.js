@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -95,10 +97,10 @@ function animate(time) {
   }
 
   if (controller.lookUp.pressed) {
-    camera.rotation.x += rotationSpeed;
+    cameraRotation[0] += rotationSpeed;
   }
   if (controller.lookDown.pressed) {
-    camera.rotation.x -= rotationSpeed;
+    cameraRotation[0] -= rotationSpeed;
   }
   if (controller.lookLeft.pressed) {
     cameraRotation[1] += rotationSpeed;
@@ -110,7 +112,7 @@ function animate(time) {
     cameraRotation = [0, 0, 0];
   }
 
-  //camera.rotation.x = cameraRotation[0];
+  camera.rotation.x = cameraRotation[0];
   camera.rotation.y = cameraRotation[1];
 
   light.position.copy(camera.position);
@@ -122,7 +124,7 @@ function animate(time) {
 
 requestAnimationFrame(animate);
 
-controller = {
+const controller = {
   forward: {
     key: ["w", "W"],
     pressed: false,

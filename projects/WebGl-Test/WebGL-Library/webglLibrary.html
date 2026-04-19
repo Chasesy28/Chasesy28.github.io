@@ -30,8 +30,16 @@
     <!--<canvas id="webglCanvas"></canvas>-->
     <div id="container"></div>
     <script src="webglLibrary.js"></script>
-    <!--<script src="webgl.js"></script>-->
-    <script src="webglthree.js"></script>
+    <!--<script src="webgl.js"></script> -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+        }
+      }
+   </script>
+    <script type="module" src="webglthree.js"></script>
   </body>
 
 </html>
