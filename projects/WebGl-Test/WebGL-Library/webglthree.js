@@ -38,9 +38,10 @@ const loader = new THREE.TextureLoader();
 const texture = loader.load("/images/SuperMarioTitle.png");
 const texture2 = loader.load("/icons/icon-512x512.png");
 scene.background = new THREE.Color(173/255, 216/255, 230/255);
-scene.background = texture2;
+scene.background = texture;
 
 const cubes = [
+  makeInstance(0, 0, 0, geometry, 0x44aa88),
   makeInstance(0, 0, 0, geometry, texture),
   makeInstance(-2, 0, 0, geometry, 0x8844aa),
   makeInstance(1, 0, 0, geometry, 0xaa8844),
@@ -121,9 +122,29 @@ function animate(time) {
     cameraRotation = [0, 0, 0];
   }
 
-  cubes.forEach((cube) => {
-    cube.material.map = texture;
-    cube.position.add(offsetVector);
+  cubes.forEach((cube, index) => {
+    if (index === 0) {
+      cube.material.map = texture2;
+      cube.position.copy(camera.getWorldPosition(new THREE.Vector3()));
+      cube.position.y -= 1;
+      cube.geometry.dispose();
+      cube.geometry = new THREE.BoxGeometry(2, 0.5, 2);
+    } else {
+      cube.material.map = texture;
+      cube.position.add(offsetVector);
+      let size = cube.geometry.parameters;
+      if (size.width > 5) {
+        size.width *= -1;
+      }
+      if (size.height > 5) {
+        size.height *= -1;
+      }
+      if (size.depth > 5) {
+        size.depth *= -1;
+      }
+      cube.geometry.dispose();
+      cube.geometry = new THREE.BoxGeometry(size.width + Math.random() * 0.1, size.height + Math.random() * 0.1, size.depth + Math.random() * 0.1);
+    }
   });
 
   camera.rotation.order = "YXZ";
