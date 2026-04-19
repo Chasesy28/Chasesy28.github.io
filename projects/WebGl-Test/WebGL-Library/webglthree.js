@@ -38,6 +38,7 @@ const loader = new THREE.TextureLoader();
 const texture = loader.load("/images/SuperMarioTitle.png");
 const texture2 = loader.load("/icons/icon-512x512.png");
 scene.background = new THREE.Color(173/255, 216/255, 230/255);
+scene.background = texture2;
 
 const cubes = [
   makeInstance(0, 0, 0, geometry, texture),
