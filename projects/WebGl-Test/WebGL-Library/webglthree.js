@@ -36,6 +36,8 @@ function makeInstance(x, y, z, geometry, color) {
 
 const loader = new THREE.TextureLoader();
 const texture = loader.load("/images/SuperMarioTitle.png");
+const texture2 = loader.load("/icons/icon-512x512.png");
+scene.background = new THREE.Color(173/255, 216/255, 230/255);
 
 const cubes = [
   makeInstance(0, 0, 0, geometry, texture),
@@ -43,10 +45,12 @@ const cubes = [
   makeInstance(1, 0, 0, geometry, 0xaa8844),
 ];
 
+const cubesPositions = cubes.map(cube => [cube.position.x, cube.position.y, cube.position.z]);
+
 let cameraRotation = [0, 0, 0];
 
-const moveSpeed = 0.1;
-const rotationSpeed = 0.025;
+const moveSpeed = -0.1;
+const rotationSpeed = 0.03;
 
 function animate(time) {
   time *= 0.001;  // convert time to seconds
@@ -57,50 +61,56 @@ function animate(time) {
   camera.aspect = canvas.clientWidth / canvas.clientHeight;
   camera.updateProjectionMatrix();
 
-  cubes.forEach((cube) => {
-    cube.material.map = texture;
-  });
+  let offsetVector = new THREE.Vector3();
 
   if (controller.forward.pressed) {
     const forward = new THREE.Vector3();
     camera.getWorldDirection(forward);
     forward.y = 0;
-    camera.position.addScaledVector(forward, moveSpeed);
+    forward.normalize();
+    offsetVector.addScaledVector(forward, moveSpeed);
   }
   if (controller.backward.pressed) {
     const backward = new THREE.Vector3();
     camera.getWorldDirection(backward);
     backward.y = 0;
-    camera.position.addScaledVector(backward, -moveSpeed);
+    backward.normalize();
+    offsetVector.addScaledVector(backward, -moveSpeed);
   }
   if (controller.left.pressed) {
     const left = new THREE.Vector3();
     camera.getWorldDirection(left);
     left.y = 0;
     left.cross(camera.up);
-    camera.position.addScaledVector(left, -moveSpeed);
+    left.normalize();
+    offsetVector.addScaledVector(left, -moveSpeed);
   }
   if (controller.right.pressed) {
     const right = new THREE.Vector3();
     camera.getWorldDirection(right);
     right.y = 0;
     right.cross(camera.up);
-    camera.position.addScaledVector(right, moveSpeed);
+    right.normalize();
+    offsetVector.addScaledVector(right, moveSpeed);
   }
   if (controller.up.pressed) {
     const up = new THREE.Vector3(0, 1, 0);
-    camera.position.addScaledVector(up, moveSpeed);
+    offsetVector.addScaledVector(up, moveSpeed);
   }
   if (controller.down.pressed) {
     const down = new THREE.Vector3(0, 1, 0);
-    camera.position.addScaledVector(down, -moveSpeed);
+    offsetVector.addScaledVector(down, -moveSpeed);
   }
 
   if (controller.lookUp.pressed) {
-    cameraRotation[0] += rotationSpeed;
+    if (cameraRotation[0] + rotationSpeed < Math.PI / 2) {
+      cameraRotation[0] += rotationSpeed;
+    }
   }
   if (controller.lookDown.pressed) {
-    cameraRotation[0] -= rotationSpeed;
+    if (cameraRotation[0] - rotationSpeed > -Math.PI / 2) {
+      cameraRotation[0] -= rotationSpeed;
+    }
   }
   if (controller.lookLeft.pressed) {
     cameraRotation[1] += rotationSpeed;
@@ -112,8 +122,14 @@ function animate(time) {
     cameraRotation = [0, 0, 0];
   }
 
-  camera.rotation.x = cameraRotation[0];
+  cubes.forEach((cube) => {
+    cube.material.map = texture;
+    cube.position.add(offsetVector);
+  });
+
+  camera.rotation.order = "YXZ";
   camera.rotation.y = cameraRotation[1];
+  camera.rotation.x = cameraRotation[0];
 
   light.position.copy(camera.position);
 
