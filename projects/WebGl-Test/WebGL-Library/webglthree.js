@@ -46,8 +46,6 @@ const cubes = [
   makeInstance(1, 0, 0, geometry, 0xaa8844),
 ];
 
-const cubesPositions = cubes.map(cube => [cube.position.x, cube.position.y, cube.position.z]);
-
 let cameraRotation = [0, 0, 0];
 
 const moveSpeed = -0.1;
