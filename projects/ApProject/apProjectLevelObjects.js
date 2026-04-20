@@ -7,6 +7,7 @@ class Player {
   constructor(size, imageSrc) {
     this.x;
     this.y;
+    this.z;
     this.baseSize = size;
     this.size = size;
     this.image = new Image();
@@ -22,6 +23,7 @@ class Player {
 
     this.velX = 0;
     this.velY = 0;
+    this.velZ = 0;
     this.prevY;
     this.prevX;
     this.speed = 0.5;
@@ -60,6 +62,10 @@ class Player {
     this.canMove = true;
     this.alpha = 1;
 
+    if (webGl3d) {
+      ambientLight.color.set(0x404040);
+    }
+
     this.x = this.spawnValues[currentArea][0];
     this.y = this.spawnValues[currentArea][1];
     if (this.state === 1) {
@@ -68,6 +74,7 @@ class Player {
       this.y += this.baseSize * 0.5;
     }
     this.layer = this.spawnValues[currentArea][2];
+    this.z = this.layer * 50;
     this.globalOffsetX = this.spawnValues[currentArea][3];
     this.globalOffsetY = this.spawnValues[currentArea][4];
 
@@ -88,6 +95,10 @@ class Player {
     );
     if (this.dead) {
       this.alpha -= 0.01;
+      if (webGl3d) {
+        ambientLight.color.set(`rgb(${Math.floor(105 * this.alpha)}, 0, 0)`);
+        sceneBackgroundColor(Math.floor(105 * this.alpha), 0, 0);
+      }
       if (this.alpha <= 0) {
         this.spawn();
       }
@@ -123,14 +134,17 @@ class Player {
   }
 
   move(controller) {
+    if (!webGl3d) { this.z = this.layer * 50; }
     if (this.canMove) {
-      if (controller.right.pressed) {
-        this.direction = "right";
-        if (this.velX < this.maxVelX) this.velX += this.speed;
-      }
-      if (controller.left.pressed) {
-        this.direction = "left";
-        if (this.velX > -this.maxVelX) this.velX -= this.speed;
+      if (!webGl3d) {
+        if (controller.right.pressed) {
+          this.direction = "right";
+          if (this.velX < this.maxVelX) this.velX += this.speed;
+        }
+        if (controller.left.pressed) {
+          this.direction = "left";
+          if (this.velX > -this.maxVelX) this.velX -= this.speed;
+        }
       }
 
       if (this.currentGroundBlock != null && !controller.right.pressed && !controller.left.pressed) {
@@ -139,6 +153,9 @@ class Player {
       if (this.insideBlock !== null) {
         if (this.insideBlock.type === "cobweb") {
           this.velX *= this.insideBlock.friction;
+          if (webGl3d) {
+            this.velZ *= this.insideBlock.friction;
+          }
         }
       }
 
@@ -194,35 +211,52 @@ class Player {
 
       this.scrolling();
 
-      if (controller.grow.pressed && !this.sizeChangeCooldown) {
-        if (this.size == this.baseSize) {
-          this.size = this.baseSize * 1.5;
-          this.y -= this.baseSize * 0.5;
-          this.state = 1;
-        } else if (this.size == this.baseSize * 0.5) {
-          this.size = this.baseSize;
-          this.y -= this.baseSize * 0.5;
-          this.state = 0;
+      if (webGl3d) {
+        if (controller.forward.pressed) {
+          const forward = new THREE.Vector3();
+          camera.getWorldDirection(forward);
+          forward.y = 0;
+          forward.normalize();
+          forward.multiplyScalar(this.speed);
+          this.velX += forward.x;
+          this.velZ += forward.z;
         }
-        setTimeout(() => {
-          this.sizeChangeCooldown = false;
-        }, 250);
-        this.sizeChangeCooldown = true;
-      }
-      if (controller.shrink.pressed && !this.sizeChangeCooldown) {
-        if (this.size == this.baseSize * 1.5) {
-          this.size = this.baseSize;
-          this.y += this.baseSize * 0.5;
-          this.state = 0;
-        } else if (this.size == this.baseSize) {
-          this.size = this.baseSize * 0.5;
-          this.y += this.baseSize * 0.5;
-          this.state = -1;
+        if (controller.backward.pressed) {
+          const backward = new THREE.Vector3();
+          camera.getWorldDirection(backward);
+          backward.y = 0;
+          backward.normalize();
+          backward.multiplyScalar(this.speed);
+          this.velX -= backward.x;
+          this.velZ -= backward.z;
         }
-        setTimeout(() => {
-          this.sizeChangeCooldown = false;
-        }, 250);
-        this.sizeChangeCooldown = true;
+        if (controller.left.pressed) {
+          const left = new THREE.Vector3();
+          camera.getWorldDirection(left);
+          left.y = 0;
+          left.normalize();
+          left.multiplyScalar(this.speed);
+          this.velX -= left.x;
+          this.velZ -= left.z;
+        }
+        if (controller.right.pressed) {
+          const right = new THREE.Vector3();
+          camera.getWorldDirection(right);
+          right.y = 0;
+          right.normalize();
+          right.multiplyScalar(this.speed);
+          this.velX += right.x;
+          this.velZ += right.z;
+        }
+        this.velX = Math.max(-this.maxVelX, Math.min(this.maxVelX, this.velX));
+        this.velZ = Math.max(-this.maxVelX, Math.min(this.maxVelX, this.velZ));
+        if (this.currentGroundBlock != null && !controller.right.pressed && !controller.left.pressed && !controller.forward.pressed && !controller.backward.pressed) {
+          this.velX *= this.currentGroundBlock.friction;
+          this.velZ *= this.currentGroundBlock.friction;
+        }
+        this.x += this.velX;
+        this.z += this.velZ;
+        this.layer = Math.round(this.z / 50);
       }
     }
   }
@@ -609,6 +643,8 @@ class Block {
     this.isBlock = true;
     this.isEnemy = false;
     this.texture = Block.getTexture(this.textureIndex);
+
+    this.setTexture = false;
   }
   colorReset() {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
@@ -688,10 +724,12 @@ class Block {
         } else {
           this.cube.visible = true;
         }
-        if (shouldUseTextures && this.texture) {
+        if (shouldUseTextures && this.texture && !this.setTexture) {
           setTexture(this.cube, this.texture);
-        } else {
+          this.setTexture = true;
+        } else if (!shouldUseTextures) {
           setColor(this.cube, this.colorR, this.colorG, this.colorB);
+          this.setTexture = false;
         }
         this.cube.position.x = renderX
         this.cube.position.y = renderY;
@@ -785,6 +823,8 @@ class Enemy {
 
     this.isBlock = false;
     this.isEnemy = true;
+
+    this.cube = null;
   }
 
   colorReset() {
@@ -821,7 +861,7 @@ class Enemy {
       if (webGl && !webGl3d) {
         let index = Object.keys(enemyTypes).indexOf(this.type) + Object.keys(blockTypes).length;
         renderRect(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, this.height, index, this.alpha);
-      } else {
+      } else if (!webGl && !webGl3d) {
         ctx.fillStyle = this.color;
         ctx.fillRect(
           Math.round(this.x - player.globalOffsetX),
@@ -829,7 +869,19 @@ class Enemy {
           this.width,
           this.height
         );
+      } else if (webGl3d) {
+        if (!this.cube) {
+          this.cube = createColoredCube(this.colorR, this.colorG, this.colorB);
+        } else {
+          this.cube.visible = true;
+        }
+        this.cube.position.x = Math.round(this.x - player.globalOffsetX);
+        this.cube.position.y = Math.round(this.y - player.globalOffsetY);
+        this.cube.position.z = this.layer * 50;
+        setOpacity(this.cube, this.alpha);
       }
+    } else if (webGl3d && this.cube) {
+      this.cube.visible = false;
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }

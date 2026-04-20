@@ -7,7 +7,7 @@ scene.add(world);
 
 const toRenderY = (y) => -y;
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -18,7 +18,7 @@ const geometry = new THREE.BoxGeometry(50, 50, 50);
 
 const loader = new THREE.TextureLoader();
 
-const ambientLight = new THREE.AmbientLight(0x404040, 2);
+const ambientLight = new THREE.AmbientLight(0x404040, 3);
 scene.add(ambientLight);
 
 function createColoredCube(r, g, b) {
@@ -104,12 +104,14 @@ window.document.addEventListener("mousemove", (e) => {
 function renderScene() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  sceneBackgroundColor(173, 216, 230);
+  if (!player.dead) {
+    sceneBackgroundColor(173, 216, 230);
+  }
 
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
-  camera.position.set(player.x, toRenderY(player.y), player.layer * 50);
+  camera.position.set(player.x, toRenderY(player.y), player.z);
 
   camera.rotation.order = "YXZ";
   camera.rotation.y = cameraYaw;
