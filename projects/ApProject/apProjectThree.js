@@ -7,6 +7,32 @@ const world = new THREE.Group();
 world.scale.set(1, -1, 1);
 scene.add(world);
 
+// --- GLTF import ---
+const gltfLoader = new GLTFLoader();
+
+// IMPORTANT: set this path to where the file is hosted relative to the HTML page
+// Example if your model is at: projects/ApProject/models/myModel.glb
+gltfLoader.load(
+  './projects/ApProject/models/myModel.glb',
+  (gltf) => {
+    const model = gltf.scene;
+    world.add(model);
+    model.position.set(0, toRenderY(0), -100);
+    model.scale.set(10, 10, 10);
+
+    // Optional: improve shading
+    model.traverse((obj) => {
+      if (obj.isMesh) {
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+      }
+    })
+  },
+  (err) => {
+    console.error('GLTF failed to load:', err);
+  }
+);
+
 const toRenderY = (y) => -y;
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
