@@ -30,6 +30,7 @@ function saveSettings() {
 }
 
 let webGl = false;
+let webGl3d = false;
 
 // Apply settings to the game
 function applySettings() {
@@ -46,11 +47,20 @@ function applySettings() {
     if (gameSettings.renderMode === "gpu") {
       canvas.style.display = "none";
       webGlCanvas.style.display = "block";
+      webGl3dCanvas.style.display = "none";
       webGl = true;
+      webG3d = false;
+    } else if (gameSettings.renderMode === "3D") {
+      canvas.style.display = "none";
+      webGlCanvas.style.display = "none";
+      webGl3dCanvas.style.display = "block";
+      webGl3d = true;
     } else {
       canvas.style.display = "block";
       webGlCanvas.style.display = "none";
+      webGl3dCanvas.style.display = "none";
       webGl = false;
+      webGl3d = false;
     }
 	}
 
@@ -91,11 +101,20 @@ function applySettings() {
       if (gameSettings.renderMode === "gpu") {
         canvas.style.display = "none";
         webGlCanvas.style.display = "block";
+        webGl3dCanvas.style.display = "none";
         webGl = true;
+        webG3d = false;
+      } else if (gameSettings.renderMode === "3D") {
+        canvas.style.display = "none";
+        webGlCanvas.style.display = "none";
+        webGl3dCanvas.style.display = "block";
+        webGl3d = true;
       } else {
         canvas.style.display = "block";
         webGlCanvas.style.display = "none";
+        webGl3dCanvas.style.display = "none";
         webGl = false;
+        webGl3d = false;
       }
 		});
 	}
@@ -218,6 +237,8 @@ function settingsKeybind(buttonId) {
     if (e.key === "Escape") {
       if (isLetter(controller[buttonId].key[0])) {
         button.textContent = controller[buttonId].key[0].toUpperCase();
+      } else if (controller[buttonId].key[0] === " ") {
+        button.textContent = "Space";
       } else {
         button.textContent = controller[buttonId].key[0];
       }
@@ -226,6 +247,8 @@ function settingsKeybind(buttonId) {
     }
     if (isLetter(e.key)) {
       button.textContent = e.key.toUpperCase();
+    } else if (e.key === " ") {
+      button.textContent = "Space";
     } else {
       button.textContent = e.key;
     }

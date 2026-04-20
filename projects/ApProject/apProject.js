@@ -5,6 +5,8 @@ const ctx = canvas.getContext("2d");
 const webGlCanvas = document.getElementById("webGlGameArea");
 const gl = webGlCanvas.getContext("webgl2", { alpha: false}, {premultipliedAlpha: false}, {antialias: false});
 
+const webGl3dCanvas = document.getElementById("webGl3DCanvas");
+
 function canvasDimensions(canvas) {
   canvas.style.width = "100dvw";
   canvas.style.height = "100dvh";
@@ -30,6 +32,7 @@ function canvasDimensions(canvas) {
 function resizeGameCanvases() {
   canvasDimensions(canvas);
   canvasDimensions(webGlCanvas);
+  canvasDimensions(webGl3dCanvas);
 
   if (gl) {
     gl.viewport(0, 0, webGlCanvas.width, webGlCanvas.height);
@@ -117,6 +120,7 @@ function backgroundColor(color) {
 
 backgroundColor("dimgray");
 webGlBackgroundColor(105, 105, 105, 1);
+sceneBackgroundColor(105, 105, 105);
 
 // Code found online on detecting if a character is a letter
 function isLetter(char) {
@@ -124,10 +128,12 @@ function isLetter(char) {
 }
 
 const controller = {
-  jump: { pressed: false, key: ["W", "w"] },
+  jump: { pressed: false, key: [" "] },
+  forward: { pressed: false, key: ["W", "w"] },
+  backward: { pressed: false, key: ["S", "s"] },
   left: { pressed: false, key: ["A", "a"] },
   right: { pressed: false, key: ["D", "d"] },
-  interact: { pressed: false, key: ["S", "s"] },
+  interact: { pressed: false, key: ["E", "e"] },
   previousLevel: { pressed: false, key: ["ArrowLeft"] },
   nextLevel: { pressed: false, key: ["ArrowRight"] },
   previousLayer: { pressed: false, key: ["ArrowUp"] },
@@ -206,14 +212,16 @@ function gameLoop() {
   fps = times.length;
 
 
-  if (!webGl){
+  if (!webGl && !webGl3d) {
     backgroundColor("lightblue");
-  } else {
+  } else if (webGl) {
     if (!shadersInitialized) {
       initializeWebGL();
       shadersInitialized = true;
     }
     requestAnimationFrame(webGLRender2D);
+  } else if (webGl3d) {
+    renderScene();
   }
   for (let i = 0; i < activeLevelData[currentArea].length; i++) {
     buildLevel(activeLevelData[currentArea][i]);
@@ -369,6 +377,11 @@ function startGame() {
     initializeWebGL();
     canvas.style.display = "none";
     webGlCanvas.style.display = "block";
+    webGl3dCanvas.style.display = "none";
+  } else if (webGl3d) {
+    canvas.style.display = "none";
+    webGlCanvas.style.display = "none";
+    webGl3dCanvas.style.display = "block";
   }
 
   updateLevelData();

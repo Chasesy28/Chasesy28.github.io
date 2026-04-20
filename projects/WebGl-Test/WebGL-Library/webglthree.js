@@ -7,6 +7,10 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+renderer.domElement.addEventListener("click", () => {
+  renderer.domElement.requestPointerLock();
+});
+
 const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
@@ -47,10 +51,23 @@ const cubes = [
   makeInstance(1, 0, 0, geometry, 0xaa8844),
 ];
 
-let cameraRotation = [0, 0, 0];
+let cameraYaw = 0;
+let cameraPitch = 0;
 
 const moveSpeed = -0.1;
-const rotationSpeed = 0.03;
+const mouseSensitivity = 0.002;
+
+// Mouse look handler (only while pointer is locked)
+window.document.addEventListener("mousemove", (e) => {
+  if (document.pointerLockElement !== renderer.domElement) return;
+
+  cameraYaw -= e.movementX * mouseSensitivity;
+  cameraPitch -= e.movementY * mouseSensitivity;
+
+  const maxPitch = Math.PI / 2 - 0.01;
+  if (cameraPitch > maxPitch) cameraPitch = maxPitch;
+  if (cameraPitch < -maxPitch) cameraPitch = -maxPitch;
+});
 
 function animate(time) {
   time *= 0.001;  // convert time to seconds
@@ -102,24 +119,9 @@ function animate(time) {
     offsetVector.addScaledVector(down, -moveSpeed);
   }
 
-  if (controller.lookUp.pressed) {
-    if (cameraRotation[0] + rotationSpeed < Math.PI / 2) {
-      cameraRotation[0] += rotationSpeed;
-    }
-  }
-  if (controller.lookDown.pressed) {
-    if (cameraRotation[0] - rotationSpeed > -Math.PI / 2) {
-      cameraRotation[0] -= rotationSpeed;
-    }
-  }
-  if (controller.lookLeft.pressed) {
-    cameraRotation[1] += rotationSpeed;
-  }
-  if (controller.lookRight.pressed) {
-    cameraRotation[1] -= rotationSpeed;
-  }
   if (controller.resetView.pressed) {
-    cameraRotation = [0, 0, 0];
+    cameraYaw = 0;
+    cameraPitch = 0;
   }
 
   cubes.forEach((cube, index) => {
@@ -148,8 +150,8 @@ function animate(time) {
   });
 
   camera.rotation.order = "YXZ";
-  camera.rotation.y = cameraRotation[1];
-  camera.rotation.x = cameraRotation[0];
+  camera.rotation.y = cameraYaw;
+  camera.rotation.x = cameraPitch;
 
   light.position.copy(camera.position);
 
@@ -183,21 +185,6 @@ const controller = {
   },
   down: {
     key: ["Shift"],
-    pressed: false,
-  },
-  lookUp: {
-    key: ["ArrowUp"],
-    pressed: false,
-  },
-  lookDown: {
-    key: ["ArrowDown"],
-    pressed: false,
-  },
-  lookLeft: {
-    key: ["ArrowLeft"],
-    pressed: false,  },
-  lookRight: {
-    key: ["ArrowRight"],
     pressed: false,
   },
   resetView: {

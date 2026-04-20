@@ -604,6 +604,8 @@ class Block {
       this.doorArea = doorArea;
     }
 
+    this.cube = null;
+
     this.isBlock = true;
     this.isEnemy = false;
     this.texture = Block.getTexture(this.textureIndex);
@@ -661,23 +663,35 @@ class Block {
     if (this.visible && this.alpha > 0) {
       const renderX = Math.round(this.x - player.globalOffsetX);
       const renderY = Math.round(this.y - player.globalOffsetY);
-      if (shouldUseTextures && this.texture && !webGl) {
+      if (shouldUseTextures && this.texture && !webGl && !webGl3d) {
         const previousSmoothing = ctx.imageSmoothingEnabled;
         ctx.imageSmoothingEnabled = false;
         ctx.globalAlpha = this.alpha;
         ctx.drawImage(this.texture, renderX, renderY, this.width, this.height);
         ctx.globalAlpha = 1;
         ctx.imageSmoothingEnabled = previousSmoothing;
-      } else if (webGl && shouldUseTextures && this.texture) {
-        renderImage(this.texture, renderX, renderY, this.width, this.height, this.alpha);
-      } else if (webGl) {
-          let index = Object.keys(blockTypes).indexOf(this.type);
-          renderRect(renderX, renderY, this.width, this.height, index, this.alpha);
-      } else {
+      } else if (!webGl && !webGl3d) {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
+      } else if (webGl && shouldUseTextures && this.texture && !webGl3d) {
+        renderImage(this.texture, renderX, renderY, this.width, this.height, this.alpha);
+      } else if (webGl && !webGl3d) {
+        let index = Object.keys(blockTypes).indexOf(this.type);
+        renderRect(renderX, renderY, this.width, this.height, index, this.alpha);
+      } else if (webGl3d && shouldUseTextures && this.texture) {
+        if (!this.cube) {
+          let texture = new THREE.Texture(this.texture);
+          this.cube = createTexturedCube(texture);
+        }
+        this.cube.position.x = renderX
+        this.cube.position.y = renderY;
+        this.cube.position.z = this.layer * 50;
+        this.cube.scale.x = this.width;
+        this.cube.scale.y = this.height;
+        this.cube.scale.z = 50;
+        this.cube.material.opacity = this.alpha;
+        scene.add(this.cube);
       }
-
 
       /*if (shouldUseTextures && this.solid && this.textureIndex > 0) {
         const texture = Block.texturePool[this.textureIndex - 1];
@@ -797,7 +811,7 @@ class Enemy {
 
     // Skip rendering if not visible or fully transparent
     if (this.visible && this.alpha > 0) {
-      if (webGl) {
+      if (webGl && !webGl3d) {
         let index = Object.keys(enemyTypes).indexOf(this.type) + Object.keys(blockTypes).length;
         renderRect(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, this.height, index, this.alpha);
       } else {
