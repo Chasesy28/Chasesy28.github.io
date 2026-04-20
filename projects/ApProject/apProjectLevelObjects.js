@@ -234,6 +234,7 @@ class Player {
           const left = new THREE.Vector3();
           camera.getWorldDirection(left);
           left.y = 0;
+          left.cross(camera.up);
           left.normalize();
           left.multiplyScalar(this.speed);
           this.velX -= left.x;
@@ -243,6 +244,7 @@ class Player {
           const right = new THREE.Vector3();
           camera.getWorldDirection(right);
           right.y = 0;
+          right.cross(camera.up);
           right.normalize();
           right.multiplyScalar(this.speed);
           this.velX += right.x;
@@ -425,6 +427,14 @@ class Player {
     }
     if (this.y + this.size >= gameArea.height) {
       this.spawn();
+    }
+    if (webGl3d) {
+      if (this.z > activeLevelData[currentArea].length * 50 - 50) {
+        this.z = activeLevelData[currentArea].length * 50 - 50;
+      }
+      if (this.z < 0) {
+        this.z = 0;
+      }
     }
   }
 
@@ -832,7 +842,9 @@ class Enemy {
   }
 
   draw() {
-    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    if (!webGl3d){
+      this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    } else if (webGl3d) { this.alpha = 1; }
 
     if (this.layer !== player.layer) {
       let color = Math.max(this.colorR, this.colorG, this.colorB);

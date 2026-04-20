@@ -1,5 +1,5 @@
 // apProjectThree.js
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+//import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
 
@@ -8,11 +8,11 @@ world.scale.set(1, -1, 1);
 scene.add(world);
 
 // --- GLTF import ---
-const gltfLoader = new GLTFLoader();
+//const gltfLoader = new GLTFLoader();
 
 // IMPORTANT: set this path to where the file is hosted relative to the HTML page
 // Example if your model is at: projects/ApProject/models/myModel.glb
-gltfLoader.load(
+/*gltfLoader.load(
   './projects/ApProject/models/myModel.glb',
   (gltf) => {
     const model = gltf.scene;
@@ -31,7 +31,7 @@ gltfLoader.load(
   (err) => {
     console.error('GLTF failed to load:', err);
   }
-);
+);*/
 
 const toRenderY = (y) => -y;
 
