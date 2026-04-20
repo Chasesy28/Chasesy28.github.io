@@ -79,8 +79,7 @@ Located in `workers/` directory:
 ### Tailwind + Dark Mode
 
 - Dark mode via class strategy (`darkMode: ["class"]`)
-- Tailwind CSS v4 built locally with PostCSS from `styles.css` (includes @tailwind directives)
-- Custom CSS variables and animations in `styles.css`
+- Tailwind CSS v4 is built into `tailwind.css`; `styles.css` imports it and holds custom CSS variables and animations
 - Projects use local Tailwind via relative links to `../../styles.css`
 
 ## Integration Points

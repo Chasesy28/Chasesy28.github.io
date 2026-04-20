@@ -18,6 +18,7 @@ for entry in \
   scripts.js \
   SERVICE-WORKER-CACHE.md \
   styles.css \
+  tailwind.css \
   SUPABASE-INTEGRATION.md \
   sw.js \
   icons \

@@ -115,10 +115,10 @@ caches.keys().then((keys) => console.log("Current caches:", keys));
 
 ## Files Cached
 
-The service worker caches 25 essential files:
+The service worker caches 26 essential files:
 
 - Core pages: `/`, `/index.html`, `/manifest.json`
-- Static assets: `/styles.css`, `/scripts.js`, icons (includes loader/accessibility code)
+- Static assets: `/styles.css`, `/tailwind.css`, `/scripts.js`, icons (includes loader/accessibility code)
 - All project HTML, CSS, and JS files
 
 See `URLS_TO_CACHE` array in `sw.js` for the complete list.
