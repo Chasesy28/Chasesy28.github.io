@@ -690,7 +690,6 @@ class Block {
         this.cube.scale.y = this.height;
         this.cube.scale.z = 50;
         this.cube.material.opacity = this.alpha;
-        scene.add(this.cube);
       }
 
       /*if (shouldUseTextures && this.solid && this.textureIndex > 0) {

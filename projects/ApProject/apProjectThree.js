@@ -1,7 +1,8 @@
 // apProjectThree.js
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 0, 100);
+
+THREE.Object3D.DEFAULT_UP.set(0, -1, 0);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -17,6 +18,7 @@ scene.add(ambientLight);
 
 function createColoredCube(color) {
   const material = new THREE.MeshPhongMaterial({color});
+  material.side = THREE.DoubleSide;
   const cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
   return cube;
@@ -24,6 +26,7 @@ function createColoredCube(color) {
 
 function createTexturedCube(texture) {
   const material = new THREE.MeshPhongMaterial({map: texture});
+  material.side = THREE.DoubleSide;
   const cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
   return cube;
