@@ -1,4 +1,6 @@
 // apProjectThree.js
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 const scene = new THREE.Scene();
 
 const world = new THREE.Group();
