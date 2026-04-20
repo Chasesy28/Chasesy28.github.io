@@ -1,8 +1,13 @@
 // apProjectThree.js
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-THREE.Object3D.DEFAULT_UP.set(0, -1, 0);
+const world = new THREE.Group();
+world.scale.set(1, -1, 1);
+scene.add(world);
+
+const toRenderY = (y) => -y;
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -16,32 +21,49 @@ const loader = new THREE.TextureLoader();
 const ambientLight = new THREE.AmbientLight(0x404040, 2);
 scene.add(ambientLight);
 
-function createColoredCube(color) {
-  const material = new THREE.MeshPhongMaterial({color});
-  material.side = THREE.DoubleSide;
+function createColoredCube(r, g, b) {
+  const material = new THREE.MeshPhongMaterial({color: new THREE.Color(r/255, g/255, b/255)});
   const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  world.add(cube);
   return cube;
 }
 
-function createTexturedCube(texture) {
+function createTexturedCube(image) {
+  const texture = new THREE.Texture(image);
+  texture.needsUpdate = true;
+  texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.MeshPhongMaterial({map: texture});
-  material.side = THREE.DoubleSide;
   const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  world.add(cube);
   return cube;
 }
 
-function setColor(object, color) {
-  let objectColor = new THREE.Color(color);
+function setColor(object, r, g, b) {
+  let objectColor = new THREE.Color(r/255, g/255, b/255);
+  object.material.dispose();
   if (object.material) {
     object.material.color = objectColor;
+    object.material.map = null;
   }
 }
 
-function setTexture(object, texture) {
+function setTexture(object, image) {
+  const texture = new THREE.Texture(image);
+  texture.needsUpdate = true;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.NearestMipmapLinearFilter;
+  texture.magFilter = THREE.NearestFilter;
+  object.material.dispose();
   if (object.material) {
     object.material.map = texture;
+    object.material.color = new THREE.Color(1, 1, 1);
+  }
+}
+
+function setOpacity(object, opacity) {
+  if (object.material) {
+    object.material.transparent = opacity < 1;
+    object.material.opacity = opacity;
   }
 }
 
@@ -52,10 +74,6 @@ function sceneBackgroundColor(r, g, b) {
 function sceneBackgroundTexture(texture) {
   scene.background = texture;
 }
-
-let cube = createColoredCube(0x44aa88);
-cube.position.set(0, 0, 0);
-scene.add(cube);
 
 sceneBackgroundColor(105, 105, 105);
 
@@ -91,7 +109,7 @@ function renderScene() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
-  camera.position.set(player.x, player.y, player.layer * 50)
+  camera.position.set(player.x, toRenderY(player.y), player.layer * 50);
 
   camera.rotation.order = "YXZ";
   camera.rotation.y = cameraYaw;

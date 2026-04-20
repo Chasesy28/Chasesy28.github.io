@@ -614,7 +614,11 @@ class Block {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
   }
   draw() {
-    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    if (!webGl3d) {
+      this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    } else {
+      this.alpha = 1;
+    }
     const blockTypeData = blockTypes[this.type];
 
     if (this.temporary && this.timeToDisappear !== undefined) {
@@ -678,18 +682,21 @@ class Block {
       } else if (webGl && !webGl3d) {
         let index = Object.keys(blockTypes).indexOf(this.type);
         renderRect(renderX, renderY, this.width, this.height, index, this.alpha);
-      } else if (webGl3d && shouldUseTextures && this.texture) {
+      } else if (webGl3d) {
         if (!this.cube) {
-          let texture = new THREE.Texture(this.texture);
-          this.cube = createTexturedCube(texture);
+          this.cube = createColoredCube(this.colorR, this.colorG, this.colorB);
+        } else {
+          this.cube.visible = true;
+        }
+        if (shouldUseTextures && this.texture) {
+          setTexture(this.cube, this.texture);
+        } else {
+          setColor(this.cube, this.colorR, this.colorG, this.colorB);
         }
         this.cube.position.x = renderX
         this.cube.position.y = renderY;
         this.cube.position.z = this.layer * 50;
-        this.cube.scale.x = this.width;
-        this.cube.scale.y = this.height;
-        this.cube.scale.z = 50;
-        this.cube.material.opacity = this.alpha;
+        setOpacity(this.cube, this.alpha);
       }
 
       /*if (shouldUseTextures && this.solid && this.textureIndex > 0) {
@@ -709,8 +716,9 @@ class Block {
         ctx.fillStyle = this.color;
       ctx.fillRect(renderX, renderY, this.width, this.height);
       }*/
+    } else if (webGl3d && this.cube) {
+      this.cube.visible = false;
     }
-
 
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
