@@ -835,6 +835,7 @@ class Enemy {
     this.isEnemy = true;
 
     this.cube = null;
+    this.model = './3D-Models/snowball_dark.glb';
   }
 
   colorReset() {
@@ -883,13 +884,15 @@ class Enemy {
         );
       } else if (webGl3d) {
         if (!this.cube) {
-          this.cube = createColoredCube(this.colorR, this.colorG, this.colorB);
+          //this.cube = createColoredCube(this.colorR, this.colorG, this.colorB);
+          this.cube = createModel(this.model);
         } else {
           this.cube.visible = true;
         }
         this.cube.position.x = Math.round(this.x - player.globalOffsetX);
         this.cube.position.y = Math.round(this.y - player.globalOffsetY);
         this.cube.position.z = this.layer * 50;
+        this.cube.scale.set(this.width, this.height, this.width);
         setOpacity(this.cube, this.alpha);
       }
     } else if (webGl3d && this.cube) {

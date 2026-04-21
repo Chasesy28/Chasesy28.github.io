@@ -8,21 +8,13 @@ world.scale.set(1, -1, 1);
 scene.add(world);
 
 // --- GLTF import ---
-function initGLTFLoader() {
-  if (typeof THREE === 'undefined' || !THREE.GLTFLoader) {
-    console.error('THREE or GLTFLoader not loaded yet');
-    return null;
-  }
-  return new THREE.GLTFLoader();
-}
-
-const gltfLoader = initGLTFLoader();
+const gltfLoader = new THREE.GLTFLoader();
 
 // IMPORTANT: set this path to where the file is hosted relative to the HTML page
-// Example if your model is at: projects/ApProject/models/myModel.glb
+// Example if your model is at: projects/ApProject/3D-Models/myModel.glb
 if (gltfLoader) {
   gltfLoader.load(
-    './3D-Models/Enemy-1.glb',
+    './3D-Models/snowball_dark.glb',
     (gltf) => {
       const model = gltf.scene;
       world.add(model);
@@ -37,6 +29,7 @@ if (gltfLoader) {
         }
       })
     },
+    undefined,
     (err) => {
       console.error('GLTF failed to load:', err);
     }
@@ -74,6 +67,31 @@ function createTexturedCube(image) {
   const cube = new THREE.Mesh(geometry, material);
   world.add(cube);
   return cube;
+}
+
+function createModel(modelPath) {
+  const modelObject = new THREE.Group();
+  world.add(modelObject);
+
+  gltfLoader.load(
+    modelPath,
+    (gltf) => {
+      const model = gltf.scene;
+      modelObject.add(model);
+
+      model.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+        }
+      });
+    },
+    undefined,
+    (err) => {
+      console.error('GLTF failed to load:', err);
+    }
+  );
+  return modelObject;
 }
 
 function setColor(object, r, g, b) {
