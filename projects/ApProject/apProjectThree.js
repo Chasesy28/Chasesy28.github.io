@@ -11,34 +11,10 @@ scene.add(world);
 const gltfLoader = new THREE.GLTFLoader();
 
 // IMPORTANT: set this path to where the file is hosted relative to the HTML page
-// Example if your model is at: projects/ApProject/3D-Models/myModel.glb
-if (gltfLoader) {
-  gltfLoader.load(
-    './3D-Models/snowball_dark.glb',
-    (gltf) => {
-      const model = gltf.scene;
-      world.add(model);
-      model.position.set(0, toRenderY(0), -100);
-      model.scale.set(10, 10, 10);
-
-      // Optional: improve shading
-      model.traverse((obj) => {
-        if (obj.isMesh) {
-          obj.castShadow = true;
-          obj.receiveShadow = true;
-        }
-      })
-    },
-    undefined,
-    (err) => {
-      console.error('GLTF failed to load:', err);
-    }
-  );
-}
-
+// Example if your model is at: ./3D-Models/myModel.glb
 const toRenderY = (y) => -y;
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);

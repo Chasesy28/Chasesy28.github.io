@@ -250,8 +250,11 @@ class Player {
           this.velX += right.x;
           this.velZ += right.z;
         }
-        this.velX = Math.max(-this.maxVelX, Math.min(this.maxVelX, this.velX));
-        this.velZ = Math.max(-this.maxVelX, Math.min(this.maxVelX, this.velZ));
+        if (Math.abs(this.velX) + Math.abs(this.velZ) > this.maxVelX) {
+          const angle = Math.atan2(this.velZ, this.velX);
+          this.velX = Math.cos(angle) * this.maxVelX;
+          this.velZ = Math.sin(angle) * this.maxVelX;
+        }
         if (this.currentGroundBlock != null && !controller.right.pressed && !controller.left.pressed && !controller.forward.pressed && !controller.backward.pressed) {
           this.velX *= this.currentGroundBlock.friction;
           this.velZ *= this.currentGroundBlock.friction;
@@ -265,10 +268,16 @@ class Player {
 
   scrolling() {
     //Scrolling horizontally
-    let longestHorizontalLayerLength = Math.max.apply(
-      null,
-      activeLevelData[currentArea][player.layer].map((layer) => layer.length),
-    );
+    let longestHorizontalLayerLength = 0;
+    let longestVerticalLayerLength = 0;
+    for (let i = 0; i < activeLevelData[currentArea].length; i++) {
+      if (activeLevelData[currentArea][i].length > longestHorizontalLayerLength) {
+        longestHorizontalLayerLength = activeLevelData[currentArea][i].length;
+      }
+      if (activeLevelData[currentArea][i].length > longestVerticalLayerLength) {
+        longestVerticalLayerLength = activeLevelData[currentArea][i].length;
+      }
+    }
     if (
       (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) &&
       this.globalOffsetX < longestHorizontalLayerLength * 50 - gameArea.width &&
@@ -298,9 +307,9 @@ class Player {
     if (
       (this.y >= gameArea.height / 2 || this.globalOffsetY > 0) &&
       this.globalOffsetY <
-        activeLevelData[currentArea][player.layer].length * 50 -
+        longestVerticalLayerLength * 50 -
           gameArea.height &&
-      activeLevelData[currentArea][player.layer].length * 50 > gameArea.height
+      longestVerticalLayerLength * 50 > gameArea.height
     ) {
       this.globalOffsetY += this.velY;
       if (this.globalOffsetY <= 0) {
@@ -312,13 +321,12 @@ class Player {
     }
     if (
       this.globalOffsetY >=
-        activeLevelData[currentArea][player.layer].length * 50 -
-          gameArea.height &&
-      activeLevelData[currentArea][player.layer].length * 50 > gameArea.height
+        longestVerticalLayerLength * 50 - gameArea.height &&
+      longestVerticalLayerLength * 50 > gameArea.height
     ) {
       if (this.y >= gameArea.height / 2) {
         this.globalOffsetY =
-          activeLevelData[currentArea][player.layer].length * 50 -
+          longestVerticalLayerLength * 50 -
           gameArea.height;
       } else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
@@ -413,15 +421,15 @@ class Player {
   }
 
   gameBoundaryDetection() {
-    if (this.x <= 0) {
+    if (this.x <= 0 && !webGl3d) {
       this.x = 0;
       this.velX = 0;
     }
-    if (this.x + this.width > gameArea.width) {
+    if (this.x + this.width > gameArea.width && !webGl3d) {
       this.x = gameArea.width - this.width;
       this.velX = 0;
     }
-    if (this.y <= 0) {
+    if (this.y <= 0 && !webGl3d) {
       this.y = 0;
       this.velY = 0;
     }
@@ -693,17 +701,22 @@ class Block {
       this.colorReset();
     }
 
-    if (
-      Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
-      Math.round(this.x - player.globalOffsetX) > gameArea.width ||
-      Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
-      Math.round(this.y - player.globalOffsetY) > gameArea.height ||
-      this.alpha <= 0 ||
-      this.timeToReappear !== undefined
-    ) {
+    if (this.alpha <= 0 || this.timeToReappear !== undefined) {
       this.visible = false;
     } else {
       this.visible = true;
+    }
+
+    if (
+      !webGl3d &&
+      (
+        Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
+        Math.round(this.x - player.globalOffsetX) > gameArea.width ||
+        Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
+        Math.round(this.y - player.globalOffsetY) > gameArea.height
+      )
+    ) {
+      this.visible = false;
     }
 
     const shouldUseTextures =
@@ -741,34 +754,20 @@ class Block {
           setColor(this.cube, this.colorR, this.colorG, this.colorB);
           this.setTexture = false;
         }
-        this.cube.position.x = renderX
+        this.cube.position.x = renderX;
         this.cube.position.y = renderY;
         this.cube.position.z = this.layer * 50;
         setOpacity(this.cube, this.alpha);
       }
-
-      /*if (shouldUseTextures && this.solid && this.textureIndex > 0) {
-        const texture = Block.texturePool[this.textureIndex - 1];
-        if (texture && texture.complete && texture.naturalWidth > 0) {
-          const previousSmoothing = ctx.imageSmoothingEnabled;
-          ctx.imageSmoothingEnabled = false;
-          ctx.globalAlpha = this.alpha;
-          ctx.drawImage(texture, renderX, renderY, this.width, this.height);
-          ctx.globalAlpha = 1;
-          ctx.imageSmoothingEnabled = previousSmoothing;
-        } else {
-          ctx.fillStyle = this.color;
-        ctx.fillRect(renderX, renderY, this.width, this.height);
-        }
-        } else {
-        ctx.fillStyle = this.color;
-      ctx.fillRect(renderX, renderY, this.width, this.height);
-      }*/
     } else if (webGl3d && this.cube) {
-      this.cube.visible = false;
+      this.visible = true;
     }
 
-    this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    if (!webGl3d) {
+      this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+    } else {
+      this.alpha = 1;
+    }
   }
   startTempDisappear() {
     this.timeToDisappear = blockTypes[this.type].disappearTime;
