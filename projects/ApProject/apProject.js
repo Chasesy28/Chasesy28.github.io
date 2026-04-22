@@ -172,15 +172,6 @@ let longestVerticalLength;
 let activeLevelData = [];
 
 function removeAllObjects() {
-  /*for (let i = world.children.length - 1; i >= 0; i--) {
-    const child = world.children[i];
-    world.remove(child);
-    if (child.geometry) child.geometry.dispose();
-    if (child.material) {
-      if (child.material.map) child.material.map.dispose();
-      child.material.dispose();
-    }
-  }*/
   for (let i = activeLevelData[currentArea].length - 1; i >= 0; i--) {
     const layer = activeLevelData[currentArea][i];
     for (let j = layer.length - 1; j >= 0; j--) {
