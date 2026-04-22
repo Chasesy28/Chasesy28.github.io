@@ -452,14 +452,6 @@ class Player {
     }
   }
 
-  groundedDetection(object) {
-    this.resolveSolidCollision(object);
-  }
-
-  sideBlockDetection(object) {
-    this.resolveSolidCollision(object);
-  }
-
   gameBoundaryDetection() {
     if (this.x <= 0 && !webGl3d) {
       this.x = 0;
@@ -987,7 +979,6 @@ class Enemy {
     }
   }
 
-  // ↓ I'm Probably going to use this as my part of the ap project ↓
   getSolidBlocksOnLayer() {
     const solids = [];
     const layerData = activeLevelData[currentArea][this.layer];
@@ -1004,6 +995,7 @@ class Enemy {
     return solids;
   }
 
+  // ↓ I'm Probably going to use this as my part of the AP project ↓
   collidesWithSolid(nextX, nextY, solids) {
     for (let i = 0; i < solids.length; i++) {
       const block = solids[i];
