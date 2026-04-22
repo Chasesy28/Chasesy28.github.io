@@ -10,7 +10,6 @@
 7 = spike
 d = area door (Needs a number after it to determine which area it goes to (Based off of the index of the area in the level array), ex: d1 would be an area door that goes to area 1)
 e = enemy (Followed by a number for the type of enemy)
-  0 = basic enemy (Moves back and forth on a platform)
 */
 const levels = [
   //Level 1

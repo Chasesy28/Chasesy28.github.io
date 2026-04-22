@@ -5,9 +5,9 @@ function getBlockTexturePath(index) {
 
 class Player {
   constructor(size, imageSrc) {
-    this.x;
-    this.y;
-    this.z;
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
     this.baseSize = size;
     this.size = size;
     this.image = new Image();
@@ -24,9 +24,9 @@ class Player {
     this.velX = 0;
     this.velY = 0;
     this.velZ = 0;
-    this.prevY;
-    this.prevX;
-    this.speed = 0.5;
+    this.prevY = 0;
+    this.prevX = 0;
+    this.speed = 0.3;
     this.gravity = 0.5;
     this.jumpStrength = -11;
     this.jumps = 0;
@@ -35,7 +35,6 @@ class Player {
     this.maxFallSpeed = 15;
     this.maxVelX = 5;
     this.maxVelY = 15;
-    this.acceleration = 0;
     this.currentGroundBlock = null;
     this.insideBlock = null;
 
@@ -90,9 +89,7 @@ class Player {
   }
 
   drawPlayer() {
-    this.width = Math.floor(
-      this.size * (this.image.width / this.image.height),
-    );
+    this.width = Math.floor(this.size * (this.image.width / this.image.height));
     if (this.dead) {
       this.alpha -= 0.01;
       if (webGl3d) {
@@ -127,14 +124,30 @@ class Player {
       }
       ctx.globalAlpha = 1;
     } else if (webGl && this.direction === "right") {
-      renderImage(this.image, Math.round(this.x), Math.round(this.y), this.width, this.size, this.alpha);
+      renderImage(
+        this.image,
+        Math.round(this.x),
+        Math.round(this.y),
+        this.width,
+        this.size,
+        this.alpha,
+      );
     } else if (webGl && this.direction === "left") {
-      renderImage(this.image, Math.round(this.x) + this.width, Math.round(this.y), this.width * -1, this.size, this.alpha);
+      renderImage(
+        this.image,
+        Math.round(this.x) + this.width,
+        Math.round(this.y),
+        this.width * -1,
+        this.size,
+        this.alpha,
+      );
     }
   }
 
   move(controller) {
-    if (!webGl3d) { this.z = this.layer * 50; }
+    if (!webGl3d) {
+      this.z = this.layer * 50;
+    }
     if (this.canMove) {
       if (!webGl3d) {
         if (controller.right.pressed) {
@@ -147,7 +160,11 @@ class Player {
         }
       }
 
-      if (this.currentGroundBlock != null && !controller.right.pressed && !controller.left.pressed) {
+      if (
+        this.currentGroundBlock != null &&
+        !controller.right.pressed &&
+        !controller.left.pressed
+      ) {
         this.velX *= this.currentGroundBlock.friction;
       }
       if (this.insideBlock !== null) {
@@ -192,18 +209,8 @@ class Player {
         }
       }
 
-      if (this.velX <= 0.1 && this.velX > 0) {
-        this.velX = 0;
-      }
-      if (this.velX >= -0.1 && this.velX < 0) {
-        this.velX = 0;
-      }
-      if (this.velY <= 0.1 && this.velY > 0) {
-        this.velY = 0;
-      }
-      if (this.velY >= -0.1 && this.velY < 0) {
-        this.velY = 0;
-      }
+      this.snapVelocityToZero("velX");
+      this.snapVelocityToZero("velY");
 
       // Store previous offsets before scrolling
       this.prevGlobalOffsetX = this.globalOffsetX;
@@ -255,7 +262,13 @@ class Player {
           this.velX = Math.cos(angle) * this.maxVelX;
           this.velZ = Math.sin(angle) * this.maxVelX;
         }
-        if (this.currentGroundBlock != null && !controller.right.pressed && !controller.left.pressed && !controller.forward.pressed && !controller.backward.pressed) {
+        if (
+          this.currentGroundBlock != null &&
+          !controller.right.pressed &&
+          !controller.left.pressed &&
+          !controller.forward.pressed &&
+          !controller.backward.pressed
+        ) {
           this.velX *= this.currentGroundBlock.friction;
           this.velZ *= this.currentGroundBlock.friction;
         }
@@ -266,17 +279,37 @@ class Player {
     }
   }
 
+  snapVelocityToZero(axis, threshold = 0.1) {
+    if (Math.abs(this[axis]) <= threshold) {
+      this[axis] = 0;
+    }
+  }
+
   scrolling() {
-    //Scrolling horizontally
     let longestHorizontalLayerLength = 0;
     let longestVerticalLayerLength = 0;
-    for (let i = 0; i < activeLevelData[currentArea].length; i++) {
-      if (activeLevelData[currentArea][i].length > longestHorizontalLayerLength) {
-        longestHorizontalLayerLength = activeLevelData[currentArea][i].length;
+    try {
+      for (let i = 0; i < activeLevelData[currentArea].length; i++) {
+        if (
+          activeLevelData[currentArea][i].length > longestHorizontalLayerLength
+        ) {
+          longestHorizontalLayerLength = activeLevelData[currentArea][i].length;
+        }
+        if (
+          activeLevelData[currentArea][i].length > longestVerticalLayerLength
+        ) {
+          longestVerticalLayerLength = activeLevelData[currentArea][i].length;
+        }
       }
-      if (activeLevelData[currentArea][i].length > longestVerticalLayerLength) {
-        longestVerticalLayerLength = activeLevelData[currentArea][i].length;
-      }
+    } catch (error) {
+      console.warn("[APProject] Failed to read level bounds for scrolling", {
+        currentArea,
+        playerLayer: this.layer,
+        error,
+      });
+      this.x += this.velX;
+      this.y += this.velY;
+      return;
     }
     if (
       (this.x >= gameArea.width / 2 || this.globalOffsetX > 0) &&
@@ -303,12 +336,9 @@ class Player {
       }
     }
 
-    //scrolling vertically
     if (
       (this.y >= gameArea.height / 2 || this.globalOffsetY > 0) &&
-      this.globalOffsetY <
-        longestVerticalLayerLength * 50 -
-          gameArea.height &&
+      this.globalOffsetY < longestVerticalLayerLength * 50 - gameArea.height &&
       longestVerticalLayerLength * 50 > gameArea.height
     ) {
       this.globalOffsetY += this.velY;
@@ -320,104 +350,114 @@ class Player {
       this.y += this.velY;
     }
     if (
-      this.globalOffsetY >=
-        longestVerticalLayerLength * 50 - gameArea.height &&
+      this.globalOffsetY >= longestVerticalLayerLength * 50 - gameArea.height &&
       longestVerticalLayerLength * 50 > gameArea.height
     ) {
       if (this.y >= gameArea.height / 2) {
-        this.globalOffsetY =
-          longestVerticalLayerLength * 50 -
-          gameArea.height;
+        this.globalOffsetY = longestVerticalLayerLength * 50 - gameArea.height;
       } else if (this.y < gameArea.height / 2) {
         this.globalOffsetY += this.velY;
       }
     }
   }
 
-  groundedDetection(object) {
-    // Convert to world space using previous frame offsets
-    const previousBottomWorld =
-      this.prevY + this.prevGlobalOffsetY + this.width;
-    const currentBottomWorld = this.y + this.globalOffsetY + this.size;
-    const blockTopWorld = object.y;
+  getWorldBounds(usePreviousFrame = false) {
+    const offsetX = usePreviousFrame
+      ? this.prevGlobalOffsetX
+      : this.globalOffsetX;
+    const offsetY = usePreviousFrame
+      ? this.prevGlobalOffsetY
+      : this.globalOffsetY;
+    const playerX = usePreviousFrame ? this.prevX : this.x;
+    const playerY = usePreviousFrame ? this.prevY : this.y;
 
-    // Player X in world space
-    const playerLeftWorld = this.x + this.prevGlobalOffsetX;
-    const playerRightWorld = this.x + this.prevGlobalOffsetX + this.width;
-    const blockLeftWorld = object.x;
-    const blockRightWorld = object.x + object.width;
+    const left = playerX + offsetX;
+    const top = playerY + offsetY;
 
-    if (
-      previousBottomWorld <= blockTopWorld &&
-      currentBottomWorld >= blockTopWorld &&
-      playerRightWorld > blockLeftWorld &&
-      playerLeftWorld < blockRightWorld
-    ) {
-      this.grounded = true;
-      this.jumps = this.maxAirJumps;
-      this.currentGroundBlock = object;
-      if (
-        this.currentGroundBlock.temporary &&
-        this.currentGroundBlock.timeToDisappear === undefined
-      ) {
-        object.startTempDisappear();
+    return {
+      left,
+      right: left + this.width,
+      top,
+      bottom: top + this.size,
+    };
+  }
+
+  resolveSolidCollision(object) {
+    if (!object || !object.solid) {
+      return;
+    }
+
+    const previousBounds = this.getWorldBounds(true);
+    let currentBounds = this.getWorldBounds(false);
+
+    const blockLeft = object.x;
+    const blockRight = object.x + object.width;
+    const blockTop = object.y;
+    const blockBottom = object.y + object.height;
+
+    const overlapsY =
+      currentBounds.bottom > blockTop && currentBounds.top < blockBottom;
+
+    if (overlapsY) {
+      const enteredLeftFace =
+        previousBounds.right <= blockLeft &&
+        currentBounds.right > blockLeft &&
+        this.velX > 0;
+      const enteredRightFace =
+        previousBounds.left >= blockRight &&
+        currentBounds.left < blockRight &&
+        this.velX < 0;
+
+      if (enteredLeftFace) {
+        this.globalOffsetX = this.prevGlobalOffsetX;
+        this.x = blockLeft - this.width - this.globalOffsetX;
+        this.velX = 0;
+      } else if (enteredRightFace) {
+        this.globalOffsetX = this.prevGlobalOffsetX;
+        this.x = blockRight - this.globalOffsetX;
+        this.velX = 0;
       }
-      this.velY = 0;
-      this.y = object.y - this.size - this.globalOffsetY;
+    }
+
+    currentBounds = this.getWorldBounds(false);
+    const overlapsX =
+      currentBounds.right > blockLeft && currentBounds.left < blockRight;
+
+    if (overlapsX) {
+      const landedOnTop =
+        previousBounds.bottom <= blockTop &&
+        currentBounds.bottom >= blockTop &&
+        this.velY >= 0;
+      const hitUnderside =
+        previousBounds.top >= blockBottom &&
+        currentBounds.top <= blockBottom &&
+        this.velY < 0;
+
+      if (landedOnTop) {
+        this.grounded = true;
+        this.jumps = this.maxAirJumps;
+        this.currentGroundBlock = object;
+        if (
+          this.currentGroundBlock.temporary &&
+          this.currentGroundBlock.timeToDisappear === undefined
+        ) {
+          object.startTempDisappear();
+        }
+        this.velY = 0;
+        this.y = object.y - this.size - this.globalOffsetY;
+      } else if (hitUnderside) {
+        this.velY = 0;
+        this.y = blockBottom - this.globalOffsetY;
+      }
     }
   }
 
+  groundedDetection(object) {
+    this.resolveSolidCollision(object);
+  }
+
   sideBlockDetection(object) {
-    // Use previous and current world space positions
-    const previousPlayerLeftWorld = this.prevX + this.prevGlobalOffsetX;
-    const previousPlayerRightWorld = previousPlayerLeftWorld + this.width;
-
-    const playerLeftWorld = this.x + this.globalOffsetX;
-    const playerRightWorld = playerLeftWorld + this.width;
-    const playerTopWorld = this.y + this.globalOffsetY;
-    const playerBottomWorld = playerTopWorld + this.size;
-
-    const blockLeftWorld = object.x;
-    const blockRightWorld = object.x + object.width;
-    const blockTopWorld = object.y;
-    const blockBottomWorld = object.y + object.height;
-
-    // Check for horizontal collision
-    if (
-      playerBottomWorld > blockTopWorld &&
-      playerTopWorld < blockBottomWorld
-    ) {
-      const pushingIntoLeftFace =
-        this.velX > 0 &&
-        playerLeftWorld < blockLeftWorld &&
-        playerRightWorld > blockLeftWorld;
-      const pushingIntoRightFace =
-        this.velX < 0 &&
-        playerLeftWorld < blockRightWorld &&
-        playerRightWorld > blockRightWorld;
-
-      if (
-        (previousPlayerRightWorld <= blockLeftWorld &&
-          playerRightWorld > blockLeftWorld &&
-          this.velX > 0) ||
-        pushingIntoLeftFace
-      ) {
-        // Entered the block from the left this frame.
-        this.globalOffsetX = this.prevGlobalOffsetX;
-        this.x = blockLeftWorld - this.width - this.globalOffsetX;
-        this.velX = 0;
-      } else if (
-        (previousPlayerLeftWorld >= blockRightWorld &&
-          playerLeftWorld < blockRightWorld &&
-          this.velX < 0) ||
-        pushingIntoRightFace
-      ) {
-        // Entered the block from the right this frame.
-        this.globalOffsetX = this.prevGlobalOffsetX;
-        this.x = blockRightWorld - this.globalOffsetX;
-        this.velX = 0;
-      }
-    }
+    this.resolveSolidCollision(object);
   }
 
   gameBoundaryDetection() {
@@ -485,7 +525,7 @@ class Player {
   }
 }
 
-function newPlayer () {
+function newPlayer() {
   return new Player(50, "images/Mario.png");
 }
 
@@ -604,7 +644,14 @@ class Block {
   static getTexture(index) {
     if (!Block.texturePool[index - 1]) {
       const image = new Image();
-      image.src = getBlockTexturePath(index);
+      try {
+        image.src = getBlockTexturePath(index);
+      } catch (error) {
+        console.warn("[APProject] Failed to load block texture", {
+          textureIndex: index,
+          error,
+        });
+      }
       Block.texturePool[index - 1] = image;
     }
 
@@ -616,11 +663,13 @@ class Block {
       return;
     }
 
-    const textureIndexes = [...new Set(
-      Object.values(blockTypes)
-        .map((blockType) => blockType.textureIndex)
-        .filter((textureIndex) => Number.isInteger(textureIndex)),
-    )];
+    const textureIndexes = [
+      ...new Set(
+        Object.values(blockTypes)
+          .map((blockType) => blockType.textureIndex)
+          .filter((textureIndex) => Number.isInteger(textureIndex)),
+      ),
+    ];
 
     textureIndexes.forEach((index) => {
       Block.getTexture(index);
@@ -669,7 +718,10 @@ class Block {
   }
   draw() {
     if (!webGl3d) {
-      this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+      this.alpha = Math.max(
+        0.1,
+        1 - Math.abs(player.layer - this.layer) * 0.85,
+      );
     } else {
       this.alpha = 1;
     }
@@ -709,12 +761,10 @@ class Block {
 
     if (
       !webGl3d &&
-      (
-        Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
+      (Math.round(this.x - player.globalOffsetX + this.width) < 0 ||
         Math.round(this.x - player.globalOffsetX) > gameArea.width ||
         Math.round(this.y - player.globalOffsetY + this.height) < 0 ||
-        Math.round(this.y - player.globalOffsetY) > gameArea.height
-      )
+        Math.round(this.y - player.globalOffsetY) > gameArea.height)
     ) {
       this.visible = false;
     }
@@ -737,10 +787,24 @@ class Block {
         ctx.fillStyle = this.color;
         ctx.fillRect(renderX, renderY, this.width, this.height);
       } else if (webGl && shouldUseTextures && this.texture && !webGl3d) {
-        renderImage(this.texture, renderX, renderY, this.width, this.height, this.alpha);
+        renderImage(
+          this.texture,
+          renderX,
+          renderY,
+          this.width,
+          this.height,
+          this.alpha,
+        );
       } else if (webGl && !webGl3d) {
         let index = Object.keys(blockTypes).indexOf(this.type);
-        renderRect(renderX, renderY, this.width, this.height, index, this.alpha);
+        renderRect(
+          renderX,
+          renderY,
+          this.width,
+          this.height,
+          index,
+          this.alpha,
+        );
       } else if (webGl3d) {
         if (!this.cube) {
           this.cube = createColoredCube(this.colorR, this.colorG, this.colorB);
@@ -764,7 +828,10 @@ class Block {
     }
 
     if (!webGl3d) {
-      this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
+      this.alpha = Math.max(
+        0.1,
+        1 - Math.abs(player.layer - this.layer) * 0.85,
+      );
     } else {
       this.alpha = 1;
     }
@@ -807,7 +874,7 @@ const enemyTypes = {
     colorR: 0,
     colorG: 0,
     colorB: 255,
-  }
+  },
 };
 
 class Enemy {
@@ -834,7 +901,7 @@ class Enemy {
     this.isEnemy = true;
 
     this.cube = null;
-    this.model = './3D-Models/snowball_dark.glb';
+    this.model = "./3D-Models/snowball_dark.glb";
   }
 
   colorReset() {
@@ -842,9 +909,14 @@ class Enemy {
   }
 
   draw() {
-    if (!webGl3d){
-      this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
-    } else if (webGl3d) { this.alpha = 1; }
+    if (!webGl3d) {
+      this.alpha = Math.max(
+        0.1,
+        1 - Math.abs(player.layer - this.layer) * 0.85,
+      );
+    } else if (webGl3d) {
+      this.alpha = 1;
+    }
 
     if (this.layer !== player.layer) {
       let color = Math.max(this.colorR, this.colorG, this.colorB);
@@ -871,15 +943,24 @@ class Enemy {
     // Skip rendering if not visible or fully transparent
     if (this.visible && this.alpha > 0) {
       if (webGl && !webGl3d) {
-        let index = Object.keys(enemyTypes).indexOf(this.type) + Object.keys(blockTypes).length;
-        renderRect(Math.round(this.x - player.globalOffsetX), Math.round(this.y - player.globalOffsetY), this.width, this.height, index, this.alpha);
+        let index =
+          Object.keys(enemyTypes).indexOf(this.type) +
+          Object.keys(blockTypes).length;
+        renderRect(
+          Math.round(this.x - player.globalOffsetX),
+          Math.round(this.y - player.globalOffsetY),
+          this.width,
+          this.height,
+          index,
+          this.alpha,
+        );
       } else if (!webGl && !webGl3d) {
         ctx.fillStyle = this.color;
         ctx.fillRect(
           Math.round(this.x - player.globalOffsetX),
           Math.round(this.y - player.globalOffsetY),
           this.width,
-          this.height
+          this.height,
         );
       } else if (webGl3d) {
         if (!this.cube) {
@@ -908,10 +989,13 @@ class Enemy {
     }
   }
 
+  // ↓ I'm Probably going to use this as my part of the ap project ↓
   getSolidBlocksOnLayer() {
     const solids = [];
     const layerData = activeLevelData[currentArea][this.layer];
+    // Loop through the rows of the layer
     for (let i = 0; i < layerData.length; i++) {
+      // Loop through the columns of the layer
       for (let j = 0; j < layerData[i].length; j++) {
         const object = layerData[i][j];
         if (object.isBlock && object.solid) {
@@ -925,8 +1009,10 @@ class Enemy {
   collidesWithSolid(nextX, nextY, solids) {
     for (let i = 0; i < solids.length; i++) {
       const block = solids[i];
-      const overlapX = nextX < block.x + block.width && nextX + this.width > block.x;
-      const overlapY = nextY < block.y + block.height && nextY + this.height > block.y;
+      const overlapX =
+        nextX < block.x + block.width && nextX + this.width > block.x;
+      const overlapY =
+        nextY < block.y + block.height && nextY + this.height > block.y;
       if (overlapX && overlapY) {
         return true;
       }
@@ -940,8 +1026,10 @@ class Enemy {
 
     for (let i = 0; i < solids.length; i++) {
       const block = solids[i];
-      const overBlockX = lookAheadX >= block.x && lookAheadX <= block.x + block.width;
-      const nearTopSurface = feetY >= block.y && feetY <= block.y + block.height;
+      const overBlockX =
+        lookAheadX >= block.x && lookAheadX <= block.x + block.width;
+      const nearTopSurface =
+        feetY >= block.y && feetY <= block.y + block.height;
       if (overBlockX && nearTopSurface) {
         return true;
       }

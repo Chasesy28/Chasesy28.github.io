@@ -9,7 +9,6 @@ body {
 	position: fixed;
 	/* Prevents scrolling */
 	touch-action: none;
-	/* Prevents pull-to-refresh and pinch-zoom on touchscreens */
 	display: flex;
 }
 
@@ -246,7 +245,7 @@ body {
 }
 
 .keybind,
-.level-editor-menu button{
+.level-editor-menu button {
 	width: 100%;
 	padding: 0.6rem;
 	margin-bottom: 0.75rem;
@@ -351,6 +350,7 @@ body {
 	border-radius: 8px;
 	box-shadow: 0 8px 24px rgba(149, 57, 0, 0.25);
 }
+
 .area h3 {
 	margin: 0;
 }
@@ -362,6 +362,7 @@ body {
 	border-radius: 8px;
 	box-shadow: 0 6px 18px rgba(149, 57, 0, 0.15);
 }
+
 .layer h4 {
 	margin: 0;
 }
@@ -373,6 +374,7 @@ body {
 	border-radius: 8px;
 	box-shadow: 0 4px 12px rgba(149, 57, 0, 0.1);
 }
+
 .row h5 {
 	margin: 0;
 	font-size: 0.9rem;
@@ -388,6 +390,7 @@ body {
 	flex-direction: column;
 	gap: 0.25rem;
 }
+
 .tile h6 {
 	margin: 0;
 	font-size: 0.85rem;

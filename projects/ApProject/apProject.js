@@ -239,26 +239,31 @@ function gameLoop() {
     player.currentGroundBlock = null;
     player.insideBlock = null;
     let areaChanged = false;
-    for (let i = 0; i < activeLevelData[currentArea][player.layer].length; i++) {
-      for (let j = 0; j < activeLevelData[currentArea][player.layer][i].length; j++) {
-        if (activeLevelData[currentArea][player.layer][i][j].isBlock) {
-          const block = activeLevelData[currentArea][player.layer][i][j];
-          if (block.solid) {
-            if (
-              Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
-              Math.abs(player.y - block.y + player.globalOffsetY) < 100
-            ) {
-              const wasInsideThisBlock = player.isOverlappingObject(block, true);
-              const insideThisBlock = player.insideBlockDetection(block);
-              const shouldIgnoreCollision = wasInsideThisBlock && insideThisBlock;
+    try {
+      const layerData = activeLevelData[currentArea][player.layer];
+      for (let i = 0; i < layerData.length; i++) {
+        for (let j = 0; j < layerData[i].length; j++) {
+          const levelObject = layerData[i][j];
+          if (!levelObject) {
+            continue;
+          }
 
-              if (!shouldIgnoreCollision) {
-                player.sideBlockDetection(block);
-                player.groundedDetection(block);
+          if (levelObject.isBlock) {
+            const block = levelObject;
+            if (block.solid) {
+              if (
+                Math.abs(player.x - block.x + player.globalOffsetX) < 100 &&
+                Math.abs(player.y - block.y + player.globalOffsetY) < 100
+              ) {
+                const wasInsideThisBlock = player.isOverlappingObject(block, true);
+                const insideThisBlock = player.insideBlockDetection(block);
+                const shouldIgnoreCollision = wasInsideThisBlock && insideThisBlock;
+
+                if (!shouldIgnoreCollision) {
+                  player.resolveSolidCollision(block);
+                }
               }
-            }
-          } else {
-            if (player.insideBlockDetection(block)) {
+            } else if (player.insideBlockDetection(block)) {
               if (controller.interact.pressed) {
                 if (
                   block.type === "areaDoor" ||
@@ -276,19 +281,30 @@ function gameLoop() {
                 break;
               }
             }
+          } else if (levelObject.isEnemy) {
+            const enemy = levelObject;
+            enemy.update();
+            if (player.isOverlappingObject(enemy, true)) {
+              player.die();
+              break;
+            }
           }
-        } else if (activeLevelData[currentArea][player.layer][i][j].isEnemy) {
-          const enemy = activeLevelData[currentArea][player.layer][i][j];
-          enemy.update();
-          if (player.isOverlappingObject(enemy, true)) {
-            player.die();
+
+          if (areaChanged) {
             break;
           }
         }
-        if (areaChanged) {
-          break;
-        }
       }
+    } catch (error) {
+      console.warn("[APProject] Collision iteration failed", {
+        currentArea,
+        playerLayer: player.layer,
+        playerX: player.x,
+        playerY: player.y,
+        offsetX: player.globalOffsetX,
+        offsetY: player.globalOffsetY,
+        error,
+      });
     }
   }
 

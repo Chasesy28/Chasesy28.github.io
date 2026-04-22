@@ -1,4 +1,5 @@
 //apProjectSettings.js
+
 //PS currently the settings menu has features like framerate and rendering type which I haven't figured out how to do yet so they just send console.logs when changed, but the keybind changing works and saves to local storage so you can change your keybinds and they will be there when you refresh the page
 const panel = document.getElementById("settingsMenu");
 
