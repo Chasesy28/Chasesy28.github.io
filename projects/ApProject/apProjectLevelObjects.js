@@ -844,6 +844,12 @@ class Block {
     this.timeToReappear = undefined;
     this.visible = true;
   }
+  remove() {
+    if (webGl3d && this.cube) {
+      removeObject(this.cube);
+      this.cube = null;
+    }
+  }
 }
 
 const enemyTypes = {
@@ -893,7 +899,7 @@ class Enemy {
     this.isEnemy = true;
 
     this.cube = null;
-    this.model = "./3D-Models/snowball_dark.glb";
+    this.model = "./3D-Models/Kieran.glb";
   }
 
   colorReset() {
@@ -964,7 +970,7 @@ class Enemy {
         this.cube.position.x = Math.round(this.x - player.globalOffsetX);
         this.cube.position.y = Math.round(this.y - player.globalOffsetY);
         this.cube.position.z = this.layer * 50;
-        this.cube.scale.set(this.width, this.height, this.width);
+        this.cube.scale.set(10, 10, 10);
         setOpacity(this.cube, this.alpha);
       }
     } else if (webGl3d && this.cube) {
@@ -1056,4 +1062,12 @@ class Enemy {
 
     this.y += this.speed * this.direction;
   }
+
+  remove() {
+    if (webGl3d && this.cube) {
+      removeObject(this.cube);
+      this.cube = null;
+    }
+  }
 }
+

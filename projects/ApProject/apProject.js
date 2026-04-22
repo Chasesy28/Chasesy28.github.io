@@ -171,6 +171,28 @@ let longestHorizontalLength;
 let longestVerticalLength;
 let activeLevelData = [];
 
+function removeAllObjects() {
+  /*for (let i = world.children.length - 1; i >= 0; i--) {
+    const child = world.children[i];
+    world.remove(child);
+    if (child.geometry) child.geometry.dispose();
+    if (child.material) {
+      if (child.material.map) child.material.map.dispose();
+      child.material.dispose();
+    }
+  }*/
+  for (let i = activeLevelData[currentArea].length - 1; i >= 0; i--) {
+    const layer = activeLevelData[currentArea][i];
+    for (let j = layer.length - 1; j >= 0; j--) {
+      const row = layer[j];
+      for (let k = row.length - 1; k >= 0; k--) {
+        const obj = row[k];
+        obj.remove();
+      }
+    }
+  }
+}
+
 function updateLevelData() {
   currentArea = 0;
   activeLevelData = [];
@@ -270,6 +292,7 @@ function gameLoop() {
                   block.type === "areaDoorBottom" ||
                   block.type === "areaDoorTop"
                 ) {
+                  removeAllObjects();
                   currentArea = Number(block.doorArea);
                   player.spawn();
                   areaChanged = true;
@@ -317,6 +340,7 @@ function gameLoop() {
         setTimeout(() => {
           levelSwitchCooldown = false;
         }, 250);
+        removeAllObjects();
         updateLevelData();
         player.spawn();
       }
@@ -330,6 +354,7 @@ function gameLoop() {
         setTimeout(() => {
           levelSwitchCooldown = false;
         }, 250);
+        removeAllObjects();
         updateLevelData();
         player.spawn();
       }

@@ -105,6 +105,16 @@ function sceneBackgroundTexture(texture) {
   scene.background = texture;
 }
 
+function removeObject(object) {
+  if (object) {
+    world.remove(object);
+    if (object.geometry) object.geometry.dispose();
+    if (object.material) {
+      if (object.material.map) object.material.map.dispose();
+      object.material.dispose();
+    }
+  }
+}
 
 webGl3DCanvas.addEventListener("click", () => {
   if (gameRunning) {
