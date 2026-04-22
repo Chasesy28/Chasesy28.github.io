@@ -105,9 +105,6 @@ function sceneBackgroundTexture(texture) {
   scene.background = texture;
 }
 
-sceneBackgroundColor(105, 105, 105);
-
-renderer.render(scene, camera);
 
 webGl3DCanvas.addEventListener("click", () => {
   if (gameRunning) {

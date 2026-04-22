@@ -52,9 +52,9 @@ function applySettings() {
       webGl = true;
       webG3d = false;
     } else if (gameSettings.renderMode === "3D") {
-      canvas.style.display = "none";
+      canvas.style.display = "block";
       webGlCanvas.style.display = "none";
-      webGl3dCanvas.style.display = "block";
+      //webGl3dCanvas.style.display = "block";
       webGl3d = true;
     } else {
       canvas.style.display = "block";

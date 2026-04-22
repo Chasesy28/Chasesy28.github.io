@@ -476,14 +476,6 @@ class Player {
     if (this.y + this.size >= gameArea.height) {
       this.spawn();
     }
-    if (webGl3d) {
-      if (this.z > activeLevelData[currentArea].length * 50 - 50) {
-        this.z = activeLevelData[currentArea].length * 50 - 50;
-      }
-      if (this.z < 0) {
-        this.z = 0;
-      }
-    }
   }
 
   isOverlappingObject(object, usePreviousFrame = false) {
