@@ -79,6 +79,7 @@ class Player {
 
     this.velX = 0;
     this.velY = 0;
+    this.velZ = 0;
     this.prevY = this.y;
     this.prevX = this.x;
   }
@@ -257,11 +258,12 @@ class Player {
           this.velX += right.x;
           this.velZ += right.z;
         }
-        if (Math.abs(this.velX) + Math.abs(this.velZ) > this.maxVelX) {
-          const angle = Math.atan2(this.velZ, this.velX);
-          this.velX = Math.cos(angle) * this.maxVelX;
-          this.velZ = Math.sin(angle) * this.maxVelX;
-        }
+        let movementVector = new THREE.Vector3(this.velX, this.velY, this.velZ);
+        let horizontalVector = movementVector.clone();
+        horizontalVector.y = 0;
+        movementVector.clampLength(0, this.maxVelX);
+          this.velX = movementVector.x;
+          this.velZ = movementVector.z;
         if (
           this.currentGroundBlock != null &&
           !controller.right.pressed &&
