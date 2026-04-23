@@ -8,7 +8,8 @@
 5 = slow
 6 = cobweb
 7 = spike
-d = area door (Needs a number after it to determine which area it goes to (Based off of the index of the area in the level array), ex: d1 would be an area door that goes to area 1)
+d = area door bottom (Needs a number after it to determine which area it goes to (Based off of the index of the area in the level array), ex: d1 would be an area door that goes to area 1)
+t = area door top (Same as area door bottom just a different texture)
 e = enemy (Followed by a number for the type of enemy)
 */
 const levels = [
