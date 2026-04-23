@@ -960,9 +960,9 @@ class Enemy {
           this.cube.visible = true;
         }
         this.cube.position.x = Math.round(this.x - player.globalOffsetX);
-        this.cube.position.y = Math.round(this.y - player.globalOffsetY);
+        this.cube.position.y = Math.round(this.y - player.globalOffsetY) + this.height / 2;
         this.cube.position.z = this.layer * 50;
-        this.cube.scale.set(10, 10, 10);
+        this.cube.scale.set(this.width / 4, -this.height / 4, this.width / 4);
         setOpacity(this.cube, this.alpha);
       }
     } else if (webGl3d && this.cube) {
