@@ -509,10 +509,6 @@ class Player {
   }
 }
 
-function newPlayer() {
-  return new Player(50, "images/Mario.png");
-}
-
 let defaultFriction = 0.8;
 
 const blockTypes = {
