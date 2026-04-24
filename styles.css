@@ -173,12 +173,13 @@ nav a:hover {
     text-shadow: 1px 1px 3px rgba(149, 57, 0, 0.2);
 }
 
-.project-carousel {
+.swiper.project-carousel {
     width: 100%;
     max-width: 100%;
     margin: 0 0 2.5rem;
     padding: 0 0 2.5rem;
-    overflow: visible;
+    overflow-x: visible;
+    overflow-y: visible;
 }
 
 .swiper-pagination-bullet {
