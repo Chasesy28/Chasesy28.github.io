@@ -996,14 +996,15 @@ class Enemy {
   // ↓ I'm Probably going to use this as my part of the AP project ↓
   collidesWithSolid(nextX, nextY, solids) {
     for (let i = 0; i < solids.length; i++) {
-      const block = solids[i];
+      //goes through every solid block on the enemy's layer and checks if the enemy's next position would overlap with any of them. If it does, it returns true, indicating a collision. If it goes through all solids without finding a collision, it returns false.
+      const block = solids[i];// Loop through the solid blocks and check for collision
       const overlapX =
-        nextX < block.x + block.width && nextX + this.width > block.x;
+        nextX < block.x + block.width && nextX + this.width > block.x; // Check for overlap in x direction
       const overlapY =
-        nextY < block.y + block.height && nextY + this.height > block.y;
+        nextY < block.y + block.height && nextY + this.height > block.y; // Check for overlap in y directions
       if (overlapX && overlapY) {
         return true;
-      }
+      } // If there's an overlap in both x and y directions, a collision is detected
     }
     return false;
   }
