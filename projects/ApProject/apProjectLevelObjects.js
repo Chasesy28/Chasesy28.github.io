@@ -49,6 +49,7 @@ class Player {
 
     this.dead = false;
     this.canMove = true;
+    this.deathRespawnTimeout = null;
 
     this.alpha = 1;
 
@@ -57,6 +58,11 @@ class Player {
   }
 
   spawn() {
+    if (this.deathRespawnTimeout) {
+      clearTimeout(this.deathRespawnTimeout);
+      this.deathRespawnTimeout = null;
+    }
+
     this.dead = false;
     this.canMove = true;
     this.alpha = 1;
@@ -85,8 +91,22 @@ class Player {
   }
 
   die() {
+    if (this.dead) {
+      return;
+    }
+
     this.dead = true;
     this.canMove = false;
+    this.velX = 0;
+    this.velY = 0;
+    this.velZ = 0;
+
+    // Keep respawn independent from rendering so empty/unrendered layers still recover.
+    this.deathRespawnTimeout = setTimeout(() => {
+      if (this.dead) {
+        this.spawn();
+      }
+    }, 1800);
   }
 
   drawPlayer() {
@@ -162,6 +182,7 @@ class Player {
       }
 
       if (
+        !webGl3d &&
         this.currentGroundBlock != null &&
         !controller.right.pressed &&
         !controller.left.pressed
@@ -220,23 +241,20 @@ class Player {
       this.scrolling();
 
       if (webGl3d) {
+        let movementVector = new THREE.Vector3();
         if (controller.forward.pressed) {
           const forward = new THREE.Vector3();
           camera.getWorldDirection(forward);
           forward.y = 0;
           forward.normalize();
-          forward.multiplyScalar(this.speed);
-          this.velX += forward.x;
-          this.velZ += forward.z;
+          movementVector.add(forward);
         }
         if (controller.backward.pressed) {
           const backward = new THREE.Vector3();
           camera.getWorldDirection(backward);
           backward.y = 0;
           backward.normalize();
-          backward.multiplyScalar(this.speed);
-          this.velX -= backward.x;
-          this.velZ -= backward.z;
+          movementVector.sub(backward);
         }
         if (controller.left.pressed) {
           const left = new THREE.Vector3();
@@ -244,9 +262,7 @@ class Player {
           left.y = 0;
           left.cross(camera.up);
           left.normalize();
-          left.multiplyScalar(this.speed);
-          this.velX -= left.x;
-          this.velZ -= left.z;
+          movementVector.sub(left);
         }
         if (controller.right.pressed) {
           const right = new THREE.Vector3();
@@ -254,16 +270,15 @@ class Player {
           right.y = 0;
           right.cross(camera.up);
           right.normalize();
-          right.multiplyScalar(this.speed);
-          this.velX += right.x;
-          this.velZ += right.z;
+          movementVector.add(right);
         }
-        let movementVector = new THREE.Vector3(this.velX, this.velY, this.velZ);
-        let horizontalVector = movementVector.clone();
-        horizontalVector.y = 0;
+        movementVector.normalize();
+        movementVector.multiplyScalar(this.speed);
+        movementVector.x += this.velX;
+        movementVector.z += this.velZ;
         movementVector.clampLength(0, this.maxVelX);
-          this.velX = movementVector.x;
-          this.velZ = movementVector.z;
+        this.velX = movementVector.x;
+        this.velZ = movementVector.z;
         if (
           this.currentGroundBlock != null &&
           !controller.right.pressed &&
@@ -274,6 +289,8 @@ class Player {
           this.velX *= this.currentGroundBlock.friction;
           this.velZ *= this.currentGroundBlock.friction;
         }
+        this.snapVelocityToZero("velX");
+        this.snapVelocityToZero("velZ");
         this.x += this.velX;
         this.z += this.velZ;
         this.layer = Math.round(this.z / 50);
@@ -309,7 +326,7 @@ class Player {
         playerLayer: this.layer,
         error,
       });
-      this.x += this.velX;
+      if (!webGl3d) this.x += this.velX;
       this.y += this.velY;
       return;
     }
@@ -321,10 +338,10 @@ class Player {
       this.globalOffsetX += this.velX;
       if (this.globalOffsetX <= 0) {
         this.globalOffsetX = 0;
-        this.x += this.velX;
+        if (!webGl3d) this.x += this.velX;
       }
     } else {
-      this.x += this.velX;
+      if (!webGl3d) this.x += this.velX;
     }
     if (
       this.globalOffsetX >=
