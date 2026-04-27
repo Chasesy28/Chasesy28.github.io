@@ -11,9 +11,7 @@ const levelNumberKey = {
 function convertToObjects(levelData, layer, area, player) {
   let longestHorizontalLength = Math.max.apply(null, levelData.map(row => row.length));
   let level = [];
-  //Runs for each row in the level data
   for (let i = 0; i < levelData.length; i++) {
-    //Creates objects for each column in the row
     let row = [];
     for (let j = 0; j < levelData[i].length; j++) {
       if (levelData[i][j] === "p") {
@@ -64,9 +62,13 @@ function convertToObjects(levelData, layer, area, player) {
 
 function buildLevel(levelData) {
   for (let i = 0; i < levelData.length; i++) {
-    //Builds each column in the row
     for (let j = 0; j < levelData[i].length; j++) {
-      levelData[i][j].draw();
+      let object = levelData[i][j];
+      if (object.isBlock) {
+        levelData[i][j].drawBlock();
+      } else if (object.isEnemy) {
+        levelData[i][j].drawEnemy();
+      }
     }
   }
 }

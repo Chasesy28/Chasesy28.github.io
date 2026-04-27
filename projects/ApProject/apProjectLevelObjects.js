@@ -715,7 +715,7 @@ class Block {
   colorReset() {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
   }
-  draw() {
+  drawBlock() {
     if (!webGl3d) {
       this.alpha = Math.max(
         0.1,
@@ -913,7 +913,7 @@ class Enemy {
     this.color = `rgba(${this.colorR}, ${this.colorG}, ${this.colorB}, ${this.alpha})`;
   }
 
-  draw() {
+  drawEnemy() {
     if (!webGl3d) {
       this.alpha = Math.max(
         0.1,
@@ -980,8 +980,8 @@ class Enemy {
         this.cube.scale.set(this.width / 4, -this.height / 4, this.width / 4);
         setOpacity(this.cube, this.alpha);
       }
-    } else if (webGl3d && this.cube) {
-      this.cube.visible = false;
+    } else if (webGl3d) {
+      this.visible = true;
     }
     this.alpha = Math.max(0.1, 1 - Math.abs(player.layer - this.layer) * 0.85);
   }
