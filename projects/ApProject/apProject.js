@@ -41,15 +41,11 @@ function resizeGameCanvases() {
 
 resizeGameCanvases();
 
-const handleResize = function () {
-  resizeGameCanvases();
-};
-
 if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", handleResize);
+  window.visualViewport.addEventListener("resize", resizeGameCanvases);
 }
-window.addEventListener("resize", handleResize);
-window.addEventListener("orientationchange", handleResize);
+window.addEventListener("resize", resizeGameCanvases);
+window.addEventListener("orientationchange", resizeGameCanvases);
 
 function toggleFullScreen() {
   if (!document.fullscreenElement) {

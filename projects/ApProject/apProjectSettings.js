@@ -1,6 +1,6 @@
 //apProjectSettings.js
 
-//PS currently the settings menu has features like framerate and rendering type which I haven't figured out how to do yet so they just send console.logs when changed, but the keybind changing works and saves to local storage so you can change your keybinds and they will be there when you refresh the page
+//PS currently the settings menu has features like framerate which I haven't figured out how to do yet so they just send console.logs when changed, but the keybind and rendering changing works and saves to local storage so you can change your keybinds and rendering method and they will be there when you refresh the page
 const panel = document.getElementById("settingsMenu");
 
 // Game Settings Object
@@ -262,8 +262,14 @@ function settingsKeybind(buttonId) {
 function attachSettingsListeners(buttonId) {
   const button = document.getElementById(buttonId);
   button.textContent = controller[buttonId].key[0];
-  button.addEventListener("click", () => {
+  button.addEventListener("click", (e) => {
+    e.target.blur();
     settingsKeybind(buttonId);
+  });
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Space") {
+      e.preventDefault();
+    }
   });
 }
 
