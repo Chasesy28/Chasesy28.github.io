@@ -1,7 +1,11 @@
 // apProject2dWebGl.js
 let shadersInitialized = false;
 
-// Shader code adapted from online tutorials
+/* Shader code adapted from online tutorials
+https://www.youtube.com/watch?v=y2UsQB3WSvo
+https://www.youtube.com/watch?v=lLa6XkVLj0w
+*/
+
 const vertexShaderSourceCode = `#version 300 es
   precision mediump float;
 

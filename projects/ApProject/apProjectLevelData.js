@@ -13,11 +13,8 @@ t = area door top (Same as area door bottom just a different texture)
 e = enemy (Followed by a number for the type of enemy)
 */
 const levels = [
-  //Level 1
   [
-    //Area 1
     [
-      //Layer 1
       [
         [],
         [],

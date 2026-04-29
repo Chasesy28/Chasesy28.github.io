@@ -118,7 +118,8 @@ backgroundColor("dimgray");
 webGlBackgroundColor(105, 105, 105, 1);
 sceneBackgroundColor(105, 105, 105);
 
-// Code found online on detecting if a character is a letter
+/* Code found online on detecting if a character is a letter
+https://codingbeautydev.com/blog/javascript-check-if-character-is-letter/ */
 function isLetter(char) {
   return /^[a-z]$/i.test(char);
 }
@@ -157,6 +158,7 @@ function updateKeybind(keybind, newKey) {
   }
 }
 
+// Mario image from https://www.pngegg.com/en/png-yserwd
 const player = new Player(45, "images/Mario.png");
 
 let currentLevel = 0;

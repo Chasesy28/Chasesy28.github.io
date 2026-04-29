@@ -158,7 +158,8 @@ function updateVolumeDisplay() {
 	}
 }
 
-//Dragging functionality taken from online tutorial for another project then ported here
+/*Dragging functionality taken from online tutorial for another project then ported here
+https://www.w3schools.com/howto/howto_js_draggable.asp*/
 function dragElement(elmnt) {
   var pos1 = 0,
     pos2 = 0,

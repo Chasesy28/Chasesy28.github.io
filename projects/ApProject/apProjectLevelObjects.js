@@ -1,4 +1,9 @@
 //apProjectLevelObjects.js
+/*Block textures
+
+Texture source:
+https://piiixl.itch.io/textures
+*/
 function getBlockTexturePath(index) {
   return `images/Block-assets/texture_16px ${index}.png`;
 }
