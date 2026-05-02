@@ -1,14 +1,14 @@
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(
-  window.innerWidth / -2,
-  window.innerWidth / 2,
-  window.innerHeight / 2,
-  window.innerHeight / -2,
+  0,
+  window.innerWidth,
+  0,
+  window.innerHeight,
   0.1,
   1000
 );
+camera.position.set(0, 0, 10);
 
-camera.position.set(200, -200, 0);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -26,7 +26,8 @@ function createBox(x, y, z, width, height = width, depth = width) {
 
   const material = new THREE.MeshPhongMaterial({ color: new THREE.Color(1, 1, 1), side: THREE.DoubleSide });
   const box = new THREE.Mesh(geometry, material);
-  box.position.set(x, y, z);
+  // Treat x/y/z as the block's corner instead of the geometry center.
+  box.position.set(x + width / 2, y + height / 2, z + depth / 2);
 
   box.frustumCulled = false;
   return box;
@@ -47,12 +48,10 @@ function gameLoop() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   backgroundColor(173, 216, 230);
 
-  const hw = window.innerWidth / 2;
-  const hh = window.innerHeight / 2;
-  camera.left = -hw;
-  camera.right = hw;
-  camera.top = hh;
-  camera.bottom = -hh;
+  camera.left = 0;
+  camera.right = window.innerWidth;
+  camera.top = 0;
+  camera.bottom = window.innerHeight;
   camera.updateProjectionMatrix();
 
   renderer.render(scene, camera);

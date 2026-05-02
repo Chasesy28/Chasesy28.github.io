@@ -1,6 +1,8 @@
+const baseBlockSize = 50;
+
 const worldData = [
   [
-    [1, 2, 1, 1, 1, 1, 1, 1],
+    [2, 2, 1, 1, 1, 1, 1, 1],
     [1, 1, 2, 1, 1, 1, 1, 1],
     [2, 1, 1, 1, 1, 1, 1, 1],
     [0, 1, 1, 1, 2, 1, 1, 1],
@@ -24,7 +26,7 @@ function convertToObjects(array) {
           const type = Object.keys(gameObjectTypes).find((key) => gameObjectTypes[key].id === id);
           if (type) {
               // Place layers along negative Z so higher layers are in front of the camera
-              const block = new Block(k * 100, -j * 100, -i * 100, 100, 100, 100, type);
+              const block = new Block(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize, baseBlockSize, baseBlockSize, baseBlockSize, type);
             objects.push(block.block);
           }
         }
