@@ -1,4 +1,4 @@
-const baseBlockSize = 50;
+const baseBlockSize = 25;
 
 const worldData = [
   [
@@ -7,6 +7,7 @@ const worldData = [
     [2, 1, 1, 1, 1, 1, 1, 1],
     [0, 1, 1, 1, 2, 1, 1, 1],
     [2, 1, 2, 1, 1, 1, 1, 1],
+    new Array(8).fill(1).fill(2, 4),
   ],
   [
     [],
