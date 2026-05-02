@@ -24,7 +24,7 @@ function convertToObjects(array) {
           const type = Object.keys(gameObjectTypes).find((key) => gameObjectTypes[key].id === id);
           if (type) {
               // Place layers along negative Z so higher layers are in front of the camera
-              const block = new Block(k * 100, j * 100, -i * 100, 100, 100, 100, type);
+              const block = new Block(k * 100, -j * 100, -i * 100, 100, 100, 100, type);
             objects.push(block.block);
           }
         }

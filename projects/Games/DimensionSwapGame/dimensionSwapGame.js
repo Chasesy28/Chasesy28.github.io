@@ -8,7 +8,7 @@ const camera = new THREE.OrthographicCamera(
   1000
 );
 
-camera.position.set(200, 200, 0);
+camera.position.set(200, -200, 0);
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
