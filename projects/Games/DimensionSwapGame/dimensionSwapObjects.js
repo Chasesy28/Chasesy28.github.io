@@ -1,11 +1,3 @@
-class Player {
-  constructor() {
-    this.position = new THREE.Vector3(0, 0, 0);
-    this.rotation = new THREE.Euler(0, 0, 0);
-    this.speed = 5;
-  }
-}
-
 const gameObjectTypes = {
   wall: {
     color: [136, 136, 136],
