@@ -5,6 +5,7 @@ class Player {
     this.onGround = false;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.gravity = 1;
+    this.jumpStrength = 10;
     this.maxFallSpeed = 15;
     this.mesh = null; // This will hold the player's mesh for rendering
   }
@@ -32,7 +33,7 @@ class Player {
   }
   jump() {
     if (true) {
-      this.velocity.y = -10; // Set an initial jump velocity
+      this.velocity.y = -this.jumpStrength; // Set an initial jump velocity
       this.onGround = false;
     }
   }
