@@ -26,7 +26,7 @@ function createBox(x, y, z, width, height = width, depth = width) {
 
   const material = new THREE.MeshPhongMaterial({ color: new THREE.Color(1, 1, 1), side: THREE.DoubleSide });
   const box = new THREE.Mesh(geometry, material);
-  // Treat x/y/z as the block's top left corner instead of the geometry center.
+  // Treat x/y/z as the block's corner.
   box.position.set(x + width / 2, y + height / 2, z + depth / 2);
 
   box.frustumCulled = false;
@@ -42,7 +42,6 @@ function setColor(object, r, g, b) {
 let gameObjects;
 
 let player = new Player();
-scene.add(player.render());
 let direction = 'xy'; // Default dimension swap direction
 
 function swapDimensions(dimensions) {
@@ -74,14 +73,7 @@ window.document.addEventListener("keyup", function (e) {
   }
 });
 
-let dt = 0;
-let lastTime = performance.now();
-
 function gameLoop() {
-  const currentTime = performance.now();
-  dt = (currentTime - lastTime) / 1000; // Convert to seconds
-  lastTime = currentTime;
-
   renderer.setSize(window.innerWidth, window.innerHeight);
   backgroundColor(173, 216, 230);
 
@@ -92,10 +84,10 @@ function gameLoop() {
   camera.updateProjectionMatrix();
 
   if (controller.left.pressed) {
-    player.move('left', dt);
+    player.move('left');
   }
   if (controller.right.pressed) {
-    player.move('right', dt);
+    player.move('right');
   }
   if (controller.jump.pressed) {
     player.jump();
@@ -110,7 +102,7 @@ function gameLoop() {
     swapDimensions('yz');
   }
 
-  player.update(dt);
+  player.update();
 
   renderer.render(scene, camera);
   requestAnimationFrame(gameLoop);

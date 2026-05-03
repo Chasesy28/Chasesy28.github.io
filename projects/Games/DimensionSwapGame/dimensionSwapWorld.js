@@ -33,7 +33,7 @@ function convertToObjects(array) {
             objects.push(block.block);
           }
         } else if (id === "p") {
-          player.position = new THREE.Vector3(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize);
+          scene.add(player.render(k * baseBlockSize, j * baseBlockSize, (-i * baseBlockSize) + 1)); // Position player slightly in front of the block to avoid z-fighting
         }
       }
     }
