@@ -1,27 +1,41 @@
 class Player {
   constructor() {
-    this.position = new THREE.Vector3();
-    this.size = new THREE.Vector3();
+    this.position = new THREE.Vector3(0, 0, 0);
+    this.size = new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize);
     this.speed = 5;
     this.onGround = false;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.mesh = null; // This will hold the player's mesh for rendering
   }
+  syncMeshPosition() {
+    if (this.mesh) {
+      this.mesh.position.set(
+        this.position.x + this.size.x / 2,
+        this.position.y + this.size.y / 2,
+        this.position.z + this.size.z / 2
+      );
+    }
+  }
   render() {
     if (!this.mesh) {
-      const geometry = new THREE.BoxGeometry(this.size.x, this.size.y, this.size.z);
-      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-      this.mesh = new THREE.Mesh(geometry, material);
+      this.mesh = createBox(this.position.x, this.position.y, this.position.z, this.size.x, this.size.y, this.size.z);
+      setColor(this.mesh, 255, 0, 0); // Set player color to red
     }
-    this.mesh.position.copy(this.position);
+    this.syncMeshPosition();
     return this.mesh;
   }
   move(direction, deltaTime) {
     const moveVector = new THREE.Vector3();
     if (direction === 'left') {
-      moveVector.x -= this.speed * deltaTime;
+      camera.getWorldDirection(moveVector);
+      moveVector.y = 0; // Keep movement horizontal
+      moveVector.cross(camera.up).normalize();
+      moveVector.multiplyScalar(-this.speed * deltaTime);
     } else if (direction === 'right') {
-      moveVector.x += this.speed * deltaTime;
+      camera.getWorldDirection(moveVector);
+      moveVector.y = 0; // Keep movement horizontal
+      moveVector.cross(camera.up).normalize();
+      moveVector.multiplyScalar(this.speed * deltaTime);
     }
     this.position.add(moveVector);
   }
@@ -33,8 +47,8 @@ class Player {
   }
   update(deltaTime) {
     // Apply gravity
-    this.velocity.y -= 9.81 * deltaTime; // Gravity acceleration
-    this.position.add(this.velocity.clone().multiplyScalar(deltaTime));
+    //this.velocity.y += 9.81 * deltaTime; // Gravity acceleration
+    //this.position.add(this.velocity.clone().multiplyScalar(deltaTime));
 
     // Check for ground collision (simple example, you would need to check against the world)
     if (this.position.y <= 0) {
@@ -42,10 +56,9 @@ class Player {
       this.onGround = true;
       this.velocity.y = 0;
     }
+    this.velocity.y = 0;
 
     // Update the player's mesh position
-    if (this.mesh) {
-      this.mesh.position.copy(this.position);
-    }
+    this.syncMeshPosition();
   }
 }

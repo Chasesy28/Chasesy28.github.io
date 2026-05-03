@@ -7,7 +7,7 @@ const camera = new THREE.OrthographicCamera(
   0.1,
   1000
 );
-camera.position.set(0, 0, 10);
+camera.position.set(0, 0, 100);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -26,7 +26,7 @@ function createBox(x, y, z, width, height = width, depth = width) {
 
   const material = new THREE.MeshPhongMaterial({ color: new THREE.Color(1, 1, 1), side: THREE.DoubleSide });
   const box = new THREE.Mesh(geometry, material);
-  // Treat x/y/z as the block's corner instead of the geometry center.
+  // Treat x/y/z as the block's top left corner instead of the geometry center.
   box.position.set(x + width / 2, y + height / 2, z + depth / 2);
 
   box.frustumCulled = false;
@@ -39,14 +39,40 @@ function setColor(object, r, g, b) {
   }
 }
 
-const gameObjects = convertToObjects(worldData);
-for (const object of gameObjects) {
-  scene.add(object);
-}
+let gameObjects;
+
+let player = new Player();
+scene.add(player.render());
+let direction = 'xy'; // Default dimension swap direction
 
 function swapDimensions(dimensions) {
 
 }
+
+const controller = {
+  left: { pressed: false, key: ['a', 'A', 'ArrowLeft'] },
+  right: { pressed: false, key: ['d', 'D', 'ArrowRight'] },
+  jump: { pressed: false, key: ['w', 'W', 'ArrowUp'] },
+  xySwap: { pressed: false, key: ['e', 'E'] },
+  xzSwap: { pressed: false, key: ['q', 'Q'] },
+  yzSwap: { pressed: false, key: ['r', 'R'] },
+}
+
+window.document.addEventListener("keydown", function (e) {
+  for (const controllerKey in controller) {
+    if (controller[controllerKey].key.includes(e.key)) {
+      controller[controllerKey].pressed = true;
+    }
+  }
+});
+
+window.document.addEventListener("keyup", function (e) {
+  for (const controllerKey in controller) {
+    if (controller[controllerKey].key.includes(e.key)) {
+      controller[controllerKey].pressed = false;
+    }
+  }
+});
 
 let dt = 0;
 let lastTime = performance.now();
@@ -83,33 +109,9 @@ function gameLoop() {
   if (controller.yzSwap.pressed) {
     swapDimensions('yz');
   }
+
+  player.update(dt);
+
   renderer.render(scene, camera);
   requestAnimationFrame(gameLoop);
 }
-
-const controller = {
-  left: { pressed: false, key: ['a', 'A', 'ArrowLeft'] },
-  right: { pressed: false, key: ['d', 'D', 'ArrowRight'] },
-  jump: { pressed: false, key: ['w', 'W', 'ArrowUp'] },
-  xySwap: { pressed: false, key: ['e', 'E'] },
-  xzSwap: { pressed: false, key: ['q', 'Q'] },
-  yzSwap: { pressed: false, key: ['r', 'R'] },
-}
-
-window.document.addEventListener("keydown", function (e) {
-  for (const controllerKey in controller) {
-    if (controller[controllerKey].key.includes(e.key)) {
-      controller[controllerKey].pressed = true;
-    }
-  }
-});
-
-window.document.addEventListener("keyup", function (e) {
-  for (const controllerKey in controller) {
-    if (controller[controllerKey].key.includes(e.key)) {
-      controller[controllerKey].pressed = false;
-    }
-  }
-});
-
-gameLoop();
