@@ -9,6 +9,7 @@ class Player {
     this.maxFallSpeed = 15;
     this.mesh = null; // This will hold the player's mesh for rendering
   }
+
   render(x, y, z) {
     if (!this.mesh) {
       this.mesh = createBox(x, y, z, this.size.x, this.size.y, this.size.z);
@@ -16,6 +17,7 @@ class Player {
     }
     return this.mesh;
   }
+
   move(direction) {
     const moveVector = new THREE.Vector3();
     if (direction === 'left') {
@@ -31,12 +33,18 @@ class Player {
     }
     this.mesh.position.add(moveVector);
   }
+
   jump() {
     if (true) {
       this.velocity.y = -this.jumpStrength; // Set an initial jump velocity
       this.onGround = false;
     }
   }
+
+  groundedDetection() {
+
+  }
+
   update() {
     // Apply gravity
     this.velocity.y += this.gravity; // Gravity acceleration
