@@ -8,16 +8,16 @@ const gameObjectTypes = {
   floor: {
     color: [200, 200, 200],
     texture: null,
-    solid: false,
+    solid: true,
     id: 2
   }
 }
 
 class Block {
   constructor(x, y, z, w, h, d, type) {
-    this.block = createBox(x, y, z, w, h, d);
-    this.block.type = type;
-    this.block.solid = gameObjectTypes[type].solid;
-    setColor(this.block, ...gameObjectTypes[type].color);
+    this.mesh = createBox(x, y, z, w, h, d);
+    this.type = type;
+    this.solid = gameObjectTypes[type].solid;
+    setColor(this.mesh, ...gameObjectTypes[type].color);
   }
 }

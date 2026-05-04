@@ -2,22 +2,15 @@ const baseBlockSize = 30;
 
 const worldData = [
   [
-    [2, 2, 1, 1, 1, 1, 1, 1].fill(1),
-    [1, "p", 2, 1, 1, 1, 1, 1],
-    [2, 1, 1, 1, 1, 1, 1, 1],
+    [],
+    [],
+    [],
+    [0, "p"].concat(new Array(31).fill(0)),
+    new Array(32).fill(1),
     [0, 1, 1, 1, 2, 1, 1, 1],
     [2, 1, 2, 1, 1, 1, 1, 1].concat(new Array(24).fill(1)),
     new Array(8).fill(1).fill(2, 4),
   ],
-  [
-    new Array(32).fill(2),
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    [1]
-  ],
-  [
-    new Array(32).fill(1),
-  ]
 ];
 
 function convertToObjects(array) {
@@ -30,7 +23,7 @@ function convertToObjects(array) {
           const type = Object.keys(gameObjectTypes).find((key) => gameObjectTypes[key].id === id);
           if (type) {
               const block = new Block(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize, baseBlockSize, baseBlockSize, baseBlockSize, type);
-            objects.push(block.block);
+            objects.push(block);
           }
         } else if (id === "p") {
           scene.add(player.render(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize));
