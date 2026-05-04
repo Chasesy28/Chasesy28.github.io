@@ -52,12 +52,12 @@ class Player {
       this.velocity.y = this.maxFallSpeed; // Cap fall speed
     }
 
+    this.mesh.position.add(this.velocity.clone());
+
     // Check for ground collision (simple example, you would need to check against the world)
     if (this.groundedDetection()) {
       this.velocity.y = 0;
       this.onGround = true;
     }
-
-    this.mesh.position.add(this.velocity.clone());
   }
 }
