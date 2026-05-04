@@ -3,14 +3,18 @@ const baseBlockSize = 30;
 const worldData = [
   [
     [],
+    new Array(32).fill(1),
     [],
-    [],
-    [0, "p"].concat(new Array(31).fill(0)),
+    [0, "p"].concat(new Array(31).fill(1, 2, 5).concat(new Array(5).fill(0)).concat(new Array(24).fill(1))),
     new Array(32).fill(1),
     [0, 1, 1, 1, 2, 1, 1, 1],
     [2, 1, 2, 1, 1, 1, 1, 1].concat(new Array(24).fill(1)),
     new Array(8).fill(1).fill(2, 4),
   ],
+  [
+    new Array(32).fill(1),
+    new Array(32).fill(1),
+  ]
 ];
 
 function convertToObjects(array) {

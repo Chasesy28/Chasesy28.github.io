@@ -4,10 +4,11 @@ const camera = new THREE.OrthographicCamera(
   window.innerWidth,
   0,
   window.innerHeight,
-  0.1,
-  1000
+  -10000,
+  10000
 );
 camera.position.set(0, 0, 100);
+camera.rotation.order = "YXZ";
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -44,8 +45,43 @@ let gameObjects;
 let player = new Player();
 let direction = 'xy'; // Default dimension swap direction
 
-function swapDimensions(dimensions) {
+function cameraFollowPlayer() {
+  if (player.mesh) {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
 
+    if (direction === 'xy') {
+      camera.left = player.mesh.position.x - w / 2;
+      camera.right = player.mesh.position.x + w / 2;
+      camera.bottom = player.mesh.position.y + h / 2;
+      camera.top = player.mesh.position.y - h / 2;
+      camera.z = player.mesh.position.z + 100; // Keep camera above player in Z-axis
+    } else if (direction === 'xz') {
+      camera.left = player.mesh.position.x - w / 2;
+      camera.right = player.mesh.position.x + w / 2;
+      camera.bottom = player.mesh.position.z - h / 2;
+      camera.top = player.mesh.position.z + h / 2;
+      camera.y = player.mesh.position.y - 100; // Keep camera on the correct side in XZ mode
+    } else if (direction === 'yz') {
+      camera.left = player.mesh.position.z - w / 2;
+      camera.right = player.mesh.position.z + w / 2;
+      camera.bottom = player.mesh.position.y + h / 2;
+      camera.top = player.mesh.position.y - h / 2;
+      camera.x = player.mesh.position.x + 100; // Keep camera above player in X-axis
+    }
+    camera.updateProjectionMatrix();
+  }
+}
+
+function swapDimensions(dimensions) {
+  direction = dimensions;
+  if (direction === 'xy') {
+    camera.rotation.set(0, 0, 0);
+  } else if (direction === 'xz') {
+    camera.rotation.set(Math.PI / 2, 0, 0);
+  } else if (direction === 'yz') {
+    camera.rotation.set(0, -Math.PI / 2, 0);
+  }
 }
 
 const controller = {
@@ -103,6 +139,7 @@ function gameLoop() {
   }
 
   player.update();
+  cameraFollowPlayer();
 
   renderer.render(scene, camera);
   requestAnimationFrame(gameLoop);

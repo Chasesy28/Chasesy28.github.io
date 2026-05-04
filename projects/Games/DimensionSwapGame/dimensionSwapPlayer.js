@@ -2,7 +2,7 @@ class Player {
   constructor() {
     this.size = new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize);
     this.speed = 3;
-    this.maxSpeed = 10;
+    this.maxSpeed = 7.5;
     this.onGround = false;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.gravity = 0.9;
@@ -12,6 +12,8 @@ class Player {
     this.currentFriction = 0.9; // Friction applied when on the ground
     this.defaultFriction = 0.9; // Default friction value
     this.airResistance = 0.99; // Air resistance applied when in the air
+    this.coyoteTimeMax = 6; // Frames of coyote time allowed
+    this.coyoteTime = 0; // Current coyote time remaining
   }
 
   render(x, y, z) {
@@ -39,9 +41,10 @@ class Player {
   }
 
   jump() {
-    if (this.onGround) {
+    if (this.onGround || this.coyoteTime > 0) {
       this.velocity.y = -this.jumpStrength; // Set an initial jump velocity
       this.onGround = false;
+      this.coyoteTime = 0; // Consume coyote time
     }
   }
 
@@ -52,39 +55,68 @@ class Player {
         const playerBox = new THREE.Box3().setFromObject(this.mesh);
         const objectBox = new THREE.Box3().setFromObject(object.mesh);
         if (playerBox.intersectsBox(objectBox)) {
-          // Simple collision response: stop vertical movement and place player on top of the object
-          if (this.velocity.y > 0) { // Falling down
-            this.mesh.position.y = objectBox.min.y - this.size.y / 2; // Place player on top of the object
-            playerBox.setFromObject(this.mesh); // Update player box after position change
-            this.velocity.y = 0; // Stop vertical movement
-            this.onGround = true; // Player is now on the ground
-            groundDetected = true; // Mark that we've detected ground
+          // Calculate overlap amounts in each direction
+          const overlapX = Math.min(playerBox.max.x, objectBox.max.x) - Math.max(playerBox.min.x, objectBox.min.x);
+          const overlapY = Math.min(playerBox.max.y, objectBox.max.y) - Math.max(playerBox.min.y, objectBox.min.y);
+          const overlapZ = Math.min(playerBox.max.z, objectBox.max.z) - Math.max(playerBox.min.z, objectBox.min.z);
+
+          // Determine the axis with smallest overlap (the collision direction)
+          const minOverlap = Math.min(overlapX, overlapY, overlapZ);
+
+          // Vertical collision - player is landing on top of object
+          // Treat as landing if moving downward, positioned above, and Y overlap is minimal relative to other overlaps
+          const isLanding = this.velocity.y > 0 && playerBox.min.y <= objectBox.max.y &&
+                           overlapY < Math.max(overlapX, overlapZ) * 0.75;
+          if (isLanding) {
+            this.mesh.position.y = objectBox.min.y - this.size.y / 2;
+            this.velocity.y = 0;
+            this.onGround = true;
+            this.coyoteTime = this.coyoteTimeMax; // Reset coyote time when landing
+            groundDetected = true;
+            continue;
           }
-          if (this.velocity.x !== 0) { // Horizontal collision
-            if (this.velocity.x > 0) { // Moving right
-              this.mesh.position.x = objectBox.min.x - this.size.x / 2; // Place player to the left of the object
-            } else { // Moving left
-              this.mesh.position.x = objectBox.max.x + this.size.x / 2; // Place player to the right of the object
-            }
-            this.velocity.x = 0; // Stop horizontal movement
+
+          // Skip horizontal/depth collisions if player is standing on top (small Y overlap)
+          if (overlapY < 1.5) {
+            continue;
           }
-          if (this.velocity.z !== 0) { // Depth collision
-            if (this.velocity.z > 0) { // Moving forward
-              this.mesh.position.z = objectBox.min.z - this.size.z / 2; // Place player in front of the object
-            } else { // Moving backward
-              this.mesh.position.z = objectBox.max.z + this.size.z / 2; // Place player behind the object
+
+          // Only handle horizontal/depth collisions if they are the primary collision direction
+          if (minOverlap === overlapX) {
+            // Horizontal collision
+            if (this.velocity.x > 0) {
+              this.mesh.position.x = objectBox.min.x - this.size.x / 2;
+              this.velocity.x = 0;
+            } else if (this.velocity.x < 0) {
+              this.mesh.position.x = objectBox.max.x + this.size.x / 2;
+              this.velocity.x = 0;
             }
-            this.velocity.z = 0; // Stop depth movement
+          } else if (minOverlap === overlapZ) {
+            // Depth collision
+            if (this.velocity.z > 0) {
+              this.mesh.position.z = objectBox.min.z - this.size.z / 2;
+              this.velocity.z = 0;
+            } else if (this.velocity.z < 0) {
+              this.mesh.position.z = objectBox.max.z + this.size.z / 2;
+              this.velocity.z = 0;
+            }
           }
         }
       }
     }
     if (!groundDetected) {
-      this.onGround = false; // If no ground was detected, player is in the air
+      this.onGround = false;
     }
   }
 
   update() {
+    // Update coyote time
+    if (this.onGround) {
+      this.coyoteTime = this.coyoteTimeMax; // Reset coyote time while on ground
+    } else {
+      this.coyoteTime--; // Decrement coyote time while in air
+    }
+
     // Apply gravity
     this.velocity.y += this.gravity; // Gravity acceleration
     if (this.velocity.y > this.maxFallSpeed) {
