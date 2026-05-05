@@ -9,7 +9,7 @@ const gameObjectTypes = {
     bottomCollision: true,
     id: 1
   },
-  semiSolid: {
+  semiSolidPlatform: {
     color: [150, 75, 0],
     dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize / 4, baseBlockSize),
     texture: null,
@@ -34,7 +34,7 @@ class Block {
         this.mesh.visible = false;
       }
     } else if (direction === 'xz') {
-      if (this.mesh.position.y < player.mesh.position.y + baseBlockSize) {
+      if (this.mesh.position.y > player.mesh.position.y - baseBlockSize) {
         this.mesh.visible = false;
       }
     } else if (direction === 'yz') {

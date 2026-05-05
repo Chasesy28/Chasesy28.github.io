@@ -109,6 +109,12 @@ window.document.addEventListener("keyup", function (e) {
   }
 });
 
+function objectLoopFunction(func) {
+  for (const object of gameObjects) {
+    func(object);
+  }
+}
+
 function gameLoop() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   backgroundColor(173, 216, 230);
@@ -139,9 +145,7 @@ function gameLoop() {
   }
 
   player.update();
-  for (const object of gameObjects) {
-    object.update();
-  }
+  objectLoopFunction((object) => object.update());
   cameraFollowPlayer();
 
   renderer.render(scene, camera);
