@@ -1,6 +1,6 @@
 class Player {
   constructor() {
-    this.size = new THREE.Vector3(baseBlockSize-0.01, baseBlockSize-0.01, baseBlockSize-0.01);
+    this.size = new THREE.Vector3(baseBlockSize-0.001, baseBlockSize-0.001, baseBlockSize-0.001);
     this.speed = 3;
     this.maxSpeed = 7.5;
     this.onGround = false;
@@ -67,10 +67,15 @@ class Player {
           // Only allow top snap if the player's bottom is close to (or crossed) the block's top this frame.
           const playerBottom = playerBox.max.y;
           const previousPlayerBottom = playerBottom - this.velocity.y;
+          const playerTop = playerBox.min.y;
+          const previousPlayerTop = playerTop - this.velocity.y;
           const blockTop = objectBox.min.y;
+          const blockBottom = objectBox.max.y;
           const topSnapTolerance = Math.max(0.2, this.size.y * 0.35);
           const nearTop = Math.abs(playerBottom - blockTop) <= topSnapTolerance;
           const crossedTopThisFrame = previousPlayerBottom <= blockTop && playerBottom >= blockTop;
+          const nearBottom = Math.abs(playerTop - blockBottom) <= topSnapTolerance;
+          const crossedBottomThisFrame = previousPlayerTop >= blockBottom && playerTop <= blockBottom;
           const hasHorizontalContact = overlapX > 0.05 && overlapZ > 0.05;
           const isLanding = this.velocity.y > 0 && hasHorizontalContact && (nearTop || crossedTopThisFrame);
           if (isLanding) {
@@ -79,6 +84,13 @@ class Player {
             this.onGround = true;
             this.coyoteTime = this.coyoteTimeMax; // Reset coyote time when landing
             groundDetected = true;
+            continue;
+          }
+
+          const isHittingBottom = this.velocity.y < 0 && hasHorizontalContact && (nearBottom || crossedBottomThisFrame);
+          if (isHittingBottom && object.bottomCollision) {
+            this.mesh.position.y = objectBox.max.y + this.size.y / 2;
+            this.velocity.y = 0;
             continue;
           }
 

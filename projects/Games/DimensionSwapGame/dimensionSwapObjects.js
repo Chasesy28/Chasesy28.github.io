@@ -1,23 +1,38 @@
+const baseBlockSize = 30;
+
 const gameObjectTypes = {
   wall: {
     color: [136, 136, 136],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
     texture: null,
     solid: true,
+    bottomCollision: true,
     id: 1
   },
   floor: {
     color: [200, 200, 200],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
     texture: null,
     solid: true,
+    bottomCollision: true,
     id: 2
+  },
+  semiSolid: {
+    color: [150, 75, 0],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize / 4, baseBlockSize),
+    texture: null,
+    solid: true,
+    bottomCollision: false,
+    id: 3
   }
-}
+};
 
 class Block {
-  constructor(x, y, z, w, h, d, type) {
-    this.mesh = createBox(x, y, z, w, h, d);
+  constructor(x, y, z, type) {
+    this.mesh = createBox(x, y, z, gameObjectTypes[type].dimensions.x, gameObjectTypes[type].dimensions.y, gameObjectTypes[type].dimensions.z);
     this.type = type;
     this.solid = gameObjectTypes[type].solid;
+    this.bottomCollision = gameObjectTypes[type].bottomCollision;
     setColor(this.mesh, ...gameObjectTypes[type].color);
   }
 }
