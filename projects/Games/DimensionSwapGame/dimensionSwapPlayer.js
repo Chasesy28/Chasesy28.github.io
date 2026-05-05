@@ -1,6 +1,6 @@
 class Player {
   constructor() {
-    this.size = new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize);
+    this.size = new THREE.Vector3(baseBlockSize-0.01, baseBlockSize-0.01, baseBlockSize-0.01);
     this.speed = 3;
     this.maxSpeed = 7.5;
     this.onGround = false;
@@ -64,9 +64,15 @@ class Player {
           const minOverlap = Math.min(overlapX, overlapY, overlapZ);
 
           // Vertical collision - player is landing on top of object
-          // Treat as landing if moving downward, positioned above, and Y overlap is minimal relative to other overlaps
-          const isLanding = this.velocity.y > 0 && playerBox.min.y <= objectBox.max.y &&
-                           overlapY < Math.max(overlapX, overlapZ) * 0.75;
+          // Only allow top snap if the player's bottom is close to (or crossed) the block's top this frame.
+          const playerBottom = playerBox.max.y;
+          const previousPlayerBottom = playerBottom - this.velocity.y;
+          const blockTop = objectBox.min.y;
+          const topSnapTolerance = Math.max(0.2, this.size.y * 0.35);
+          const nearTop = Math.abs(playerBottom - blockTop) <= topSnapTolerance;
+          const crossedTopThisFrame = previousPlayerBottom <= blockTop && playerBottom >= blockTop;
+          const hasHorizontalContact = overlapX > 0.05 && overlapZ > 0.05;
+          const isLanding = this.velocity.y > 0 && hasHorizontalContact && (nearTop || crossedTopThisFrame);
           if (isLanding) {
             this.mesh.position.y = objectBox.min.y - this.size.y / 2;
             this.velocity.y = 0;
