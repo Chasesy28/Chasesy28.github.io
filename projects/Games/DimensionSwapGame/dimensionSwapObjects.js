@@ -35,4 +35,20 @@ class Block {
     this.bottomCollision = gameObjectTypes[type].bottomCollision;
     setColor(this.mesh, ...gameObjectTypes[type].color);
   }
+  update() {
+    this.mesh.visible = true
+    if (direction === 'xy') {
+      if (this.mesh.position.z > player.mesh.position.z + baseBlockSize) {
+        this.mesh.visible = false;
+      }
+    } else if (direction === 'xz') {
+      if (this.mesh.position.y < player.mesh.position.y + baseBlockSize) {
+        this.mesh.visible = false;
+      }
+    } else if (direction === 'yz') {
+      if (this.mesh.position.x < player.mesh.position.x + baseBlockSize) {
+        this.mesh.visible = false;
+      }
+    }
+  }
 }

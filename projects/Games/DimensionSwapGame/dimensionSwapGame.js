@@ -139,6 +139,9 @@ function gameLoop() {
   }
 
   player.update();
+  for (const object of gameObjects) {
+    object.update();
+  }
   cameraFollowPlayer();
 
   renderer.render(scene, camera);
