@@ -100,7 +100,7 @@ class Player {
           }
 
           // Only handle horizontal/depth collisions if they are the primary collision direction
-          if (minOverlap === overlapX) {
+          if (minOverlap === overlapX && object.bottomCollision) {
             // Horizontal collision
             if (this.velocity.x > 0) {
               this.mesh.position.x = objectBox.min.x - this.size.x / 2;
@@ -109,7 +109,7 @@ class Player {
               this.mesh.position.x = objectBox.max.x + this.size.x / 2;
               this.velocity.x = 0;
             }
-          } else if (minOverlap === overlapZ) {
+          } else if (minOverlap === overlapZ && object.bottomCollision) {
             // Depth collision
             if (this.velocity.z > 0) {
               this.mesh.position.z = objectBox.min.z - this.size.z / 2;
