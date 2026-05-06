@@ -156,7 +156,7 @@ nav a:hover {
 .projects-section {
     position: relative;
     z-index: 1;
-    max-width: 1400px;
+    max-width: 100dvw;
     margin: 0 auto;
     padding: 0;
     overflow-x: hidden;
