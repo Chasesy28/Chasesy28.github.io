@@ -34,11 +34,11 @@ class Block {
         this.mesh.visible = false;
       }
     } else if (direction === 'xz') {
-      if (this.mesh.position.y > player.mesh.position.y - baseBlockSize) {
+      if (this.mesh.position.y < player.mesh.position.y - baseBlockSize) {
         this.mesh.visible = false;
       }
-    } else if (direction === 'yz') {
-      if (this.mesh.position.x < player.mesh.position.x + baseBlockSize) {
+    } else if (direction === 'zy') {
+      if (this.mesh.position.x < player.mesh.position.x - baseBlockSize) {
         this.mesh.visible = false;
       }
     }
