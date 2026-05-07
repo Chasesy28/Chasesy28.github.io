@@ -78,7 +78,7 @@ function cameraFollowPlayer() {
         cameraX = halfW;
       }
       if (player.mesh.position.z - halfH <= 0) {
-        cameraZ = halfH;
+        cameraZ = 0;
       }
       camera.position.set(
         cameraX,
@@ -88,6 +88,7 @@ function cameraFollowPlayer() {
     } else if (direction === 'zy') {
       let cameraZ = player.mesh.position.z;
       let cameraY = player.mesh.position.y;
+      // Fix camera position when player is near the edges of the world and check condition
       if (player.mesh.position.z - halfW <= 0) {
         cameraZ = halfW;
       }
@@ -100,7 +101,6 @@ function cameraFollowPlayer() {
         cameraZ
       );
     }
-    camera.updateProjectionMatrix();
   }
 }
 
@@ -111,7 +111,7 @@ function swapDimensions(dimensions) {
   } else if (direction === 'xz') {
     camera.rotation.set(Math.PI / 2, 0, 0);
   } else if (direction === 'zy') {
-    camera.rotation.set(0, -Math.PI / 2, 0);
+    camera.rotation.set(0, Math.PI / 2, 0);
   }
 }
 
@@ -151,13 +151,25 @@ function gameLoop() {
   backgroundColor(173, 216, 230);
 
   if (controller.left.pressed) {
-    player.move('left');
+    if (direction === 'xz') {
+      player.moveTopDown('left');
+    } else {
+      player.move('left');
+    }
   }
   if (controller.right.pressed) {
-    player.move('right');
+    if (direction === 'xz') {
+      player.moveTopDown('right');
+    } else {
+      player.move('right');
+    }
   }
   if (controller.jump.pressed) {
-    player.jump();
+    if (direction === 'xz') {
+      player.moveTopDown('up');
+    } else {
+      player.jump();
+    }
   }
   if (controller.xySwap.pressed) {
     swapDimensions('xy');

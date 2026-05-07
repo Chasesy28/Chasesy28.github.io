@@ -38,7 +38,7 @@ class Block {
         this.mesh.visible = false;
       }
     } else if (direction === 'zy') {
-      if (this.mesh.position.x < player.mesh.position.x - baseBlockSize) {
+      if (this.mesh.position.x > player.mesh.position.x + baseBlockSize) {
         this.mesh.visible = false;
       }
     }

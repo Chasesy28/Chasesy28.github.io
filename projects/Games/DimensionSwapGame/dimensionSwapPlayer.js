@@ -1,19 +1,16 @@
 class Player {
   constructor() {
     this.size = new THREE.Vector3(baseBlockSize-0.001, baseBlockSize-0.001, baseBlockSize-0.001);
-    this.speed = 3;
-    this.maxSpeed = 7.5;
+    this.speed = 7;
     this.onGround = false;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.gravity = 0.9;
     this.jumpStrength = 15;
     this.maxFallSpeed = 15;
     this.mesh = null; // This will hold the player's mesh for rendering
-    this.currentFriction = 0.9; // Friction applied when on the ground
-    this.defaultFriction = 0.9; // Default friction value
-    this.airResistance = 0.99; // Air resistance applied when in the air
     this.coyoteTimeMax = 6; // Frames of coyote time allowed
     this.coyoteTime = 0; // Current coyote time remaining
+    this.previousPosition = new THREE.Vector3(0, 0, 0); // Track previous position for collision direction
   }
 
   render(x, y, z) {
@@ -37,7 +34,21 @@ class Player {
       moveVector.cross(camera.up).normalize();
       moveVector.multiplyScalar(this.speed);
     }
-    this.velocity.add(moveVector);
+    this.mesh.position.add(moveVector);
+  }
+
+  moveTopDown(direction) {
+    const moveVector = new THREE.Vector3();
+    if (direction === 'left') {
+      moveVector.set(-this.speed, 0, 0);
+    } else if (direction === 'right') {
+      moveVector.set(this.speed, 0, 0);
+    } else if (direction === 'up') {
+      moveVector.set(0, 0, -this.speed);
+    } else if (direction === 'down') {
+      moveVector.set(0, 0, this.speed);
+    }
+    this.mesh.position.add(moveVector);
   }
 
   jump() {
@@ -101,22 +112,20 @@ class Player {
 
           // Only handle horizontal/depth collisions if they are the primary collision direction
           if (minOverlap === overlapX && object.bottomCollision) {
-            // Horizontal collision
-            if (this.velocity.x > 0) {
+            // Horizontal collision - determine direction from position change
+            const movementX = this.mesh.position.x - this.previousPosition.x;
+            if (movementX > 0) {
               this.mesh.position.x = objectBox.min.x - this.size.x / 2;
-              this.velocity.x = 0;
-            } else if (this.velocity.x < 0) {
+            } else if (movementX < 0) {
               this.mesh.position.x = objectBox.max.x + this.size.x / 2;
-              this.velocity.x = 0;
             }
           } else if (minOverlap === overlapZ && object.bottomCollision) {
-            // Depth collision
-            if (this.velocity.z > 0) {
+            // Depth collision - determine direction from position change
+            const movementZ = this.mesh.position.z - this.previousPosition.z;
+            if (movementZ > 0) {
               this.mesh.position.z = objectBox.min.z - this.size.z / 2;
-              this.velocity.z = 0;
-            } else if (this.velocity.z < 0) {
+            } else if (movementZ < 0) {
               this.mesh.position.z = objectBox.max.z + this.size.z / 2;
-              this.velocity.z = 0;
             }
           }
         }
@@ -135,25 +144,18 @@ class Player {
       this.coyoteTime--; // Decrement coyote time while in air
     }
 
-    // Apply gravity
+    // Apply gravity (vertical only)
     this.velocity.y += this.gravity; // Gravity acceleration
     if (this.velocity.y > this.maxFallSpeed) {
       this.velocity.y = this.maxFallSpeed; // Cap fall speed
     }
-    let horizontalVelocity = new THREE.Vector3(this.velocity.x, 0, this.velocity.z);
-    if (horizontalVelocity.length() > this.maxSpeed) {
-      horizontalVelocity.setLength(this.maxSpeed); // Limit horizontal speed
-    }
-    if (this.onGround) {
-      horizontalVelocity.multiplyScalar(this.currentFriction); // Apply friction when on the ground
-    } else {
-      horizontalVelocity.multiplyScalar(this.airResistance);
-    }
-    this.velocity.x = horizontalVelocity.x;
-    this.velocity.z = horizontalVelocity.z;
 
-    this.mesh.position.add(this.velocity.clone());
+    // Apply vertical velocity to position
+    this.mesh.position.y += this.velocity.y;
 
     this.objectCollisionDetection();
+
+    // Store position after all movement and collision resolution for next frame's collision detection
+    this.previousPosition.copy(this.mesh.position);
   }
 }
