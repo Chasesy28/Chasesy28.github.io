@@ -11,6 +11,7 @@ class Player {
     this.coyoteTimeMax = 6; // Frames of coyote time allowed
     this.coyoteTime = 0; // Current coyote time remaining
     this.previousPosition = new THREE.Vector3(0, 0, 0); // Track previous position for collision direction
+    this.passDown = false;
   }
 
   render(x, y, z) {
@@ -90,6 +91,11 @@ class Player {
           const hasHorizontalContact = overlapX > 0.05 && overlapZ > 0.05;
           const isLanding = this.velocity.y > 0 && hasHorizontalContact && (nearTop || crossedTopThisFrame);
           if (isLanding) {
+            if (!object.bottomCollision) {
+              if (this.passDown) {
+                continue; // Allow passing down through platforms without snapping to top
+              }
+            }
             this.mesh.position.y = objectBox.min.y - this.size.y / 2;
             this.velocity.y = 0;
             this.onGround = true;

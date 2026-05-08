@@ -29,16 +29,23 @@ class Block {
   }
   update() {
     this.mesh.visible = true
+    setColor(this.mesh, ...gameObjectTypes[this.type].color);
     if (direction === 'xy') {
       if (this.mesh.position.z > player.mesh.position.z + baseBlockSize) {
         this.mesh.visible = false;
+      } else if (this.mesh.position.z < player.mesh.position.z) {
+        setColor(this.mesh, this.mesh.material.color.r * 255 * 0.5, this.mesh.material.color.g * 255 * 0.5, this.mesh.material.color.b * 255 * 0.5);
       }
     } else if (direction === 'xz') {
       if (this.mesh.position.y < player.mesh.position.y - baseBlockSize) {
         this.mesh.visible = false;
+      } else if (this.mesh.position.y > player.mesh.position.y) {
+        setColor(this.mesh, this.mesh.material.color.r * 255 * 0.5, this.mesh.material.color.g * 255 * 0.5, this.mesh.material.color.b * 255 * 0.5);
       }
     } else if (direction === 'zy') {
       if (this.mesh.position.x > player.mesh.position.x + baseBlockSize) {
+        this.mesh.visible = false;
+      } else if (this.mesh.position.x < player.mesh.position.x) {
         this.mesh.visible = false;
       }
     }

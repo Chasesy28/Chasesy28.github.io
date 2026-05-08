@@ -119,6 +119,7 @@ const controller = {
   left: { pressed: false, key: ['a', 'A', 'ArrowLeft'] },
   right: { pressed: false, key: ['d', 'D', 'ArrowRight'] },
   jump: { pressed: false, key: ['w', 'W', 'ArrowUp'] },
+  down: { pressed: false, key: ['s', 'S', 'ArrowDown'] },
   xySwap: { pressed: false, key: ['e', 'E'] },
   xzSwap: { pressed: false, key: ['q', 'Q'] },
   zySwap: { pressed: false, key: ['r', 'R'] },
@@ -170,6 +171,15 @@ function gameLoop() {
     } else {
       player.jump();
     }
+  }
+  if (controller.down.pressed) {
+    if (direction === 'xz') {
+      player.moveTopDown('down');
+    } else {
+      player.passDown = true;
+    }
+  } else {
+    player.passDown = false;
   }
   if (controller.xySwap.pressed) {
     swapDimensions('xy');
