@@ -19,6 +19,8 @@ const gameObjectTypes = {
   }
 };
 
+const darkenFactor = 0.8;
+
 class Block {
   constructor(x, y, z, type) {
     this.mesh = createBox(x, y, z, gameObjectTypes[type].dimensions.x, gameObjectTypes[type].dimensions.y, gameObjectTypes[type].dimensions.z);
@@ -34,19 +36,19 @@ class Block {
       if (this.mesh.position.z > player.mesh.position.z + baseBlockSize) {
         this.mesh.visible = false;
       } else if (this.mesh.position.z < player.mesh.position.z) {
-        setColor(this.mesh, this.mesh.material.color.r * 255 * 0.5, this.mesh.material.color.g * 255 * 0.5, this.mesh.material.color.b * 255 * 0.5);
+        setColor(this.mesh, this.mesh.material.color.r * 255 * darkenFactor, this.mesh.material.color.g * 255 * darkenFactor, this.mesh.material.color.b * 255 * darkenFactor);
       }
     } else if (direction === 'xz') {
       if (this.mesh.position.y < player.mesh.position.y - baseBlockSize) {
         this.mesh.visible = false;
       } else if (this.mesh.position.y > player.mesh.position.y) {
-        setColor(this.mesh, this.mesh.material.color.r * 255 * 0.5, this.mesh.material.color.g * 255 * 0.5, this.mesh.material.color.b * 255 * 0.5);
+        setColor(this.mesh, this.mesh.material.color.r * 255 * darkenFactor, this.mesh.material.color.g * 255 * darkenFactor, this.mesh.material.color.b * 255 * darkenFactor);
       }
     } else if (direction === 'zy') {
       if (this.mesh.position.x > player.mesh.position.x + baseBlockSize) {
         this.mesh.visible = false;
       } else if (this.mesh.position.x < player.mesh.position.x) {
-        this.mesh.visible = false;
+        setColor(this.mesh, this.mesh.material.color.r * 255 * darkenFactor, this.mesh.material.color.g * 255 * darkenFactor, this.mesh.material.color.b * 255 * darkenFactor);
       }
     }
   }

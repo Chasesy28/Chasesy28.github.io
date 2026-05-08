@@ -63,6 +63,7 @@ function cameraFollowPlayer() {
       if (player.mesh.position.x - halfW <= 0) {
         cameraX = halfW;
       }
+      // Fix conditional because it doesn't unlock
       if (player.mesh.position.y + halfH >= 0) {
         cameraY = halfH;
       }
@@ -89,8 +90,8 @@ function cameraFollowPlayer() {
       let cameraZ = player.mesh.position.z;
       let cameraY = player.mesh.position.y;
       // Fix camera position when player is near the edges of the world and check condition
-      if (player.mesh.position.z - halfW <= 0) {
-        cameraZ = halfW;
+      if (player.mesh.position.z - halfW + baseBlockSize <= 0) {
+        cameraZ = -halfW + baseBlockSize;
       }
       if (player.mesh.position.y + halfH >= 0) {
         cameraY = halfH;
