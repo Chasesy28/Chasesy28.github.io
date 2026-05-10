@@ -64,7 +64,7 @@ function cameraFollowPlayer() {
         cameraX = halfW;
       }
       // Fix conditional because it doesn't unlock
-      if (player.mesh.position.y + halfH >= 0) {
+      if (-player.mesh.position.y + halfH >= 0) {
         cameraY = halfH;
       }
       camera.position.set(
@@ -79,7 +79,7 @@ function cameraFollowPlayer() {
         cameraX = halfW;
       }
       if (player.mesh.position.z - halfH <= 0) {
-        cameraZ = 0;
+        cameraZ = -halfH + baseBlockSize;
       }
       camera.position.set(
         cameraX,
@@ -93,7 +93,7 @@ function cameraFollowPlayer() {
       if (player.mesh.position.z - halfW + baseBlockSize <= 0) {
         cameraZ = -halfW + baseBlockSize;
       }
-      if (player.mesh.position.y + halfH >= 0) {
+      if (-player.mesh.position.y + halfH >= 0) {
         cameraY = halfH;
       }
       camera.position.set(
