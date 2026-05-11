@@ -10,13 +10,14 @@ class Player {
     this.mesh = null; // This will hold the player's mesh for rendering
     this.coyoteTimeMax = 6; // Frames of coyote time allowed
     this.coyoteTime = 0; // Current coyote time remaining
-    this.previousPosition = new THREE.Vector3(0, 0, 0); // Track previous position for collision direction
+    this.previousPosition = null; // Track previous position for collision direction
     this.passDown = false;
   }
 
   render(x, y, z) {
     if (!this.mesh) {
       this.mesh = createBox(x, y, z, this.size.x, this.size.y, this.size.z);
+      this.previousPosition = this.mesh.position.clone();
       setColor(this.mesh, 255, 0, 0); // Set player color to red
     }
     return this.mesh;

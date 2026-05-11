@@ -1,6 +1,20 @@
 const worldData = [
   [
     [],
+    new Array(32).fill(1),
+    [],
+    new Array(32).fill(1),
+    new Array(32).fill(1),
+  ],
+  [
+    [],
+    new Array(32).fill(1),
+    [],
+    new Array(32).fill(1),
+    new Array(32).fill(1),
+  ],
+  [
+    [],
     new Array(32).fill(2).fill(1, 4, 28).concat(new Array(4).fill(2)),
     [],
     [0, "p"].concat(new Array(31).fill(1, 2, 5).concat(new Array(5).fill(0)).concat(new Array(24).fill(1))),
@@ -14,20 +28,6 @@ const worldData = [
     new Array(32).fill(1),
     new Array(32).fill(1),
     new Array(32).fill(1)
-  ],
-  [
-    [],
-    new Array(32).fill(1),
-    [],
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-  ],
-  [
-    [],
-    new Array(32).fill(1),
-    [],
-    new Array(32).fill(1),
-    new Array(32).fill(1),
   ],
   [
     [],
