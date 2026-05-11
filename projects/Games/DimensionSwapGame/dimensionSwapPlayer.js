@@ -12,6 +12,7 @@ class Player {
     this.coyoteTime = 0; // Current coyote time remaining
     this.previousPosition = null; // Track previous position for collision direction
     this.passDown = false;
+    this.objectsTouching = [];
   }
 
   render(x, y, z) {
@@ -62,7 +63,10 @@ class Player {
   }
 
   objectCollisionDetection() {
+    this.objectsTouching = [];
     let groundDetected = false;
+    const landingCollisions = []; // Collect all landing collisions first
+
     for (let object of gameObjects) {
       if (object.solid) {
         const playerBox = new THREE.Box3().setFromObject(this.mesh);
@@ -97,10 +101,9 @@ class Player {
                 continue; // Allow passing down through platforms without snapping to top
               }
             }
-            this.mesh.position.y = objectBox.min.y - this.size.y / 2;
-            this.velocity.y = 0;
-            this.onGround = true;
-            this.coyoteTime = this.coyoteTimeMax; // Reset coyote time when landing
+            // Store landing collision for processing after all checks
+            landingCollisions.push({ object, objectBox });
+            this.objectsTouching.push(object);
             groundDetected = true;
             continue;
           }
@@ -138,6 +141,22 @@ class Player {
         }
       }
     }
+
+    // Process all landing collisions after checking all objects
+    if (landingCollisions.length > 0) {
+      // Snap to the topmost block (smallest Y value = highest block)
+      let topmost = landingCollisions[0];
+      for (let i = 1; i < landingCollisions.length; i++) {
+        if (landingCollisions[i].objectBox.min.y < topmost.objectBox.min.y) {
+          topmost = landingCollisions[i];
+        }
+      }
+      this.mesh.position.y = topmost.objectBox.min.y - this.size.y / 2;
+      this.velocity.y = 0;
+      this.onGround = true;
+      this.coyoteTime = this.coyoteTimeMax; // Reset coyote time when landing
+    }
+
     if (!groundDetected) {
       this.onGround = false;
     }
@@ -157,8 +176,10 @@ class Player {
       this.velocity.y = this.maxFallSpeed; // Cap fall speed
     }
 
-    // Apply vertical velocity to position
+    // Apply velocity to position
+    this.mesh.position.x += this.velocity.x;
     this.mesh.position.y += this.velocity.y;
+    this.mesh.position.z += this.velocity.z;
 
     this.objectCollisionDetection();
 

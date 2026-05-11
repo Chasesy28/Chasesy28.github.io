@@ -184,9 +184,10 @@ function gameLoop() {
       player.moveTopDown('down');
     } else {
       player.passDown = true;
+      setTimeout(() => {
+        player.passDown = false;
+      }, 200);
     }
-  } else {
-    player.passDown = false;
   }
   if (controller.xySwap.pressed) {
     swapDimensions('xy');

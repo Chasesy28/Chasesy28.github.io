@@ -33,6 +33,10 @@ class Block {
     this.mesh.visible = true;
     setColor(this.mesh, ...gameObjectTypes[this.type].color);
 
+    if (player.objectsTouching.includes(this)) {
+      return;
+    }
+
     if (direction === 'xy') {
       // Camera is at player.z + 100, so hide blocks far in front
       if (this.mesh.position.z > player.mesh.position.z + baseBlockSize) {
