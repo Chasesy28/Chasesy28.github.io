@@ -1,7 +1,8 @@
 class Player {
   constructor() {
     this.size = new THREE.Vector3(baseBlockSize-0.001, baseBlockSize-0.001, baseBlockSize-0.001);
-    this.speed = 7;
+    this.speed = 5;
+    this.maxSpeed = 10;
     this.onGround = false;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.gravity = 0.9;
@@ -12,7 +13,7 @@ class Player {
     this.coyoteTime = 0; // Current coyote time remaining
     this.previousPosition = null; // Track previous position for collision direction
     this.passDown = false;
-    this.objectsTouching = [];
+    this.objectsOn = [];
   }
 
   render(x, y, z) {
@@ -24,32 +25,40 @@ class Player {
     return this.mesh;
   }
 
-  move(direction) {
+  move(direction, timeHeld = 1) {
     const moveVector = new THREE.Vector3();
+    let speed = this.speed * (1 + (timeHeld / 100));
+    if (speed > this.maxSpeed) {
+      speed = this.maxSpeed;
+    }
     if (direction === 'left') {
       camera.getWorldDirection(moveVector);
       moveVector.y = 0; // Keep movement horizontal
       moveVector.cross(camera.up).normalize();
-      moveVector.multiplyScalar(-this.speed);
+      moveVector.multiplyScalar(-speed);
     } else if (direction === 'right') {
       camera.getWorldDirection(moveVector);
       moveVector.y = 0; // Keep movement horizontal
       moveVector.cross(camera.up).normalize();
-      moveVector.multiplyScalar(this.speed);
+      moveVector.multiplyScalar(speed);
     }
     this.mesh.position.add(moveVector);
   }
 
-  moveTopDown(direction) {
+  moveTopDown(direction, timeHeld = 1) {
     const moveVector = new THREE.Vector3();
+    let speed = this.speed * (1 + (timeHeld / 100));
+    if (speed > this.maxSpeed) {
+      speed = this.maxSpeed;
+    }
     if (direction === 'left') {
-      moveVector.set(-this.speed, 0, 0);
+      moveVector.set(-speed, 0, 0);
     } else if (direction === 'right') {
-      moveVector.set(this.speed, 0, 0);
+      moveVector.set(speed, 0, 0);
     } else if (direction === 'up') {
-      moveVector.set(0, 0, -this.speed);
+      moveVector.set(0, 0, -speed);
     } else if (direction === 'down') {
-      moveVector.set(0, 0, this.speed);
+      moveVector.set(0, 0, speed);
     }
     this.mesh.position.add(moveVector);
   }
@@ -63,7 +72,7 @@ class Player {
   }
 
   objectCollisionDetection() {
-    this.objectsTouching = [];
+    this.objectsOn = [];
     let groundDetected = false;
     const landingCollisions = []; // Collect all landing collisions first
 
@@ -103,7 +112,7 @@ class Player {
             }
             // Store landing collision for processing after all checks
             landingCollisions.push({ object, objectBox });
-            this.objectsTouching.push(object);
+            this.objectsOn.push(object);
             groundDetected = true;
             continue;
           }

@@ -117,14 +117,14 @@ function swapDimensions(dimensions) {
 }
 
 const controller = {
-  left: { pressed: false, key: ['a', 'A', 'ArrowLeft'] },
-  right: { pressed: false, key: ['d', 'D', 'ArrowRight'] },
-  up: { pressed: false, key: ['w', 'W', 'ArrowUp'] },
-  jump: { pressed: false, key: [' '] },
-  down: { pressed: false, key: ['s', 'S', 'ArrowDown'] },
-  xySwap: { pressed: false, key: ['e', 'E'] },
-  xzSwap: { pressed: false, key: ['q', 'Q'] },
-  zySwap: { pressed: false, key: ['r', 'R'] },
+  left: { pressed: false, key: ['a', 'A', 'ArrowLeft'], timeHeld: 0 },
+  right: { pressed: false, key: ['d', 'D', 'ArrowRight'], timeHeld: 0 },
+  up: { pressed: false, key: ['w', 'W', 'ArrowUp'], timeHeld: 0 },
+  jump: { pressed: false, key: [' '], timeHeld: 0 },
+  down: { pressed: false, key: ['s', 'S', 'ArrowDown'], timeHeld: 0 },
+  xySwap: { pressed: false, key: ['e', 'E'], timeHeld: 0 },
+  xzSwap: { pressed: false, key: ['q', 'Q'], timeHeld: 0 },
+  zySwap: { pressed: false, key: ['r', 'R'], timeHeld: 0 },
 }
 
 window.document.addEventListener("keydown", function (e) {
@@ -154,49 +154,91 @@ function gameLoop() {
   backgroundColor(173, 216, 230);
 
   if (controller.left.pressed) {
+    controller.left.timeHeld++;
     if (direction === 'xz') {
-      player.moveTopDown('left');
+      player.moveTopDown('left', controller.left.timeHeld);
     } else {
-      player.move('left');
+      player.move('left', controller.left.timeHeld);
+    }
+  } else {
+    controller.left.timeHeld--;
+    if (controller.left.timeHeld < 0) {
+      controller.left.timeHeld = 0;
     }
   }
   if (controller.right.pressed) {
+    controller.right.timeHeld++;
     if (direction === 'xz') {
-      player.moveTopDown('right');
+      player.moveTopDown('right', controller.right.timeHeld);
     } else {
-      player.move('right');
+      player.move('right', controller.right.timeHeld);
+    }
+  } else {
+    controller.right.timeHeld--;
+    if (controller.right.timeHeld < 0) {
+      controller.right.timeHeld = 0;
     }
   }
   if (controller.jump.pressed) {
+    controller.jump.timeHeld++;
     if (direction !== 'xz') {
       player.jump();
     }
+  } else {
+    controller.jump.timeHeld = 0;
   }
   if (controller.up.pressed) {
+    controller.up.timeHeld++;
     if (direction === 'xz') {
-      player.moveTopDown('up');
+      player.moveTopDown('up', controller.up.timeHeld);
     } else {
       player.jump();
     }
+  } else {
+    controller.up.timeHeld--;
+    if (controller.up.timeHeld < 0) {
+      controller.up.timeHeld = 0;
+    }
   }
   if (controller.down.pressed) {
+    controller.down.timeHeld++;
     if (direction === 'xz') {
-      player.moveTopDown('down');
+      player.moveTopDown('down', controller.down.timeHeld);
     } else {
       player.passDown = true;
       setTimeout(() => {
         player.passDown = false;
       }, 200);
     }
+  } else {
+    controller.down.timeHeld--;
+    if (controller.down.timeHeld < 0) {
+      controller.down.timeHeld = 0;
+    }
   }
   if (controller.xySwap.pressed) {
-    swapDimensions('xy');
+    if (controller.xySwap.timeHeld === 0) {
+      swapDimensions('xy');
+    }
+    controller.xySwap.timeHeld++;
+  } else {
+    controller.xySwap.timeHeld = 0;
   }
   if (controller.xzSwap.pressed) {
-    swapDimensions('xz');
+    if (controller.xzSwap.timeHeld === 0) {
+      swapDimensions('xz');
+    }
+    controller.xzSwap.timeHeld++;
+  } else {
+    controller.xzSwap.timeHeld = 0;
   }
   if (controller.zySwap.pressed) {
-    swapDimensions('zy');
+    if (controller.zySwap.timeHeld === 0) {
+      swapDimensions('zy');
+    }
+    controller.zySwap.timeHeld++;
+  } else {
+    controller.zySwap.timeHeld = 0;
   }
 
   player.update();
