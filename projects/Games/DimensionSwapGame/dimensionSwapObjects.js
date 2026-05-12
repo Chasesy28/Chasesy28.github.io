@@ -34,11 +34,14 @@ class Block {
     setColor(this.mesh, ...gameObjectTypes[this.type].color);
 
     if (player.objectsOn.includes(this)) {
-      return;
+      setColor(this.mesh, gameObjectTypes[this.type].color[0] * 2, gameObjectTypes[this.type].color[1] * 2, gameObjectTypes[this.type].color[2] * 2); // Highlight blocks the player is standing on
     }
 
+    const viewDistance = baseBlockSize * 5; // Distance to render blocks in each direction
+
     if (direction === 'xy') {
-      // Camera is at player.z + 100, so hide blocks far in front
+      // Camera is at player.z + 100, looking at XY plane
+      // Hide blocks far in front on Z axis
       if (this.mesh.position.z > player.mesh.position.z + baseBlockSize) {
         this.mesh.visible = false;
       } else if (this.mesh.position.z < player.mesh.position.z) {
@@ -46,8 +49,14 @@ class Block {
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
       }
+      // Hide blocks too far on X or Y (off-screen)
+      if (Math.abs(this.mesh.position.x - player.mesh.position.x) > viewDistance ||
+          Math.abs(this.mesh.position.y - player.mesh.position.y) > viewDistance) {
+        this.mesh.visible = false;
+      }
     } else if (direction === 'xz') {
-      // Camera is at player.y - 100, so hide blocks far below
+      // Camera is at player.y - 100, looking at XZ plane
+      // Hide blocks far below on Y axis
       if (this.mesh.position.y < player.mesh.position.y - baseBlockSize) {
         this.mesh.visible = false;
       } else if (this.mesh.position.y > player.mesh.position.y + baseBlockSize) {
@@ -55,14 +64,25 @@ class Block {
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
       }
+      // Hide blocks too far on X or Z (off-screen)
+      if (Math.abs(this.mesh.position.x - player.mesh.position.x) > viewDistance ||
+          Math.abs(this.mesh.position.z - player.mesh.position.z) > viewDistance) {
+        this.mesh.visible = false;
+      }
     } else if (direction === 'zy') {
-      // Camera is at player.x + 100, so hide blocks far to the right
+      // Camera is at player.x + 100, looking at ZY plane
+      // Hide blocks far to the right on X axis
       if (this.mesh.position.x > player.mesh.position.x + baseBlockSize) {
         this.mesh.visible = false;
       } else if (this.mesh.position.x < player.mesh.position.x) {
         // Darken blocks behind the player
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
+      }
+      // Hide blocks too far on Z or Y (off-screen)
+      if (Math.abs(this.mesh.position.z - player.mesh.position.z) > viewDistance ||
+          Math.abs(this.mesh.position.y - player.mesh.position.y) > viewDistance) {
+        this.mesh.visible = false;
       }
     }
   }
