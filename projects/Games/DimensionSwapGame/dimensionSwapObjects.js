@@ -37,8 +37,6 @@ class Block {
       setColor(this.mesh, gameObjectTypes[this.type].color[0] * 2, gameObjectTypes[this.type].color[1] * 2, gameObjectTypes[this.type].color[2] * 2); // Highlight blocks the player is standing on
     }
 
-    const viewDistance = baseBlockSize * 5; // Distance to render blocks in each direction
-
     if (direction === 'xy') {
       // Camera is at player.z + 100, looking at XY plane
       // Hide blocks far in front on Z axis
@@ -48,11 +46,6 @@ class Block {
         // Darken blocks behind the player
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
-      }
-      // Hide blocks too far on X or Y (off-screen)
-      if (Math.abs(this.mesh.position.x - player.mesh.position.x) > viewDistance ||
-          Math.abs(this.mesh.position.y - player.mesh.position.y) > viewDistance) {
-        this.mesh.visible = false;
       }
     } else if (direction === 'xz') {
       // Camera is at player.y - 100, looking at XZ plane
@@ -64,11 +57,6 @@ class Block {
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
       }
-      // Hide blocks too far on X or Z (off-screen)
-      if (Math.abs(this.mesh.position.x - player.mesh.position.x) > viewDistance ||
-          Math.abs(this.mesh.position.z - player.mesh.position.z) > viewDistance) {
-        this.mesh.visible = false;
-      }
     } else if (direction === 'zy') {
       // Camera is at player.x + 100, looking at ZY plane
       // Hide blocks far to the right on X axis
@@ -78,11 +66,6 @@ class Block {
         // Darken blocks behind the player
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
-      }
-      // Hide blocks too far on Z or Y (off-screen)
-      if (Math.abs(this.mesh.position.z - player.mesh.position.z) > viewDistance ||
-          Math.abs(this.mesh.position.y - player.mesh.position.y) > viewDistance) {
-        this.mesh.visible = false;
       }
     }
   }
