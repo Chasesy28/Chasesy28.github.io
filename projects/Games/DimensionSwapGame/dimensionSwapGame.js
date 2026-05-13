@@ -181,7 +181,7 @@ function gameLoop() {
   }
   if (controller.jump.pressed) {
     controller.jump.timeHeld++;
-    if (direction !== 'xz') {
+    if (direction !== 'xz' && controller.jump.timeHeld === 1) {
       player.jump();
     }
   } else {
@@ -191,14 +191,11 @@ function gameLoop() {
     controller.up.timeHeld++;
     if (direction === 'xz') {
       player.moveTopDown('up', controller.up.timeHeld);
-    } else {
+    } else if (controller.up.timeHeld === 1) {
       player.jump();
     }
   } else {
-    controller.up.timeHeld--;
-    if (controller.up.timeHeld < 0) {
-      controller.up.timeHeld = 0;
-    }
+    controller.up.timeHeld = 0;
   }
   if (controller.down.pressed) {
     controller.down.timeHeld++;
@@ -217,26 +214,26 @@ function gameLoop() {
     }
   }
   if (controller.xySwap.pressed) {
-    if (controller.xySwap.timeHeld === 0) {
+    controller.xySwap.timeHeld++;
+    if (controller.xySwap.timeHeld === 1) {
       swapDimensions('xy');
     }
-    controller.xySwap.timeHeld++;
   } else {
     controller.xySwap.timeHeld = 0;
   }
   if (controller.xzSwap.pressed) {
-    if (controller.xzSwap.timeHeld === 0) {
+    controller.xzSwap.timeHeld++;
+    if (controller.xzSwap.timeHeld === 1) {
       swapDimensions('xz');
     }
-    controller.xzSwap.timeHeld++;
   } else {
     controller.xzSwap.timeHeld = 0;
   }
   if (controller.zySwap.pressed) {
-    if (controller.zySwap.timeHeld === 0) {
+    controller.zySwap.timeHeld++;
+    if (controller.zySwap.timeHeld === 1) {
       swapDimensions('zy');
     }
-    controller.zySwap.timeHeld++;
   } else {
     controller.zySwap.timeHeld = 0;
   }

@@ -14,6 +14,8 @@ class Player {
     this.previousPosition = null; // Track previous position for collision direction
     this.passDown = false;
     this.objectsOn = [];
+    this.jumpBuffer = 0; // Buffer to allow jump input slightly before landing
+    this.maxJumpBuffer = 6; // Maximum frames to buffer jump input
   }
 
   render(x, y, z) {
@@ -68,6 +70,8 @@ class Player {
       this.velocity.y = -this.jumpStrength; // Set an initial jump velocity
       this.onGround = false;
       this.coyoteTime = 0; // Consume coyote time
+    } else {
+      this.jumpBuffer = this.maxJumpBuffer;
     }
   }
 
@@ -172,11 +176,16 @@ class Player {
   }
 
   update() {
-    // Update coyote time
+    // Update coyote time and jump buffer
     if (this.onGround) {
       this.coyoteTime = this.coyoteTimeMax; // Reset coyote time while on ground
+      if (this.jumpBuffer > 0) {
+        this.jump(); // Perform jump if jump was buffered
+        this.jumpBuffer = 0; // Clear jump buffer after jumping
+      }
     } else {
       this.coyoteTime--; // Decrement coyote time while in air
+      this.jumpBuffer--; // Decrement jump buffer while in air
     }
 
     // Apply gravity (vertical only)
