@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "nasm: assemble (win64)",
+      "type": "shell",
+      "command": "nasm",
+      "args": [
+        "-f", "win64",
+        "${file}",
+        "-o", "${fileDirname}/${fileBasenameNoExtension}.obj"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "link: gcc (mingw)",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "${fileDirname}/${fileBasenameNoExtension}.obj",
+        "-o",
+        "${fileDirname}/${fileBasenameNoExtension}.exe"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build EXE (nasm + gcc)",
+      "dependsOn": [
+        "nasm: assemble (win64)",
+        "link: gcc (mingw)"
+      ],
+      "dependsOrder": "sequence",
+      "type": "shell",
+      "problemMatcher": []
+    },
+    {
+      "label": "nasm: assemble (win32)",
+      "type": "shell",
+      "command": "nasm",
+      "args": [
+        "-f", "win32",
+        "${file}",
+        "-o", "${fileDirname}/${fileBasenameNoExtension}.obj"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "link: gcc (win32)",
+      "type": "shell",
+      "command": "gcc",
+      "args": [
+        "${fileDirname}/${fileBasenameNoExtension}.obj",
+        "-o",
+        "${fileDirname}/${fileBasenameNoExtension}.exe"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Build EXE (nasm win32 + gcc)",
+      "dependsOn": [
+        "nasm: assemble (win32)",
+        "link: gcc (win32)"
+      ],
+      "dependsOrder": "sequence",
+      "type": "shell",
+      "problemMatcher": []
+    }
+  ]
+}
