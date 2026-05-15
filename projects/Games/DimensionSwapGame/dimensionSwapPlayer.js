@@ -1,8 +1,10 @@
 class Player {
   constructor() {
-    this.size = new THREE.Vector3(baseBlockSize-0.001, baseBlockSize-0.001, baseBlockSize-0.001);
-    this.speed = 5;
+    this.size = new THREE.Vector3(baseBlockSize-0.01, baseBlockSize-0.01, baseBlockSize-0.01);
+    this.speed = 4;
     this.maxSpeed = 10;
+    this.maxHorizontalVelocity = 10;
+    this.friction = 0.9;
     this.onGround = false;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.gravity = 0.9;
@@ -67,7 +69,7 @@ class Player {
 
   jump() {
     if (this.onGround || this.coyoteTime > 0) {
-      this.velocity.y = -this.jumpStrength; // Set an initial jump velocity
+      this.velocity.y += -this.jumpStrength; // Set an initial jump velocity
       this.onGround = false;
       this.coyoteTime = 0; // Consume coyote time
     } else {
@@ -102,12 +104,17 @@ class Player {
           const blockTop = objectBox.min.y;
           const blockBottom = objectBox.max.y;
           const topSnapTolerance = Math.max(0.2, this.size.y * 0.35);
+          const bottomSnapTolerance = Math.max(0.2, this.size.y * 0.08);
+          const landingHorizontalContactTolerance = 0.001;
+          const headHitHorizontalContactTolerance = Math.min(this.size.x, this.size.z) * 0.2;
           const nearTop = Math.abs(playerBottom - blockTop) <= topSnapTolerance;
           const crossedTopThisFrame = previousPlayerBottom <= blockTop && playerBottom >= blockTop;
-          const nearBottom = Math.abs(playerTop - blockBottom) <= topSnapTolerance;
+          const nearBottom = Math.abs(playerTop - blockBottom) <= bottomSnapTolerance;
           const crossedBottomThisFrame = previousPlayerTop >= blockBottom && playerTop <= blockBottom;
-          const hasHorizontalContact = overlapX > 0.05 && overlapZ > 0.05;
-          const isLanding = this.velocity.y > 0 && hasHorizontalContact && (nearTop || crossedTopThisFrame);
+          const verticalIsPrimary = overlapY <= overlapX && overlapY <= overlapZ;
+          const hasLandingContact = overlapX > landingHorizontalContactTolerance && overlapZ > landingHorizontalContactTolerance;
+          const hasHeadHitContact = overlapX > headHitHorizontalContactTolerance && overlapZ > headHitHorizontalContactTolerance;
+          const isLanding = this.velocity.y > 0 && verticalIsPrimary && hasLandingContact && (nearTop || crossedTopThisFrame);
           if (isLanding) {
             if (!object.bottomCollision) {
               if (this.passDown) {
@@ -121,7 +128,7 @@ class Player {
             continue;
           }
 
-          const isHittingBottom = this.velocity.y < 0 && hasHorizontalContact && (nearBottom || crossedBottomThisFrame);
+          const isHittingBottom = this.velocity.y < 0 && verticalIsPrimary && hasHeadHitContact && (nearBottom || crossedBottomThisFrame);
           if (isHittingBottom && object.bottomCollision) {
             this.mesh.position.y = objectBox.max.y + this.size.y / 2;
             this.velocity.y = 0;
@@ -139,16 +146,20 @@ class Player {
             const movementX = this.mesh.position.x - this.previousPosition.x;
             if (movementX > 0) {
               this.mesh.position.x = objectBox.min.x - this.size.x / 2;
+              this.velocity.x = 0;
             } else if (movementX < 0) {
               this.mesh.position.x = objectBox.max.x + this.size.x / 2;
+              this.velocity.x = 0;
             }
           } else if (minOverlap === overlapZ && object.bottomCollision) {
             // Depth collision - determine direction from position change
             const movementZ = this.mesh.position.z - this.previousPosition.z;
             if (movementZ > 0) {
               this.mesh.position.z = objectBox.min.z - this.size.z / 2;
+              this.velocity.z = 0;
             } else if (movementZ < 0) {
               this.mesh.position.z = objectBox.max.z + this.size.z / 2;
+              this.velocity.z = 0;
             }
           }
         }
@@ -193,6 +204,21 @@ class Player {
     if (this.velocity.y > this.maxFallSpeed) {
       this.velocity.y = this.maxFallSpeed; // Cap fall speed
     }
+
+    if (this.velocity.x > this.maxHorizontalVelocity) {
+      this.velocity.x = this.maxHorizontalVelocity;
+    } else if (this.velocity.x < -this.maxHorizontalVelocity) {
+      this.velocity.x = -this.maxHorizontalVelocity;
+    }
+    if (this.velocity.z > this.maxHorizontalVelocity) {
+      this.velocity.z = this.maxHorizontalVelocity;
+    } else if (this.velocity.z < -this.maxHorizontalVelocity) {
+      this.velocity.z = -this.maxHorizontalVelocity;
+    }
+
+    // Apply friction to horizontal movement
+    this.velocity.x *= this.friction;
+    this.velocity.z *= this.friction;
 
     // Apply velocity to position
     this.mesh.position.x += this.velocity.x;

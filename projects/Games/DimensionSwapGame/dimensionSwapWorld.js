@@ -1,42 +1,101 @@
 const worldData = [
   [
-    [],
-    new Array(32).fill(1),
-    [],
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-  ],
-  [
-    [],
-    new Array(32).fill(1),
-    [],
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-  ],
-  [
-    [],
-    new Array(32).fill(2).fill(1, 4, 28).concat(new Array(4).fill(2)),
-    [],
-    [0, "p"].concat(new Array(31).fill(1, 2, 5).concat(new Array(5).fill(0)).concat(new Array(24).fill(1))),
-    new Array(8).fill(1).concat(new Array(24).fill(0)).concat(new Array(8).fill(1)),
-    [],
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    new Array(32).fill(1),
-    new Array(32).fill(1)
-  ],
-  [
-    [],
-    new Array(32).fill(1),
-    [],
-    new Array(32).fill(1),
-    new Array(32).fill(1),
+    [1, 1, 1, 1, 1],
+    [1, 2, 2, 2, 1],
+    [1, 2, "p", 2, 1],
+    [1, 2, 2, 2, 1],
+    [1, 1, 1, 6, 1]
   ]
 ];
+
+const objectIdentifiers = {
+  1: {
+    type: "basic",
+  },
+  2: {
+    type: "semiSolidPlatform",
+  },
+  3: {
+    type: "launcher",
+    axis: 'y',
+    direction: -10,
+  },
+  4: {
+    type: "launcher",
+    axis: 'y',
+    direction: -15,
+  },
+  5: {
+    type: "launcher",
+    axis: 'y',
+    direction: -20,
+  },
+  6: {
+    type: "launcher",
+    axis: 'y',
+    direction: 10,
+  },
+  7: {
+    type: "launcher",
+    axis: 'x',
+    direction: 10,
+  },
+  8: {
+    type: "launcher",
+    axis: 'x',
+    direction: 15,
+  },
+  9: {
+    type: "launcher",
+    axis: 'x',
+    direction: 20,
+  },
+  10: {
+    type: "launcher",
+    axis: 'x',
+    direction: -10,
+  },
+  11: {
+    type: "launcher",
+    axis: 'x',
+    direction: -15,
+  },
+  12: {
+    type: "launcher",
+    axis: 'x',
+    direction: -20,
+  },
+  13: {
+    type: "launcher",
+    axis: 'z',
+    direction: 10,
+  },
+  14: {
+    type: "launcher",
+    axis: 'z',
+    direction: 15,
+  },
+  15: {
+    type: "launcher",
+    axis: 'z',
+    direction: 20,
+  },
+  16: {
+    type: "launcher",
+    axis: 'z',
+    direction: -10,
+  },
+  17: {
+    type: "launcher",
+    axis: 'z',
+    direction: -15,
+  },
+  18: {
+    type: "launcher",
+    axis: 'z',
+    direction: -20,
+  }
+};
 
 function convertToObjects(array) {
   const objects = [];
@@ -44,14 +103,21 @@ function convertToObjects(array) {
     for (let j = 0; j < array[i].length; j++) {
       for (let k = 0; k < array[i][j].length; k++) {
         const id = array[i][j][k];
-        if (id !== 0 && id !== undefined && id !== "p") {
-          const type = Object.keys(gameObjectTypes).find((key) => gameObjectTypes[key].id === id);
-          if (type) {
-              const block = new Block(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize, type);
-            objects.push(block);
+        if (id !== 0 && id !== undefined) {
+          if (id === "p") {
+            scene.add(player.render(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize));
+          } else {
+            const objectInfo = objectIdentifiers[id];
+            if (objectInfo) {
+              let object;
+              if (objectInfo.type === "launcher") {
+                object = new Launcher(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize, objectInfo.axis, objectInfo.direction);
+              } else {
+                object = new Block(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize, objectInfo.type);
+              }
+              objects.push(object);
+            }
           }
-        } else if (id === "p") {
-          scene.add(player.render(k * baseBlockSize, j * baseBlockSize, -i * baseBlockSize));
         }
       }
     }

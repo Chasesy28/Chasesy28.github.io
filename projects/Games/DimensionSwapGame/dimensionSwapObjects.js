@@ -1,13 +1,12 @@
 const baseBlockSize = 30;
 
 const gameObjectTypes = {
-  wall: {
+  basic: {
     color: [136, 136, 136],
     dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
     texture: null,
     solid: true,
     bottomCollision: true,
-    id: 1
   },
   semiSolidPlatform: {
     color: [150, 75, 0],
@@ -15,7 +14,13 @@ const gameObjectTypes = {
     texture: null,
     solid: true,
     bottomCollision: false,
-    id: 2
+  },
+  launcher: {
+    color: [0, 128, 255],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
+    texture: null,
+    solid: true,
+    bottomCollision: true,
   }
 };
 
@@ -67,6 +72,20 @@ class Block {
         const [r, g, b] = gameObjectTypes[this.type].color;
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
       }
+    }
+  }
+}
+
+class Launcher extends Block {
+  constructor(x, y, z, axis, direction) {
+    super(x, y, z, 'launcher');
+    this.launchAxis = axis;
+    this.launchDirection = direction;
+  }
+  update() {
+    super.update();
+    if (player.objectsOn.includes(this)) {
+      player.velocity[this.launchAxis] = this.launchDirection;
     }
   }
 }
