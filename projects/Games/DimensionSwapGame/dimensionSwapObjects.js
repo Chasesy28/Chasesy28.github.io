@@ -47,9 +47,6 @@ class Block {
 
     if (this.checkForPlayer()) {
       setColor(this.mesh, gameObjectTypes[this.type].color[0] * 2, gameObjectTypes[this.type].color[1] * 2, gameObjectTypes[this.type].color[2] * 2); // Highlight blocks the player is standing on
-      if (this.type === 'grounder') {
-        player.canJump = false;
-      }
     }
 
     if (direction === 'xy') {

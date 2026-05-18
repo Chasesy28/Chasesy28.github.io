@@ -69,7 +69,7 @@ class Player {
   }
 
   jump() {
-    if (this.onGround || this.coyoteTime > 0) {
+    if ((this.onGround || this.coyoteTime > 0) && this.canJump) {
       this.velocity.y += -this.jumpStrength; // Set an initial jump velocity
       this.onGround = false;
       this.coyoteTime = 0; // Consume coyote time
@@ -188,6 +188,12 @@ class Player {
   }
 
   update() {
+    this.canJump = true; // Reset canJump each frame, will be set to false if player is on a grounder block
+    for (let obj of this.objectsOn) {
+      if (obj.type === 'grounder') {
+        this.canJump = false;
+      }
+    }
     // Update coyote time and jump buffer
     if (this.onGround) {
       this.coyoteTime = this.coyoteTimeMax; // Reset coyote time while on ground
