@@ -4,7 +4,7 @@ const worldData = [
     [1, 2, 2, 2, 1],
     [1, 2, "p", 2, 1],
     [1, 2, 2, 2, 1],
-    [1, 1, 1, 6, 1]
+    [1, 1, 1, 5, 1]
   ]
 ];
 
@@ -32,65 +32,60 @@ const objectIdentifiers = {
   },
   6: {
     type: "launcher",
-    axis: 'y',
+    axis: 'x',
     direction: 10,
   },
   7: {
     type: "launcher",
     axis: 'x',
-    direction: 10,
+    direction: 15,
   },
   8: {
     type: "launcher",
     axis: 'x',
-    direction: 15,
+    direction: 20,
   },
   9: {
     type: "launcher",
     axis: 'x',
-    direction: 20,
+    direction: -10,
   },
   10: {
     type: "launcher",
     axis: 'x',
-    direction: -10,
+    direction: -15,
   },
   11: {
     type: "launcher",
     axis: 'x',
-    direction: -15,
-  },
-  12: {
-    type: "launcher",
-    axis: 'x',
     direction: -20,
   },
-  13: {
+  12: {
     type: "launcher",
     axis: 'z',
     direction: 10,
   },
-  14: {
+  13: {
     type: "launcher",
     axis: 'z',
     direction: 15,
   },
-  15: {
+  14: {
     type: "launcher",
     axis: 'z',
     direction: 20,
   },
-  16: {
+  15: {
     type: "launcher",
     axis: 'z',
     direction: -10,
   },
-  17: {
+  16: {
     type: "launcher",
     axis: 'z',
     direction: -15,
   },
-  18: {
+  17: {
     type: "launcher",
     axis: 'z',
     direction: -20,
