@@ -1,6 +1,10 @@
 class Player {
   constructor() {
-    this.size = new THREE.Vector3(baseBlockSize-0.01, baseBlockSize-0.01, baseBlockSize-0.01);
+    this.size = new THREE.Vector3(
+      baseBlockSize - 0.01,
+      baseBlockSize - 0.01,
+      baseBlockSize - 0.01,
+    );
     this.speed = 4;
     this.maxSpeed = 10;
     this.maxHorizontalVelocity = 10;
@@ -32,16 +36,16 @@ class Player {
 
   move(direction, timeHeld = 1) {
     const moveVector = new THREE.Vector3();
-    let speed = this.speed * (1 + (timeHeld / 100));
+    let speed = this.speed * (1 + timeHeld / 100);
     if (speed > this.maxSpeed) {
       speed = this.maxSpeed;
     }
-    if (direction === 'left') {
+    if (direction === "left") {
       camera.getWorldDirection(moveVector);
       moveVector.y = 0; // Keep movement horizontal
       moveVector.cross(camera.up).normalize();
       moveVector.multiplyScalar(-speed);
-    } else if (direction === 'right') {
+    } else if (direction === "right") {
       camera.getWorldDirection(moveVector);
       moveVector.y = 0; // Keep movement horizontal
       moveVector.cross(camera.up).normalize();
@@ -52,29 +56,31 @@ class Player {
 
   moveTopDown(direction, timeHeld = 1) {
     const moveVector = new THREE.Vector3();
-    let speed = this.speed * (1 + (timeHeld / 100));
+    let speed = this.speed * (1 + timeHeld / 100);
     if (speed > this.maxSpeed) {
       speed = this.maxSpeed;
     }
-    if (direction === 'left') {
+    if (direction === "left") {
       moveVector.set(-speed, 0, 0);
-    } else if (direction === 'right') {
+    } else if (direction === "right") {
       moveVector.set(speed, 0, 0);
-    } else if (direction === 'up') {
+    } else if (direction === "up") {
       moveVector.set(0, 0, -speed);
-    } else if (direction === 'down') {
+    } else if (direction === "down") {
       moveVector.set(0, 0, speed);
     }
     this.mesh.position.add(moveVector);
   }
 
   jump() {
-    if ((this.onGround || this.coyoteTime > 0) && this.canJump) {
-      this.velocity.y += -this.jumpStrength; // Set an initial jump velocity
-      this.onGround = false;
-      this.coyoteTime = 0; // Consume coyote time
-    } else {
-      this.jumpBuffer = this.maxJumpBuffer;
+    if (this.canJump) {
+      if (this.onGround || this.coyoteTime > 0) {
+        this.velocity.y += -this.jumpStrength; // Set an initial jump velocity
+        this.onGround = false;
+        this.coyoteTime = 0; // Consume coyote time
+      } else {
+        this.jumpBuffer = this.maxJumpBuffer;
+      }
     }
   }
 
@@ -89,9 +95,15 @@ class Player {
         const objectBox = new THREE.Box3().setFromObject(object.mesh);
         if (playerBox.intersectsBox(objectBox)) {
           // Calculate overlap amounts in each direction
-          const overlapX = Math.min(playerBox.max.x, objectBox.max.x) - Math.max(playerBox.min.x, objectBox.min.x);
-          const overlapY = Math.min(playerBox.max.y, objectBox.max.y) - Math.max(playerBox.min.y, objectBox.min.y);
-          const overlapZ = Math.min(playerBox.max.z, objectBox.max.z) - Math.max(playerBox.min.z, objectBox.min.z);
+          const overlapX =
+            Math.min(playerBox.max.x, objectBox.max.x) -
+            Math.max(playerBox.min.x, objectBox.min.x);
+          const overlapY =
+            Math.min(playerBox.max.y, objectBox.max.y) -
+            Math.max(playerBox.min.y, objectBox.min.y);
+          const overlapZ =
+            Math.min(playerBox.max.z, objectBox.max.z) -
+            Math.max(playerBox.min.z, objectBox.min.z);
 
           // Determine the axis with smallest overlap (the collision direction)
           const minOverlap = Math.min(overlapX, overlapY, overlapZ);
@@ -107,15 +119,28 @@ class Player {
           const topSnapTolerance = Math.max(0.2, this.size.y * 0.35);
           const bottomSnapTolerance = Math.max(0.2, this.size.y * 0.08);
           const landingHorizontalContactTolerance = 0.001;
-          const headHitHorizontalContactTolerance = Math.min(this.size.x, this.size.z) * 0.2;
+          const headHitHorizontalContactTolerance =
+            Math.min(this.size.x, this.size.z) * 0.2;
           const nearTop = Math.abs(playerBottom - blockTop) <= topSnapTolerance;
-          const crossedTopThisFrame = previousPlayerBottom <= blockTop && playerBottom >= blockTop;
-          const nearBottom = Math.abs(playerTop - blockBottom) <= bottomSnapTolerance;
-          const crossedBottomThisFrame = previousPlayerTop >= blockBottom && playerTop <= blockBottom;
-          const verticalIsPrimary = overlapY <= overlapX && overlapY <= overlapZ;
-          const hasLandingContact = overlapX > landingHorizontalContactTolerance && overlapZ > landingHorizontalContactTolerance;
-          const hasHeadHitContact = overlapX > headHitHorizontalContactTolerance && overlapZ > headHitHorizontalContactTolerance;
-          const isLanding = this.velocity.y > 0 && verticalIsPrimary && hasLandingContact && (nearTop || crossedTopThisFrame);
+          const crossedTopThisFrame =
+            previousPlayerBottom <= blockTop && playerBottom >= blockTop;
+          const nearBottom =
+            Math.abs(playerTop - blockBottom) <= bottomSnapTolerance;
+          const crossedBottomThisFrame =
+            previousPlayerTop >= blockBottom && playerTop <= blockBottom;
+          const verticalIsPrimary =
+            overlapY <= overlapX && overlapY <= overlapZ;
+          const hasLandingContact =
+            overlapX > landingHorizontalContactTolerance &&
+            overlapZ > landingHorizontalContactTolerance;
+          const hasHeadHitContact =
+            overlapX > headHitHorizontalContactTolerance &&
+            overlapZ > headHitHorizontalContactTolerance;
+          const isLanding =
+            this.velocity.y > 0 &&
+            verticalIsPrimary &&
+            hasLandingContact &&
+            (nearTop || crossedTopThisFrame);
           if (isLanding) {
             if (!object.bottomCollision) {
               if (this.passDown) {
@@ -129,7 +154,11 @@ class Player {
             continue;
           }
 
-          const isHittingBottom = this.velocity.y < 0 && verticalIsPrimary && hasHeadHitContact && (nearBottom || crossedBottomThisFrame);
+          const isHittingBottom =
+            this.velocity.y < 0 &&
+            verticalIsPrimary &&
+            hasHeadHitContact &&
+            (nearBottom || crossedBottomThisFrame);
           if (isHittingBottom && object.bottomCollision) {
             this.mesh.position.y = objectBox.max.y + this.size.y / 2;
             this.velocity.y = 0;
@@ -190,7 +219,7 @@ class Player {
   update() {
     this.canJump = true; // Reset canJump each frame, will be set to false if player is on a grounder block
     for (let obj of this.objectsOn) {
-      if (obj.type === 'grounder') {
+      if (obj.type === "grounder") {
         this.canJump = false;
       }
     }
