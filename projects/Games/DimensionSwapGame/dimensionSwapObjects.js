@@ -21,6 +21,13 @@ const gameObjectTypes = {
     texture: null,
     solid: true,
     bottomCollision: true,
+  },
+  grounder: {
+    color: [0, 255, 0],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
+    texture: null,
+    solid: true,
+    bottomCollision: true,
   }
 };
 
@@ -38,8 +45,11 @@ class Block {
     this.mesh.visible = true;
     setColor(this.mesh, ...gameObjectTypes[this.type].color);
 
-    if (player.objectsOn.includes(this)) {
+    if (this.checkForPlayer()) {
       setColor(this.mesh, gameObjectTypes[this.type].color[0] * 2, gameObjectTypes[this.type].color[1] * 2, gameObjectTypes[this.type].color[2] * 2); // Highlight blocks the player is standing on
+      if (this.type === 'grounder') {
+        player.canJump = false;
+      }
     }
 
     if (direction === 'xy') {
@@ -73,6 +83,15 @@ class Block {
         setColor(this.mesh, r * darkenFactor, g * darkenFactor, b * darkenFactor);
       }
     }
+  }
+
+  checkForPlayer() {
+    for (let obj of player.objectsOn) {
+      if (obj === this) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

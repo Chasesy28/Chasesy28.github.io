@@ -6,6 +6,7 @@ class Player {
     this.maxHorizontalVelocity = 10;
     this.friction = 0.9;
     this.onGround = false;
+    this.canJump = true;
     this.velocity = new THREE.Vector3(0, 0, 0);
     this.gravity = 0.9;
     this.jumpStrength = 15;

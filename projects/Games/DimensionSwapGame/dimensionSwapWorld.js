@@ -89,6 +89,9 @@ const objectIdentifiers = {
     type: "launcher",
     axis: 'z',
     direction: -20,
+  },
+  18: {
+    type: "grounder",
   }
 };
 
