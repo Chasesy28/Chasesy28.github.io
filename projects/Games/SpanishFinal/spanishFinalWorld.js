@@ -4,7 +4,7 @@ const worldData = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, "p", 3, 3, 3, 3, 3, 3, 3],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-]
+];
 
 function convertToObjects(worldData) {
   const objects = [];
