@@ -67,3 +67,9 @@ function gameLoop() {
   cameraFollowPlayer();
   requestAnimationFrame(gameLoop);
 }
+
+function startGame() {
+  backgroundColor(0, 0, 0);
+  gameObjects = convertToObjects(worldData);
+  gameLoop();
+}
