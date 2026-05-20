@@ -3,6 +3,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SESSION_KEY = "admin_session";
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const PLACEHOLDER_PREFIX = "__SUPABASE_";
+const VITE_ADMIN_ROUTE = "/vite/admin";
 
 const config = window.__ADMIN_SUPABASE_CONFIG ?? {};
 const supabaseUrl = typeof config.url === "string" ? config.url.trim() : "";
@@ -136,9 +137,7 @@ export async function authenticateAdmin(email) {
 export async function loginWithGoogle(redirectPath) {
   const client = requireSupabaseClient();
 
-  const currentUrl = new URL(window.location.href);
-  const defaultRedirectPath = `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`;
-  const targetRedirect = redirectPath ?? defaultRedirectPath;
+  const targetRedirect = redirectPath ?? VITE_ADMIN_ROUTE;
   const redirectTo = new URL(targetRedirect, window.location.origin).toString();
 
   const { error } = await client.auth.signInWithOAuth({

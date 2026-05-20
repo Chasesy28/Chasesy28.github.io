@@ -230,6 +230,8 @@ async function handleCreateAnnouncement(e) {
 
   const announcement = await saveAnnouncement(message, type, dismissible, session?.adminId ?? null);
 
+
+    const VITE_ADMIN_ROUTE = "/vite/admin";
   if (!announcement) {
     showToast("Unable to create announcement. Check your Supabase permissions.", "error");
     return;
@@ -271,7 +273,7 @@ async function loadAnnouncements() {
 
     if (announcement.dismissible) {
       const dismissText = document.createElement("span");
-      dismissText.style.fontSize = "12px";
+          window.location.replace(VITE_ADMIN_ROUTE);
       dismissText.style.color = "#6b7280";
       dismissText.textContent = " • Dismissible";
       headerDiv.appendChild(dismissText);
@@ -291,7 +293,7 @@ async function loadAnnouncements() {
     contentDiv.appendChild(headerDiv);
     contentDiv.appendChild(messageP);
     contentDiv.appendChild(dateP);
-
+        await loginWithGoogle(VITE_ADMIN_ROUTE);
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "btn btn-danger";
     deleteBtn.style.padding = "8px 16px";
@@ -302,17 +304,7 @@ async function loadAnnouncements() {
         const deleted = await removeAnnouncement(announcement.id);
         if (deleted) {
           await loadAnnouncements();
-          showToast("Announcement deleted", "success");
-        } else {
-          showToast("Unable to delete announcement right now.", "error");
-        }
-      }
-    });
-
-    itemDiv.appendChild(contentDiv);
-    itemDiv.appendChild(deleteBtn);
-    announcementsList.appendChild(itemDiv);
-  });
+      window.location.replace(VITE_ADMIN_ROUTE);
 }
 
 function loadAnalytics() {
