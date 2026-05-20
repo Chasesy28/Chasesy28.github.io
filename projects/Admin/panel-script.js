@@ -101,10 +101,14 @@ function showLoginModal(message = "") {
   loginModal.classList.remove("hidden");
   adminContent.classList.add("hidden");
   loginForm.reset();
-  loginSubmitButton.disabled = !isSupabaseConfigured();
+  // Allow handoff to the Vite admin route even when build-time Supabase
+  // placeholders are present. The Vite admin page enforces auth, so
+  // enabling the button here improves UX for deployments where CI
+  // injection hasn't run yet.
+  loginSubmitButton.disabled = false;
   loginSubmitButton.textContent = isSupabaseConfigured()
     ? "Continue with Google"
-    : "Supabase Not Configured";
+    : "Continue to Admin (will prompt for sign-in)";
 
   if (message) {
     loginError.textContent = message;
