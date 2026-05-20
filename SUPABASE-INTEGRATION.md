@@ -13,9 +13,12 @@
   - Admin allow-list check against `admin_users`
   - 24-hour local session mirror for UI state
 
-- **Legacy admin panel (still present)**: localStorage session with hardcoded credentials
-- **Location**: `/admin-auth.js`, `/projects/Admin/Panel.html`
-- **Status**: legacy/testing only; not recommended for production auth
+- **Legacy admin panel (still present)**: Supabase-backed Google OAuth login with a local session mirror
+- **Location**: `/projects/Admin/Panel.html`, `/projects/Admin/panel-script.js`, `/projects/Admin/panel-supabase.js`
+- **Features**:
+  - Google OAuth sign-in via Supabase Auth
+  - Admin allow-list check against `admin_users`
+  - 24-hour local session mirror for UI state
 
 ### Announcements
 
@@ -75,7 +78,7 @@ create table announcement_dismissals (
 
 ### 2. Environment Configuration
 
-Create a `.env` file (add to `.gitignore`):
+Create a `.env` file for the Vite app (add to `.gitignore`):
 
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
@@ -83,6 +86,13 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
 # Optional fallback for older setups:
 # VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+
+For the static admin panel on GitHub Pages, use repository secrets instead of `.env` files:
+
+- `SUPABASE_URL`
+- `SUPABASE_PUBLISHABLE_KEY` or `SUPABASE_ANON_KEY`
+
+The Pages workflow injects those values into `projects/Admin/Panel.html` at build time. Do not use a Supabase service-role key in the browser.
 
 ### 3. Installation
 
@@ -115,6 +125,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ```
+
+For the legacy static panel, the same idea is implemented in `/projects/Admin/panel-supabase.js`, but the credentials are read from `window.__ADMIN_SUPABASE_CONFIG` and populated during the GitHub Pages build.
 
 #### Phase 2: Migrate Authentication
 

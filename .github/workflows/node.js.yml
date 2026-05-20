@@ -63,6 +63,38 @@ jobs:
               cp "$file" dist/
             fi
           done
+      - name: Inject Supabase config into legacy admin panel
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -e
+          PANEL_FILE="dist/projects/Admin/Panel.html"
+
+          if [ ! -f "$PANEL_FILE" ]; then
+            echo "Legacy admin panel file not found; skipping Supabase injection."
+            exit 0
+          fi
+
+          if [ -z "$SUPABASE_URL" ] || { [ -z "$SUPABASE_PUBLISHABLE_KEY" ] && [ -z "$SUPABASE_ANON_KEY" ]; }; then
+            echo "Supabase secrets are missing; leaving panel in local-config mode."
+            exit 0
+          fi
+
+          node - <<'NODE'
+          const fs = require('fs');
+          const panelFile = 'dist/projects/Admin/Panel.html';
+          const supabaseUrl = process.env.SUPABASE_URL || '';
+          const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || '';
+          const anonKey = process.env.SUPABASE_ANON_KEY || '';
+
+          let html = fs.readFileSync(panelFile, 'utf8');
+          html = html.replaceAll('__SUPABASE_URL__', supabaseUrl);
+          html = html.replaceAll('__SUPABASE_PUBLISHABLE_KEY__', publishableKey || anonKey);
+          html = html.replaceAll('__SUPABASE_ANON_KEY__', anonKey || publishableKey);
+          fs.writeFileSync(panelFile, html);
+          NODE
       - name: Create /vite directory for GitHub Pages clean-URL routing
         run: |
           set -e

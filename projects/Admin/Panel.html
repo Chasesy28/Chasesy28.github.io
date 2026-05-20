@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Site Management</title>
+    <script>
+        window.__ADMIN_SUPABASE_CONFIG = {
+            url: "__SUPABASE_URL__",
+            publishableKey: "__SUPABASE_PUBLISHABLE_KEY__",
+            anonKey: "__SUPABASE_ANON_KEY__"
+        };
+    </script>
     <!-- Use site-wide Tailwind CSS -->
     <link rel="stylesheet" href="/styles.css">
     <style>
@@ -11,7 +18,7 @@
         body {
             background-color: #f9fafb;
         }
-        
+
         /* Toast animations */
         @keyframes slideIn {
             from {
@@ -23,7 +30,7 @@
                 opacity: 1;
             }
         }
-        
+
         @keyframes slideOut {
             from {
                 transform: translateX(0);
@@ -34,7 +41,7 @@
                 opacity: 0;
             }
         }
-        
+
         .admin-card {
             background: white;
             border-radius: 8px;
@@ -42,7 +49,7 @@
             padding: 24px;
             margin-bottom: 24px;
         }
-        
+
         .admin-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -50,26 +57,26 @@
             margin-bottom: 32px;
             border-radius: 0 0 12px 12px;
         }
-        
+
         .stat-card {
             background: white;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        
+
         .stat-value {
             font-size: 32px;
             font-weight: bold;
             color: #667eea;
         }
-        
+
         .stat-label {
             font-size: 14px;
             color: #6b7280;
             margin-top: 4px;
         }
-        
+
         /* Modal styles */
         .modal-overlay {
             position: fixed;
@@ -83,11 +90,11 @@
             justify-content: center;
             z-index: 9999;
         }
-        
+
         .modal-overlay.hidden {
             display: none;
         }
-        
+
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -98,18 +105,18 @@
             overflow-y: auto;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-label {
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
             color: #374151;
         }
-        
+
         .form-input,
         .form-textarea,
         .form-select {
@@ -120,7 +127,7 @@
             font-size: 14px;
             transition: border-color 0.2s;
         }
-        
+
         .form-input:focus,
         .form-textarea:focus,
         .form-select:focus {
@@ -128,12 +135,12 @@
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        
+
         .form-textarea {
             min-height: 100px;
             resize: vertical;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border-radius: 6px;
@@ -143,34 +150,34 @@
             border: none;
             font-size: 14px;
         }
-        
+
         .btn-primary {
             background: #667eea;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background: #5568d3;
         }
-        
+
         .btn-secondary {
             background: #e5e7eb;
             color: #374151;
         }
-        
+
         .btn-secondary:hover {
             background: #d1d5db;
         }
-        
+
         .btn-danger {
             background: #ef4444;
             color: white;
         }
-        
+
         .btn-danger:hover {
             background: #dc2626;
         }
-        
+
         .announcement-item {
             background: #f9fafb;
             padding: 16px;
@@ -180,11 +187,11 @@
             justify-content: space-between;
             align-items: start;
         }
-        
+
         .announcement-item-content {
             flex: 1;
         }
-        
+
         .announcement-type-badge {
             display: inline-block;
             padding: 2px 8px;
@@ -193,7 +200,7 @@
             font-weight: 600;
             margin-right: 8px;
         }
-        
+
         .type-info { background: #dbeafe; color: #1e40af; }
         .type-success { background: #d1fae5; color: #065f46; }
         .type-warning { background: #fef3c7; color: #92400e; }
@@ -206,19 +213,15 @@
         <div class="modal-content">
             <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #111827;">Admin Login</h2>
             <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label" for="username">Username</label>
-                    <input type="text" id="username" class="form-input" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input type="password" id="password" class="form-input" required autocomplete="current-password">
+                <div style="background: #eff6ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+                    <p style="font-size: 14px; color: #1e3a8a; margin: 0;">
+                        Sign in with the Google account that exists in the Supabase <code>admin_users</code> table.
+                    </p>
                 </div>
                 <div id="loginError" style="color: #ef4444; font-size: 14px; margin-bottom: 16px; display: none;"></div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
-                <!-- Demo credentials note - Remove in production -->
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Continue with Google</button>
                 <p style="margin-top: 16px; font-size: 12px; color: #6b7280; text-align: center;">
-                    Development mode: admin / admin123
+                    Supabase auth is configured at build time from GitHub Secrets.
                 </p>
             </form>
         </div>
@@ -233,7 +236,15 @@
                     <h1 style="font-size: 32px; font-weight: bold; margin-bottom: 8px;">Admin Panel</h1>
                     <p style="opacity: 0.9;">Manage site announcements and view analytics</p>
                 </div>
-                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                <div style="text-align: right;">
+                    <p style="margin: 0 0 6px; font-size: 14px; opacity: 0.95;">
+                        Logged in as: <span id="sessionEmail" style="font-weight: 600;">-</span>
+                    </p>
+                    <p style="margin: 0 0 12px; font-size: 12px; opacity: 0.8;">
+                        Session expires in <span id="sessionExpiration">0</span> minutes
+                    </p>
+                    <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                </div>
             </div>
         </div>
 
@@ -243,7 +254,7 @@
                 <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #111827;">
                     ☁️ Cloudflare Analytics Overview
                 </h2>
-                
+
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
                     <div class="stat-card">
                         <div class="stat-value" id="stat-requests">-</div>
@@ -262,14 +273,14 @@
                         <div class="stat-label">Cache Hit Rate</div>
                     </div>
                 </div>
-                
+
                 <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 6px;">
                     <p style="font-size: 14px; color: #92400e; margin: 0;">
                         <strong>⚠️ Setup Required:</strong> To view real analytics data, configure Cloudflare Analytics API access.
                         <a href="#" id="analyticsSetupLink" style="color: #f59e0b; text-decoration: underline; margin-left: 8px;">Learn more</a>
                     </p>
                 </div>
-                
+
                 <div style="margin-top: 20px;">
                     <button id="refreshAnalyticsBtn" class="btn btn-primary">Refresh Analytics</button>
                     <button id="viewFullDashboardBtn" class="btn btn-secondary" style="margin-left: 8px;">View Full Dashboard</button>
@@ -284,11 +295,11 @@
                     </h2>
                     <button id="createAnnouncementBtn" class="btn btn-primary">Create Announcement</button>
                 </div>
-                
+
                 <div id="announcementsList">
                     <!-- Announcements will be populated here -->
                 </div>
-                
+
                 <div id="noAnnouncementsMsg" style="text-align: center; padding: 40px; color: #6b7280; display: none;">
                     <p style="font-size: 16px; margin-bottom: 8px;">No active announcements</p>
                     <p style="font-size: 14px;">Create your first announcement to notify users site-wide</p>
@@ -301,7 +312,7 @@
                     🔮 Supabase Integration (Coming Soon)
                 </h2>
                 <p style="color: #6b7280; font-size: 14px; margin-bottom: 16px;">
-                    This panel is prepared for Supabase integration. When enabled, authentication and announcements 
+                    This panel is prepared for Supabase integration. When enabled, authentication and announcements
                     will be stored in a secure database instead of localStorage.
                 </p>
                 <div style="background: #ede9fe; border-left: 4px solid #8b5cf6; padding: 16px; border-radius: 6px;">
@@ -326,7 +337,7 @@
                     <label class="form-label" for="announcementMessage">Message</label>
                     <textarea id="announcementMessage" class="form-textarea" required placeholder="Enter your announcement message..."></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="announcementType">Type</label>
                     <select id="announcementType" class="form-select" required>
@@ -336,21 +347,21 @@
                         <option value="error">Error (Red)</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label style="display: flex; align-items: center; cursor: pointer;">
                         <input type="checkbox" id="announcementDismissible" checked style="margin-right: 8px;">
                         <span class="form-label" style="margin: 0;">Allow users to dismiss this announcement</span>
                     </label>
                 </div>
-                
+
                 <div style="background: #f3f4f6; padding: 16px; border-radius: 6px; margin-bottom: 20px;">
                     <p style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Preview:</p>
                     <div id="announcementPreview" style="padding: 12px; border-radius: 6px; background: #4a9eff; color: white;">
                         ℹ️ Your announcement will appear here
                     </div>
                 </div>
-                
+
                 <div style="display: flex; gap: 12px;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Create & Publish</button>
                     <button type="button" id="cancelAnnouncementBtn" class="btn btn-secondary">Cancel</button>
@@ -360,8 +371,6 @@
     </div>
 
     <!-- Load required scripts -->
-    <script src="/admin-auth.js"></script>
-    <script src="/announcements.js"></script>
-    <script src="/projects/Admin/panel-script.js"></script>
+    <script type="module" src="/projects/Admin/panel-script.js"></script>
 </body>
 </html>

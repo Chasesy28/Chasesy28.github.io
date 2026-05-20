@@ -1,35 +1,53 @@
-/**
- * Admin Panel Script
- * Handles UI interactions for the admin panel
- */
+import {
+  createAnnouncement as saveAnnouncement,
+  deleteAnnouncement as removeAnnouncement,
+  getAllAnnouncements,
+  getSession,
+  getSessionExpirationMinutes,
+  getSupabaseConfigError,
+  initializeAuthFromSupabase,
+  isAuthenticated,
+  isSupabaseConfigured,
+  loginWithGoogle,
+  logout as supabaseLogout,
+  refreshSession,
+} from "./panel-supabase.js";
 
-// DOM Elements
-let loginModal, loginForm, loginError;
-let adminContent, logoutBtn;
-let announcementModal, announcementForm, announcementPreview;
-let createAnnouncementBtn, cancelAnnouncementBtn;
-let announcementsList, noAnnouncementsMsg;
-let refreshAnalyticsBtn, viewFullDashboardBtn, analyticsSetupLink;
+let loginModal;
+let loginForm;
+let loginError;
+let loginSubmitButton;
+let adminContent;
+let logoutBtn;
+let sessionEmailEl;
+let sessionExpirationEl;
+let announcementModal;
+let announcementForm;
+let announcementPreview;
+let createAnnouncementBtn;
+let cancelAnnouncementBtn;
+let announcementsList;
+let noAnnouncementsMsg;
+let refreshAnalyticsBtn;
+let viewFullDashboardBtn;
+let analyticsSetupLink;
 
-// Announcement type icons and colors
 const ANNOUNCEMENT_CONFIG = {
   info: { icon: "ℹ️", color: "#4a9eff" },
   success: { icon: "✓", color: "#10b981" },
   warning: { icon: "⚠️", color: "#f59e0b" },
   error: { icon: "❌", color: "#ef4444" },
-  silly: { icon: "🤪", color: "#f472b6" },
 };
 
-/**
- * Initialize the admin panel
- */
 function initializeAdminPanel() {
-  // Get DOM elements
   loginModal = document.getElementById("loginModal");
   loginForm = document.getElementById("loginForm");
   loginError = document.getElementById("loginError");
+  loginSubmitButton = loginForm.querySelector('button[type="submit"]');
   adminContent = document.getElementById("adminContent");
   logoutBtn = document.getElementById("logoutBtn");
+  sessionEmailEl = document.getElementById("sessionEmail");
+  sessionExpirationEl = document.getElementById("sessionExpiration");
   announcementModal = document.getElementById("announcementModal");
   announcementForm = document.getElementById("announcementForm");
   announcementPreview = document.getElementById("announcementPreview");
@@ -41,33 +59,28 @@ function initializeAdminPanel() {
   viewFullDashboardBtn = document.getElementById("viewFullDashboardBtn");
   analyticsSetupLink = document.getElementById("analyticsSetupLink");
 
-  // Check authentication status
-  if (window.AdminAuth.isAuthenticated()) {
+  setupEventListeners();
+
+  if (!isSupabaseConfigured()) {
+    showLoginModal(getSupabaseConfigError());
+    return;
+  }
+
+  if (isAuthenticated()) {
     showAdminContent();
   } else {
     showLoginModal();
+    void tryRestoreSupabaseSession();
   }
-
-  // Setup event listeners
-  setupEventListeners();
 }
 
-/**
- * Setup all event listeners
- */
 function setupEventListeners() {
-  // Login form
   loginForm.addEventListener("submit", handleLogin);
-
-  // Logout button
   logoutBtn.addEventListener("click", handleLogout);
-
-  // Announcement management
   createAnnouncementBtn.addEventListener("click", showAnnouncementModal);
   cancelAnnouncementBtn.addEventListener("click", hideAnnouncementModal);
   announcementForm.addEventListener("submit", handleCreateAnnouncement);
 
-  // Announcement preview updates
   document
     .getElementById("announcementMessage")
     .addEventListener("input", updateAnnouncementPreview);
@@ -75,83 +88,94 @@ function setupEventListeners() {
     .getElementById("announcementType")
     .addEventListener("change", updateAnnouncementPreview);
 
-  // Analytics buttons
   refreshAnalyticsBtn.addEventListener("click", refreshAnalytics);
   viewFullDashboardBtn.addEventListener("click", openCloudflareAnalytics);
   analyticsSetupLink.addEventListener("click", showAnalyticsSetup);
 }
 
-/**
- * Shows login modal
- */
-function showLoginModal() {
+function showLoginModal(message = "") {
   loginModal.classList.remove("hidden");
   adminContent.classList.add("hidden");
-  loginError.style.display = "none";
   loginForm.reset();
+  loginSubmitButton.disabled = !isSupabaseConfigured();
+  loginSubmitButton.textContent = isSupabaseConfigured()
+    ? "Continue with Google"
+    : "Supabase Not Configured";
+
+  if (message) {
+    loginError.textContent = message;
+    loginError.style.display = "block";
+  } else {
+    loginError.textContent = "";
+    loginError.style.display = "none";
+  }
 }
 
-/**
- * Shows admin content
- */
 function showAdminContent() {
   loginModal.classList.add("hidden");
   adminContent.classList.remove("hidden");
 
-  // Refresh session timestamp
-  window.AdminAuth.refreshSession();
+  refreshSession();
 
-  // Load data
-  loadAnnouncements();
+  const session = getSession();
+  sessionEmailEl.textContent = session?.email ?? "-";
+  sessionExpirationEl.textContent = String(getSessionExpirationMinutes() ?? 0);
+
+  void loadAnnouncements();
   loadAnalytics();
 }
 
-/**
- * Handles login form submission
- */
-function handleLogin(e) {
+async function tryRestoreSupabaseSession() {
+  try {
+    const admin = await initializeAuthFromSupabase();
+    if (admin) {
+      showAdminContent();
+    }
+  } catch (error) {
+    showLoginModal(error instanceof Error ? error.message : "Unable to validate your Supabase session.");
+  }
+}
+
+async function handleLogin(e) {
   e.preventDefault();
 
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  if (!isSupabaseConfigured()) {
+    showLoginModal(getSupabaseConfigError());
+    return;
+  }
 
-  if (window.AdminAuth.authenticate(username, password)) {
-    showAdminContent();
-  } else {
-    loginError.textContent = "Invalid credentials. Please try again.";
+  loginSubmitButton.disabled = true;
+  loginSubmitButton.textContent = "Redirecting...";
+  loginError.style.display = "none";
+
+  try {
+    await loginWithGoogle();
+  } catch (error) {
+    loginSubmitButton.disabled = false;
+    loginSubmitButton.textContent = "Continue with Google";
+    loginError.textContent =
+      error instanceof Error ? error.message : "Google sign-in failed.";
     loginError.style.display = "block";
   }
 }
 
-/**
- * Handles logout
- */
-function handleLogout() {
+async function handleLogout() {
   if (confirm("Are you sure you want to logout?")) {
-    window.AdminAuth.logout();
+    await supabaseLogout();
     showLoginModal();
   }
 }
 
-/**
- * Shows announcement creation modal
- */
 function showAnnouncementModal() {
   announcementModal.classList.remove("hidden");
   announcementForm.reset();
   updateAnnouncementPreview();
 }
 
-/**
- * Hides announcement creation modal
- */
 function hideAnnouncementModal() {
   announcementModal.classList.add("hidden");
 }
 
-/**
- * Updates the announcement preview
- */
 function updateAnnouncementPreview() {
   const message =
     document.getElementById("announcementMessage").value ||
@@ -163,11 +187,6 @@ function updateAnnouncementPreview() {
   announcementPreview.style.backgroundColor = config.color;
 }
 
-/**
- * Shows a toast notification
- * @param {string} message - Message to display
- * @param {string} type - Type: 'success', 'error', 'info'
- */
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.style.position = "fixed";
@@ -182,7 +201,6 @@ function showToast(message, type = "info") {
   toast.style.animation = "slideIn 0.3s ease-out";
   toast.textContent = message;
 
-  // Set color based on type
   if (type === "success") {
     toast.style.backgroundColor = "#10b981";
   } else if (type === "error") {
@@ -193,47 +211,34 @@ function showToast(message, type = "info") {
 
   document.body.appendChild(toast);
 
-  // Auto-remove after 3 seconds
   setTimeout(() => {
     toast.style.animation = "slideOut 0.3s ease-out";
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
 
-/**
- * Handles announcement creation
- */
-function handleCreateAnnouncement(e) {
+async function handleCreateAnnouncement(e) {
   e.preventDefault();
 
   const message = document.getElementById("announcementMessage").value;
   const type = document.getElementById("announcementType").value;
-  const dismissible = document.getElementById(
-    "announcementDismissible",
-  ).checked;
+  const dismissible = document.getElementById("announcementDismissible").checked;
+  const session = getSession();
 
-  // Create and save announcement
-  const announcement = window.Announcements.create(message, type, dismissible);
-  window.Announcements.save(announcement);
+  const announcement = await saveAnnouncement(message, type, dismissible, session?.adminId ?? null);
 
-  // Show success toast
-  showToast(
-    "Announcement created successfully! It will now appear site-wide.",
-    "success",
-  );
+  if (!announcement) {
+    showToast("Unable to create announcement. Check your Supabase permissions.", "error");
+    return;
+  }
 
-  // Refresh the list
-  loadAnnouncements();
-
-  // Close modal
+  showToast("Announcement created successfully! It will now appear site-wide.", "success");
+  await loadAnnouncements();
   hideAnnouncementModal();
 }
 
-/**
- * Loads and displays all announcements
- */
-function loadAnnouncements() {
-  const announcements = window.Announcements.getAll();
+async function loadAnnouncements() {
+  const announcements = await getAllAnnouncements();
 
   if (announcements.length === 0) {
     announcementsList.innerHTML = "";
@@ -242,12 +247,10 @@ function loadAnnouncements() {
   }
 
   noAnnouncementsMsg.style.display = "none";
-
   announcementsList.innerHTML = "";
 
   announcements.forEach((announcement) => {
-    const config = ANNOUNCEMENT_CONFIG[announcement.type];
-    const date = new Date(announcement.createdAt).toLocaleString();
+    const date = new Date(announcement.created_at).toLocaleString();
 
     const itemDiv = document.createElement("div");
     itemDiv.className = "announcement-item";
@@ -291,35 +294,25 @@ function loadAnnouncements() {
     deleteBtn.style.padding = "8px 16px";
     deleteBtn.style.fontSize = "12px";
     deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", () =>
-      deleteAnnouncementById(announcement.id),
-    );
+    deleteBtn.addEventListener("click", async () => {
+      if (confirm("Are you sure you want to delete this announcement?")) {
+        const deleted = await removeAnnouncement(announcement.id);
+        if (deleted) {
+          await loadAnnouncements();
+          showToast("Announcement deleted", "success");
+        } else {
+          showToast("Unable to delete announcement right now.", "error");
+        }
+      }
+    });
 
     itemDiv.appendChild(contentDiv);
     itemDiv.appendChild(deleteBtn);
-
     announcementsList.appendChild(itemDiv);
   });
 }
 
-/**
- * Deletes an announcement
- */
-function deleteAnnouncementById(announcementId) {
-  if (confirm("Are you sure you want to delete this announcement?")) {
-    window.Announcements.delete(announcementId);
-    loadAnnouncements();
-    showToast("Announcement deleted", "success");
-  }
-}
-
-/**
- * Loads analytics data (placeholder)
- */
 function loadAnalytics() {
-  // TODO: Implement real Cloudflare Analytics API integration
-  // For now, show placeholder data
-
   document.getElementById("stat-requests").textContent = "-";
   document.getElementById("stat-bandwidth").textContent = "-";
   document.getElementById("stat-visitors").textContent = "-";
@@ -328,14 +321,10 @@ function loadAnalytics() {
   console.log("[AdminPanel] Analytics API integration pending");
 }
 
-/**
- * Refreshes analytics data
- */
 function refreshAnalytics() {
   refreshAnalyticsBtn.disabled = true;
   refreshAnalyticsBtn.textContent = "Refreshing...";
 
-  // Simulate API call
   setTimeout(() => {
     loadAnalytics();
     refreshAnalyticsBtn.disabled = false;
@@ -344,17 +333,10 @@ function refreshAnalytics() {
   }, 1000);
 }
 
-/**
- * Opens Cloudflare Analytics dashboard
- */
 function openCloudflareAnalytics() {
-  // Open Cloudflare dashboard in new tab
   window.open("https://dash.cloudflare.com/", "_blank");
 }
 
-/**
- * Shows analytics setup information
- */
 function showAnalyticsSetup(e) {
   e.preventDefault();
   showToast(
@@ -363,7 +345,6 @@ function showAnalyticsSetup(e) {
   );
 }
 
-// Initialize when DOM is ready
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializeAdminPanel);
 } else {
