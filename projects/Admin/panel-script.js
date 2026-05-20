@@ -8,7 +8,6 @@ import {
   initializeAuthFromSupabase,
   isAuthenticated,
   isSupabaseConfigured,
-  loginWithGoogle,
   logout as supabaseLogout,
   refreshSession,
 } from "./panel-supabase.js";
@@ -144,24 +143,9 @@ async function tryRestoreSupabaseSession() {
 async function handleLogin(e) {
   e.preventDefault();
 
-  if (!isSupabaseConfigured()) {
-    showLoginModal(getSupabaseConfigError());
-    return;
-  }
-
   loginSubmitButton.disabled = true;
-  loginSubmitButton.textContent = "Redirecting...";
-  loginError.style.display = "none";
-
-  try {
-    await loginWithGoogle(VITE_ADMIN_ROUTE);
-  } catch (error) {
-    loginSubmitButton.disabled = false;
-    loginSubmitButton.textContent = "Continue with Google";
-    loginError.textContent =
-      error instanceof Error ? error.message : "Google sign-in failed.";
-    loginError.style.display = "block";
-  }
+  loginSubmitButton.textContent = "Opening admin dashboard...";
+  window.location.replace(VITE_ADMIN_ROUTE);
 }
 
 async function handleLogout() {
