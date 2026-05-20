@@ -76,6 +76,7 @@ function initializeAdminPanel() {
 
 function setupEventListeners() {
   loginForm.addEventListener("submit", handleLogin);
+  loginSubmitButton.addEventListener("click", handleLogin);
   logoutBtn.addEventListener("click", handleLogout);
   createAnnouncementBtn.addEventListener("click", showAnnouncementModal);
   cancelAnnouncementBtn.addEventListener("click", hideAnnouncementModal);
