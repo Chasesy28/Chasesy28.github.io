@@ -13,6 +13,8 @@ import {
   refreshSession,
 } from "./panel-supabase.js";
 
+const VITE_ADMIN_ROUTE = "/vite/admin";
+
 let loginModal;
 let loginForm;
 let loginError;
@@ -152,7 +154,7 @@ async function handleLogin(e) {
   loginError.style.display = "none";
 
   try {
-    await loginWithGoogle();
+    await loginWithGoogle(VITE_ADMIN_ROUTE);
   } catch (error) {
     loginSubmitButton.disabled = false;
     loginSubmitButton.textContent = "Continue with Google";
@@ -190,6 +192,25 @@ function updateAnnouncementPreview() {
   announcementPreview.style.backgroundColor = config.color;
 }
 
+function showAdminContent() {
+  window.location.replace(VITE_ADMIN_ROUTE);
+}
+
+async function tryRestoreSupabaseSession() {
+  try {
+    const admin = await initializeAuthFromSupabase();
+    if (admin) {
+      window.location.replace(VITE_ADMIN_ROUTE);
+    }
+  } catch (error) {
+    showLoginModal(
+      error instanceof Error
+        ? error.message
+        : "Unable to validate your Supabase session.",
+    );
+  }
+}
+
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.style.position = "fixed";
@@ -218,126 +239,6 @@ function showToast(message, type = "info") {
     toast.style.animation = "slideOut 0.3s ease-out";
     setTimeout(() => toast.remove(), 300);
   }, 3000);
-}
-
-async function handleCreateAnnouncement(e) {
-  e.preventDefault();
-
-  const message = document.getElementById("announcementMessage").value;
-  const type = document.getElementById("announcementType").value;
-  const dismissible = document.getElementById("announcementDismissible").checked;
-  const session = getSession();
-
-  const announcement = await saveAnnouncement(message, type, dismissible, session?.adminId ?? null);
-
-
-    const VITE_ADMIN_ROUTE = "/vite/admin";
-  if (!announcement) {
-    showToast("Unable to create announcement. Check your Supabase permissions.", "error");
-    return;
-  }
-
-  showToast("Announcement created successfully! It will now appear site-wide.", "success");
-  await loadAnnouncements();
-  hideAnnouncementModal();
-}
-
-async function loadAnnouncements() {
-  const announcements = await getAllAnnouncements();
-
-  if (announcements.length === 0) {
-    announcementsList.innerHTML = "";
-    noAnnouncementsMsg.style.display = "block";
-    return;
-  }
-
-  noAnnouncementsMsg.style.display = "none";
-  announcementsList.innerHTML = "";
-
-  announcements.forEach((announcement) => {
-    const date = new Date(announcement.created_at).toLocaleString();
-
-    const itemDiv = document.createElement("div");
-    itemDiv.className = "announcement-item";
-
-    const contentDiv = document.createElement("div");
-    contentDiv.className = "announcement-item-content";
-
-    const headerDiv = document.createElement("div");
-    headerDiv.style.marginBottom = "8px";
-
-    const badge = document.createElement("span");
-    badge.className = `announcement-type-badge type-${announcement.type}`;
-    badge.textContent = announcement.type.toUpperCase();
-    headerDiv.appendChild(badge);
-
-    if (announcement.dismissible) {
-      const dismissText = document.createElement("span");
-          window.location.replace(VITE_ADMIN_ROUTE);
-      dismissText.style.color = "#6b7280";
-      dismissText.textContent = " • Dismissible";
-      headerDiv.appendChild(dismissText);
-    }
-
-    const messageP = document.createElement("p");
-    messageP.style.fontSize = "14px";
-    messageP.style.color = "#111827";
-    messageP.style.marginBottom = "4px";
-    messageP.textContent = announcement.message;
-
-    const dateP = document.createElement("p");
-    dateP.style.fontSize = "12px";
-    dateP.style.color = "#6b7280";
-    dateP.textContent = `Created: ${date}`;
-
-    contentDiv.appendChild(headerDiv);
-    contentDiv.appendChild(messageP);
-    contentDiv.appendChild(dateP);
-        await loginWithGoogle(VITE_ADMIN_ROUTE);
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn btn-danger";
-    deleteBtn.style.padding = "8px 16px";
-    deleteBtn.style.fontSize = "12px";
-    deleteBtn.textContent = "Delete";
-    deleteBtn.addEventListener("click", async () => {
-      if (confirm("Are you sure you want to delete this announcement?")) {
-        const deleted = await removeAnnouncement(announcement.id);
-        if (deleted) {
-          await loadAnnouncements();
-      window.location.replace(VITE_ADMIN_ROUTE);
-}
-
-function loadAnalytics() {
-  document.getElementById("stat-requests").textContent = "-";
-  document.getElementById("stat-bandwidth").textContent = "-";
-  document.getElementById("stat-visitors").textContent = "-";
-  document.getElementById("stat-cache").textContent = "-";
-
-  console.log("[AdminPanel] Analytics API integration pending");
-}
-
-function refreshAnalytics() {
-  refreshAnalyticsBtn.disabled = true;
-  refreshAnalyticsBtn.textContent = "Refreshing...";
-
-  setTimeout(() => {
-    loadAnalytics();
-    refreshAnalyticsBtn.disabled = false;
-    refreshAnalyticsBtn.textContent = "Refresh Analytics";
-    showToast("Analytics data refreshed (demo mode)", "info");
-  }, 1000);
-}
-
-function openCloudflareAnalytics() {
-  window.open("https://dash.cloudflare.com/", "_blank");
-}
-
-function showAnalyticsSetup(e) {
-  e.preventDefault();
-  showToast(
-    "Check the admin panel docs for Cloudflare Analytics setup instructions",
-    "info",
-  );
 }
 
 if (document.readyState === "loading") {
