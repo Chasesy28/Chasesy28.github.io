@@ -65,6 +65,7 @@ jobs:
           done
       - name: Inject Supabase config into legacy admin panel
         env:
+          SITE_ORIGIN: https://chasesy28.github.io
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
@@ -85,11 +86,13 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const panelFile = 'dist/projects/Admin/Panel.html';
+          const siteOrigin = process.env.SITE_ORIGIN || 'https://chasesy28.github.io';
           const supabaseUrl = process.env.SUPABASE_URL || '';
           const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || '';
           const anonKey = process.env.SUPABASE_ANON_KEY || '';
 
           let html = fs.readFileSync(panelFile, 'utf8');
+          html = html.replaceAll('__SITE_ORIGIN__', siteOrigin);
           html = html.replaceAll('__SUPABASE_URL__', supabaseUrl);
           html = html.replaceAll('__SUPABASE_PUBLISHABLE_KEY__', publishableKey || anonKey);
           html = html.replaceAll('__SUPABASE_ANON_KEY__', anonKey || publishableKey);

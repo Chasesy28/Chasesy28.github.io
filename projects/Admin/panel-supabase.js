@@ -6,6 +6,8 @@ const PLACEHOLDER_PREFIX = "__SUPABASE_";
 const VITE_ADMIN_ROUTE = "/vite/admin";
 
 const config = window.__ADMIN_SUPABASE_CONFIG ?? {};
+const configuredSiteOrigin =
+  typeof config.siteOrigin === "string" ? config.siteOrigin.trim() : "";
 const supabaseUrl = typeof config.url === "string" ? config.url.trim() : "";
 const supabaseKey =
   typeof config.publishableKey === "string" && config.publishableKey.trim()
@@ -22,6 +24,14 @@ const hasSupabaseCredentials =
   Boolean(supabaseUrl && supabaseKey) &&
   !isPlaceholder(supabaseUrl) &&
   !isPlaceholder(supabaseKey);
+
+function getSiteOrigin() {
+  if (configuredSiteOrigin && !isPlaceholder(configuredSiteOrigin)) {
+    return configuredSiteOrigin.replace(/\/$/, "");
+  }
+
+  return window.location.origin;
+}
 
 if (!hasSupabaseCredentials) {
   console.warn(
@@ -138,7 +148,7 @@ export async function loginWithGoogle(redirectPath) {
   const client = requireSupabaseClient();
 
   const targetRedirect = redirectPath ?? VITE_ADMIN_ROUTE;
-  const redirectTo = new URL(targetRedirect, window.location.origin).toString();
+  const redirectTo = new URL(targetRedirect, getSiteOrigin()).toString();
 
   const { error } = await client.auth.signInWithOAuth({
     provider: "google",
