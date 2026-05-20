@@ -17,6 +17,7 @@ let loginModal;
 let loginForm;
 let loginError;
 let loginSubmitButton;
+let googleLoginBtn;
 let adminContent;
 let logoutBtn;
 let sessionEmailEl;
@@ -43,7 +44,8 @@ function initializeAdminPanel() {
   loginModal = document.getElementById("loginModal");
   loginForm = document.getElementById("loginForm");
   loginError = document.getElementById("loginError");
-  loginSubmitButton = loginForm.querySelector('button[type="submit"]');
+  googleLoginBtn = document.getElementById("googleLoginBtn");
+  loginSubmitButton = googleLoginBtn;
   adminContent = document.getElementById("adminContent");
   logoutBtn = document.getElementById("logoutBtn");
   sessionEmailEl = document.getElementById("sessionEmail");
@@ -76,7 +78,7 @@ function initializeAdminPanel() {
 
 function setupEventListeners() {
   loginForm.addEventListener("submit", handleLogin);
-  loginSubmitButton.addEventListener("click", handleLogin);
+  googleLoginBtn.addEventListener("click", handleLogin);
   logoutBtn.addEventListener("click", handleLogout);
   createAnnouncementBtn.addEventListener("click", showAnnouncementModal);
   cancelAnnouncementBtn.addEventListener("click", hideAnnouncementModal);
