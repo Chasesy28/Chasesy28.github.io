@@ -33,6 +33,10 @@ function getSiteOrigin() {
   return window.location.origin;
 }
 
+function getAbsoluteRedirectUrl(pathname) {
+  return new URL(pathname, getSiteOrigin()).toString();
+}
+
 if (!hasSupabaseCredentials) {
   console.warn(
     "Supabase credentials are missing for the admin panel. Set GitHub Secrets SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY, then rebuild the Pages artifact.",
@@ -148,7 +152,7 @@ export async function loginWithGoogle(redirectPath) {
   const client = requireSupabaseClient();
 
   const targetRedirect = redirectPath ?? VITE_ADMIN_ROUTE;
-  const redirectTo = new URL(targetRedirect, getSiteOrigin()).toString();
+  const redirectTo = getAbsoluteRedirectUrl(targetRedirect);
 
   const { error } = await client.auth.signInWithOAuth({
     provider: "google",
