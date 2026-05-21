@@ -39,11 +39,7 @@ export class AdminAuthManager {
     }
 
     const targetRedirect = redirectPath ?? '/vite/admin'
-    const baseOrigin =
-      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? DEFAULT_SITE_ORIGIN
-        : window.location.origin
-    const redirectTo = new URL(targetRedirect, baseOrigin).toString()
+    const redirectTo = new URL(targetRedirect, DEFAULT_SITE_ORIGIN).toString()
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

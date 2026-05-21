@@ -31,11 +31,7 @@ function getSiteOrigin() {
     return configuredSiteOrigin.replace(/\/$/, "");
   }
 
-  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-    return DEFAULT_SITE_ORIGIN;
-  }
-
-  return window.location.origin;
+  return DEFAULT_SITE_ORIGIN;
 }
 
 function getAbsoluteRedirectUrl(pathname) {
