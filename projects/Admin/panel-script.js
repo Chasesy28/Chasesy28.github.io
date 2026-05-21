@@ -8,11 +8,10 @@ import {
   initializeAuthFromSupabase,
   isAuthenticated,
   isSupabaseConfigured,
+  loginWithGoogle,
   logout as supabaseLogout,
   refreshSession,
 } from "./panel-supabase.js";
-
-const VITE_ADMIN_ROUTE = "/vite/admin";
 
 let loginModal;
 let loginForm;
@@ -101,14 +100,10 @@ function showLoginModal(message = "") {
   loginModal.classList.remove("hidden");
   adminContent.classList.add("hidden");
   loginForm.reset();
-  // Allow handoff to the Vite admin route even when build-time Supabase
-  // placeholders are present. The Vite admin page enforces auth, so
-  // enabling the button here improves UX for deployments where CI
-  // injection hasn't run yet.
-  loginSubmitButton.disabled = false;
+  loginSubmitButton.disabled = !isSupabaseConfigured();
   loginSubmitButton.textContent = isSupabaseConfigured()
     ? "Continue with Google"
-    : "Continue to Admin (will prompt for sign-in)";
+    : "Supabase not configured";
 
   if (message) {
     loginError.textContent = message;
@@ -147,9 +142,21 @@ async function tryRestoreSupabaseSession() {
 async function handleLogin(e) {
   e.preventDefault();
 
+  if (!isSupabaseConfigured()) {
+    showLoginModal(getSupabaseConfigError());
+    return;
+  }
+
   loginSubmitButton.disabled = true;
-  loginSubmitButton.textContent = "Opening admin dashboard...";
-  window.location.replace(VITE_ADMIN_ROUTE);
+  loginSubmitButton.textContent = "Opening Supabase sign-in...";
+
+  try {
+    await loginWithGoogle();
+  } catch (error) {
+    showLoginModal(
+      error instanceof Error ? error.message : "Unable to start Supabase sign-in.",
+    );
+  }
 }
 
 async function handleLogout() {
@@ -178,25 +185,6 @@ function updateAnnouncementPreview() {
 
   announcementPreview.textContent = `${config.icon} ${message}`;
   announcementPreview.style.backgroundColor = config.color;
-}
-
-function showAdminContent() {
-  window.location.replace(VITE_ADMIN_ROUTE);
-}
-
-async function tryRestoreSupabaseSession() {
-  try {
-    const admin = await initializeAuthFromSupabase();
-    if (admin) {
-      window.location.replace(VITE_ADMIN_ROUTE);
-    }
-  } catch (error) {
-    showLoginModal(
-      error instanceof Error
-        ? error.message
-        : "Unable to validate your Supabase session.",
-    );
-  }
 }
 
 function showToast(message, type = "info") {
