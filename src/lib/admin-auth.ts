@@ -2,6 +2,7 @@ import { authenticateAdmin, supabase } from './supabase'
 
 const SESSION_KEY = 'admin_session'
 const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
+const DEFAULT_SITE_ORIGIN = 'https://chasesy28.github.io'
 
 export class AdminAuthManager {
   private sessionKey = SESSION_KEY
@@ -38,7 +39,11 @@ export class AdminAuthManager {
     }
 
     const targetRedirect = redirectPath ?? '/vite/admin'
-    const redirectTo = new URL(targetRedirect, window.location.origin).toString()
+    const baseOrigin =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? DEFAULT_SITE_ORIGIN
+        : window.location.origin
+    const redirectTo = new URL(targetRedirect, baseOrigin).toString()
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

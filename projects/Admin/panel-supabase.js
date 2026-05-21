@@ -4,6 +4,7 @@ const SESSION_KEY = "admin_session";
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const PLACEHOLDER_PREFIX = "__SUPABASE_";
 const VITE_ADMIN_ROUTE = "/vite/admin";
+const DEFAULT_SITE_ORIGIN = "https://chasesy28.github.io";
 
 const config = window.__ADMIN_SUPABASE_CONFIG ?? {};
 const configuredSiteOrigin =
@@ -28,6 +29,10 @@ const hasSupabaseCredentials =
 function getSiteOrigin() {
   if (configuredSiteOrigin && !isPlaceholder(configuredSiteOrigin)) {
     return configuredSiteOrigin.replace(/\/$/, "");
+  }
+
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return DEFAULT_SITE_ORIGIN;
   }
 
   return window.location.origin;
