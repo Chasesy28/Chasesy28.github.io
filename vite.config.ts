@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 function isKnownAppRoute(url: string) {
-  return ['/', '/vite', '/vite/', '/admin', '/admin/', '/vite/admin', '/vite/admin/', '/admin/auth', '/admin/auth/'].includes(url)
+  return ['/', '/vite', '/vite/', '/admin', '/admin/', '/admin/auth', '/admin/auth/'].includes(url)
 }
 
 function shouldServeCustom404(url: string) {
@@ -19,7 +19,7 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, _res, next) => {
           const url = req.url ?? ''
-          const viteRoutes = ['/vite', '/vite/', '/admin', '/admin/', '/vite/admin', '/vite/admin/', '/admin/auth', '/admin/auth/']
+          const viteRoutes = ['/vite', '/vite/', '/admin', '/admin/', '/admin/auth', '/admin/auth/']
           if (viteRoutes.includes(url)) {
             req.url = '/vite.html'
           }
@@ -38,7 +38,7 @@ export default defineConfig({
       configurePreviewServer(server) {
         server.middlewares.use((req, _res, next) => {
           const url = req.url ?? ''
-          const viteRoutes = ['/vite', '/vite/', '/admin', '/admin/', '/vite/admin', '/vite/admin/', '/admin/auth', '/admin/auth/']
+          const viteRoutes = ['/vite', '/vite/', '/admin', '/admin/', '/admin/auth', '/admin/auth/']
           if (viteRoutes.includes(url)) {
             req.url = '/vite.html'
           }

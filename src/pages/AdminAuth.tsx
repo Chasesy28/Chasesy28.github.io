@@ -52,7 +52,7 @@ function AdminAuthPage() {
 
   const primaryAction =
     authState === 'signedIn'
-      ? { label: 'Open dashboard', href: '/vite/admin' }
+      ? { label: 'Open dashboard', href: '/projects/Admin/admin.html' }
       : { label: 'Go to login', href: '/admin' }
 
   const titleByState: Record<AuthState, string> = {
