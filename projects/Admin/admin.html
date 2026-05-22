@@ -10,10 +10,17 @@
       .btn{padding:8px 12px;border-radius:6px;border:1px solid #666;background:#f3f3f3;cursor:pointer}
       .btn-danger{background:#ffecec;border-color:#ff6b6b}
       .box{border:1px solid #e6e6e6;padding:16px;border-radius:8px;margin-top:12px}
+      .box-success{border-color:#86efac;background:#f0fdf4}
+      .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em}
+      .badge-success{background:#dcfce7;color:#166534}
     </style>
   </head>
   <body>
-    <h1>Admin Panel</h1>
+    <h1 id="page-title">Admin Panel</h1>
+    <div id="signed-in-banner" class="box box-success hidden">
+      <span class="badge badge-success">Signed in</span>
+      <p id="signed-in-banner-text" style="margin:12px 0 0">You are authenticated with Supabase.</p>
+    </div>
     <div id="not-configured" class="box hidden">
       <strong>Configuration missing</strong>
       <p>The admin panel is not configured with Supabase credentials.</p>
@@ -47,8 +54,11 @@
       } from './panel-supabase.js'
 
       const elNotConfigured = document.getElementById('not-configured')
+      const elSignedInBanner = document.getElementById('signed-in-banner')
       const elSignedOut = document.getElementById('signed-out')
       const elSignedIn = document.getElementById('signed-in')
+      const pageTitle = document.getElementById('page-title')
+      const signedInBannerText = document.getElementById('signed-in-banner-text')
       const signinBtn = document.getElementById('signin')
       const signoutBtn = document.getElementById('signout')
       const refreshBtn = document.getElementById('refresh')
@@ -57,12 +67,20 @@
 
       function hideAll(){
         elNotConfigured.classList.add('hidden')
+        elSignedInBanner.classList.add('hidden')
         elSignedOut.classList.add('hidden')
         elSignedIn.classList.add('hidden')
       }
 
+      function showSignedInState(message) {
+        pageTitle.textContent = 'Admin Panel - Signed In'
+        signedInBannerText.textContent = message || 'You are authenticated with Supabase.'
+        elSignedInBanner.classList.remove('hidden')
+      }
+
       async function render(){
         hideAll()
+        pageTitle.textContent = 'Admin Panel'
 
         if (!isSupabaseConfigured()){
           elNotConfigured.classList.remove('hidden')
@@ -75,6 +93,7 @@
           emailSpan.textContent = s.email || 'admin'
           const mins = getSessionExpirationMinutes()
           expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+          showSignedInState(`Signed in as ${s.email || 'admin'}.`)
           elSignedIn.classList.remove('hidden')
           return
         }
@@ -86,6 +105,7 @@
             emailSpan.textContent = admin.email || 'admin'
             const mins = getSessionExpirationMinutes()
             expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+            showSignedInState(`Login successful for ${admin.email || 'admin'}.`)
             elSignedIn.classList.remove('hidden')
             return
           }
