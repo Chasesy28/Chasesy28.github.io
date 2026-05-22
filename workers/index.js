@@ -75,6 +75,9 @@ function resolveHtmlEntry(pathname) {
   if (pathname === '/admin' || pathname === '/admin/') {
     return '/vite.html';
   }
+  if (pathname === '/admin/auth' || pathname === '/admin/auth/') {
+    return '/vite.html';
+  }
   if (pathname === '/vite' || pathname.startsWith('/vite/')) {
     return '/vite.html';
   }
@@ -86,6 +89,8 @@ function isSpaRoute(pathname) {
     pathname === '/' ||
     pathname === '/admin' ||
     pathname === '/admin/' ||
+    pathname === '/admin/auth' ||
+    pathname === '/admin/auth/' ||
     pathname === '/vite' ||
     pathname === '/vite/' ||
     pathname.startsWith('/vite/')

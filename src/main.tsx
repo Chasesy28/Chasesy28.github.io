@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.tsx'
 import Home from './pages/Home.tsx'
 import Admin from './pages/Admin.tsx'
+import AdminAuth from './pages/AdminAuth.tsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -16,6 +17,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/admin" element={<Admin />} />
           <Route path="/vite/admin" element={<Admin />} />
           <Route path="/vite.html/admin" element={<Admin />} />
+          <Route path="/admin/auth" element={<AdminAuth />} />
+          <Route path="/vite/admin/auth" element={<AdminAuth />} />
+          <Route path="/vite.html/admin/auth" element={<AdminAuth />} />
         </Route>
       </Routes>
     </BrowserRouter>
