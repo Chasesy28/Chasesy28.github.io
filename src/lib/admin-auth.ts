@@ -3,6 +3,7 @@ import { authenticateAdmin, supabase } from './supabase'
 const SESSION_KEY = 'admin_session'
 const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 const DEFAULT_SITE_ORIGIN = 'https://silly-site.me'
+const DEFAULT_ADMIN_REDIRECT_URL = 'https://silly-site.me/projects/Admin/admin.html'
 
 export class AdminAuthManager {
   private sessionKey = SESSION_KEY
@@ -38,7 +39,7 @@ export class AdminAuthManager {
       throw new Error('Supabase is not configured. Google sign-in is unavailable.')
     }
 
-    const targetRedirect = redirectPath ?? '/projects/Admin/admin.html'
+    const targetRedirect = redirectPath ?? DEFAULT_ADMIN_REDIRECT_URL
     const redirectTo = new URL(targetRedirect, DEFAULT_SITE_ORIGIN).toString()
 
     const { error } = await supabase.auth.signInWithOAuth({
