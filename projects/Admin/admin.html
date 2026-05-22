@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Panel</title>
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px}
+      .hidden{display:none}
+      .btn{padding:8px 12px;border-radius:6px;border:1px solid #666;background:#f3f3f3;cursor:pointer}
+      .btn-danger{background:#ffecec;border-color:#ff6b6b}
+      .box{border:1px solid #e6e6e6;padding:16px;border-radius:8px;margin-top:12px}
+    </style>
+  </head>
+  <body>
+    <h1>Admin Panel</h1>
+    <div id="not-configured" class="box hidden">
+      <strong>Configuration missing</strong>
+      <p>The admin panel is not configured with Supabase credentials.</p>
+    </div>
+
+    <div id="signed-out" class="box hidden">
+      <p>You are not signed in.</p>
+      <button id="signin" class="btn">Sign in with Google</button>
+    </div>
+
+    <div id="signed-in" class="box hidden">
+      <p>Welcome, <span id="admin-email"></span></p>
+      <p>Session expires in <span id="expires-mins"></span> minutes.</p>
+      <button id="refresh" class="btn">Refresh Session</button>
+      <button id="signout" class="btn btn-danger">Sign out</button>
+      <div id="admin-actions" style="margin-top:12px">
+        <a href="/projects/Admin/Panel.html">Open Legacy Panel</a>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        isSupabaseConfigured,
+        isAuthenticated,
+        getSession,
+        loginWithGoogle,
+        logout,
+        getSessionExpirationMinutes,
+        initializeAuthFromSupabase,
+        refreshSession,
+      } from './panel-supabase.js'
+
+      const elNotConfigured = document.getElementById('not-configured')
+      const elSignedOut = document.getElementById('signed-out')
+      const elSignedIn = document.getElementById('signed-in')
+      const signinBtn = document.getElementById('signin')
+      const signoutBtn = document.getElementById('signout')
+      const refreshBtn = document.getElementById('refresh')
+      const emailSpan = document.getElementById('admin-email')
+      const expiresSpan = document.getElementById('expires-mins')
+
+      function hideAll(){
+        elNotConfigured.classList.add('hidden')
+        elSignedOut.classList.add('hidden')
+        elSignedIn.classList.add('hidden')
+      }
+
+      async function render(){
+        hideAll()
+
+        if (!isSupabaseConfigured()){
+          elNotConfigured.classList.remove('hidden')
+          return
+        }
+
+        // Try reading local session first
+        if (isAuthenticated()){
+          const s = getSession() || {}
+          emailSpan.textContent = s.email || 'admin'
+          const mins = getSessionExpirationMinutes()
+          expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+          elSignedIn.classList.remove('hidden')
+          return
+        }
+
+        // No local session, but check Supabase session (this will create local session if valid)
+        try {
+          const admin = await initializeAuthFromSupabase()
+          if (admin) {
+            emailSpan.textContent = admin.email || 'admin'
+            const mins = getSessionExpirationMinutes()
+            expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+            elSignedIn.classList.remove('hidden')
+            return
+          }
+        } catch (err) {
+          // initialization failed or not an admin
+          console.warn('initializeAuthFromSupabase:', err?.message ?? err)
+        }
+
+        elSignedOut.classList.remove('hidden')
+      }
+
+      signinBtn.addEventListener('click', async () => {
+        try {
+          await loginWithGoogle()
+        } catch (err) {
+          alert('Login failed: ' + (err?.message || String(err)))
+        }
+      })
+
+      signoutBtn.addEventListener('click', async () => {
+        try {
+          await logout()
+          render()
+        } catch (err) {
+          console.error(err)
+        }
+      })
+
+      refreshBtn.addEventListener('click', async () => {
+        try {
+          const r = await refreshSession()
+          render()
+        } catch (err) {
+          console.error(err)
+        }
+      })
+
+      // Initial render
+      render()
+
+      // Periodically refresh UI
+      setInterval(() => {
+        if (isAuthenticated()){
+          const mins = getSessionExpirationMinutes()
+          expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+        }
+      }, 30 * 1000)
+    </script>
+  </body>
+</html>

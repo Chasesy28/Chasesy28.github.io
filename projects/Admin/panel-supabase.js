@@ -3,7 +3,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SESSION_KEY = "admin_session";
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const PLACEHOLDER_PREFIX = "__SUPABASE_";
-const VITE_ADMIN_ROUTE = "/admin/auth";
+const VITE_ADMIN_ROUTE = "/projects/Admin/admin.html";
 const DEFAULT_SITE_ORIGIN = "https://silly-site.me";
 
 const config = window.__ADMIN_SUPABASE_CONFIG ?? {};
