@@ -38,7 +38,7 @@ export class AdminAuthManager {
       throw new Error('Supabase is not configured. Google sign-in is unavailable.')
     }
 
-    const targetRedirect = redirectPath ?? '/vite/admin/auth'
+    const targetRedirect = redirectPath ?? '/admin/auth'
     const redirectTo = new URL(targetRedirect, DEFAULT_SITE_ORIGIN).toString()
 
     const { error } = await supabase.auth.signInWithOAuth({

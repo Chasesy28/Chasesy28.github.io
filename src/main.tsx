@@ -18,8 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/vite/admin" element={<Admin />} />
           <Route path="/vite.html/admin" element={<Admin />} />
           <Route path="/admin/auth" element={<AdminAuth />} />
-          <Route path="/vite/admin/auth" element={<AdminAuth />} />
-          <Route path="/vite.html/admin/auth" element={<AdminAuth />} />
+          <Route path="/admin/auth" element={<AdminAuth />} />
         </Route>
       </Routes>
     </BrowserRouter>
