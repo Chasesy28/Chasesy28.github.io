@@ -2,7 +2,7 @@ import { authenticateAdmin, supabase } from './supabase'
 
 const SESSION_KEY = 'admin_session'
 const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
-const DEFAULT_SITE_ORIGIN = 'https://chasesy28.github.io'
+const DEFAULT_SITE_ORIGIN = 'https://silly-site.me'
 
 export class AdminAuthManager {
   private sessionKey = SESSION_KEY

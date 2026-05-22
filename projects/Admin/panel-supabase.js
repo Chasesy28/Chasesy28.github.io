@@ -4,7 +4,7 @@ const SESSION_KEY = "admin_session";
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const PLACEHOLDER_PREFIX = "__SUPABASE_";
 const VITE_ADMIN_ROUTE = "/vite/admin/auth";
-const DEFAULT_SITE_ORIGIN = "https://chasesy28.github.io";
+const DEFAULT_SITE_ORIGIN = "https://silly-site.me";
 
 const config = window.__ADMIN_SUPABASE_CONFIG ?? {};
 const configuredSiteOrigin =
