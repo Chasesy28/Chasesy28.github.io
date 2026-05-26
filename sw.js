@@ -7,7 +7,7 @@
 // Automatic cache versioning with timestamp - update this when deploying new versions
 // This ensures users get fresh content when the site is updated
 const CACHE_VERSION = "7";
-const CACHE_TIMESTAMP = "2026-05-22T19:50:45Z"; // Update this timestamp when deploying
+const CACHE_TIMESTAMP = "2026-05-26T22:30:49Z"; // Update this timestamp when deploying
 const CACHE_NAME = `silly-site-cache-v${CACHE_VERSION}-${CACHE_TIMESTAMP}`;
 
 /**
@@ -54,6 +54,12 @@ const URLS_TO_CACHE = [
   "/projects/Games/Pong/Pong.html",
   "/projects/Games/Pong/Pong.js",
   "/projects/Games/Pong/Pong.css",
+
+  // Admin page
+  "/projects/Admin/Panel.html",
+  "/projects/Admin/admin.html",
+  "/projects/Admin/panel-script.js",
+  "projects/Admin/panel-supabase.js",
 ];
 
 /**
