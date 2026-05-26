@@ -31,6 +31,10 @@ function getSiteOrigin() {
     return configuredSiteOrigin.replace(/\/$/, "");
   }
 
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+
   return DEFAULT_SITE_ORIGIN;
 }
 

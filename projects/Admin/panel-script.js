@@ -151,7 +151,7 @@ async function handleLogin(e) {
   loginSubmitButton.textContent = "Opening Supabase sign-in...";
 
   try {
-    await loginWithGoogle();
+    await loginWithGoogle(window.location.pathname);
   } catch (error) {
     showLoginModal(
       error instanceof Error ? error.message : "Unable to start Supabase sign-in.",
