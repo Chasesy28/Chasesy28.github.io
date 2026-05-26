@@ -5,18 +5,93 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Admin Panel</title>
     <style>
-      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px}
+      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;background:#f8fafc;color:#0f172a;transition:background .25s ease,color .25s ease}
       .hidden{display:none}
-      .btn{padding:8px 12px;border-radius:6px;border:1px solid #666;background:#f3f3f3;cursor:pointer}
+      .btn{padding:8px 12px;border-radius:6px;border:1px solid #666;background:#f3f3f3;cursor:pointer;transition:all .2s ease}
       .btn-danger{background:#ffecec;border-color:#ff6b6b}
-      .box{border:1px solid #e6e6e6;padding:16px;border-radius:8px;margin-top:12px}
+      .box{border:1px solid #e6e6e6;padding:16px;border-radius:8px;margin-top:12px;background:#fff;transition:all .25s ease}
       .box-success{border-color:#86efac;background:#f0fdf4}
       .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em}
       .badge-success{background:#dcfce7;color:#166534}
+
+      .state-indicator{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        margin-left:10px;
+        padding:4px 10px;
+        border-radius:999px;
+        font-size:12px;
+        font-weight:700;
+        letter-spacing:.02em;
+        vertical-align:middle;
+        background:#e2e8f0;
+        color:#334155;
+      }
+
+      .state-indicator::before{
+        content:"";
+        width:8px;
+        height:8px;
+        border-radius:999px;
+        background:#64748b;
+      }
+
+      body.signed-in{
+        background:linear-gradient(135deg,#ecfeff 0%,#f0fdf4 35%,#eef2ff 100%);
+      }
+
+      body.signed-in #page-title{
+        color:#0f766e;
+      }
+
+      body.signed-in .state-indicator{
+        background:#ccfbf1;
+        color:#115e59;
+      }
+
+      body.signed-in .state-indicator::before{
+        background:#14b8a6;
+        box-shadow:0 0 0 4px rgba(20,184,166,.2);
+      }
+
+      body.signed-in .box{
+        border-color:#cbd5e1;
+        box-shadow:0 12px 24px -20px rgba(15,23,42,.45);
+      }
+
+      body.signed-in #signed-in{
+        border-color:#2dd4bf;
+        background:#f0fdfa;
+      }
+
+      body.signed-in #signed-in .btn{
+        border-color:#0f766e;
+      }
+
+      body.signed-in #refresh{
+        background:#14b8a6;
+        color:#fff;
+        border-color:#14b8a6;
+      }
+
+      body.signed-in #refresh:hover{
+        background:#0d9488;
+        border-color:#0d9488;
+      }
+
+      body.signed-in #admin-actions a{
+        color:#0f766e;
+        font-weight:600;
+      }
+
+      body.signed-in #admin-actions a:hover{
+        color:#134e4a;
+      }
     </style>
   </head>
   <body>
-    <h1 id="page-title">Admin Panel</h1>
+    <h1 id="page-title"><span id="page-title-text">Admin Panel</span> <span id="auth-state-indicator" class="state-indicator">Signed out</span></h1>
     <div id="signed-in-banner" class="box box-success hidden">
       <span class="badge badge-success">Signed in</span>
       <p id="signed-in-banner-text" style="margin:12px 0 0">You are authenticated with Supabase.</p>
@@ -57,13 +132,19 @@
       const elSignedInBanner = document.getElementById('signed-in-banner')
       const elSignedOut = document.getElementById('signed-out')
       const elSignedIn = document.getElementById('signed-in')
-      const pageTitle = document.getElementById('page-title')
+      const pageTitleText = document.getElementById('page-title-text')
       const signedInBannerText = document.getElementById('signed-in-banner-text')
       const signinBtn = document.getElementById('signin')
       const signoutBtn = document.getElementById('signout')
       const refreshBtn = document.getElementById('refresh')
       const emailSpan = document.getElementById('admin-email')
       const expiresSpan = document.getElementById('expires-mins')
+      const stateIndicator = document.getElementById('auth-state-indicator')
+
+      function setSignedInAppearance(isSignedIn) {
+        document.body.classList.toggle('signed-in', isSignedIn)
+        stateIndicator.textContent = isSignedIn ? 'Signed in' : 'Signed out'
+      }
 
       function hideAll(){
         elNotConfigured.classList.add('hidden')
@@ -73,14 +154,15 @@
       }
 
       function showSignedInState(message) {
-        pageTitle.textContent = 'Admin Panel - Signed In'
+        pageTitleText.textContent = 'Admin Panel - Signed In'
         signedInBannerText.textContent = message || 'You are authenticated with Supabase.'
         elSignedInBanner.classList.remove('hidden')
       }
 
       async function render(){
         hideAll()
-        pageTitle.textContent = 'Admin Panel'
+        setSignedInAppearance(false)
+        pageTitleText.textContent = 'Admin Panel'
 
         if (!isSupabaseConfigured()){
           elNotConfigured.classList.remove('hidden')
@@ -94,6 +176,7 @@
           const mins = getSessionExpirationMinutes()
           expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
           showSignedInState(`Signed in as ${s.email || 'admin'}.`)
+          setSignedInAppearance(true)
           elSignedIn.classList.remove('hidden')
           return
         }
@@ -106,6 +189,7 @@
             const mins = getSessionExpirationMinutes()
             expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
             showSignedInState(`Login successful for ${admin.email || 'admin'}.`)
+            setSignedInAppearance(true)
             elSignedIn.classList.remove('hidden')
             return
           }

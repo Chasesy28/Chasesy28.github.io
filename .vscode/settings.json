@@ -80,5 +80,13 @@
     "WASD",
     "WOWZA",
     "Zimmet"
-  ]
+  ],
+  "chat.mcp.serverSampling": {
+    "Chasesy28.github.io/.vscode/mcp.json: supabase": {
+      "allowedModels": [
+        "copilot/auto",
+        "copilotcli/claude-haiku-4.5"
+      ]
+    }
+  }
 }
