@@ -18,6 +18,48 @@ document.body.appendChild(renderer.domElement);
 const light = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(light);
 
+const interactionTextElement = document.createElement("div");
+interactionTextElement.style.position = "fixed";
+interactionTextElement.style.left = "50%";
+interactionTextElement.style.bottom = "8%";
+interactionTextElement.style.transform = "translateX(-50%)";
+interactionTextElement.style.padding = "12px 16px";
+interactionTextElement.style.maxWidth = "80vw";
+interactionTextElement.style.background = "rgba(0, 0, 0, 0.8)";
+interactionTextElement.style.color = "#ffffff";
+interactionTextElement.style.border = "1px solid rgba(255, 255, 255, 0.25)";
+interactionTextElement.style.borderRadius = "8px";
+interactionTextElement.style.fontFamily = "sans-serif";
+interactionTextElement.style.fontSize = "18px";
+interactionTextElement.style.lineHeight = "1.4";
+interactionTextElement.style.textAlign = "center";
+interactionTextElement.style.zIndex = "1000";
+interactionTextElement.style.display = "none";
+interactionTextElement.style.pointerEvents = "none";
+document.body.appendChild(interactionTextElement);
+
+let interactionTextTimeoutId = null;
+
+function hideInteractionText() {
+  interactionTextElement.style.display = "none";
+  interactionTextElement.textContent = "";
+  if (interactionTextTimeoutId !== null) {
+    clearTimeout(interactionTextTimeoutId);
+    interactionTextTimeoutId = null;
+  }
+}
+
+function showInteractionText(text, duration = 3000) {
+  interactionTextElement.textContent = text;
+  interactionTextElement.style.display = "block";
+  if (interactionTextTimeoutId !== null) {
+    clearTimeout(interactionTextTimeoutId);
+  }
+  interactionTextTimeoutId = setTimeout(() => {
+    hideInteractionText();
+  }, duration);
+}
+
 function backgroundColor(r, g, b) {
   scene.background = new THREE.Color(r / 255, g / 255, b / 255);
 }
@@ -77,6 +119,7 @@ const controller = {
   right: { pressed: false, key: ["d", "D", "ArrowRight"], timeHeld: 0 },
   jump: { pressed: false, key: ["w", "W", "ArrowUp", " "], timeHeld: 0 },
   down: { pressed: false, key: ["s", "S", "ArrowDown"], timeHeld: 0 },
+  interact: { pressed: false, key: ["e", "E"], timeHeld: 0 },
 };
 
 window.document.addEventListener("keydown", function (e) {
@@ -142,6 +185,14 @@ function gameLoop() {
     if (controller.down.timeHeld < 0) {
       controller.down.timeHeld = 0;
     }
+  }
+  if (controller.interact.pressed) {
+    controller.interact.timeHeld++;
+    if (controller.interact.timeHeld === 1) {
+      player.interact();
+    }
+  } else {
+    controller.interact.timeHeld = 0;
   }
 
   player.update();

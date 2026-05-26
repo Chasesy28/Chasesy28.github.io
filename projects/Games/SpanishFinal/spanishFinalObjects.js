@@ -19,6 +19,13 @@ const gameObjectTypes = {
     solid: true,
     bottomCollision: false,
   },
+  backgroundObject: {
+    color: [173, 216, 230],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
+    texture: null,
+    solid: false,
+    bottomCollision: false,
+  },
   grounder: {
     color: [0, 255, 0],
     dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
@@ -66,5 +73,20 @@ class Block {
       }
     }
     return false;
+  }
+}
+
+class Sign extends Block {
+  constructor(x, y, z, text) {
+    super(x, y, z, "backgroundObject");
+    this.type = "sign";
+    this.solid = true;
+    this.bottomCollision = true;
+    this.text = text;
+    this.mesh.visible = false;
+  }
+
+  interact() {
+    showInteractionText(this.text);
   }
 }

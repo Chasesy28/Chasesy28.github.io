@@ -84,6 +84,16 @@ class Player {
     }
   }
 
+  interact() {
+    for (let obj of this.objectsOn) {
+      if (obj instanceof Sign) {
+        obj.interact();
+        return;
+      }
+    }
+    hideInteractionText();
+  }
+
   objectCollisionDetection() {
     this.objectsOn = [];
     let groundDetected = false;
