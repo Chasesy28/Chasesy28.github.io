@@ -62,6 +62,8 @@ function cameraFollowPlayer() {
 }
 
 function gameLoop() {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  backgroundColor(173, 216, 230);
   renderer.render(scene, camera);
   player.update();
   cameraFollowPlayer();
@@ -69,7 +71,8 @@ function gameLoop() {
 }
 
 function startGame() {
-  backgroundColor(0, 0, 0);
+  const startButton = document.getElementById("startButton");
+  startButton.classList.add("hidden");
   gameObjects = convertToObjects(worldData);
   gameLoop();
 }

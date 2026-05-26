@@ -11,4 +11,8 @@ class Player {
     }
     return this.mesh;
   }
+
+  update () {
+
+  }
 }
