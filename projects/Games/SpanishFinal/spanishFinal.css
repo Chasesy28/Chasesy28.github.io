@@ -12,10 +12,6 @@ body {
 	background-color: 101 101 101;
 }
 
-.hidden {
-	display: none;
-}
-
 .menu-overlay {
   position: absolute;
 	cursor: pointer;

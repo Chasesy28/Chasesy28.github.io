@@ -1,42 +1,70 @@
-const objectProperties = {
-  block: {
-    dimensions: [50, 50],
+const baseBlockSize = 30;
+
+const gameObjectTypes = {
+  basic: {
+    color: [136, 136, 136],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
+    texture: null,
     solid: true,
     bottomCollision: true,
   },
   semiSolidPlatform: {
-    dimensions: [50, 12.5],
+    color: [150, 75, 0],
+    dimensions: new THREE.Vector3(
+      baseBlockSize,
+      baseBlockSize / 4,
+      baseBlockSize,
+    ),
+    texture: null,
     solid: true,
     bottomCollision: false,
-  }
-}
+  },
+  grounder: {
+    color: [0, 255, 0],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
+    texture: null,
+    solid: true,
+    bottomCollision: true,
+  },
+};
 
-const objectTypes = {
-  wall: {
-    property: objectProperties.block,
-    color: [136, 136, 136],
-    id: 1,
-  },
-  floor: {
-    property: objectProperties.block,
-    color: [136, 136, 136],
-    id: 2,
-  },
-  platform: {
-    property: objectProperties.semiSolidPlatform,
-    color: [150, 75, 0],
-    id: 3,
-  },
-}
+const darkenFactor = 0.8;
 
 class Block {
-  constructor(x, y, type) {
-    this.x = x;
-    this.y = y;
+  constructor(x, y, z, type) {
+    this.mesh = createBox(
+      x,
+      y,
+      z,
+      gameObjectTypes[type].dimensions.x,
+      gameObjectTypes[type].dimensions.y,
+      gameObjectTypes[type].dimensions.z,
+    );
     this.type = type;
+    this.solid = gameObjectTypes[type].solid;
+    this.bottomCollision = gameObjectTypes[type].bottomCollision;
+    setColor(this.mesh, ...gameObjectTypes[type].color);
+  }
+  update() {
+    this.mesh.visible = true;
+    setColor(this.mesh, ...gameObjectTypes[this.type].color);
+
+    if (this.checkForPlayer()) {
+      setColor(
+        this.mesh,
+        gameObjectTypes[this.type].color[0] * 2,
+        gameObjectTypes[this.type].color[1] * 2,
+        gameObjectTypes[this.type].color[2] * 2,
+      ); // Highlight blocks the player is standing on
+    }
   }
 
-  update() {
-
+  checkForPlayer() {
+    for (let obj of player.objectsOn) {
+      if (obj === this) {
+        return true;
+      }
+    }
+    return false;
   }
 }
