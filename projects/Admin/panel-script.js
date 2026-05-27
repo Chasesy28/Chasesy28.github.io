@@ -117,6 +117,11 @@ function showLoginModal(message = "") {
 }
 
 function showAdminContent() {
+  if (window.location.pathname.endsWith("/Panel.html") || window.location.pathname.endsWith("/panel.html")) {
+    window.location.replace(ADMIN_REDIRECT_PATH);
+    return;
+  }
+
   loginModal.classList.add("hidden");
   adminContent.classList.remove("hidden");
 
