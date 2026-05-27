@@ -9,7 +9,7 @@ const gameObjectTypes = {
     bottomCollision: true,
   },
   semiSolidPlatform: {
-    color: [150, 75, 0],
+    color: [200, 125, 0],
     dimensions: new THREE.Vector3(
       baseBlockSize,
       baseBlockSize / 4,
@@ -19,8 +19,8 @@ const gameObjectTypes = {
     solid: true,
     bottomCollision: false,
   },
-  backgroundObject: {
-    color: [173, 216, 230],
+  sign: {
+    color: [150, 75, 0],
     dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
     texture: null,
     solid: false,
@@ -36,6 +36,37 @@ const gameObjectTypes = {
 };
 
 const darkenFactor = 0.8;
+
+function createSignMesh(x, y, z, width, height, depth) {
+  const topBarHeight = height * 0.6;
+  const stemWidth = width * 0.28;
+  const stemLeft = (width - stemWidth) / 2;
+  const stemRight = stemLeft + stemWidth;
+
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0);
+  shape.lineTo(width, 0);
+  shape.lineTo(width, topBarHeight);
+  shape.lineTo(stemRight, topBarHeight);
+  shape.lineTo(stemRight, height);
+  shape.lineTo(stemLeft, height);
+  shape.lineTo(stemLeft, topBarHeight);
+  shape.lineTo(0, topBarHeight);
+  shape.lineTo(0, 0);
+
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: false,
+  });
+  const material = new THREE.MeshPhongMaterial({
+    color: new THREE.Color(1, 1, 1),
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.set(x, y, z);
+  mesh.frustumCulled = false;
+  return mesh;
+}
 
 class Block {
   constructor(x, y, z, type) {
@@ -78,12 +109,19 @@ class Block {
 
 class Sign extends Block {
   constructor(x, y, z, text) {
-    super(x, y, z, "backgroundObject");
+    super(x, y, z, "sign");
     this.type = "sign";
-    this.solid = true;
-    this.bottomCollision = true;
+    this.solid = gameObjectTypes[this.type].solid;
     this.text = text;
-    this.mesh.visible = false;
+    this.mesh = createSignMesh(
+      x,
+      y,
+      z,
+      gameObjectTypes[this.type].dimensions.x,
+      gameObjectTypes[this.type].dimensions.y,
+      gameObjectTypes[this.type].dimensions.z / 5,
+    );
+    setColor(this.mesh, ...gameObjectTypes[this.type].color);
   }
 
   interact() {

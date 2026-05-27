@@ -21,16 +21,17 @@ scene.add(light);
 const interactionTextElement = document.createElement("div");
 interactionTextElement.style.position = "fixed";
 interactionTextElement.style.left = "50%";
-interactionTextElement.style.bottom = "8%";
-interactionTextElement.style.transform = "translateX(-50%)";
-interactionTextElement.style.padding = "12px 16px";
-interactionTextElement.style.maxWidth = "80vw";
-interactionTextElement.style.background = "rgba(0, 0, 0, 0.8)";
+interactionTextElement.style.top = "50%";
+interactionTextElement.style.transform = "translate(-50%, -50%)";
+interactionTextElement.style.padding = "18px 24px";
+interactionTextElement.style.width = "min(420px, 80vw)";
+interactionTextElement.style.background = "rgba(15, 15, 15, 0.92)";
 interactionTextElement.style.color = "#ffffff";
-interactionTextElement.style.border = "1px solid rgba(255, 255, 255, 0.25)";
-interactionTextElement.style.borderRadius = "8px";
+interactionTextElement.style.border = "2px solid rgba(255, 255, 255, 0.35)";
+interactionTextElement.style.borderRadius = "12px";
+interactionTextElement.style.boxShadow = "0 12px 32px rgba(0, 0, 0, 0.35)";
 interactionTextElement.style.fontFamily = "sans-serif";
-interactionTextElement.style.fontSize = "18px";
+interactionTextElement.style.fontSize = "20px";
 interactionTextElement.style.lineHeight = "1.4";
 interactionTextElement.style.textAlign = "center";
 interactionTextElement.style.zIndex = "1000";
@@ -38,26 +39,18 @@ interactionTextElement.style.display = "none";
 interactionTextElement.style.pointerEvents = "none";
 document.body.appendChild(interactionTextElement);
 
-let interactionTextTimeoutId = null;
+let interactionTextShowing = false;
 
 function hideInteractionText() {
   interactionTextElement.style.display = "none";
   interactionTextElement.textContent = "";
-  if (interactionTextTimeoutId !== null) {
-    clearTimeout(interactionTextTimeoutId);
-    interactionTextTimeoutId = null;
-  }
+  interactionTextShowing = false;
 }
 
-function showInteractionText(text, duration = 3000) {
+function showInteractionText(text) {
   interactionTextElement.textContent = text;
   interactionTextElement.style.display = "block";
-  if (interactionTextTimeoutId !== null) {
-    clearTimeout(interactionTextTimeoutId);
-  }
-  interactionTextTimeoutId = setTimeout(() => {
-    hideInteractionText();
-  }, duration);
+  interactionTextShowing = true;
 }
 
 function backgroundColor(r, g, b) {
@@ -123,6 +116,7 @@ const controller = {
 };
 
 window.document.addEventListener("keydown", function (e) {
+  if (interactionTextShowing) hideInteractionText();
   for (const controllerKey in controller) {
     if (controller[controllerKey].key.includes(e.key)) {
       controller[controllerKey].pressed = true;

@@ -85,13 +85,17 @@ class Player {
   }
 
   interact() {
-    for (let obj of this.objectsOn) {
+    const playerBox = new THREE.Box3().setFromObject(this.mesh);
+
+    for (let obj of gameObjects) {
       if (obj instanceof Sign) {
-        obj.interact();
-        return;
+        const objectBox = new THREE.Box3().setFromObject(obj.mesh);
+        if (playerBox.intersectsBox(objectBox)) {
+          obj.interact();
+          return;
+        }
       }
     }
-    hideInteractionText();
   }
 
   objectCollisionDetection() {

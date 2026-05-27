@@ -28,7 +28,7 @@ function createWorldObject(objectInfo, x, y) {
   }
 
   if (objectInfo.type === "sign") {
-    return new Sign(x, y, 0, objectInfo.text ?? "");
+    return new Sign(x, y, -1, objectInfo.text ?? "");
   }
 
   return new Block(x, y, 0, objectInfo.type);
