@@ -5,6 +5,10 @@ const SESSION_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 const DEFAULT_SITE_ORIGIN = 'https://silly-site.me'
 const DEFAULT_ADMIN_REDIRECT_URL = 'https://silly-site.me/projects/Admin/admin.html'
 
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase()
+}
+
 export class AdminAuthManager {
   private sessionKey = SESSION_KEY
   private sessionDuration = SESSION_DURATION
@@ -17,7 +21,7 @@ export class AdminAuthManager {
   async login(email: string) {
     try {
       // Authenticate against Supabase
-      const admin = await authenticateAdmin(email)
+      const admin = await authenticateAdmin(normalizeEmail(email))
 
       if (admin) {
         // Create session
@@ -96,7 +100,7 @@ export class AdminAuthManager {
     }
 
     const session = exchangedSession ?? data.session
-    const userEmail = session?.user?.email
+    const userEmail = session?.user?.email ? normalizeEmail(session.user.email) : ''
     if (!userEmail) return null
 
     const admin = await authenticateAdmin(userEmail)

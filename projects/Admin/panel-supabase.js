@@ -74,6 +74,10 @@ function requireSupabaseClient() {
   return supabase;
 }
 
+function normalizeEmail(email) {
+  return typeof email === "string" ? email.trim().toLowerCase() : "";
+}
+
 async function exchangeOAuthCodeFromUrl(client) {
   const url = new URL(window.location.href);
   const code = url.searchParams.get("code");
@@ -148,10 +152,16 @@ export function getSessionExpirationMinutes() {
 export async function authenticateAdmin(email) {
   try {
     const client = requireSupabaseClient();
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!normalizedEmail) {
+      return null;
+    }
+
     const { data, error } = await client
       .from("admin_users")
       .select("*")
-      .eq("email", email)
+      .ilike("email", normalizedEmail)
       .single();
 
     if (error && error.code !== "PGRST116") throw error;
