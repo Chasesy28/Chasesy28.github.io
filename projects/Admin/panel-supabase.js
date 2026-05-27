@@ -79,10 +79,10 @@ async function exchangeOAuthCodeFromUrl(client) {
   const code = url.searchParams.get("code");
 
   if (!code) {
-    return;
+    return null;
   }
 
-  const { error } = await client.auth.exchangeCodeForSession(code);
+  const { data, error } = await client.auth.exchangeCodeForSession(code);
   if (error) {
     throw error;
   }
@@ -90,6 +90,7 @@ async function exchangeOAuthCodeFromUrl(client) {
   url.searchParams.delete("code");
   url.searchParams.delete("state");
   window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+  return data.session ?? null;
 }
 
 function createSession(admin) {
@@ -195,14 +196,15 @@ export async function loginWithGoogle(redirectPath) {
 
 export async function initializeAuthFromSupabase() {
   const client = requireSupabaseClient();
-  await exchangeOAuthCodeFromUrl(client);
+  const exchangedSession = await exchangeOAuthCodeFromUrl(client);
   const { data, error } = await client.auth.getSession();
 
   if (error) {
     throw error;
   }
 
-  const userEmail = data.session?.user?.email;
+  const session = exchangedSession ?? data.session;
+  const userEmail = session?.user?.email;
   if (!userEmail) return null;
 
   const admin = await authenticateAdmin(userEmail);

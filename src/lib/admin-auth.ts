@@ -66,9 +66,9 @@ export class AdminAuthManager {
     const url = new URL(window.location.href)
     const code = url.searchParams.get('code')
 
-    if (!code) return
+    if (!code) return null
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (error) {
       throw error
     }
@@ -76,6 +76,7 @@ export class AdminAuthManager {
     url.searchParams.delete('code')
     url.searchParams.delete('state')
     window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`)
+    return data.session ?? null
   }
 
   /**
@@ -86,7 +87,7 @@ export class AdminAuthManager {
       throw new Error('Supabase is not configured. Admin auth is unavailable.')
     }
 
-    await this.exchangeOAuthCodeFromUrl()
+    const exchangedSession = await this.exchangeOAuthCodeFromUrl()
 
     const { data, error } = await supabase.auth.getSession()
 
@@ -94,7 +95,8 @@ export class AdminAuthManager {
       throw error
     }
 
-    const userEmail = data.session?.user?.email
+    const session = exchangedSession ?? data.session
+    const userEmail = session?.user?.email
     if (!userEmail) return null
 
     const admin = await authenticateAdmin(userEmail)
