@@ -38,8 +38,8 @@ const gameObjectTypes = {
 const darkenFactor = 0.8;
 
 function createSignMesh(x, y, z, width, height, depth) {
-  const topBarHeight = height * 0.6;
-  const stemWidth = width * 0.28;
+  const topBarHeight = height * 0.5;
+  const stemWidth = width * 0.25;
   const stemLeft = (width - stemWidth) / 2;
   const stemRight = stemLeft + stemWidth;
 
