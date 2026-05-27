@@ -74,6 +74,24 @@ function requireSupabaseClient() {
   return supabase;
 }
 
+async function exchangeOAuthCodeFromUrl(client) {
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get("code");
+
+  if (!code) {
+    return;
+  }
+
+  const { error } = await client.auth.exchangeCodeForSession(code);
+  if (error) {
+    throw error;
+  }
+
+  url.searchParams.delete("code");
+  url.searchParams.delete("state");
+  window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+}
+
 function createSession(admin) {
   const session = {
     adminId: admin.id,
@@ -177,6 +195,7 @@ export async function loginWithGoogle(redirectPath) {
 
 export async function initializeAuthFromSupabase() {
   const client = requireSupabaseClient();
+  await exchangeOAuthCodeFromUrl(client);
   const { data, error } = await client.auth.getSession();
 
   if (error) {

@@ -58,6 +58,26 @@ export class AdminAuthManager {
     }
   }
 
+  private async exchangeOAuthCodeFromUrl() {
+    if (!supabase) {
+      throw new Error('Supabase is not configured. Admin auth is unavailable.')
+    }
+
+    const url = new URL(window.location.href)
+    const code = url.searchParams.get('code')
+
+    if (!code) return
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      throw error
+    }
+
+    url.searchParams.delete('code')
+    url.searchParams.delete('state')
+    window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`)
+  }
+
   /**
    * Initialize local admin session from Supabase auth session
    */
@@ -65,6 +85,8 @@ export class AdminAuthManager {
     if (!supabase) {
       throw new Error('Supabase is not configured. Admin auth is unavailable.')
     }
+
+    await this.exchangeOAuthCodeFromUrl()
 
     const { data, error } = await supabase.auth.getSession()
 
