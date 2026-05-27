@@ -100,6 +100,7 @@
   </head>
   <body>
     <h1 id="page-title"><span id="page-title-text">Admin Panel</span> <span id="auth-state-indicator" class="state-indicator">Signed out</span></h1>
+    <p id="auth-context" style="margin:8px 0 0;color:#475569"></p>
     <div id="signed-in-banner" class="box box-success hidden">
       <span class="badge badge-success">Signed in</span>
       <p id="signed-in-banner-text" style="margin:12px 0 0">You are authenticated with Supabase.</p>
@@ -141,6 +142,7 @@
       const elSignedOut = document.getElementById('signed-out')
       const elSignedIn = document.getElementById('signed-in')
       const pageTitleText = document.getElementById('page-title-text')
+      const authContext = document.getElementById('auth-context')
       const signedInBannerText = document.getElementById('signed-in-banner-text')
       const signinBtn = document.getElementById('signin')
       const signoutBtn = document.getElementById('signout')
@@ -148,6 +150,59 @@
       const emailSpan = document.getElementById('admin-email')
       const expiresSpan = document.getElementById('expires-mins')
       const stateIndicator = document.getElementById('auth-state-indicator')
+
+      function getSupabaseCallbackState() {
+        const url = new URL(window.location.href)
+        const searchParams = url.searchParams
+        const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
+
+        const searchError = searchParams.get('error') || searchParams.get('error_code') || searchParams.get('error_description')
+        const hashError = hashParams.get('error') || hashParams.get('error_code') || hashParams.get('error_description')
+        const hasCode = searchParams.has('code')
+        const hasAccessToken = hashParams.has('access_token')
+        const hasCallbackMarkers = hasCode || hasAccessToken || searchParams.has('state') || Boolean(searchError || hashError)
+
+        return {
+          isRedirect: hasCallbackMarkers,
+          hasSuccessMarker: hasCode || hasAccessToken,
+          errorMessage: searchError || hashError || '',
+        }
+      }
+
+      function clearSupabaseCallbackState() {
+        const url = new URL(window.location.href)
+        const paramsToRemove = ['code', 'state', 'error', 'error_code', 'error_description', 'token_hash', 'type']
+        let changed = false
+
+        for (const key of paramsToRemove) {
+          if (url.searchParams.has(key)) {
+            url.searchParams.delete(key)
+            changed = true
+          }
+        }
+
+        if (url.hash) {
+          const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
+          for (const key of ['access_token', 'refresh_token', 'expires_in', 'token_type', 'type', 'error', 'error_code', 'error_description']) {
+            if (hashParams.has(key)) {
+              hashParams.delete(key)
+              changed = true
+            }
+          }
+
+          const nextHash = hashParams.toString()
+          if (nextHash) {
+            url.hash = `#${nextHash}`
+          } else if (hashParams.size > 0 || url.hash) {
+            url.hash = ''
+          }
+        }
+
+        if (changed) {
+          const nextUrl = `${url.pathname}${url.search}${url.hash}`
+          window.history.replaceState({}, document.title, nextUrl)
+        }
+      }
 
       function setSignedInAppearance(isSignedIn) {
         document.body.classList.toggle('signed-in', isSignedIn)
@@ -167,10 +222,23 @@
         elSignedInBanner.classList.remove('hidden')
       }
 
+      function setAuthContext(message) {
+        authContext.textContent = message || ''
+      }
+
       async function render(){
+        const callbackState = getSupabaseCallbackState()
+
         hideAll()
         setSignedInAppearance(false)
         pageTitleText.textContent = 'Admin Panel'
+        setAuthContext(
+          callbackState.isRedirect
+            ? callbackState.errorMessage
+              ? `Supabase redirected back here with an auth error: ${callbackState.errorMessage}`
+              : 'Supabase redirected back here. Verifying the session now.'
+            : 'No Supabase redirect detected on this visit.',
+        )
 
         if (!isSupabaseConfigured()){
           elNotConfigured.classList.remove('hidden')
@@ -183,9 +251,19 @@
           emailSpan.textContent = s.email || 'admin'
           const mins = getSessionExpirationMinutes()
           expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
-          showSignedInState(`Signed in as ${s.email || 'admin'}.`)
+          showSignedInState(
+            callbackState.isRedirect
+              ? `Supabase login completed successfully for ${s.email || 'admin'}.`
+              : `Signed in as ${s.email || 'admin'}.`,
+          )
+          setAuthContext(
+            callbackState.isRedirect
+              ? 'This page was reached through the Supabase OAuth redirect and the session was restored successfully.'
+              : 'This page loaded an existing admin session without a fresh Supabase redirect.',
+          )
           setSignedInAppearance(true)
           elSignedIn.classList.remove('hidden')
+          clearSupabaseCallbackState()
           return
         }
 
@@ -196,17 +274,30 @@
             emailSpan.textContent = admin.email || 'admin'
             const mins = getSessionExpirationMinutes()
             expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
-            showSignedInState(`Login successful for ${admin.email || 'admin'}.`)
+            showSignedInState(`Supabase login successful for ${admin.email || 'admin'}.`)
+            setAuthContext(
+              callbackState.isRedirect
+                ? 'Supabase redirected back here and the user logged in successfully.'
+                : 'A valid Supabase session was found without a fresh redirect.',
+            )
             setSignedInAppearance(true)
             elSignedIn.classList.remove('hidden')
+            clearSupabaseCallbackState()
             return
           }
         } catch (err) {
           // initialization failed or not an admin
-          console.warn('initializeAuthFromSupabase:', err?.message ?? err)
+          const message = err?.message ?? String(err)
+          console.warn('initializeAuthFromSupabase:', message)
+          setAuthContext(
+            callbackState.isRedirect
+              ? `Supabase redirected back here, but login did not complete successfully: ${message}`
+              : 'No valid Supabase session was restored for this visit.',
+          )
         }
 
         elSignedOut.classList.remove('hidden')
+        clearSupabaseCallbackState()
       }
 
       signinBtn.addEventListener('click', async () => {
