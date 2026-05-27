@@ -72,9 +72,10 @@ jobs:
         run: |
           set -e
           PANEL_FILE="dist/projects/Admin/Panel.html"
+          ADMIN_FILE="dist/projects/Admin/admin.html"
 
-          if [ ! -f "$PANEL_FILE" ]; then
-            echo "Legacy admin panel file not found; skipping Supabase injection."
+          if [ ! -f "$PANEL_FILE" ] && [ ! -f "$ADMIN_FILE" ]; then
+            echo "Admin panel files not found; skipping Supabase injection."
             exit 0
           fi
 
@@ -85,18 +86,25 @@ jobs:
 
           node - <<'NODE'
           const fs = require('fs');
-          const panelFile = 'dist/projects/Admin/Panel.html';
+          const panelFiles = [
+            'dist/projects/Admin/Panel.html',
+            'dist/projects/Admin/admin.html',
+          ];
           const siteOrigin = process.env.SITE_ORIGIN || 'https://silly-site.me';
           const supabaseUrl = process.env.SUPABASE_URL || '';
           const publishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || '';
           const anonKey = process.env.SUPABASE_ANON_KEY || '';
 
-          let html = fs.readFileSync(panelFile, 'utf8');
-          html = html.replaceAll('__SITE_ORIGIN__', siteOrigin);
-          html = html.replaceAll('__SUPABASE_URL__', supabaseUrl);
-          html = html.replaceAll('__SUPABASE_PUBLISHABLE_KEY__', publishableKey || anonKey);
-          html = html.replaceAll('__SUPABASE_ANON_KEY__', anonKey || publishableKey);
-          fs.writeFileSync(panelFile, html);
+          for (const panelFile of panelFiles) {
+            if (!fs.existsSync(panelFile)) continue;
+
+            let html = fs.readFileSync(panelFile, 'utf8');
+            html = html.replaceAll('__SITE_ORIGIN__', siteOrigin);
+            html = html.replaceAll('__SUPABASE_URL__', supabaseUrl);
+            html = html.replaceAll('__SUPABASE_PUBLISHABLE_KEY__', publishableKey || anonKey);
+            html = html.replaceAll('__SUPABASE_ANON_KEY__', anonKey || publishableKey);
+            fs.writeFileSync(panelFile, html);
+          }
           NODE
       - name: Create /vite directory for GitHub Pages clean-URL routing
         run: |
