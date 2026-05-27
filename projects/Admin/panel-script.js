@@ -40,6 +40,8 @@ const ANNOUNCEMENT_CONFIG = {
   error: { icon: "❌", color: "#ef4444" },
 };
 
+const ADMIN_REDIRECT_PATH = "/projects/Admin/admin.html";
+
 function initializeAdminPanel() {
   loginModal = document.getElementById("loginModal");
   loginForm = document.getElementById("loginForm");
@@ -151,7 +153,7 @@ async function handleLogin(e) {
   loginSubmitButton.textContent = "Opening Supabase sign-in...";
 
   try {
-    await loginWithGoogle(window.location.pathname);
+    await loginWithGoogle(ADMIN_REDIRECT_PATH);
   } catch (error) {
     showLoginModal(
       error instanceof Error ? error.message : "Unable to start Supabase sign-in.",
