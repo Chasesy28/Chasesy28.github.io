@@ -15,21 +15,6 @@
 			"gallery": "https://api.mcp.github.com",
 			"version": "0.21.0"
 		},
-		"io.github.github/github-mcp-server": {
-			"type": "stdio",
-			"command": "docker",
-			"args": [
-				"run",
-				"-i",
-				"--rm",
-				"-e",
-				"GITHUB_PERSONAL_ACCESS_TOKEN=${input:token = (prompt('Enter your GitHub Personal Access Token'))}",
-				"ghcr.io/github/github-mcp-server:0.34.0"
-			],
-			"gallery": "https://api.mcp.github.com",
-			"version": "0.34.0"
-		}
-	},
 	"inputs": [
 		{
 			"id": "token = (prompt('Enter your GitHub Personal Access Token'))",
