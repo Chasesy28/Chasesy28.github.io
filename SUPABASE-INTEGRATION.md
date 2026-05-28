@@ -262,3 +262,18 @@ During migration, maintain backwards compatibility:
 - [Supabase Auth](https://supabase.com/docs/guides/auth)
 - [Supabase Database](https://supabase.com/docs/guides/database)
 - [Cloudflare Analytics API](https://developers.cloudflare.com/analytics/)
+
+## Production Compliance Readiness
+
+Legal/compliance pages now exist for production preparation:
+
+- `/privacy-policy.html`
+- `/terms-of-service.html`
+- Cookie consent banner (`/cookie-consent.js` + `/cookie-consent.css`) linked site-wide
+
+Supabase capabilities to leverage during production rollout:
+
+- Auth provider controls and auditability for admin sessions
+- Row Level Security policies for least-privilege table access
+- Regional project configuration and retention controls where required
+- Secure secret handling for Edge Functions and environment variables
