@@ -14,13 +14,6 @@
 			],
 			"gallery": "https://api.mcp.github.com",
 			"version": "0.21.0"
-		},
-	"inputs": [
-		{
-			"id": "token = (prompt('Enter your GitHub Personal Access Token'))",
-			"type": "promptString",
-			"description": "",
-			"password": true
 		}
 	]
 }
