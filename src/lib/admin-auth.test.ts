@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const authenticateAdminMock = vi.fn()
-const signInWithOAuthMock = vi.fn()
-const exchangeCodeForSessionMock = vi.fn()
-const getSessionMock = vi.fn()
-const signOutMock = vi.fn()
+const {
+  authenticateAdminMock,
+  signInWithOAuthMock,
+  exchangeCodeForSessionMock,
+  getSessionMock,
+  signOutMock
+} = vi.hoisted(() => ({
+  authenticateAdminMock: vi.fn(),
+  signInWithOAuthMock: vi.fn(),
+  exchangeCodeForSessionMock: vi.fn(),
+  getSessionMock: vi.fn(),
+  signOutMock: vi.fn()
+}))
 
 vi.mock('./supabase', () => ({
   authenticateAdmin: authenticateAdminMock,
@@ -82,14 +90,16 @@ describe('AdminAuthManager', () => {
     })
     getSessionMock.mockResolvedValue({ data: { session: null }, error: null })
     authenticateAdminMock.mockResolvedValue({ id: 'a1', email: 'newadmin@example.com' })
-    window.history.replaceState({}, '', 'https://silly-site.me/admin/auth?code=oauth-code&state=abc#top')
+    window.history.replaceState({}, '', '/admin/auth?code=oauth-code&state=abc#top')
     const manager = new AdminAuthManager()
 
     const admin = await manager.initializeAuthFromSupabase()
 
     expect(exchangeCodeForSessionMock).toHaveBeenCalledWith('oauth-code')
     expect(admin).toEqual({ id: 'a1', email: 'newadmin@example.com' })
-    expect(window.location.href).toBe('https://silly-site.me/admin/auth#top')
+    expect(window.location.pathname).toBe('/admin/auth')
+    expect(window.location.search).toBe('')
+    expect(window.location.hash).toBe('#top')
     expect(manager.getSession()).toMatchObject({
       adminId: 'a1',
       email: 'newadmin@example.com'

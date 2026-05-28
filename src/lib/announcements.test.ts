@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const getAnnouncementsMock = vi.fn()
-const dismissAnnouncementMock = vi.fn()
-const isAnnouncementDismissedMock = vi.fn()
-const createAnnouncementMock = vi.fn()
-const deleteAnnouncementMock = vi.fn()
+const {
+  getAnnouncementsMock,
+  dismissAnnouncementMock,
+  isAnnouncementDismissedMock,
+  createAnnouncementMock,
+  deleteAnnouncementMock
+} = vi.hoisted(() => ({
+  getAnnouncementsMock: vi.fn(),
+  dismissAnnouncementMock: vi.fn(),
+  isAnnouncementDismissedMock: vi.fn(),
+  createAnnouncementMock: vi.fn(),
+  deleteAnnouncementMock: vi.fn()
+}))
 
 vi.mock('./supabase.ts', () => ({
   getAnnouncements: getAnnouncementsMock,
