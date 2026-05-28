@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "preview:fresh": "sh -c 'if command -v fuser >/dev/null 2>&1; then fuser -k 4173/tcp >/dev/null 2>&1 || true; fi; npm run build && vite preview --host 0.0.0.0 --port 4173'",
     "build:preview": "npm run build && vite preview",
-    "test": "echo \"No automated tests configured yet\""
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,10 @@
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
-    "vite": "^8.0.13"
+    "vite": "^8.0.13",
+    "vitest": "^4.0.8",
+    "@vitest/coverage-v8": "^4.0.8",
+    "jsdom": "^27.1.0"
   },
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.5.0",

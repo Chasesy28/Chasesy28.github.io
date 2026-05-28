@@ -77,4 +77,14 @@ export default defineConfig({
   },
   // Preserve existing static files during dev
   publicDir: 'public',
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      include: ['src/lib/**/*.ts'],
+      exclude: ['src/lib/supabase.ts']
+    }
+  }
 })
