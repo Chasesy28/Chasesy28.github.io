@@ -128,3 +128,30 @@ class Sign extends Block {
     showInteractionText(this.text);
   }
 }
+
+class Enemy {
+  constructor(x, y, z) {
+    this.mesh = createBox(x, y, z, 20, 20, 20);
+    setColor(this.mesh, 255, 0, 0);
+    this.solid = true;
+    this.bottomCollision = true;
+  }
+
+  update() {
+    // Enemy logic goes here (e.g., movement, interaction)
+    this.mesh.visible = true;
+    moveTowardsPlayer();
+  }
+
+  moveTowardsPlayer() {
+    const playerPos = player.mesh.position;
+    const enemyPos = this.mesh.position;
+    const direction = new THREE.Vector3(
+      playerPos.x - enemyPos.x,
+      playerPos.y - enemyPos.y,
+      0
+    ).normalize();
+    const speed = 0.5; // Adjust speed as needed
+    this.mesh.position.add(direction.multiplyScalar(speed));
+  }
+}
