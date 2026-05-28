@@ -1,9 +1,9 @@
 class Player {
   constructor() {
     this.size = new THREE.Vector3(
-      baseBlockSize - 0.01,
-      baseBlockSize - 0.01,
-      baseBlockSize - 0.01,
+      baseBlockSize - 0.001,
+      baseBlockSize - 0.001,
+      baseBlockSize - 0.001,
     );
     this.speed = 4;
     this.maxSpeed = 10;
@@ -23,13 +23,15 @@ class Player {
     this.objectsOn = [];
     this.jumpBuffer = 0; // Buffer to allow jump input slightly before landing
     this.maxJumpBuffer = 6; // Maximum frames to buffer jump input
+
+    this.respawnPoint = new THREE.Vector3(0, 0, 0); // Default respawn point, can be set to player's start position
   }
 
   render(x, y, z) {
     if (!this.mesh) {
       this.mesh = createBox(x, y, z, this.size.x, this.size.y, this.size.z);
       this.previousPosition = this.mesh.position.clone();
-      setColor(this.mesh, 255, 0, 0); // Set player color to red
+      setColor(this.mesh, 255, 255, 0);
     }
     return this.mesh;
   }
@@ -50,24 +52,6 @@ class Player {
       moveVector.y = 0; // Keep movement horizontal
       moveVector.cross(camera.up).normalize();
       moveVector.multiplyScalar(speed);
-    }
-    this.mesh.position.add(moveVector);
-  }
-
-  moveTopDown(direction, timeHeld = 1) {
-    const moveVector = new THREE.Vector3();
-    let speed = this.speed * (1 + timeHeld / 100);
-    if (speed > this.maxSpeed) {
-      speed = this.maxSpeed;
-    }
-    if (direction === "left") {
-      moveVector.set(-speed, 0, 0);
-    } else if (direction === "right") {
-      moveVector.set(speed, 0, 0);
-    } else if (direction === "up") {
-      moveVector.set(0, 0, -speed);
-    } else if (direction === "down") {
-      moveVector.set(0, 0, speed);
     }
     this.mesh.position.add(moveVector);
   }
@@ -256,11 +240,24 @@ class Player {
     // Apply velocity to position
     this.mesh.position.x += this.velocity.x;
     this.mesh.position.y += this.velocity.y;
-    this.mesh.position.z += this.velocity.z;
 
     this.objectCollisionDetection();
 
+    this.worldBorderCollision();
+
     // Store position after all movement and collision resolution for next frame's collision detection
     this.previousPosition.copy(this.mesh.position);
+  }
+
+  respawn() {
+    this.mesh.position.copy(this.respawnPoint);
+    this.velocity.set(0, 0, 0);
+  }
+
+  worldBorderCollision() {
+    if (this.mesh.position.x < baseBlockSize / 2) {
+      this.mesh.position.x = baseBlockSize / 2;
+      this.velocity.x = 0;
+    }
   }
 }

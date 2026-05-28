@@ -6,5 +6,9 @@ function startGame() {
     document.write(error);
   }
   objectLoopFunction((object) => scene.add(object.mesh));
-  gameLoop()
+  try {
+    gameLoop()
+  } catch (error) {
+    document.write(error);
+  }
 }

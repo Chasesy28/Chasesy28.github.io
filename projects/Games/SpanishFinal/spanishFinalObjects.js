@@ -131,27 +131,120 @@ class Sign extends Block {
 
 class Enemy {
   constructor(x, y, z) {
-    this.mesh = createBox(x, y, z, 20, 20, 20);
+    this.size = new THREE.Vector3(
+      baseBlockSize - 0.01,
+      baseBlockSize - 0.01,
+      baseBlockSize - 0.01,
+    );
+    this.mesh = createBox(x, y, z, this.size.x, this.size.y, this.size.z);
     setColor(this.mesh, 255, 0, 0);
-    this.solid = true;
+    this.type = "enemy";
+    this.solid = false; // enemies are not solid for player collision
     this.bottomCollision = true;
+
+    this.velocity = new THREE.Vector3(0, 0, 0);
+    this.gravity = 0.9;
+    this.maxFallSpeed = 15;
+    this.onGround = false;
+    this.previousPosition = this.mesh.position.clone();
+    this.direction = 1; // 1 = right, -1 = left
+    this.speed = 1; // horizontal patrol speed (units per frame)
   }
 
   update() {
-    // Enemy logic goes here (e.g., movement, interaction)
-    this.mesh.visible = true;
-    moveTowardsPlayer();
+    // Horizontal patrol movement
+    const horizontalMove = this.direction * this.speed;
+    this.mesh.position.x += horizontalMove;
+
+    // Apply gravity
+    this.velocity.y += this.gravity;
+    if (this.velocity.y > this.maxFallSpeed) this.velocity.y = this.maxFallSpeed;
+
+    // Apply vertical velocity
+    this.mesh.position.y += this.velocity.y;
+
+    this.worldCollision();
+
+
+    // Check for collision with player
+    if (this.checkForPlayer()) {
+      player.respawn();
+    }
+
+    // Store previous position for next frame
+    this.previousPosition.copy(this.mesh.position);
   }
 
-  moveTowardsPlayer() {
-    const playerPos = player.mesh.position;
-    const enemyPos = this.mesh.position;
-    const direction = new THREE.Vector3(
-      playerPos.x - enemyPos.x,
-      playerPos.y - enemyPos.y,
-      0
-    ).normalize();
-    const speed = 0.5; // Adjust speed as needed
-    this.mesh.position.add(direction.multiplyScalar(speed));
+  checkForPlayer() {
+    const playerBox = new THREE.Box3().setFromObject(player.mesh);
+    const enemyBox = new THREE.Box3().setFromObject(this.mesh);
+    return playerBox.intersectsBox(enemyBox);
+  }
+
+  worldCollision() {
+    for (let object of gameObjects) {
+      if (!object.solid) continue;
+      const enemyBox = new THREE.Box3().setFromObject(this.mesh);
+      const objectBox = new THREE.Box3().setFromObject(object.mesh);
+      if (enemyBox.intersectsBox(objectBox)) {
+        // Compute overlaps
+        const overlapX = Math.min(enemyBox.max.x, objectBox.max.x) - Math.max(enemyBox.min.x, objectBox.min.x);
+        const overlapY = Math.min(enemyBox.max.y, objectBox.max.y) - Math.max(enemyBox.min.y, objectBox.min.y);
+        const minOverlap = Math.min(overlapX, overlapY);
+
+        // Determine landing (enemy falling onto top of block)
+        const enemyBottom = enemyBox.max.y;
+        const previousEnemyBottom = enemyBottom - this.velocity.y;
+        const blockTop = objectBox.min.y;
+        const topSnapTolerance = Math.max(0.2, this.size.y * 0.35);
+        const verticalIsPrimary = overlapY <= overlapX;
+        const hasLandingContact = overlapX > 0.001;
+        const nearTop = Math.abs(enemyBottom - blockTop) <= topSnapTolerance;
+        const crossedTopThisFrame = previousEnemyBottom <= blockTop && enemyBottom >= blockTop;
+
+        // Horizontal collision (wall) handling: reverse direction only for true side hits
+        // Require horizontal-primary collision and sufficient vertical overlap to treat as a wall.
+        const horizontalCollisionThreshold = Math.max(0.2, this.size.y * 0.2);
+        if (minOverlap === overlapX && overlapX > 0.5 && overlapY > horizontalCollisionThreshold) {
+          const movementX = this.mesh.position.x - this.previousPosition.x;
+          if (movementX > 0) {
+            this.mesh.position.x = objectBox.min.x - this.size.x / 2;
+          } else if (movementX < 0) {
+            this.mesh.position.x = objectBox.max.x + this.size.x / 2;
+          }
+          this.direction *= -1; // turn around
+          this.velocity.x = 0;
+          // continue to next object after resolving horizontal collision
+          continue;
+        }
+
+        if (this.velocity.y > 0 && verticalIsPrimary && hasLandingContact && (nearTop || crossedTopThisFrame)) {
+          // Snap enemy to top of block (allow semisolid platforms)
+          this.mesh.position.y = blockTop - this.size.y / 2;
+          this.velocity.y = 0;
+          this.onGround = true;
+        } else {
+          // Head hit: prevent going through from below
+          const enemyTop = enemyBox.min.y;
+          const previousEnemyTop = enemyTop - this.velocity.y;
+          const blockBottom = objectBox.max.y;
+          const bottomSnapTolerance = Math.max(0.2, this.size.y * 0.08);
+          const nearBottom = Math.abs(enemyTop - blockBottom) <= bottomSnapTolerance;
+          const crossedBottomThisFrame = previousEnemyTop >= blockBottom && enemyTop <= blockBottom;
+          if (this.velocity.y < 0 && verticalIsPrimary && (nearBottom || crossedBottomThisFrame)) {
+            this.mesh.position.y = blockBottom + this.size.y / 2;
+            this.velocity.y = 0;
+          }
+        }
+      }
+    }
+
+    // If not touching ground this frame, mark as in-air
+    if (!this.onGround) {
+      // nothing to do — gravity will continue to pull
+    } else {
+      // reset for next frame
+      this.onGround = false;
+    }
   }
 }
