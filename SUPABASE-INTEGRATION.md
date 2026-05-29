@@ -267,9 +267,9 @@ During migration, maintain backwards compatibility:
 
 Legal/compliance pages now exist for production preparation:
 
-- `/privacy-policy.html`
-- `/terms-of-service.html`
-- Cookie consent banner (`/cookie-consent.js` + `/cookie-consent.css`) linked site-wide
+- `/legal/privacy-policy.html`
+- `/legal/terms-of-service.html`
+- Cookie consent banner (`/legal/cookie-consent.js` + `/legal/cookie-consent.css`) linked site-wide
 
 Supabase capabilities to leverage during production rollout:
 

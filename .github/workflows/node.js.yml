@@ -58,7 +58,7 @@ jobs:
               cp -R "$dir" dist/
             fi
           done
-          for file in 404.html CNAME manifest.json sw.js styles.css tailwind.css notification-bars.css notification-bars.js scripts.js admin-auth.js announcements.js; do
+          for file in 404.html CNAME manifest.json sw.js styles.css tailwind.css assets/notification/notification-bars.css assets/notification/notification-bars.js scripts.js admin-auth.js announcements.js; do
             if [ -f "$file" ]; then
               cp "$file" dist/
             fi

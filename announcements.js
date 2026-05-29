@@ -1,4 +1,4 @@
-// Site-wide announcement banners stored locally; dismissable for each visitor
+// Site-wide announcement banners stored locally; dismissible for each visitor
 
 const ANNOUNCEMENTS_STORAGE_KEY = "site_announcements";
 const DISMISSED_ANNOUNCEMENTS_KEY = "dismissed_announcements";

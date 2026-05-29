@@ -21,7 +21,7 @@
       <h2 id="cookie-consent-title">Cookie preferences</h2>
       <p id="cookie-consent-description">
         We use essential cookies/local storage to run this site and optional analytics-style storage to improve it.
-        Read our <a href="/privacy-policy.html">Privacy Policy</a> and <a href="/terms-of-service.html">Terms of Service</a>.
+        Read our <a href="/legal/privacy-policy.html">Privacy Policy</a> and <a href="/legal/terms-of-service.html">Terms of Service</a>.
       </p>
       <div class="cookie-consent-actions">
         <button id="cookie-consent-accept" type="button">Accept all</button>

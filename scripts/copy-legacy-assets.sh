@@ -13,8 +13,8 @@ for entry in \
   announcements.js \
   CNAME \
   manifest.json \
-  notification-bars.css \
-  notification-bars.js \
+  assets/notification/notification-bars.css \
+  assets/notification/notification-bars.js \
   scripts.js \
   SERVICE-WORKER-CACHE.md \
   styles.css \
