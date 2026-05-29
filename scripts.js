@@ -44,7 +44,6 @@ if (document.readyState === "complete") {
 // theme toggle utilities (shared across pages)
 function initThemeToggle() {
   const darkModeToggle = document.getElementById("darkModeToggle");
-  if (!darkModeToggle) return;
   const html = document.documentElement;
   const sunIcon = document.querySelector(".sun-icon");
   const moonIcon = document.querySelector(".moon-icon");
@@ -67,6 +66,8 @@ function initThemeToggle() {
   html.classList.remove("light", "dark");
   html.classList.add(currentTheme);
   updateIcons(currentTheme);
+
+  if (!darkModeToggle) return;
 
   darkModeToggle.addEventListener("click", () => {
     const isDark = html.classList.contains("dark");
