@@ -531,6 +531,16 @@ html.dark .slide-splash {
     font-size: 1rem;
 }
 
+.site-footer .legal-links {
+    display: inline-flex;
+    gap: 0.55rem;
+    align-items: center;
+}
+
+.site-footer .legal-links a {
+    color: #0f6ac8;
+}
+
 html.dark .about-me-section {
     background-color: #16213e;
     color: #eaeaea;
@@ -551,6 +561,10 @@ html.dark .site-footer {
 
 html.dark .site-footer p {
     color: #d1d1d1;
+}
+
+html.dark .site-footer .legal-links a {
+    color: #93c5fd;
 }
 
 body,
