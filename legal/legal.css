@@ -20,21 +20,21 @@ body {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
-h1,
-h2 {
+.legal-card h1,
+.legal-card h2 {
     color: #eba518;
 }
 
-h1 {
+.legal-card h1 {
     margin-top: 0;
 }
 
-p,
-li {
+.legal-card p,
+.legal-card li {
     line-height: 1.55;
 }
 
-a {
+.legal-card a {
     color: #0f6ac8;
 }
 
@@ -63,11 +63,11 @@ html.dark .legal-card {
     border-color: #0f3460;
 }
 
-html.dark h1,
-html.dark h2 {
+html.dark .legal-card h1,
+html.dark .legal-card h2 {
     color: #ffd369;
 }
 
-html.dark a {
+html.dark .legal-card a {
     color: #93c5fd;
 }

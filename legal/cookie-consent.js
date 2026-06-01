@@ -18,7 +18,7 @@
     banner.setAttribute("aria-labelledby", "cookie-consent-title");
     banner.setAttribute("aria-describedby", "cookie-consent-description");
     banner.innerHTML = `
-      <h2 id="cookie-consent-title">Cookie preferences</h2>
+      <p id="cookie-consent-title" class="cookie-consent-title">Cookie preferences</p>
       <p id="cookie-consent-description">
         We use essential cookies/local storage to run this site and optional analytics-style storage to improve it.
         Read our <a href="/legal/privacy-policy.html">Privacy Policy</a> and <a href="/legal/terms-of-service.html">Terms of Service</a>.
