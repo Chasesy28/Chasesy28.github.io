@@ -79,6 +79,7 @@ function setColor(object, r, g, b) {
 }
 
 let gameObjects;
+let mouseDown = false;
 
 let player = new Player();
 
@@ -138,7 +139,17 @@ function objectLoopFunction(func) {
   }
 }
 
+let gamePaused = false;
+
 function gameLoop() {
+  if (gamePaused) {
+    if (mouseDown) {
+      instructionsOverlayClick();
+    }
+    requestAnimationFrame(gameLoop);
+    return;
+  }
+
   renderer.setSize(window.innerWidth, window.innerHeight);
   backgroundColor(173, 216, 230);
 
@@ -197,3 +208,11 @@ function gameLoop() {
   renderer.render(scene, camera);
   requestAnimationFrame(gameLoop);
 }
+
+window.document.addEventListener("mousedown", function (e) {
+  mouseDown = true;
+});
+
+window.document.addEventListener("mouseup", function (e) {
+  mouseDown = false;
+});

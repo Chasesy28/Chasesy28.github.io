@@ -38,3 +38,17 @@ body {
 	transform: scale(1.05) translate(-50%, -50%);
 	box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
 }
+
+#instructionsOverlay {
+	top: 50%;
+	left: 50%;
+	padding: 30px;
+	width: 80%;
+	max-width: 400px;
+	text-align: center;
+	transform: translate(-50%, -50%);
+}
+
+.hidden {
+	display: none;
+}

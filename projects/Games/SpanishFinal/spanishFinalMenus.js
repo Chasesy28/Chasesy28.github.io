@@ -1,5 +1,7 @@
 function startGame() {
-  document.getElementById('playButton').style.display = 'none';
+  document.getElementById('playButton').classList.add('hidden');
+  document.getElementById('instructionsOverlay').classList.remove('hidden');
+  gamePaused = true;
   try {
     gameObjects = convertToObjects(worldData);
   } catch (error) {
@@ -11,4 +13,9 @@ function startGame() {
   } catch (error) {
     document.write(error);
   }
+}
+
+function instructionsOverlayClick() {
+  document.getElementById('instructionsOverlay').classList.add('hidden');
+  gamePaused = false;
 }

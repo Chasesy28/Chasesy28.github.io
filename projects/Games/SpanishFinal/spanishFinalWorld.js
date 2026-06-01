@@ -56,7 +56,7 @@ function convertToObjects(array) {
       const id = array[j][k];
       if (id !== 0 && id !== undefined) {
         if (id === "p") {
-          player.respawnPoint.set(k * baseBlockSize - (player.size.x / 2), j * baseBlockSize - (player.size.y / 2), 0);
+          player.respawnPoint.set(k * baseBlockSize + (player.size.x / 2), j * baseBlockSize + (player.size.y / 2), 0);
           scene.add(player.render(k * baseBlockSize, j * baseBlockSize, 0));
         } else {
           const objectInfo = objectIdentifiers[id];
