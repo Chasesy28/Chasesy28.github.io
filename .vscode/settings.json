@@ -8,10 +8,10 @@
   "html.format.indentInnerHtml": true,
   "html.format.wrapLineLength": 120,
   "css.validate": true,
-  "javascript.validate.enable": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
+  "js/ts.validate.enabled": true,
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": true,
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
