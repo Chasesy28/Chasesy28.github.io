@@ -88,12 +88,12 @@ class Block {
     setColor(this.mesh, ...gameObjectTypes[this.type].color);
 
     if (this.checkForPlayer()) {
-      setColor(
+      /*setColor(
         this.mesh,
         gameObjectTypes[this.type].color[0] * 2,
         gameObjectTypes[this.type].color[1] * 2,
         gameObjectTypes[this.type].color[2] * 2,
-      ); // Highlight blocks the player is standing on
+      ); // Highlight blocks the player is standing on*/
     }
   }
 
