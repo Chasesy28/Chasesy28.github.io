@@ -15,6 +15,7 @@ for entry in \
   manifest.json \
   assets/notification/notification-bars.css \
   assets/notification/notification-bars.js \
+  legal \
   scripts.js \
   SERVICE-WORKER-CACHE.md \
   styles.css \
