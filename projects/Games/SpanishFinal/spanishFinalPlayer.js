@@ -31,7 +31,7 @@ class Player {
     if (!this.mesh) {
       this.mesh = createBox(x, y, z, this.size.x, this.size.y, this.size.z);
       this.previousPosition = this.mesh.position.clone();
-      setColor(this.mesh, 255, 255, 0);
+      setColor(this.mesh, 0, 0, 255);
     }
     return this.mesh;
   }
@@ -72,7 +72,7 @@ class Player {
     const playerBox = new THREE.Box3().setFromObject(this.mesh);
 
     for (let obj of gameObjects) {
-      if (obj instanceof Sign) {
+      if (obj instanceof Sign || obj instanceof Goal) {
         const objectBox = new THREE.Box3().setFromObject(obj.mesh);
         if (playerBox.intersectsBox(objectBox)) {
           obj.interact();

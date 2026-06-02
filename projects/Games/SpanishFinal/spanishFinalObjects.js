@@ -26,6 +26,13 @@ const gameObjectTypes = {
     solid: false,
     bottomCollision: false,
   },
+  goal: {
+    color: [255, 255, 0],
+    dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
+    texture: null,
+    solid: false,
+    bottomCollision: false,
+  },
   grounder: {
     color: [0, 255, 0],
     dimensions: new THREE.Vector3(baseBlockSize, baseBlockSize, baseBlockSize),
@@ -126,6 +133,18 @@ class Sign extends Block {
 
   interact() {
     showInteractionText(this.text);
+  }
+}
+
+class Goal extends Block {
+  constructor(x, y, z) {
+    super(x, y, z, "goal");
+    this.type = "goal";
+    this.solid = gameObjectTypes[this.type].solid;
+    setColor(this.mesh, ...gameObjectTypes[this.type].color);
+  }
+  interact() {
+    showInteractionText("¡Has llegado a la meta! ¡Felicidades!");
   }
 }
 

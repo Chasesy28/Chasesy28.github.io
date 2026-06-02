@@ -49,35 +49,6 @@ body {
 	transform: translate(-50%, -50%);
 }
 
-.explanation-button {
-	position: absolute;
-	cursor: pointer;
-	border: none;
-	border-radius: 8px;
-	background: rgba(255, 189, 52, 0.85);
-	z-index: 10;
-	color: #333;
-	transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
-	font-weight: bold;
-	box-shadow: 0 4px 6px rgba(149, 57, 0, 0.2);
-	top: 15px;
-	right: 15px;
-	width: 48px;
-	height: 48px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 2rem;
-	margin: 0;
-	padding: 0;
-}
-
-.explanation-button:hover {
-	background: rgba(255, 189, 52, 1);
-	transform: scale(1.05);
-	box-shadow: 0 6px 12px rgba(149, 57, 0, 0.3);
-}
-
 .hidden {
 	display: none;
 }
