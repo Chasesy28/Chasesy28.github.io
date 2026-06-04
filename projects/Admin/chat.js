@@ -3,6 +3,7 @@ import {
   getSessionExpirationMinutes,
   initializeAuthFromSupabase,
   isSupabaseConfigured,
+  getSupabaseConfigError,
   loginWithGoogle,
   logout,
   refreshSession,
@@ -267,7 +268,7 @@ async function resolveAccess() {
   if (!isSupabaseConfigured() || !supabase) {
     state.access = 'error'
     setBadge('error', 'Supabase missing')
-    setNotice('Supabase credentials are missing for this page.', 'error')
+    setNotice(getSupabaseConfigError() || 'Supabase credentials are missing for this page.', 'error')
     setConnectionState('Unavailable')
     setComposerEnabled(false)
     setSignInControls(false, false)
@@ -486,7 +487,7 @@ async function bootstrap() {
   if (!isSupabaseConfigured()) {
     state.access = 'error'
     setBadge('error', 'Supabase missing')
-    setNotice('Add Supabase credentials to enable chat.', 'error')
+    setNotice(getSupabaseConfigError() || 'Add Supabase credentials to enable chat.', 'error')
     setConnectionState('Unavailable')
     setComposerEnabled(false)
     setSignInControls(false, false)
