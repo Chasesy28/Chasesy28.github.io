@@ -4,6 +4,7 @@ const SESSION_KEY = "admin_session";
 const SESSION_DURATION = 24 * 60 * 60 * 1000;
 const PLACEHOLDER_PREFIX = "__SUPABASE_";
 const VITE_ADMIN_ROUTE = "/projects/Admin/admin.html";
+const NON_ADMIN_ROUTE = "/projects/Admin/standard.html";
 const DEFAULT_SITE_ORIGIN = "https://silly-site.me";
 
 const config = window.__ADMIN_SUPABASE_CONFIG ?? {};
@@ -40,6 +41,17 @@ function getSiteOrigin() {
 
 function getAbsoluteRedirectUrl(pathname) {
   return new URL(pathname, getSiteOrigin()).toString();
+}
+
+function redirectToNonAdminRoute() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const destination = getAbsoluteRedirectUrl(NON_ADMIN_ROUTE);
+  if (window.location.href !== destination) {
+    window.location.replace(destination);
+  }
 }
 
 if (!hasSupabaseCredentials) {
@@ -219,11 +231,9 @@ export async function initializeAuthFromSupabase() {
 
   const admin = await authenticateAdmin(userEmail);
   if (!admin) {
-    await client.auth.signOut();
     localStorage.removeItem(SESSION_KEY);
-    throw new Error(
-      "Your account is authenticated but is not authorized for admin access.",
-    );
+    redirectToNonAdminRoute();
+    return null;
   }
 
   createSession(admin);
