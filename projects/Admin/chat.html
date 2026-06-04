@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Admin Chat</title>
+		<script>
+			window.__ADMIN_SUPABASE_CONFIG = {
+				siteOrigin: "__SITE_ORIGIN__",
+				url: "__SUPABASE_URL__",
+				publishableKey: "__SUPABASE_PUBLISHABLE_KEY__",
+				anonKey: "__SUPABASE_ANON_KEY__"
+			};
+		</script>
+		<style>
+			:root {
+				color-scheme: light;
+				--bg: #07111f;
+				--bg-elevated: rgba(8, 16, 30, 0.82);
+				--panel: rgba(15, 23, 42, 0.88);
+				--panel-strong: #0f172a;
+				--border: rgba(148, 163, 184, 0.18);
+				--text: #e2e8f0;
+				--muted: #94a3b8;
+				--accent: #22c55e;
+				--accent-strong: #16a34a;
+				--danger: #ef4444;
+				--warning: #f59e0b;
+				--shadow: 0 30px 80px rgba(2, 6, 23, 0.45);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				min-height: 100%;
+			}
+
+			body {
+				margin: 0;
+				font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+				background:
+					radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 30%),
+					radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 34%),
+					linear-gradient(135deg, #020617 0%, #0f172a 52%, #111827 100%);
+				color: var(--text);
+			}
+
+			body::before {
+				content: "";
+				position: fixed;
+				inset: 0;
+				pointer-events: none;
+				background-image:
+					linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+					linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+				background-size: 28px 28px;
+				mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 95%);
+			}
+
+			a {
+				color: inherit;
+			}
+
+			.shell {
+				position: relative;
+				z-index: 1;
+				min-height: 100vh;
+				padding: 28px;
+			}
+
+			.layout {
+				max-width: 1100px;
+				margin: 0 auto;
+				display: grid;
+				gap: 20px;
+			}
+
+			.hero,
+			.panel {
+				border: 1px solid var(--border);
+				background: var(--bg-elevated);
+				backdrop-filter: blur(18px);
+				box-shadow: var(--shadow);
+			}
+
+			.hero {
+				border-radius: 28px;
+				padding: 24px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 20px;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.eyebrow {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				padding: 6px 12px;
+				border-radius: 999px;
+				background: rgba(34, 197, 94, 0.12);
+				color: #bbf7d0;
+				font-size: 12px;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			.hero h1 {
+				margin: 14px 0 10px;
+				font-size: clamp(2rem, 5vw, 3.5rem);
+				line-height: 0.96;
+				letter-spacing: -0.05em;
+			}
+
+			.hero p {
+				margin: 0;
+				max-width: 64ch;
+				color: var(--muted);
+				line-height: 1.6;
+			}
+
+			.status-card {
+				min-width: 280px;
+				max-width: 360px;
+				border-radius: 22px;
+				border: 1px solid var(--border);
+				background: rgba(15, 23, 42, 0.92);
+				padding: 18px;
+			}
+
+			.status-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+			}
+
+			.status-badge {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 12px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: rgba(148, 163, 184, 0.08);
+				color: var(--muted);
+				font-size: 13px;
+				font-weight: 700;
+			}
+
+			.status-badge::before {
+				content: "";
+				width: 8px;
+				height: 8px;
+				border-radius: 999px;
+				background: #64748b;
+			}
+
+			.status-badge.is-ready {
+				background: rgba(34, 197, 94, 0.12);
+				color: #bbf7d0;
+			}
+
+			.status-badge.is-ready::before {
+				background: var(--accent);
+				box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.16);
+			}
+
+			.status-badge.is-locked {
+				background: rgba(245, 158, 11, 0.12);
+				color: #fde68a;
+			}
+
+			.status-badge.is-locked::before {
+				background: var(--warning);
+			}
+
+			.status-badge.is-error {
+				background: rgba(239, 68, 68, 0.12);
+				color: #fecaca;
+			}
+
+			.status-badge.is-error::before {
+				background: var(--danger);
+			}
+
+			.status-copy {
+				margin-top: 14px;
+				color: var(--muted);
+				font-size: 14px;
+				line-height: 1.6;
+			}
+
+			.status-meta {
+				margin-top: 14px;
+				display: grid;
+				gap: 10px;
+				color: #cbd5e1;
+				font-size: 13px;
+			}
+
+			.status-meta strong {
+				color: #f8fafc;
+			}
+
+			.actions {
+				margin-top: 16px;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+
+			.btn {
+				appearance: none;
+				border: 0;
+				border-radius: 14px;
+				padding: 12px 16px;
+				font: inherit;
+				font-weight: 700;
+				cursor: pointer;
+				transition: transform 0.15s ease, background-color 0.15s ease, opacity 0.15s ease;
+			}
+
+			.btn:hover {
+				transform: translateY(-1px);
+			}
+
+			.btn:disabled {
+				cursor: not-allowed;
+				opacity: 0.6;
+				transform: none;
+			}
+
+			.btn-primary {
+				background: linear-gradient(135deg, var(--accent), #4ade80);
+				color: #052e16;
+			}
+
+			.btn-secondary {
+				background: rgba(148, 163, 184, 0.12);
+				color: var(--text);
+				border: 1px solid var(--border);
+			}
+
+			.btn-danger {
+				background: rgba(239, 68, 68, 0.14);
+				color: #fecaca;
+				border: 1px solid rgba(239, 68, 68, 0.28);
+			}
+
+			.panel {
+				border-radius: 28px;
+				overflow: hidden;
+			}
+
+			.chat-grid {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 300px;
+				min-height: 72vh;
+			}
+
+			.chat-main {
+				display: flex;
+				flex-direction: column;
+				min-width: 0;
+				border-right: 1px solid var(--border);
+			}
+
+			.chat-toolbar,
+			.chat-composer {
+				padding: 18px 20px;
+				border-bottom: 1px solid var(--border);
+				background: rgba(15, 23, 42, 0.65);
+			}
+
+			.chat-toolbar {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 14px;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.chat-toolbar h2 {
+				margin: 0;
+				font-size: 18px;
+			}
+
+			.chat-toolbar p,
+			.chat-helper,
+			.chat-status,
+			.sidebar-note {
+				margin: 0;
+				color: var(--muted);
+				font-size: 13px;
+				line-height: 1.5;
+			}
+
+			.chat-messages {
+				flex: 1;
+				padding: 22px 20px;
+				overflow-y: auto;
+				display: grid;
+				gap: 14px;
+				align-content: start;
+				background:
+					linear-gradient(180deg, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.15)),
+					radial-gradient(circle at top, rgba(34, 197, 94, 0.08), transparent 40%);
+			}
+
+			.empty-state {
+				border: 1px dashed rgba(148, 163, 184, 0.24);
+				border-radius: 22px;
+				padding: 24px;
+				color: var(--muted);
+				line-height: 1.7;
+				background: rgba(15, 23, 42, 0.36);
+			}
+
+			.message {
+				max-width: min(78%, 760px);
+				display: grid;
+				gap: 6px;
+			}
+
+			.message.self {
+				margin-left: auto;
+				text-align: right;
+			}
+
+			.message-meta {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 12px;
+				color: var(--muted);
+			}
+
+			.message.self .message-meta {
+				justify-content: flex-end;
+			}
+
+			.message-name {
+				color: #f8fafc;
+				font-weight: 700;
+			}
+
+			.message-bubble {
+				padding: 14px 16px;
+				border-radius: 20px 20px 20px 8px;
+				background: rgba(30, 41, 59, 0.92);
+				border: 1px solid rgba(148, 163, 184, 0.16);
+				color: #e2e8f0;
+				white-space: pre-wrap;
+				word-break: break-word;
+				line-height: 1.6;
+			}
+
+			.message.self .message-bubble {
+				border-radius: 20px 20px 8px 20px;
+				background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(20, 184, 166, 0.18));
+				border-color: rgba(34, 197, 94, 0.28);
+			}
+
+			.message-time {
+				font-size: 11px;
+				color: #94a3b8;
+			}
+
+			.chat-composer {
+				display: grid;
+				gap: 12px;
+			}
+
+			.composer-row {
+				display: flex;
+				gap: 10px;
+			}
+
+			.composer-input {
+				flex: 1;
+				min-width: 0;
+				border-radius: 16px;
+				border: 1px solid rgba(148, 163, 184, 0.2);
+				background: rgba(2, 6, 23, 0.52);
+				color: var(--text);
+				padding: 14px 16px;
+				font: inherit;
+				resize: none;
+				min-height: 56px;
+				max-height: 180px;
+			}
+
+			.composer-input:focus {
+				outline: 2px solid rgba(34, 197, 94, 0.45);
+				outline-offset: 2px;
+			}
+
+			.composer-input:disabled {
+				opacity: 0.65;
+				cursor: not-allowed;
+			}
+
+			.chat-side {
+				padding: 20px;
+				display: grid;
+				gap: 16px;
+				align-content: start;
+				background: rgba(2, 6, 23, 0.28);
+			}
+
+			.side-card {
+				border-radius: 22px;
+				padding: 18px;
+				border: 1px solid var(--border);
+				background: rgba(15, 23, 42, 0.74);
+			}
+
+			.side-card h3 {
+				margin: 0 0 8px;
+				font-size: 15px;
+			}
+
+			.side-card ul {
+				margin: 10px 0 0;
+				padding-left: 18px;
+				color: var(--muted);
+				line-height: 1.7;
+				font-size: 13px;
+			}
+
+			.notice {
+				border-radius: 18px;
+				border: 1px solid rgba(148, 163, 184, 0.2);
+				padding: 14px 16px;
+				font-size: 13px;
+				line-height: 1.6;
+				color: var(--muted);
+			}
+
+			.notice.error {
+				border-color: rgba(239, 68, 68, 0.28);
+				background: rgba(239, 68, 68, 0.08);
+				color: #fecaca;
+			}
+
+			.notice.hidden {
+				display: none;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			@media (max-width: 900px) {
+				.chat-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.chat-main {
+					border-right: 0;
+					border-bottom: 1px solid var(--border);
+				}
+
+				.chat-side {
+					padding-top: 0;
+				}
+			}
+
+			@media (max-width: 640px) {
+				.shell {
+					padding: 16px;
+				}
+
+				.hero,
+				.panel {
+					border-radius: 22px;
+				}
+
+				.message {
+					max-width: 100%;
+				}
+
+				.composer-row {
+					flex-direction: column;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="shell">
+			<div class="layout">
+				<section class="hero">
+					<div>
+						<span class="eyebrow">Supabase realtime chat</span>
+						<h1>Private admin chat</h1>
+						<p>
+							This page stays locked unless your Google-authenticated Supabase session exists and your member id is present in <code>public.chat_members</code>.
+							Messages stream live from <code>public.messages</code>.
+						</p>
+					</div>
+
+					<aside class="status-card">
+						<div class="status-row">
+							<div id="chat-status-badge" class="status-badge">Checking access</div>
+							<button id="refresh-access" class="btn btn-secondary" type="button">Refresh</button>
+						</div>
+						<div id="chat-status-copy" class="status-copy">Verifying your session and membership.</div>
+						<div class="status-meta">
+							<div>Signed in as <strong id="session-email">-</strong></div>
+							<div>Session expires in <strong id="session-expires">-</strong> minutes</div>
+							<div>Member id <strong id="member-id">-</strong></div>
+						</div>
+						<div class="actions">
+							<button id="signin-btn" class="btn btn-primary" type="button">Sign in with Google</button>
+							<button id="signout-btn" class="btn btn-danger hidden" type="button">Sign out</button>
+						</div>
+					</aside>
+				</section>
+
+				<section class="panel">
+					<div class="chat-grid">
+						<div class="chat-main">
+							<div class="chat-toolbar">
+								<div>
+									<h2>Live room</h2>
+									<p id="chat-toolbar-copy">Waiting for membership validation.</p>
+								</div>
+								<div id="chat-connection-state" class="chat-status">Disconnected</div>
+							</div>
+
+							<div id="chat-notice" class="notice hidden"></div>
+							<div id="messages" class="chat-messages" aria-live="polite"></div>
+
+							<form id="composer" class="chat-composer hidden">
+								<div class="composer-row">
+									<textarea id="message-input" class="composer-input" rows="2" maxlength="2000" placeholder="Write a message..."></textarea>
+									<button id="send-btn" class="btn btn-primary" type="submit">Send</button>
+								</div>
+								<div class="chat-helper">Press Enter to send, Shift+Enter for a new line.</div>
+							</form>
+						</div>
+
+						<aside class="chat-side">
+							<div class="side-card">
+								<h3>Access rules</h3>
+								<div class="sidebar-note">
+									You can only post here when the page sees a valid Supabase auth session and your member id exists in <code>chat_members</code>.
+								</div>
+								<ul>
+									<li>Auth comes from the existing admin Google sign-in flow.</li>
+									<li>The page listens to realtime inserts on <code>messages</code>.</li>
+									<li>Unauthorized users stay in read-only, non-chat mode.</li>
+								</ul>
+							</div>
+
+							<div class="side-card">
+								<h3>Fallback links</h3>
+								<div class="sidebar-note">
+									<a href="/projects/Admin/admin.html">Open admin panel</a> or return to the <a href="/">home page</a>.
+								</div>
+							</div>
+						</aside>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<script type="module" src="./chat.js"></script>
+	</body>
+</html>
