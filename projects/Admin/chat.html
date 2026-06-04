@@ -498,7 +498,7 @@
 				<section class="hero">
 					<div>
 						<span class="eyebrow">Supabase realtime chat</span>
-						<h1>Private admin chat</h1>
+						<h1>Private member chat</h1>
 						<p>
 							This page stays locked unless your Google-authenticated Supabase session exists and your email is present in <code>public.chat_members</code>.
 							Messages stream live from <code>public.messages</code>.
@@ -553,7 +553,7 @@
 									You can only post here when the page sees a valid Supabase auth session and your email exists in <code>chat_members</code>.
 								</div>
 								<ul>
-									<li>Auth comes from the existing admin Google sign-in flow.</li>
+									<li>Auth comes from the Supabase Google sign-in flow.</li>
 									<li>The page listens to realtime inserts on <code>messages</code>.</li>
 									<li>Unauthorized users stay in read-only, non-chat mode.</li>
 								</ul>

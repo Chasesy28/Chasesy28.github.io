@@ -1,12 +1,8 @@
 import {
-  getSession,
-  getSessionExpirationMinutes,
-  initializeAuthFromSupabase,
   isSupabaseConfigured,
   getSupabaseConfigError,
   loginWithGoogle,
   logout,
-  refreshSession,
   supabase,
 } from './panel-supabase.js'
 
@@ -66,6 +62,17 @@ function extractMemberLabel(member) {
     normalizeText(member?.id) ||
     'member'
   )
+}
+
+function getSessionExpirationMinutes(session) {
+  const expiresAt = session?.expires_at
+  if (!expiresAt) return null
+
+  const expiresAtMs = Number(expiresAt) * 1000
+  if (!Number.isFinite(expiresAtMs)) return null
+
+  const minutesLeft = Math.floor((expiresAtMs - Date.now()) / (60 * 1000))
+  return Math.max(0, minutesLeft)
 }
 
 function extractMessageId(message) {
@@ -207,10 +214,9 @@ function setSignInControls(showSignIn, showSignOut) {
 }
 
 function renderSessionSummary() {
-  const session = getSession()
-  state.session = session
-  els.sessionEmail.textContent = session?.email ?? '-'
-  els.sessionExpires.textContent = session ? String(getSessionExpirationMinutes() ?? 0) : '-'
+  const session = state.session
+  els.sessionEmail.textContent = session?.user?.email ?? '-'
+  els.sessionExpires.textContent = session ? String(getSessionExpirationMinutes(session) ?? 0) : '-'
   els.memberId.textContent = state.memberRecord ? extractMemberId(state.memberRecord) ?? '-' : '-'
 }
 
@@ -299,10 +305,12 @@ async function getCurrentSupabaseUser() {
 async function findChatMember(identifier) {
   if (!supabase || !identifier) return null
 
+  const normalizedIdentifier = normalizeText(identifier)
+
   const queries = [
     // Prefer matching by email (current schema) then fallback to id
-    supabase.from('chat_members').select('*').eq('email', identifier).maybeSingle(),
-    supabase.from('chat_members').select('*').eq('id', identifier).maybeSingle(),
+    supabase.from('chat_members').select('*').ilike('email', normalizedIdentifier).maybeSingle(),
+    supabase.from('chat_members').select('*').eq('id', normalizedIdentifier).maybeSingle(),
   ]
 
   for (const query of queries) {
@@ -328,14 +336,14 @@ async function resolveAccess(callbackState = getSupabaseCallbackState()) {
   }
 
   try {
-    const authResult = await initializeAuthFromSupabase()
-    if (authResult) refreshSession()
+    const { data, error } = await supabase.auth.getSession()
+    if (error) throw error
+    state.session = data.session ?? null
   } catch (error) {
     console.warn('Chat auth initialization failed:', error)
   }
 
-  state.session = getSession()
-  state.currentUser = await getCurrentSupabaseUser().catch(() => null)
+  state.currentUser = state.session?.user ?? (await getCurrentSupabaseUser().catch(() => null))
   renderSessionSummary()
 
   if (!state.session || !state.currentUser) {
@@ -353,7 +361,7 @@ async function resolveAccess(callbackState = getSupabaseCallbackState()) {
     return
   }
 
-  const memberCandidates = [state.currentUser.email, state.session.email, state.session.adminId, state.currentUser.id]
+  const memberCandidates = [state.currentUser.email, state.session?.user?.email, state.currentUser.id]
     .map((value) => (value === null || value === undefined ? '' : String(value)))
     .filter(Boolean)
 
@@ -493,7 +501,6 @@ async function handleSendMessage(event) {
   els.messageInput.disabled = true
 
   try {
-    refreshSession()
     await tryInsertMessage(content)
     els.messageInput.value = ''
     await loadMessages()
@@ -524,6 +531,8 @@ async function handleSignOut() {
   state.memberRecord = null
   state.messages = []
   state.access = 'signedOut'
+  state.session = null
+  state.currentUser = null
   renderSessionSummary()
   setBadge('locked', 'Signed out')
   setNotice('You have been signed out.', 'info')
