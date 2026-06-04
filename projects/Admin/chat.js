@@ -10,7 +10,6 @@ import {
   supabase,
 } from './panel-supabase.js'
 
-const CHAT_REDIRECT_PATH = '/projects/Admin/chat.html'
 const MESSAGE_LIMIT = 120
 const CHAT_CHANNEL_NAME = 'admin-chat-messages'
 
@@ -115,6 +114,59 @@ function formatTimestamp(value) {
     month: 'short',
     day: 'numeric',
   }).format(date)
+}
+
+function getSupabaseCallbackState() {
+  const url = new URL(window.location.href)
+  const searchParams = url.searchParams
+  const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
+
+  const searchError = searchParams.get('error') || searchParams.get('error_code') || searchParams.get('error_description')
+  const hashError = hashParams.get('error') || hashParams.get('error_code') || hashParams.get('error_description')
+  const hasCode = searchParams.has('code')
+  const hasAccessToken = hashParams.has('access_token')
+  const hasCallbackMarkers = hasCode || hasAccessToken || searchParams.has('state') || Boolean(searchError || hashError)
+
+  return {
+    isRedirect: hasCallbackMarkers,
+    hasSuccessMarker: hasCode || hasAccessToken,
+    errorMessage: searchError || hashError || '',
+  }
+}
+
+function clearSupabaseCallbackState() {
+  const url = new URL(window.location.href)
+  const paramsToRemove = ['code', 'state', 'error', 'error_code', 'error_description', 'token_hash', 'type']
+  let changed = false
+
+  for (const key of paramsToRemove) {
+    if (url.searchParams.has(key)) {
+      url.searchParams.delete(key)
+      changed = true
+    }
+  }
+
+  if (url.hash) {
+    const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
+    for (const key of ['access_token', 'refresh_token', 'expires_in', 'token_type', 'type', 'error', 'error_code', 'error_description']) {
+      if (hashParams.has(key)) {
+        hashParams.delete(key)
+        changed = true
+      }
+    }
+
+    const nextHash = hashParams.toString()
+    if (nextHash) {
+      url.hash = `#${nextHash}`
+    } else if (hashParams.size > 0 || url.hash) {
+      url.hash = ''
+    }
+  }
+
+  if (changed) {
+    const nextUrl = `${url.pathname}${url.search}${url.hash}`
+    window.history.replaceState({}, document.title, nextUrl)
+  }
 }
 
 function setBadge(kind, text) {
@@ -264,7 +316,7 @@ async function findChatMember(identifier) {
   return null
 }
 
-async function resolveAccess() {
+async function resolveAccess(callbackState = getSupabaseCallbackState()) {
   if (!isSupabaseConfigured()) {
     state.access = 'error'
     setBadge('error', 'Supabase missing')
@@ -295,6 +347,9 @@ async function resolveAccess() {
     setComposerEnabled(false)
     setSignInControls(true, false)
     setMessagePaneForLockedState()
+    if (callbackState.isRedirect) {
+      clearSupabaseCallbackState()
+    }
     return
   }
 
@@ -331,6 +386,10 @@ async function resolveAccess() {
   els.toolbarCopy.textContent = `Chat is live for ${extractMemberLabel(matchedMember)}.`
   await loadMessages()
   startRealtime()
+
+  if (callbackState.isRedirect) {
+    clearSupabaseCallbackState()
+  }
 }
 
 function setMessagePaneForLockedState() {
@@ -459,7 +518,7 @@ async function handleSendMessage(event) {
 
 async function handleSignIn() {
   try {
-    await loginWithGoogle(CHAT_REDIRECT_PATH)
+    await loginWithGoogle(window.location.pathname)
   } catch (error) {
     setNotice(error instanceof Error ? error.message : 'Unable to start sign-in.', 'error')
   }
@@ -484,6 +543,8 @@ async function handleSignOut() {
 }
 
 async function bootstrap() {
+  const callbackState = getSupabaseCallbackState()
+
   if (!isSupabaseConfigured()) {
     state.access = 'error'
     setBadge('error', 'Supabase missing')
@@ -501,6 +562,11 @@ async function bootstrap() {
   setComposerEnabled(false)
   setSignInControls(false, false)
   renderSessionSummary()
+  els.statusCopy.textContent = callbackState.isRedirect
+    ? callbackState.errorMessage
+      ? `Supabase redirected back here with an auth error: ${callbackState.errorMessage}`
+      : 'Supabase redirected back here. Verifying the session now.'
+    : 'Verifying your session and membership.'
   renderEmptyState('Checking your session and chat membership...')
 
   els.signinBtn.addEventListener('click', handleSignIn)
@@ -514,7 +580,7 @@ async function bootstrap() {
     }
   })
 
-  await resolveAccess()
+  await resolveAccess(callbackState)
 }
 
 if (document.readyState === 'loading') {
