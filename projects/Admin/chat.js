@@ -91,6 +91,10 @@ function extractMessageAuthorId(message) {
   )
 }
 
+function extractMessageAuthorEmail(message) {
+  return normalizeText(message?.sender_email) || normalizeText(message?.email) || ''
+}
+
 function extractMessageContent(message) {
   return (
     normalizeText(message?.content) ||
@@ -235,12 +239,15 @@ function renderEmptyState(text) {
 function renderMessage(message) {
   const messageId = extractMessageId(message)
   const authorId = extractMessageAuthorId(message)
+  const authorEmail = extractMessageAuthorEmail(message)
   const content = extractMessageContent(message)
   if (!content) return null
 
   const currentUserId = state.currentUser?.id ?? null
   const isSelf = Boolean(currentUserId && authorId && String(authorId) === String(currentUserId))
-  const authorLabel = isSelf ? 'You' : String(authorId ?? 'member')
+  const authorLabel = isSelf
+    ? normalizeText(state.currentUser?.email) || normalizeText(state.memberRecord?.email) || 'member'
+    : authorEmail || String(authorId ?? 'member')
 
   const row = document.createElement('article')
   row.className = `message${isSelf ? ' self' : ''}`
@@ -477,6 +484,7 @@ async function tryInsertMessage(content) {
   const { error } = await supabase.from('messages').insert({
     content,
     sender_id: state.currentUser.id,
+    sender_email: state.currentUser.email ?? state.memberRecord.email ?? null,
   })
 
   if (error) {
