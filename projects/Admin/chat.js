@@ -232,11 +232,9 @@ function renderMessage(message) {
   const content = extractMessageContent(message)
   if (!content) return null
 
-  const currentMemberId = extractMemberId(state.memberRecord)
-  const isSelf = Boolean(currentMemberId && authorId && String(authorId) === String(currentMemberId))
-  const authorLabel = isSelf ? 'You' : extractMemberLabel(state.memberRecord) && String(authorId) === String(currentMemberId)
-    ? 'You'
-    : String(authorId ?? 'member')
+  const currentUserId = state.currentUser?.id ?? null
+  const isSelf = Boolean(currentUserId && authorId && String(authorId) === String(currentUserId))
+  const authorLabel = isSelf ? 'You' : String(authorId ?? 'member')
 
   const row = document.createElement('article')
   row.className = `message${isSelf ? ' self' : ''}`
@@ -303,6 +301,7 @@ async function findChatMember(identifier) {
 
   const queries = [
     supabase.from('chat_members').select('*').eq('id', identifier).maybeSingle(),
+    supabase.from('chat_members').select('*').eq('email', identifier).maybeSingle(),
     supabase.from('chat_members').select('*').eq('user_id', identifier).maybeSingle(),
   ]
 
@@ -343,7 +342,7 @@ async function resolveAccess(callbackState = getSupabaseCallbackState()) {
     state.access = 'signedOut'
     state.memberRecord = null
     setBadge('locked', 'Signed out')
-    setNotice('Sign in with Google to unlock chat, then your member id must exist in chat_members.', 'info')
+    setNotice('Sign in with Google to unlock chat, then your email must exist in chat_members.', 'info')
     setConnectionState('Signed out')
     setComposerEnabled(false)
     setSignInControls(true, false)
@@ -354,7 +353,7 @@ async function resolveAccess(callbackState = getSupabaseCallbackState()) {
     return
   }
 
-  const memberCandidates = [state.session.adminId, state.currentUser.id]
+  const memberCandidates = [state.currentUser.email, state.session.email, state.session.adminId, state.currentUser.id]
     .map((value) => (value === null || value === undefined ? '' : String(value)))
     .filter(Boolean)
 
@@ -368,7 +367,7 @@ async function resolveAccess(callbackState = getSupabaseCallbackState()) {
     state.access = 'unauthorized'
     state.memberRecord = null
     setBadge('locked', 'Not a member')
-    setNotice('Your session is valid, but your id does not appear in chat_members.', 'error')
+    setNotice('Your session is valid, but your email does not appear in chat_members.', 'error')
     setConnectionState('Access denied')
     setComposerEnabled(false)
     setSignInControls(false, true)
@@ -398,7 +397,7 @@ function setMessagePaneForLockedState() {
     supabase?.removeChannel(state.channel)
     state.channel = null
   }
-  renderEmptyState('Chat is locked until you sign in and match an entry in chat_members.')
+  renderEmptyState('Chat is locked until you sign in and your email matches an entry in chat_members.')
 }
 
 async function loadMessages() {
@@ -465,12 +464,11 @@ function startRealtime() {
 }
 
 async function tryInsertMessage(content) {
-  if (!supabase || !state.memberRecord) throw new Error('Chat is not available.')
+  if (!supabase || !state.memberRecord || !state.currentUser) throw new Error('Chat is not available.')
 
-  const memberId = extractMemberId(state.memberRecord)
   const { error } = await supabase.from('messages').insert({
     content,
-    sender_id: memberId,
+    sender_id: state.currentUser.id,
   })
 
   if (error) {
@@ -559,7 +557,7 @@ async function bootstrap() {
     ? callbackState.errorMessage
       ? `Supabase redirected back here with an auth error: ${callbackState.errorMessage}`
       : 'Supabase redirected back here. Verifying the session now.'
-    : 'Verifying your session and membership.'
+    : 'Verifying your session and email-based membership.'
   renderEmptyState('Checking your session and chat membership...')
 
   els.signinBtn.addEventListener('click', handleSignIn)

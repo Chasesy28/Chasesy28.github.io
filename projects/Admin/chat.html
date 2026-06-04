@@ -500,7 +500,7 @@
 						<span class="eyebrow">Supabase realtime chat</span>
 						<h1>Private admin chat</h1>
 						<p>
-							This page stays locked unless your Google-authenticated Supabase session exists and your member id is present in <code>public.chat_members</code>.
+							This page stays locked unless your Google-authenticated Supabase session exists and your email is present in <code>public.chat_members</code>.
 							Messages stream live from <code>public.messages</code>.
 						</p>
 					</div>
@@ -529,7 +529,7 @@
 							<div class="chat-toolbar">
 								<div>
 									<h2>Live room</h2>
-									<p id="chat-toolbar-copy">Waiting for membership validation.</p>
+									<p id="chat-toolbar-copy">Waiting for email-based membership validation.</p>
 								</div>
 								<div id="chat-connection-state" class="chat-status">Disconnected</div>
 							</div>
@@ -550,7 +550,7 @@
 							<div class="side-card">
 								<h3>Access rules</h3>
 								<div class="sidebar-note">
-									You can only post here when the page sees a valid Supabase auth session and your member id exists in <code>chat_members</code>.
+									You can only post here when the page sees a valid Supabase auth session and your email exists in <code>chat_members</code>.
 								</div>
 								<ul>
 									<li>Auth comes from the existing admin Google sign-in flow.</li>
