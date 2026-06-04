@@ -265,7 +265,7 @@ async function findChatMember(identifier) {
 }
 
 async function resolveAccess() {
-  if (!isSupabaseConfigured() || !supabase) {
+  if (!isSupabaseConfigured()) {
     state.access = 'error'
     setBadge('error', 'Supabase missing')
     setNotice(getSupabaseConfigError() || 'Supabase credentials are missing for this page.', 'error')
