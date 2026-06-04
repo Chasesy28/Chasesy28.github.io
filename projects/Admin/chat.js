@@ -74,6 +74,7 @@ function extractMessageId(message) {
 
 function extractMessageAuthorId(message) {
   return (
+    message?.sender_id ??
     message?.member_id ??
     message?.user_id ??
     message?.author_id ??
@@ -467,24 +468,16 @@ async function tryInsertMessage(content) {
   if (!supabase || !state.memberRecord) throw new Error('Chat is not available.')
 
   const memberId = extractMemberId(state.memberRecord)
-  const payloads = [
-    { content, user_id: memberId },
-    { content, member_id: memberId },
-    { message: content, user_id: memberId },
-    { message: content, member_id: memberId },
-  ]
+  const { error } = await supabase.from('messages').insert({
+    content,
+    sender_id: memberId,
+  })
 
-  let lastError = null
-  for (const payload of payloads) {
-    const { error } = await supabase.from('messages').insert(payload)
-    if (!error) return true
-    lastError = error
-    if (!isMissingColumnError(error)) {
-      break
-    }
+  if (error) {
+    throw error
   }
 
-  throw lastError ?? new Error('Unable to send message.')
+  return true
 }
 
 async function handleSendMessage(event) {
