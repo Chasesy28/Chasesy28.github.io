@@ -300,9 +300,9 @@ async function findChatMember(identifier) {
   if (!supabase || !identifier) return null
 
   const queries = [
-    supabase.from('chat_members').select('*').eq('id', identifier).maybeSingle(),
+    // Prefer matching by email (current schema) then fallback to id
     supabase.from('chat_members').select('*').eq('email', identifier).maybeSingle(),
-    supabase.from('chat_members').select('*').eq('user_id', identifier).maybeSingle(),
+    supabase.from('chat_members').select('*').eq('id', identifier).maybeSingle(),
   ]
 
   for (const query of queries) {
