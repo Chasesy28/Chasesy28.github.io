@@ -14,9 +14,10 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
+const playButton = document.getElementById("playButton");
+playButton.addEventListener("click", playGame);
+
 function playGame() {
   alert("Hello");
   requestAnimationFrame(playGame);
 }
-
-alert("hello");
