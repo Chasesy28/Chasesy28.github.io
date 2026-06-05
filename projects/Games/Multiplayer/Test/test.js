@@ -16,4 +16,7 @@ gameArea.height = gameArea.offsetHeight;
 
 function playGame() {
   alert("Hello");
+  requestAnimationFrame(playGame);
 }
+
+alert("hello");
