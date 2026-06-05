@@ -21,6 +21,8 @@ playButton.addEventListener("click", function() {
 });
 
 function playGame() {
-  ctx.fillStyle = "blue";
-  ctx.fillRect(50, 50, 100, 100);
+  if (!isSupabaseConfigured()) {
+    alert("Supabase is not configured. Please check the configuration and try again.");
+    return;
+  }
 }
