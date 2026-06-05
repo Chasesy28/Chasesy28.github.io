@@ -15,5 +15,5 @@ gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
 function playGame() {
-  
+  alert("Hello");
 }
