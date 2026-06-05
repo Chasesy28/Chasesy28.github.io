@@ -15,7 +15,13 @@ gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
 const playButton = document.getElementById("playButton");
-playButton.addEventListener("click", playGame);
+playButton.addEventListener("click", function() {
+  try {
+    playGame();
+  } catch (error) {
+    document.write(error);
+  }
+});
 
 function playGame() {
   alert("Hello");
