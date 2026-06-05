@@ -4,7 +4,7 @@ import {
   loginWithGoogle,
   logout,
   supabase,
-} from './panel-supabase.js'
+} from 'silly-site.me/projects/Admin/panel-supabase.js'
 
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
