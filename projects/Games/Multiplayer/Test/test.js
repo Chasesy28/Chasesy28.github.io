@@ -1,10 +1,10 @@
-import {
+/*import {
   isSupabaseConfigured,
   getSupabaseConfigError,
   loginWithGoogle,
   logout,
   supabase,
-} from '../../../Admin/panel-supabase.js';
+} from '../../../Admin/panel-supabase.js';*/
 
 try {
   const gameArea = document.getElementById("gameArea");
