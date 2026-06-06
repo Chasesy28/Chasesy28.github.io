@@ -23,9 +23,9 @@ function isPlaceholder(value) {
 }
 
 const hasSupabaseCredentials =
-  Boolean(supabaseUrl && supabaseKey) &&
+  Boolean(supabaseUrl && supabaseKey)/* &&
   !isPlaceholder(supabaseUrl) &&
-  !isPlaceholder(supabaseKey);
+  !isPlaceholder(supabaseKey)*/;
 
 function getSiteOrigin() {
   if (configuredSiteOrigin && !isPlaceholder(configuredSiteOrigin)) {
