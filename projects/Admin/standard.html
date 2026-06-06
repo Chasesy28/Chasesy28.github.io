@@ -1,334 +1,341 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>Standard Panel</title>
-		<script>
-			window.__ADMIN_SUPABASE_CONFIG = {
-				siteOrigin: "__SITE_ORIGIN__",
-				url: "__SUPABASE_URL__",
-				publishableKey: "__SUPABASE_PUBLISHABLE_KEY__",
-				anonKey: "__SUPABASE_ANON_KEY__"
-			};
-		</script>
-		<style>
-			body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;background:#f8fafc;color:#0f172a;transition:background .25s ease,color .25s ease}
-			.hidden{display:none}
-			.btn{padding:8px 12px;border-radius:6px;border:1px solid #666;background:#f3f3f3;cursor:pointer;transition:all .2s ease}
-			.btn-danger{background:#ffecec;border-color:#ff6b6b}
-			.box{border:1px solid #e6e6e6;padding:16px;border-radius:8px;margin-top:12px;background:#fff;transition:all .25s ease}
-			.box-success{border-color:#86efac;background:#f0fdf4}
-			.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em}
-			.badge-success{background:#dcfce7;color:#166534}
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Panel</title>
+    <script>
+      window.__ADMIN_SUPABASE_CONFIG = {
+        siteOrigin: "__SITE_ORIGIN__",
+        url: "__SUPABASE_URL__",
+        publishableKey: "__SUPABASE_PUBLISHABLE_KEY__",
+        anonKey: "__SUPABASE_ANON_KEY__"
+      };
+    </script>
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px;background:#f8fafc;color:#0f172a;transition:background .25s ease,color .25s ease}
+      .hidden{display:none}
+      .btn{padding:8px 12px;border-radius:6px;border:1px solid #666;background:#f3f3f3;cursor:pointer;transition:all .2s ease}
+      .btn-danger{background:#ffecec;border-color:#ff6b6b}
+      .box{border:1px solid #e6e6e6;padding:16px;border-radius:8px;margin-top:12px;background:#fff;transition:all .25s ease}
+      .box-success{border-color:#86efac;background:#f0fdf4}
+      .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.02em}
+      .badge-success{background:#dcfce7;color:#166534}
 
-			.state-indicator{
-				display:inline-flex;
-				align-items:center;
-				gap:8px;
-				margin-left:10px;
-				padding:4px 10px;
-				border-radius:999px;
-				font-size:12px;
-				font-weight:700;
-				letter-spacing:.02em;
-				vertical-align:middle;
-				background:#e2e8f0;
-				color:#334155;
-			}
+      .state-indicator{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        margin-left:10px;
+        padding:4px 10px;
+        border-radius:999px;
+        font-size:12px;
+        font-weight:700;
+        letter-spacing:.02em;
+        vertical-align:middle;
+        background:#e2e8f0;
+        color:#334155;
+      }
 
-			.state-indicator::before{
-				content:"";
-				width:8px;
-				height:8px;
-				border-radius:999px;
-				background:#64748b;
-			}
+      .state-indicator::before{
+        content:"";
+        width:8px;
+        height:8px;
+        border-radius:999px;
+        background:#64748b;
+      }
 
-			body.signed-in{
-				background:linear-gradient(135deg,#ecfeff 0%,#f0fdf4 35%,#eef2ff 100%);
-			}
+      body.signed-in{
+        background:linear-gradient(135deg,#ecfeff 0%,#f0fdf4 35%,#eef2ff 100%);
+      }
 
-			body.signed-in #page-title{
-				color:#0f766e;
-			}
+      body.signed-in #page-title{
+        color:#0f766e;
+      }
 
-			body.signed-in .state-indicator{
-				background:#ccfbf1;
-				color:#115e59;
-			}
+      body.signed-in .state-indicator{
+        background:#ccfbf1;
+        color:#115e59;
+      }
 
-			body.signed-in .state-indicator::before{
-				background:#14b8a6;
-				box-shadow:0 0 0 4px rgba(20,184,166,.2);
-			}
+      body.signed-in .state-indicator::before{
+        background:#14b8a6;
+        box-shadow:0 0 0 4px rgba(20,184,166,.2);
+      }
 
-			body.signed-in .box{
-				border-color:#cbd5e1;
-				box-shadow:0 12px 24px -20px rgba(15,23,42,.45);
-			}
+      body.signed-in .box{
+        border-color:#cbd5e1;
+        box-shadow:0 12px 24px -20px rgba(15,23,42,.45);
+      }
 
-			body.signed-in #signed-in{
-				border-color:#2dd4bf;
-				background:#f0fdfa;
-			}
+      body.signed-in #signed-in{
+        border-color:#2dd4bf;
+        background:#f0fdfa;
+      }
 
-			body.signed-in #signed-in .btn{
-				border-color:#0f766e;
-			}
+      body.signed-in #signed-in .btn{
+        border-color:#0f766e;
+      }
 
-			body.signed-in #refresh{
-				background:#14b8a6;
-				color:#fff;
-				border-color:#14b8a6;
-			}
+      body.signed-in #refresh{
+        background:#14b8a6;
+        color:#fff;
+        border-color:#14b8a6;
+      }
 
-			body.signed-in #refresh:hover{
-				background:#0d9488;
-				border-color:#0d9488;
-			}
+      body.signed-in #refresh:hover{
+        background:#0d9488;
+        border-color:#0d9488;
+      }
 
-			body.signed-in #standard-actions a{
-				color:#0f766e;
-				font-weight:600;
-			}
+      body.signed-in #admin-actions a{
+        color:#0f766e;
+        font-weight:600;
+      }
 
-			body.signed-in #standard-actions a:hover{
-				color:#134e4a;
-			}
-		</style>
-	</head>
-	<body>
-		<h1 id="page-title"><span id="page-title-text">Standard Panel</span> <span id="auth-state-indicator" class="state-indicator">Signed out</span></h1>
-		<p id="auth-context" style="margin:8px 0 0;color:#475569"></p>
-		<div id="signed-in-banner" class="box box-success hidden">
-			<span class="badge badge-success">Signed in</span>
-			<p id="signed-in-banner-text" style="margin:12px 0 0">You are authenticated with Supabase.</p>
-		</div>
-		<div id="not-configured" class="box hidden">
-			<strong>Configuration missing</strong>
-			<p>The standard panel is not configured with Supabase credentials.</p>
-		</div>
+      body.signed-in #admin-actions a:hover{
+        color:#134e4a;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="page-title"><span id="page-title-text">Admin Panel</span> <span id="auth-state-indicator" class="state-indicator">Signed out</span></h1>
+    <p id="auth-context" style="margin:8px 0 0;color:#475569"></p>
+    <div id="signed-in-banner" class="box box-success hidden">
+      <span class="badge badge-success">Signed in</span>
+      <p id="signed-in-banner-text" style="margin:12px 0 0">You are authenticated with Supabase.</p>
+    </div>
+    <div id="not-configured" class="box hidden">
+      <strong>Configuration missing</strong>
+      <p>The admin panel is not configured with Supabase credentials.</p>
+    </div>
 
-		<div id="signed-out" class="box hidden">
-			<p>You are not signed in.</p>
-			<button id="signin" class="btn">Sign in with Google</button>
-		</div>
+    <div id="signed-out" class="box hidden">
+      <p>You are not signed in.</p>
+      <button id="signin" class="btn">Sign in with Google</button>
+    </div>
 
-		<div id="signed-in" class="box hidden">
-			<p>Welcome, <span id="user-email"></span></p>
-			<p>Session expires in <span id="expires-mins"></span> minutes.</p>
-			<button id="refresh" class="btn">Refresh Session</button>
-			<button id="signout" class="btn btn-danger">Sign out</button>
-			<div id="standard-actions" style="margin-top:12px">
-				<a href="/projects/Admin/chat.html">Open Chat</a>
-			</div>
-		</div>
+    <div id="signed-in" class="box hidden">
+      <p>Welcome, <span id="admin-email"></span></p>
+      <p>Session expires in <span id="expires-mins"></span> minutes.</p>
+      <button id="refresh" class="btn">Refresh Session</button>
+      <button id="signout" class="btn btn-danger">Sign out</button>
+      <div id="admin-actions" style="margin-top:12px">
+        <a href="/projects/Admin/Panel.html">Open Legacy Panel</a>
+      </div>
+    </div>
 
-		<script type="module">
-			import {
-				getSupabaseConfigError,
-				isSupabaseConfigured,
-				loginWithGoogle,
-				logout,
-				supabase,
-			} from './panel-supabase.js'
+    <script type="module">
+      import {
+        isSupabaseConfigured,
+        isAuthenticated,
+        getSession,
+        loginWithGoogle,
+        logout,
+        getSessionExpirationMinutes,
+        initializeAuthFromSupabase,
+        refreshSession,
+      } from './panel-supabase.js'
 
-			const elNotConfigured = document.getElementById('not-configured')
-			const elSignedInBanner = document.getElementById('signed-in-banner')
-			const elSignedOut = document.getElementById('signed-out')
-			const elSignedIn = document.getElementById('signed-in')
-			const pageTitleText = document.getElementById('page-title-text')
-			const authContext = document.getElementById('auth-context')
-			const signedInBannerText = document.getElementById('signed-in-banner-text')
-			const signinBtn = document.getElementById('signin')
-			const signoutBtn = document.getElementById('signout')
-			const refreshBtn = document.getElementById('refresh')
-			const emailSpan = document.getElementById('user-email')
-			const expiresSpan = document.getElementById('expires-mins')
-			const stateIndicator = document.getElementById('auth-state-indicator')
+      const elNotConfigured = document.getElementById('not-configured')
+      const elSignedInBanner = document.getElementById('signed-in-banner')
+      const elSignedOut = document.getElementById('signed-out')
+      const elSignedIn = document.getElementById('signed-in')
+      const pageTitleText = document.getElementById('page-title-text')
+      const authContext = document.getElementById('auth-context')
+      const signedInBannerText = document.getElementById('signed-in-banner-text')
+      const signinBtn = document.getElementById('signin')
+      const signoutBtn = document.getElementById('signout')
+      const refreshBtn = document.getElementById('refresh')
+      const emailSpan = document.getElementById('admin-email')
+      const expiresSpan = document.getElementById('expires-mins')
+      const stateIndicator = document.getElementById('auth-state-indicator')
 
-			function getSupabaseCallbackState() {
-				const url = new URL(window.location.href)
-				const searchParams = url.searchParams
-				const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
+      function getSupabaseCallbackState() {
+        const url = new URL(window.location.href)
+        const searchParams = url.searchParams
+        const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
 
-				const searchError = searchParams.get('error') || searchParams.get('error_code') || searchParams.get('error_description')
-				const hashError = hashParams.get('error') || hashParams.get('error_code') || hashParams.get('error_description')
-				const hasCode = searchParams.has('code')
-				const hasAccessToken = hashParams.has('access_token')
-				const hasCallbackMarkers = hasCode || hasAccessToken || searchParams.has('state') || Boolean(searchError || hashError)
+        const searchError = searchParams.get('error') || searchParams.get('error_code') || searchParams.get('error_description')
+        const hashError = hashParams.get('error') || hashParams.get('error_code') || hashParams.get('error_description')
+        const hasCode = searchParams.has('code')
+        const hasAccessToken = hashParams.has('access_token')
+        const hasCallbackMarkers = hasCode || hasAccessToken || searchParams.has('state') || Boolean(searchError || hashError)
 
-				return {
-					isRedirect: hasCallbackMarkers,
-					hasSuccessMarker: hasCode || hasAccessToken,
-					errorMessage: searchError || hashError || '',
-				}
-			}
+        return {
+          isRedirect: hasCallbackMarkers,
+          hasSuccessMarker: hasCode || hasAccessToken,
+          errorMessage: searchError || hashError || '',
+        }
+      }
 
-			function clearSupabaseCallbackState() {
-				const url = new URL(window.location.href)
-				const paramsToRemove = ['code', 'state', 'error', 'error_code', 'error_description', 'token_hash', 'type']
-				let changed = false
+      function clearSupabaseCallbackState() {
+        const url = new URL(window.location.href)
+        const paramsToRemove = ['code', 'state', 'error', 'error_code', 'error_description', 'token_hash', 'type']
+        let changed = false
 
-				for (const key of paramsToRemove) {
-					if (url.searchParams.has(key)) {
-						url.searchParams.delete(key)
-						changed = true
-					}
-				}
+        for (const key of paramsToRemove) {
+          if (url.searchParams.has(key)) {
+            url.searchParams.delete(key)
+            changed = true
+          }
+        }
 
-				if (url.hash) {
-					const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
-					for (const key of ['access_token', 'refresh_token', 'expires_in', 'token_type', 'type', 'error', 'error_code', 'error_description']) {
-						if (hashParams.has(key)) {
-							hashParams.delete(key)
-							changed = true
-						}
-					}
+        if (url.hash) {
+          const hashParams = new URLSearchParams(url.hash.startsWith('#') ? url.hash.slice(1) : url.hash)
+          for (const key of ['access_token', 'refresh_token', 'expires_in', 'token_type', 'type', 'error', 'error_code', 'error_description']) {
+            if (hashParams.has(key)) {
+              hashParams.delete(key)
+              changed = true
+            }
+          }
 
-					const nextHash = hashParams.toString()
-					if (nextHash) {
-						url.hash = `#${nextHash}`
-					} else if (hashParams.size > 0 || url.hash) {
-						url.hash = ''
-					}
-				}
+          const nextHash = hashParams.toString()
+          if (nextHash) {
+            url.hash = `#${nextHash}`
+          } else if (hashParams.size > 0 || url.hash) {
+            url.hash = ''
+          }
+        }
 
-				if (changed) {
-					const nextUrl = `${url.pathname}${url.search}${url.hash}`
-					window.history.replaceState({}, document.title, nextUrl)
-				}
-			}
+        if (changed) {
+          const nextUrl = `${url.pathname}${url.search}${url.hash}`
+          window.history.replaceState({}, document.title, nextUrl)
+        }
+      }
 
-			function setSignedInAppearance(isSignedIn) {
-				document.body.classList.toggle('signed-in', isSignedIn)
-				stateIndicator.textContent = isSignedIn ? 'Signed in' : 'Signed out'
-			}
+      function setSignedInAppearance(isSignedIn) {
+        document.body.classList.toggle('signed-in', isSignedIn)
+        stateIndicator.textContent = isSignedIn ? 'Signed in' : 'Signed out'
+      }
 
-			function hideAll() {
-				elNotConfigured.classList.add('hidden')
-				elSignedInBanner.classList.add('hidden')
-				elSignedOut.classList.add('hidden')
-				elSignedIn.classList.add('hidden')
-			}
+      function hideAll(){
+        elNotConfigured.classList.add('hidden')
+        elSignedInBanner.classList.add('hidden')
+        elSignedOut.classList.add('hidden')
+        elSignedIn.classList.add('hidden')
+      }
 
-			function showSignedInState(message) {
-				pageTitleText.textContent = 'Standard Panel - Signed In'
-				signedInBannerText.textContent = message || 'You are authenticated with Supabase.'
-				elSignedInBanner.classList.remove('hidden')
-			}
+      function showSignedInState(message) {
+        pageTitleText.textContent = 'Admin Panel - Signed In'
+        signedInBannerText.textContent = message || 'You are authenticated with Supabase.'
+        elSignedInBanner.classList.remove('hidden')
+      }
 
-			function setAuthContext(message) {
-				authContext.textContent = message || ''
-			}
+      function setAuthContext(message) {
+        authContext.textContent = message || ''
+      }
 
-			function getMinutesUntilExpiry(session) {
-				const expiresAt = Number(session?.expires_at)
-				if (!Number.isFinite(expiresAt) || expiresAt <= 0) return null
-				const minutesLeft = Math.floor(((expiresAt * 1000) - Date.now()) / (60 * 1000))
-				return Math.max(0, minutesLeft)
-			}
+      async function render(){
+        const callbackState = getSupabaseCallbackState()
 
-			async function render() {
-				const callbackState = getSupabaseCallbackState()
+        hideAll()
+        setSignedInAppearance(false)
+        pageTitleText.textContent = 'Admin Panel'
+        setAuthContext(
+          callbackState.isRedirect
+            ? callbackState.errorMessage
+              ? `Supabase redirected back here with an auth error: ${callbackState.errorMessage}`
+              : 'Supabase redirected back here. Verifying the session now.'
+            : 'No Supabase redirect detected on this visit.',
+        )
 
-				hideAll()
-				setSignedInAppearance(false)
-				pageTitleText.textContent = 'Standard Panel'
-				setAuthContext(
-					callbackState.isRedirect
-						? callbackState.errorMessage
-							? `Supabase redirected back here with an auth error: ${callbackState.errorMessage}`
-							: 'Supabase redirected back here. Verifying the session now.'
-						: 'No Supabase redirect detected on this visit.',
-				)
+        if (!isSupabaseConfigured()){
+          elNotConfigured.classList.remove('hidden')
+          return
+        }
 
-				if (!isSupabaseConfigured()) {
-					elNotConfigured.classList.remove('hidden')
-					setAuthContext(getSupabaseConfigError())
-					return
-				}
+        // Try reading local session first
+        if (isAuthenticated()){
+          const s = getSession() || {}
+          emailSpan.textContent = s.email || 'admin'
+          const mins = getSessionExpirationMinutes()
+          expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+          showSignedInState(
+            callbackState.isRedirect
+              ? `Supabase login completed successfully for ${s.email || 'admin'}.`
+              : `Signed in as ${s.email || 'admin'}.`,
+          )
+          setAuthContext(
+            callbackState.isRedirect
+              ? 'This page was reached through the Supabase OAuth redirect and the session was restored successfully.'
+              : 'This page loaded an existing admin session without a fresh Supabase redirect.',
+          )
+          setSignedInAppearance(true)
+          elSignedIn.classList.remove('hidden')
+          clearSupabaseCallbackState()
+          return
+        }
 
-				if (!supabase) {
-					elSignedOut.classList.remove('hidden')
-					setAuthContext('Supabase client is unavailable for this page.')
-					return
-				}
+        // No local session, but check Supabase session (this will create local session if valid)
+        try {
+          const admin = await initializeAuthFromSupabase()
+          if (admin) {
+            emailSpan.textContent = admin.email || 'admin'
+            const mins = getSessionExpirationMinutes()
+            expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+            showSignedInState(`Supabase login successful for ${admin.email || 'admin'}.`)
+            setAuthContext(
+              callbackState.isRedirect
+                ? 'Supabase redirected back here and the user logged in successfully.'
+                : 'A valid Supabase session was found without a fresh redirect.',
+            )
+            setSignedInAppearance(true)
+            elSignedIn.classList.remove('hidden')
+            clearSupabaseCallbackState()
+            return
+          }
+        } catch (err) {
+          // initialization failed or not an admin
+          const message = err?.message ?? String(err)
+          console.warn('initializeAuthFromSupabase:', message)
+          setAuthContext(
+            callbackState.isRedirect
+              ? `Supabase redirected back here, but login did not complete successfully: ${message}`
+              : 'No valid Supabase session was restored for this visit.',
+          )
+        }
 
-				try {
-					const { data, error } = await supabase.auth.getSession()
-					if (error) throw error
+        elSignedOut.classList.remove('hidden')
+        clearSupabaseCallbackState()
+      }
 
-					const session = data?.session ?? null
-					if (!session || !session.user?.email) {
-						elSignedOut.classList.remove('hidden')
-						setAuthContext(
-							callbackState.isRedirect
-								? 'Supabase redirected back here, but no active session was restored.'
-								: 'No active Supabase session was found.',
-						)
-						clearSupabaseCallbackState()
-						return
-					}
+      signinBtn.addEventListener('click', async () => {
+        try {
+          await loginWithGoogle(window.location.pathname)
+        } catch (err) {
+          alert('Login failed: ' + (err?.message || String(err)))
+        }
+      })
 
-					emailSpan.textContent = session.user.email
-					const mins = getMinutesUntilExpiry(session)
-					expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
-					showSignedInState(
-						callbackState.isRedirect
-							? `Supabase login completed successfully for ${session.user.email}.`
-							: `Signed in as ${session.user.email}.`,
-					)
-					setAuthContext(
-						callbackState.isRedirect
-							? 'Supabase redirected back here and the standard user session is active.'
-							: 'This page loaded an existing standard-user session.',
-					)
-					setSignedInAppearance(true)
-					elSignedIn.classList.remove('hidden')
-					clearSupabaseCallbackState()
-				} catch (error) {
-					elSignedOut.classList.remove('hidden')
-					setAuthContext(`Unable to verify Supabase session: ${error?.message || String(error)}`)
-					clearSupabaseCallbackState()
-				}
-			}
+      signoutBtn.addEventListener('click', async () => {
+        try {
+          await logout()
+          render()
+        } catch (err) {
+          console.error(err)
+        }
+      })
 
-			signinBtn.addEventListener('click', async () => {
-				try {
-					await loginWithGoogle(window.location.pathname)
-				} catch (err) {
-					alert('Login failed: ' + (err?.message || String(err)))
-				}
-			})
+      refreshBtn.addEventListener('click', async () => {
+        try {
+          const r = await refreshSession()
+          render()
+        } catch (err) {
+          console.error(err)
+        }
+      })
 
-			signoutBtn.addEventListener('click', async () => {
-				try {
-					await logout()
-					render()
-				} catch (err) {
-					console.error(err)
-				}
-			})
+      // Initial render
+      render()
 
-			refreshBtn.addEventListener('click', async () => {
-				try {
-					await supabase?.auth?.refreshSession?.()
-					render()
-				} catch (err) {
-					console.error(err)
-				}
-			})
-
-			render()
-
-			setInterval(async () => {
-				if (!supabase) return
-				const { data } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }))
-				const mins = getMinutesUntilExpiry(data?.session)
-				expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
-			}, 30 * 1000)
-		</script>
-	</body>
+      // Periodically refresh UI
+      setInterval(() => {
+        if (isAuthenticated()){
+          const mins = getSessionExpirationMinutes()
+          expiresSpan.textContent = mins === null ? 'unknown' : String(mins)
+        }
+      }, 30 * 1000)
+    </script>
+  </body>
 </html>
