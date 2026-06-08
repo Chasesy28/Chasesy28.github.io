@@ -77,9 +77,11 @@ jobs:
           set -e
           PANEL_FILE="dist/projects/Admin/Panel.html"
           ADMIN_FILE="dist/projects/Admin/admin.html"
+          STANDARD_FILE="dist/projects/Admin/standard.html"
           CHAT_FILE="dist/projects/Admin/chat.html"
+          MULTIPLAYER_FILE="dist/projects/Games/Multiplayer/Test/test.html"
 
-          if [ ! -f "$PANEL_FILE" ] && [ ! -f "$ADMIN_FILE" ] && [ ! -f "$CHAT_FILE" ]; then
+          if [ ! -f "$PANEL_FILE" ] && [ ! -f "$ADMIN_FILE" ] && [ ! -f "$CHAT_FILE" ] && [ ! -f "$STANDARD_FILE" ] && [ ! -f "$MULTIPLAYER_FILE" ]; then
             echo "Admin panel files not found; skipping Supabase injection."
             exit 0
           fi
@@ -95,6 +97,8 @@ jobs:
             'dist/projects/Admin/Panel.html',
             'dist/projects/Admin/admin.html',
             'dist/projects/Admin/chat.html',
+            'dist/projects/Admin/standard.html',
+            'dist/projects/Games/Multiplayer/Test/test.html'
           ];
           const siteOrigin = process.env.SITE_ORIGIN || 'https://silly-site.me';
           const supabaseUrl = process.env.SUPABASE_URL || '';
