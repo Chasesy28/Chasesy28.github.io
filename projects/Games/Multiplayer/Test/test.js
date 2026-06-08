@@ -25,5 +25,5 @@ playButton.addEventListener("click", function() {
 });
 
 async function playGame() {
-
+  alert("Starting game...");
 }
