@@ -449,13 +449,49 @@ async function clearAllMessages() {
     if (!ok) return
 
     // Uses your DELETE RLS policy to delete all rows
-    // (If you have a different PK column name than id, we’ll adjust.)
-    const { error } = await supabase
+    // Delete using min/max id range (avoids "id <> NULL" = unknown => deletes nothing)
+    // Step 1: find min/max ids
+    const { data: bounds, error: boundsError } = await supabase
+      .from('messages')
+      .select('id')
+      .order('id', { ascending: true })
+      .limit(1)
+
+    if (boundsError) throw boundsError
+
+    const minIdRow = bounds?.[0] ?? null
+    const minId = minIdRow?.id ?? null
+
+    // If there are no rows, nothing to delete
+    if (minId === null) {
+      setNotice('No messages to clear.', 'info')
+      return
+    }
+
+    // Get max id
+    const { data: maxData, error: maxError } = await supabase
+      .from('messages')
+      .select('id')
+      .order('id', { ascending: false })
+      .limit(1)
+
+    if (maxError) throw maxError
+
+    const maxId = maxData?.[0]?.id ?? null
+    if (maxId === null) {
+      // Unexpected, but safe fallback
+      setNotice('No messages to clear.', 'info')
+      return
+    }
+
+    // Step 2: delete within the inclusive range
+    const { error: deleteError } = await supabase
       .from('messages')
       .delete()
-      .neq('id', null)
+      .gte('id', minId)
+      .lte('id', maxId)
 
-    if (error) throw error
+    if (deleteError) throw deleteError
 
     // Refresh the UI and local state
     state.messages = []
