@@ -6,8 +6,6 @@ import {
   supabase,
 } from '../../../Admin/panel-supabase.js';
 
-alert("Test");
-
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
 
@@ -19,12 +17,13 @@ gameArea.height = gameArea.offsetHeight;
 
 const playButton = document.getElementById("playButton");
 playButton.addEventListener("click", function() {
-  playGame();
+  if (isSupabaseConfigured()) {
+    playGame();
+  } else {
+    alert("Supabase is not configured: " + getSupabaseConfigError());
+  }
 });
 
-function playGame() {
-  if (!isSupabaseConfigured()) {
-    alert("Supabase is not configured. Please check the configuration and try again.");
-    return;
-  }
+async function playGame() {
+
 }
