@@ -672,12 +672,15 @@ async function handleSendMessage(event) {
     els.messageInput.value = "";
     await loadMessages();
   } catch (error) {
-    setNotice(error?.message ? error.message : JSON.stringify(error), "error");
-    console.error(error);
+    console.error("Unable to clear messages (full error):", error);
+    setNotice(
+      typeof error === "object"
+        ? JSON.stringify(error, null, 2)
+        : String(error),
+      "error",
+    );
   } finally {
-    els.sendBtn.disabled = false;
-    els.messageInput.disabled = false;
-    els.messageInput.focus();
+    els.clearBtn.disabled = false;
   }
 }
 
