@@ -680,7 +680,9 @@ async function handleSendMessage(event) {
       "error",
     );
   } finally {
-    els.clearBtn.disabled = false;
+    els.sendBtn.disabled = false;
+    els.messageInput.disabled = false;
+    els.messageInput.focus?.();
   }
 }
 
