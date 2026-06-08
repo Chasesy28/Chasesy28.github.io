@@ -19,6 +19,7 @@ const els = {
   composer: document.getElementById('composer'),
   messageInput: document.getElementById('message-input'),
   sendBtn: document.getElementById('send-btn'),
+  clearBtn: document.getElementById('clear-messages-btn'),
   signinBtn: document.getElementById('signin-btn'),
   signoutBtn: document.getElementById('signout-btn'),
   refreshBtn: document.getElementById('refresh-access'),
@@ -437,6 +438,48 @@ async function loadMessages() {
   }
 }
 
+async function clearAllMessages() {
+  if (!supabase) throw new Error('Supabase not configured.')
+  if (state.access !== 'authorized') throw new Error('Chat is not available.')
+
+  els.clearBtn.disabled = true
+
+  try {
+    const ok = confirm('Clear ALL messages? This cannot be undone.')
+    if (!ok) return
+
+    // Uses your DELETE RLS policy to delete all rows
+    // (If you have a different PK column name than id, we’ll adjust.)
+    const { error } = await supabase
+      .from('messages')
+      .delete()
+      .neq('id', null)
+
+    if (error) throw error
+
+    // Refresh the UI and local state
+    state.messages = []
+    renderMessages(state.messages)
+    await loadMessages()
+    setNotice('Messages cleared.', 'info')
+  } catch (error) {
+    console.error('Unable to clear messages:', error)
+    setNotice(error instanceof Error ? error.message : 'Unable to clear messages.', 'error')
+  } finally {
+    els.clearBtn.disabled = false
+  }
+}
+
+async function handleClearMessagesClick() {
+  // Optional: only enable for authorized users
+  if (state.access !== 'authorized') {
+    setNotice('You do not have chat access.', 'error')
+    return
+  }
+
+  await clearAllMessages()
+}
+
 function applyIncomingMessage(messageRow) {
   const normalizedId = extractMessageId(messageRow)
   if (normalizedId && state.messages.some((message) => String(extractMessageId(message)) === String(normalizedId))) {
@@ -587,6 +630,9 @@ async function bootstrap() {
       void handleSendMessage(event)
     }
   })
+  if (els.clearBtn) {
+    els.clearBtn.addEventListener('click', handleClearMessagesClick)
+  }
 
   await resolveAccess(callbackState)
 }
