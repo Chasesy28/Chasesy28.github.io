@@ -20,11 +20,11 @@ let playerY;
 let otherPlayerPositions = [];
 
 const controller = {
-  left: { pressed: false, key: ['a', 'A', 'ArrowLeft']},
-  right: { pressed: false, key: ['d', 'D', 'ArrowRight']},
-  up: { pressed: false, key: ['w', 'W', 'ArrowUp']},
-  down: { pressed: false, key: ['s', 'S', 'ArrowDown']},
-}
+  left: { pressed: false, key: ["a", "A", "ArrowLeft"] },
+  right: { pressed: false, key: ["d", "D", "ArrowRight"] },
+  up: { pressed: false, key: ["w", "W", "ArrowUp"] },
+  down: { pressed: false, key: ["s", "S", "ArrowDown"] },
+};
 
 window.document.addEventListener("keydown", function (e) {
   for (const controllerKey in controller) {
@@ -89,9 +89,9 @@ async function getOtherPlayers() {
   const email = await getCurrentUserEmail();
 
   const { data, error } = await supabase
-    .from('multiplayer_test')
-    .select('*')
-    .neq('player_email', email);
+    .from("multiplayer_test")
+    .select("*")
+    .neq("player_email", email);
   if (error) {
     alert("Error fetching other players: " + error.message);
     return [];
@@ -101,20 +101,24 @@ async function getOtherPlayers() {
 
 async function updateOtherPlayers() {
   const otherPlayers = await getOtherPlayers();
-  otherPlayerPositions = otherPlayers.map(player => ({
+  otherPlayerPositions = otherPlayers.map((player) => ({
     email: player.player_email,
-    x: player.x_coordinate,
-    y: player.y_coordinate,
+    x: Number(player.x_coordinate),
+    y: Number(player.y_coordinate),
   }));
 }
 
 async function updateOwnPosition(x, y) {
   const email = await getCurrentUserEmail();
+
   const { data, error } = await supabase
     .from("multiplayer_test")
     .update({ x_coordinate: x, y_coordinate: y })
-    .eq("player_email", email);
+    .eq("player_email", email)
+    .select();
+
   if (error) alert("Error updating positions: " + error.message);
+  else console.log("updated rows:", data?.length ?? 0);
 }
 
 const backgroundColor = (ctx, color) => {
@@ -126,7 +130,7 @@ function gameLoop() {
   backgroundColor(ctx, "lightblue");
 
   // Draw other players
-  otherPlayerPositions.forEach(player => {
+  otherPlayerPositions.forEach((player) => {
     ctx.fillStyle = "red";
     ctx.fillRect(player.x, player.y, 20, 20);
     ctx.fillStyle = "black";
@@ -148,7 +152,7 @@ function gameLoop() {
 }
 
 async function playGame() {
-  setInterval(updateOwnPosition, 1000, playerX, playerY); // Update own position every second
+  setInterval(() => updateOwnPosition(playerX, playerY), 1000);
   setInterval(updateOtherPlayers, 1000); // Update other players every second
   document.getElementById("playButton").style.display = "none";
   requestAnimationFrame(gameLoop);
