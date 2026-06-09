@@ -7,7 +7,7 @@ import {
   supabase,
 } from "../../../Admin/panel-supabase.js";
 
-alert("Supabase configured: " + isSupabaseConfigured());
+alert("2Supabase configured: " + isSupabaseConfigured());
 
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
@@ -69,8 +69,8 @@ async function getCurrentUser() {
 
 async function playGame() {
   alert("Starting game...");
-  alert("Email for insert:", await getCurrentUserEmail());
-  alert("Row result:", await getCurrentUser());
+  alert(`Email for insert:${await getCurrentUserEmail()}`,);
+  alert(`Row result: ${JSON.stringify(await getCurrentUser())}`,);
 }
 
 async function getOtherPlayers() {
