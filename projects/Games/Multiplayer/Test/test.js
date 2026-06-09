@@ -135,7 +135,9 @@ function gameLoop() {
     ctx.fillRect(player.x, player.y, 20, 20);
     ctx.fillStyle = "black";
     ctx.font = "12px Arial";
-    ctx.fillText(player.email, player.x, player.y - 5);
+    ctx.textAlign = "center";       // horizontal centering
+    ctx.textBaseline = "alphabetic"; // default-ish baseline; keeps vertical behavior consistent
+    ctx.fillText(player.email, player.x + 10, player.y); // y stays as the same point you were using
   });
 
   // Draw own player
@@ -152,8 +154,8 @@ function gameLoop() {
 }
 
 async function playGame() {
-  setInterval(() => updateOwnPosition(playerX, playerY), 1000);
-  setInterval(updateOtherPlayers, 1000); // Update other players every second
+  setInterval(() => updateOwnPosition(playerX, playerY), 100);
+  setInterval(updateOtherPlayers, 100); // Update other players every second
   document.getElementById("playButton").style.display = "none";
   requestAnimationFrame(gameLoop);
 }
