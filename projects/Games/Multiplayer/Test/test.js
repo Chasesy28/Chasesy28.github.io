@@ -7,8 +7,6 @@ import {
   supabase,
 } from "../../../Admin/panel-supabase.js";
 
-alert("Update3");
-
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
 
@@ -69,7 +67,7 @@ async function getCurrentUser() {
 
 async function playGame() {
   alert("Starting game...");
-  getCurrentUser();
+  alert(getCurrentUser());
 }
 
 async function getOtherPlayers() {
