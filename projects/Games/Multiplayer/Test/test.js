@@ -5,7 +5,7 @@ import {
   getSession,
   logout,
   supabase,
-} from '../../../Admin/panel-supabase.js';
+} from "../../../Admin/panel-supabase.js";
 
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
@@ -15,13 +15,24 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
+async function isUserLoggedIn() {
+  if (!supabase) return;
+
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return;
+
+  const session = data?.session ?? null;
+
+  const isSignedIn = Boolean(session?.user?.email);
+  return isSignedIn;
+}
 
 const playButton = document.getElementById("playButton");
-playButton.addEventListener("click", function() {
-  if (isSupabaseConfigured()) {
+playButton.addEventListener("click", function () {
+  if (isUserLoggedIn()) {
     playGame();
   } else {
-    alert("Supabase is not configured: " + getSupabaseConfigError());
+    loginWithGoogle();
   }
 });
 
