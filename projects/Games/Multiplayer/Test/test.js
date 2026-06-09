@@ -67,6 +67,10 @@ async function getCurrentUser() {
 
 async function playGame() {
   alert("Starting game...");
+  const email = await getCurrentUserEmail();
+  alert("Email for insert:", email);
+  const userRow = await getCurrentUser();
+  alert("Row result:", userRow);
   alert(getCurrentUser());
 }
 
