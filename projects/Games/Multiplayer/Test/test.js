@@ -7,7 +7,7 @@ import {
   supabase,
 } from "../../../Admin/panel-supabase.js";
 
-alert("Update");
+alert("Update1");
 
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
@@ -35,7 +35,7 @@ playButton.addEventListener("click", async function () {
   if (userLoggedIn) {
     playGame();
   } else {
-    loginWithGoogle();
+    loginWithGoogle(window.location.pathname);
   }
 });
 
