@@ -7,6 +7,8 @@ import {
   supabase,
 } from "../../../Admin/panel-supabase.js";
 
+alert("Supabase configured: " + isSupabaseConfigured());
+
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
 
