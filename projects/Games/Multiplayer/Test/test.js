@@ -7,7 +7,7 @@ import {
   supabase,
 } from "../../../Admin/panel-supabase.js";
 
-alert("Update1");
+alert("Update2");
 
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
@@ -29,6 +29,12 @@ async function isUserLoggedIn() {
   return isSignedIn;
 }
 
+async function getCurrentUserEmail() {
+  const session = getSession();
+  const email = session?.email ?? null;
+  return email;
+}
+
 const playButton = document.getElementById("playButton");
 playButton.addEventListener("click", async function () {
   const userLoggedIn = await isUserLoggedIn();
@@ -39,6 +45,30 @@ playButton.addEventListener("click", async function () {
   }
 });
 
+async function getCurrentUser() {
+  const email = await getCurrentUserEmail();
+  if (!email) return null;
+
+  const { data, error } = await supabase
+    .from("multiplayer_test")
+    .select("*")
+    .eq("player_email", email)
+    .maybeSingle();
+  if (error) alert("Error fetching user data: " + error.message);
+  else if (data == null) {
+    const { data: insertData, error: insertError } = await supabase
+      .from("multiplayer_test")
+      .insert({ player_email: email, x_coordinate: 0, y_coordinate: 0 })
+      .select()
+      .maybeSingle();
+    if (insertError) alert("Error inserting user data: " + insertError.message);
+    else return insertData;
+  }
+  return data;
+}
+
 async function playGame() {
   alert("Starting game...");
 }
+
+async function getOtherPlayers() {}
