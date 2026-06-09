@@ -7,7 +7,7 @@ import {
   supabase,
 } from "../../../Admin/panel-supabase.js";
 
-alert("2Supabase configured: " + isSupabaseConfigured());
+alert("3Supabase configured: " + isSupabaseConfigured());
 
 const gameArea = document.getElementById("gameArea");
 const ctx = gameArea.getContext("2d");
@@ -30,9 +30,9 @@ async function isUserLoggedIn() {
 }
 
 async function getCurrentUserEmail() {
-  const session = getSession();
-  const email = session?.email ?? null;
-  return email;
+  const { data, error } = await supabase.auth.getSession();
+  if (error) return null;
+  return data?.session?.user?.email ?? null;
 }
 
 const playButton = document.getElementById("playButton");
@@ -47,7 +47,10 @@ playButton.addEventListener("click", async function () {
 
 async function getCurrentUser() {
   const email = await getCurrentUserEmail();
-  if (!email) return null;
+  if (!email) {
+    alert("No email in Supabase session (cannot insert).");
+    return null;
+  }
 
   const { data, error } = await supabase
     .from("multiplayer_test")
