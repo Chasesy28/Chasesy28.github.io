@@ -28,8 +28,9 @@ async function isUserLoggedIn() {
 }
 
 const playButton = document.getElementById("playButton");
-playButton.addEventListener("click", function () {
-  if (isUserLoggedIn()) {
+playButton.addEventListener("click", async function () {
+  const userLoggedIn = await isUserLoggedIn();
+  if (userLoggedIn) {
     playGame();
   } else {
     loginWithGoogle();
