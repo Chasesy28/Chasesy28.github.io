@@ -17,6 +17,8 @@ gameArea.height = gameArea.offsetHeight;
 
 let playerX;
 let playerY;
+let previousPlayerX;
+let previousPlayerY;
 let otherPlayerPositions = [];
 
 const controller = {
@@ -150,7 +152,12 @@ async function gameLoop() {
     ctx.fillRect(playerX, playerY, 20, 20);
   }
 
-  await updateOwnPosition(playerX, playerY);
+  if (playerX !== previousPlayerX || playerY !== previousPlayerY) {
+    await updateOwnPosition(playerX, playerY);
+    previousPlayerX = playerX;
+    previousPlayerY = playerY;
+  }
+
   await updateOtherPlayers();
 
   requestAnimationFrame(gameLoop);
