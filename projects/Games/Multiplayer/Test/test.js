@@ -69,14 +69,11 @@ async function setupPresence() {
   const presenceKey = `user:${email}`;
 
   presenceChannel = supabase.channel("multiplayer_test:room_1", {
-    config: {
-      presence: { key: presenceKey },
-    },
+    config: { presence: { key: presenceKey } },
   });
 
   presenceChannel
     .on("presence", { event: "sync" }, () => {
-      // presenceChannel.presenceState() is the source of truth for who is online
       console.log("presence sync", presenceChannel.presenceState());
     })
     .on("presence", { event: "leave" }, ({ leftPresences }) => {
@@ -86,7 +83,8 @@ async function setupPresence() {
       console.log("presence join", newPresences);
     });
 
-  await presenceChannel.subscribe(async (status) => {
+  // Start subscription, but DO NOT await it here
+  presenceChannel.subscribe(async (status) => {
     if (status !== "SUBSCRIBED") return;
 
     await presenceChannel.track({
@@ -156,7 +154,7 @@ async function updateOtherPlayers() {
   const onlineEmails = new Set(
     Object.keys(state)
       .filter((presenceKey) => presenceKey.startsWith("user:"))
-      .map((presenceKey) => presenceKey.slice("user:".length))
+      .map((presenceKey) => presenceKey.slice("user:".length)),
   );
 
   // 2) Fetch positions from DB (for all other users)
@@ -199,7 +197,7 @@ function gameLoop() {
     ctx.fillRect(player.x, player.y, 20, 20);
     ctx.fillStyle = "black";
     ctx.font = "12px Arial";
-    ctx.textAlign = "center";       // horizontal centering
+    ctx.textAlign = "center"; // horizontal centering
     ctx.textBaseline = "alphabetic"; // default-ish baseline; keeps vertical behavior consistent
     ctx.fillText(player.email, player.x + 10, player.y - 5); // y stays as the same point you were using
   });
@@ -217,24 +215,27 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-async function playGame() {
-  setInterval(() => updateOwnPosition(playerX, playerY), 50);
-  setInterval(updateOtherPlayers, 100);
-  document.getElementById("playButton").style.display = "none";
-  requestAnimationFrame(gameLoop);
-}
-
 const playButton = document.getElementById("playButton");
 playButton.addEventListener("click", async function () {
   const userLoggedIn = await isUserLoggedIn();
-  if (userLoggedIn) {
-    const user = await getCurrentUser();
-    playerX = user.x_coordinate;
-    playerY = user.y_coordinate;
-    await setupPresence();
-    await updateOtherPlayers();
-    await playGame();
-  } else {
+  if (!userLoggedIn) {
     loginWithGoogle(window.location.pathname);
+    return;
   }
+
+  const user = await getCurrentUser();
+  playerX = user.x_coordinate;
+  playerY = user.y_coordinate;
+
+  // Start game immediately
+  document.getElementById("playButton").style.display = "none";
+  requestAnimationFrame(gameLoop);
+
+  // Now kick off realtime + DB fetching in the background
+  setupPresence();
+  updateOtherPlayers();
+
+  // Intervals (start right away too)
+  setInterval(() => updateOwnPosition(playerX, playerY), 50);
+  setInterval(updateOtherPlayers, 100);
 });
