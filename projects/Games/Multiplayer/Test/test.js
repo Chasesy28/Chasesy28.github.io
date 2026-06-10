@@ -137,7 +137,7 @@ function gameLoop() {
     ctx.font = "12px Arial";
     ctx.textAlign = "center";       // horizontal centering
     ctx.textBaseline = "alphabetic"; // default-ish baseline; keeps vertical behavior consistent
-    ctx.fillText(player.email, player.x + 10, player.y); // y stays as the same point you were using
+    ctx.fillText(player.email, player.x + 10, player.y - 5); // y stays as the same point you were using
   });
 
   // Draw own player
