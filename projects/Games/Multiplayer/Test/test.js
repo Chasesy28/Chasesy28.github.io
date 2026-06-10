@@ -126,7 +126,7 @@ const backgroundColor = (ctx, color) => {
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
-function gameLoop() {
+async function gameLoop() {
   backgroundColor(ctx, "lightblue");
 
   // Draw other players
@@ -150,13 +150,9 @@ function gameLoop() {
     ctx.fillRect(playerX, playerY, 20, 20);
   }
 
-  requestAnimationFrame(gameLoop);
-}
+  await updateOwnPosition(playerX, playerY);
+  await updateOtherPlayers();
 
-async function playGame() {
-  setInterval(() => updateOwnPosition(playerX, playerY), 100);
-  setInterval(updateOtherPlayers, 100); // Update other players every second
-  document.getElementById("playButton").style.display = "none";
   requestAnimationFrame(gameLoop);
 }
 
@@ -168,7 +164,8 @@ playButton.addEventListener("click", async function () {
     playerX = user.x_coordinate;
     playerY = user.y_coordinate;
     await updateOtherPlayers();
-    await playGame();
+    document.getElementById("playButton").style.display = "none";
+    requestAnimationFrame(gameLoop);
   } else {
     loginWithGoogle(window.location.pathname);
   }
