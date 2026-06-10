@@ -218,8 +218,8 @@ function gameLoop() {
 }
 
 async function playGame() {
-  setInterval(() => updateOwnPosition(playerX, playerY), 10);
-  setInterval(updateOtherPlayers, 10); // Update other players every second
+  setInterval(() => updateOwnPosition(playerX, playerY), 50);
+  setInterval(updateOtherPlayers, 100);
   document.getElementById("playButton").style.display = "none";
   requestAnimationFrame(gameLoop);
 }
@@ -231,8 +231,8 @@ playButton.addEventListener("click", async function () {
     const user = await getCurrentUser();
     playerX = user.x_coordinate;
     playerY = user.y_coordinate;
-    await updateOtherPlayers();
     await setupPresence();
+    await updateOtherPlayers();
     await playGame();
   } else {
     loginWithGoogle(window.location.pathname);
