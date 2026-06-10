@@ -17,8 +17,6 @@ gameArea.height = gameArea.offsetHeight;
 
 let playerX;
 let playerY;
-let previousPlayerX;
-let previousPlayerY;
 let otherPlayerPositions = [];
 
 const controller = {
@@ -128,7 +126,7 @@ const backgroundColor = (ctx, color) => {
   ctx.fillRect(0, 0, gameArea.width, gameArea.height);
 };
 
-async function gameLoop() {
+function gameLoop() {
   backgroundColor(ctx, "lightblue");
 
   // Draw other players
@@ -152,14 +150,13 @@ async function gameLoop() {
     ctx.fillRect(playerX, playerY, 20, 20);
   }
 
-  if (playerX !== previousPlayerX || playerY !== previousPlayerY) {
-    await updateOwnPosition(playerX, playerY);
-    previousPlayerX = playerX;
-    previousPlayerY = playerY;
-  }
+  requestAnimationFrame(gameLoop);
+}
 
-  await updateOtherPlayers();
-
+async function playGame() {
+  setInterval(() => updateOwnPosition(playerX, playerY), 10);
+  setInterval(updateOtherPlayers, 10); // Update other players every second
+  document.getElementById("playButton").style.display = "none";
   requestAnimationFrame(gameLoop);
 }
 
@@ -171,8 +168,7 @@ playButton.addEventListener("click", async function () {
     playerX = user.x_coordinate;
     playerY = user.y_coordinate;
     await updateOtherPlayers();
-    document.getElementById("playButton").style.display = "none";
-    requestAnimationFrame(gameLoop);
+    await playGame();
   } else {
     loginWithGoogle(window.location.pathname);
   }
