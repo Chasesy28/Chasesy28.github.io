@@ -120,8 +120,11 @@
       <p>Session expires in <span id="expires-mins"></span> minutes.</p>
       <button id="refresh" class="btn">Refresh Session</button>
       <button id="signout" class="btn btn-danger">Sign out</button>
+      <div id="standard-actions" style="margin-top:12px">
+				<a href="/projects/Admin/chat.html">Open Chat</a>
+			</div>
       <div id="admin-actions" style="margin-top:12px">
-        <a href="/projects/Admin/chat.html">Open Chat</a>
+        <button id="clear-messages-btn" type="button">Clear chat messages</button>
       </div>
     </div>
 
@@ -137,6 +140,10 @@
         refreshSession,
       } from './panel-supabase.js'
 
+      import {
+        handleClearMessagesClick
+      } from './chat.js'
+
       const elNotConfigured = document.getElementById('not-configured')
       const elSignedInBanner = document.getElementById('signed-in-banner')
       const elSignedOut = document.getElementById('signed-out')
@@ -150,6 +157,7 @@
       const emailSpan = document.getElementById('admin-email')
       const expiresSpan = document.getElementById('expires-mins')
       const stateIndicator = document.getElementById('auth-state-indicator')
+      const clearBtn = document.getElementById('clear-messages-btn')
 
       function getSupabaseCallbackState() {
         const url = new URL(window.location.href)
@@ -325,6 +333,8 @@
           console.error(err)
         }
       })
+
+      clearBtn.addEventListener('click', handleClearMessagesClick)
 
       // Initial render
       render()

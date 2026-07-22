@@ -580,7 +580,7 @@ async function clearAllMessages() {
   }
 }
 
-async function handleClearMessagesClick() {
+export async function handleClearMessagesClick() {
   // Optional: only enable for authorized users
   if (state.access !== "authorized") {
     setNotice("You do not have chat access.", "error");
