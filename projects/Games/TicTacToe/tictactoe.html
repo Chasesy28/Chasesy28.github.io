@@ -10,19 +10,19 @@
   </head>
   <div id="board" class="board">
     <div id="row1" class="row">
-      <div id="cell1" class="cell"></div>
-      <div id="cell2" class="cell"></div>
-      <div id="cell3" class="cell"></div>
+      <div id="cell1" class="cell" onclick="update(0, 0, this)"></div>
+      <div id="cell2" class="cell" onclick="update(0, 1, this)"></div>
+      <div id="cell3" class="cell" onclick="update(0, 2, this)"></div>
     </div>
     <div id="row2" class="row">
-      <div id="cell4" class="cell"></div>
-      <div id="cell5" class="cell"></div>
-      <div id="cell6" class="cell"></div>
+      <div id="cell4" class="cell" onclick="update(1, 0, this)"></div>
+      <div id="cell5" class="cell" onclick="update(1, 1, this)"></div>
+      <div id="cell6" class="cell" onclick="update(1, 2, this)"></div>
     </div>
     <div id="row3" class="row">
-      <div id="cell7" class="cell"></div>
-      <div id="cell8" class="cell"></div>
-      <div id="cell9" class="cell"></div>
+      <div id="cell7" class="cell" onclick="update(2, 0, this)"></div>
+      <div id="cell8" class="cell" onclick="update(2, 1, this)"></div>
+      <div id="cell9" class="cell" onclick="update(2, 2, this)"></div>
     </div>
   </div>
   <script src="board.js"></script>

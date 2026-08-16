@@ -15,9 +15,17 @@ let cell7 = document.getElementById("cell7");
 let cell8 = document.getElementById("cell8");
 let cell9 = document.getElementById("cell9");
 
-function update(){
-
-}
+const boardToCell = new Map([
+  [cell1, [0, 0]],
+  [cell2, [0, 1]],
+  [cell3, [0, 2]],
+  [cell4, [1, 0]],
+  [cell5, [1, 1]],
+  [cell6, [1, 2]],
+  [cell7, [2, 0]],
+  [cell8, [2, 1]],
+  [cell9, [2, 2]]
+]);
 
 function checkWin() {
   let win = false;
@@ -61,6 +69,25 @@ function checkWin() {
   if (winner == null) {
     return win;
   } else {
-    return { win, winner };
+    return winner;
+  }
+}
+
+function update(row, col, el) {
+  cell = boardToCell.get(el)
+  el.style.cursor = "default";
+  board[cell[0]][cell[1]] = turn
+  if (turn == 1){
+    turn ++;
+    el.style.backgroundColor = "red";
+  } else {
+    turn --;
+    el.style.backgroundColor = "green";
+  }
+  let win = checkWin()
+  if (win != false) {
+    setTimeout(() => {
+      alert(win);
+    }, 100)
   }
 }
