@@ -4,6 +4,7 @@ let board = [
   [0, 0, 0],
 ];
 let turn = 1;
+let gameOver = false;
 
 let cell1 = document.getElementById("cell1");
 let cell2 = document.getElementById("cell2");
@@ -16,15 +17,15 @@ let cell8 = document.getElementById("cell8");
 let cell9 = document.getElementById("cell9");
 
 const boardToCell = new Map([
-  [cell1, [0, 0]],
-  [cell2, [0, 1]],
-  [cell3, [0, 2]],
-  [cell4, [1, 0]],
-  [cell5, [1, 1]],
-  [cell6, [1, 2]],
-  [cell7, [2, 0]],
-  [cell8, [2, 1]],
-  [cell9, [2, 2]]
+  [cell1, [0, 0, true]],
+  [cell2, [0, 1, true]],
+  [cell3, [0, 2, true]],
+  [cell4, [1, 0, true]],
+  [cell5, [1, 1, true]],
+  [cell6, [1, 2, true]],
+  [cell7, [2, 0, true]],
+  [cell8, [2, 1, true]],
+  [cell9, [2, 2, true]]
 ]);
 
 function checkWin() {
@@ -75,6 +76,11 @@ function checkWin() {
 
 function update(row, col, el) {
   cell = boardToCell.get(el)
+  if (!cell[2] || gameOver) {
+    return true
+  } else {
+    boardToCell.set(el, [cell[0],cell[1],false])
+  }
   el.style.cursor = "default";
   board[cell[0]][cell[1]] = turn
   if (turn == 1){
@@ -86,6 +92,7 @@ function update(row, col, el) {
   }
   let win = checkWin()
   if (win != false) {
+    gameOver = true;
     setTimeout(() => {
       alert(win);
     }, 100)
