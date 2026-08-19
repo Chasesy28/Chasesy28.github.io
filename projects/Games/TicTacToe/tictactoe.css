@@ -2,12 +2,14 @@ html,
 body {
   margin: 0;
 	padding: 0;
-  width: 100%;
-  height: 100%;
+  width: 100dvw;
+  height: 100dvh;
   overflow: hidden;
 	position: fixed;
   touch-action: none;
 	display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: dimgray;
 }
 
@@ -28,8 +30,8 @@ body {
 }
 
 .cell {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   background-color: black;
   cursor: pointer;
 }
