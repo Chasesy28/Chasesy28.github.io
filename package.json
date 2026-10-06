@@ -31,7 +31,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
-    "autoprefixer": "^10.5.5",
+    "autoprefixer": "^10.6.1",
     "http-server": "^14.1.1",
     "playwright": "^1.62.1",
     "postcss": "^8.5.26",
@@ -39,7 +39,7 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
-    "vitest": "^5.0.0",
+    "vitest": "^5.0.1",
     "@vitest/coverage-v8": "^4.1.9",
     "jsdom": "^29.1.1"
   },
@@ -53,8 +53,8 @@
     "lucide-react": "^1.43.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.3",
     "tailwind-merge": "^3.7.0",
+    "react-router-dom": "^7.18.4",
     "tailwindcss-animate": "^1.0.7",
     "tslib": "^2.8.1"
   }
