@@ -1,4 +1,24 @@
+div {
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  scale: 25%;
+}
+
+.grow {
+  animation-name: zoomIn;
+  animation-duration: 250ms;
+  animation-fill-mode: forwards;
+}
+
+.shrink {
+  animation-name: zoomIn;
+  animation-duration: 250ms;
+  animation-direction: reverse;
+}
+
 /*Animation Code*/
 @keyframes zoomIn {
-  
+  0% {scale: 25%;}
+  100% {scale: 100%;}
 }
