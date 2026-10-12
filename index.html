@@ -342,6 +342,44 @@
             </div>
          </section>
 
+         <section class="project-category" id="school" aria-labelledby="school-heading">
+            <h3 id="school-heading" class="project-category-title">School Projects</h3>
+            <div class="swiper project-carousel" id="school-swiper" role="region" aria-label="School projects carousel">
+               <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                     <a href="projects/ApProject/apProject.html">
+                        <div class="slide-content cherry-bomb-one-regular">
+                           <img src="/icons/icon-512x512.png" alt="Ap Project Icon" class="project-icon">
+                           <h3>Ap Project</h3>
+                           <p class="project-description">A project for the AP Computer Science Principles course.</p>
+                        </div>
+                     </a>
+                  </div>
+                  <div class="swiper-slide">
+                     <a href="projects/Games/SpanishFinal/spanishFinal.html">
+                        <div class="slide-content cherry-bomb-one-regular">
+                           <img src="/icons/icon-512x512.png" alt="Spanish Final Icon" class="project-icon">
+                           <h3>Spanish Final</h3>
+                           <p class="project-description">A final project for the Spanish language course.</p>
+                        </div>
+                     </a>
+                  </div>
+                  <div class="swiper-slide">
+                     <a href="projects/CarbonCycle/carbonCycle.html">
+                        <div class="slide-content cherry-bomb-one-regular">
+                           <img src="/icons/icon-512x512.png" alt="Carbon Cycle Icon" class="project-icon">
+                           <h3>Carbon Cycle</h3>
+                           <p class="project-description">A project exploring the carbon cycle in the environment.</p>
+                        </div>
+                     </a>
+                  </div>
+               </div>
+               <div class="swiper-pagination"></div>
+               <div class="swiper-button-next"></div>
+               <div class="swiper-button-prev"></div>
+            </div>
+         </section>
+
          <section class="project-category" id="webgl" aria-labelledby="webgl-heading">
             <h3 id="webgl-heading" class="project-category-title">WebGL Projects</h3>
             <div class="swiper project-carousel" id="webgl-swiper" role="region" aria-label="WebGL projects carousel">
@@ -396,7 +434,28 @@
                <div class="swiper-button-prev"></div>
             </div>
          </section>
+
+
+         <section class="project-category" id="test" aria-labelledby="test-heading">
+            <h3 id="test-heading" class="project-category-title">Test</h3>
+            <div class="swiper project-carousel" id="test-swiper" role="region" aria-label="Test projects carousel">
+               <div class="swiper-wrapper">
+                  <div class="swiper-slide">
+                     <a href="projects/Test/CSS-Stuff/index.html">
+                        <div class="slide-content cherry-bomb-one-regular">
+                           <img src="/icons/icon-512x512.png" alt="Test Project Icon" class="project-icon">
+                           <h3>Test Project</h3>
+                           <p class="project-description">A project for testing new CSS features.</p>
+                        </div>
+                     </a>
+                  </div>
+               </div>
+               <div class="swiper-pagination"></div>
+               <div class="swiper-button-next"></div>
+               <div class="swiper-button-prev"></div>
+            </div>
          </section>
+
          <!-- About Me Section -->
          <section class="about-me-section cherry-bomb-one-regular" id="about-me" aria-labelledby="about-me-heading">
             <h2 id="about-me-heading">About Me</h2>
@@ -464,7 +523,9 @@
          const utilitiesSwiper = initSwiper('#utilities-swiper');
          const gamesSwiper = initSwiper('#games-swiper');
          const popupsSwiper = initSwiper('#popups-swiper');
+         const schoolSwiper = initSwiper('#school-swiper');
          const webGLSwiper = initSwiper('#webgl-swiper');
+         const testSwiper = initSwiper('#test-swiper');
       </script>
       <script src="scripts.js"></script>
       <script src="/legal/cookie-consent.js"></script>

@@ -1,0 +1,84 @@
+html,
+body {
+  margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	position: fixed;
+	/* Prevents scrolling */
+	touch-action: none;
+	display: flex;
+}
+
+h1 {
+	font-family: Arial, sans-serif;
+	text-align: center;
+	margin-top: 20px;
+	position: absolute;
+	width: 100%;
+}
+
+.sphere {
+	position: absolute;
+	width: 50%;
+	height: 45%;
+	background-color: rgba(0, 128, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	font-family: Arial, sans-serif;
+	text-align: center
+}
+
+#atmosphere {
+	background-color: rgba(0, 0, 255, 0.5);
+	top: 7.5%;
+	left: 75%;
+	transform: translateX(-50%);
+	margin-inline: auto;
+}
+
+#hydrosphere {
+	background-color: rgba(0, 255, 255, 0.5);
+	bottom: 2.5%;
+	left: 75%;
+	transform: translateX(-50%);
+	margin-inline: auto;
+}
+
+#biosphere {
+	background-color: rgba(0, 255, 0, 0.5);
+	top: 7.5%;
+	left: 0;
+	margin-inline: auto;
+}
+
+#lithosphere {
+	background-color: rgba(139, 69, 19, 0.5);
+	bottom: 2.5%;
+	left: 0;
+	margin-inline: auto;
+}
+
+/* Animations */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fillScreen {
+	from {
+		width: 0%;
+		height: 0%;
+	}
+	to {
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+	}
+}
