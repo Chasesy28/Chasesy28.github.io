@@ -10,3 +10,37 @@ body {
 	touch-action: none;
 	display: flex;
 }
+
+#lithosphere {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 100%;
+	height: 100%;
+	background-color: #1e1e1e; /* Dark background for contrast */
+	z-index: -1; /* Ensure it's behind other content */
+	animation: fadeIn 1s ease-in-out, fillScreen 2s ease-in-out forwards 2 alternate;
+}
+
+/* Animations */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fillScreen {
+	from {
+		width: 0%;
+		height: 0%;
+	}
+	to {
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+	}
+}
