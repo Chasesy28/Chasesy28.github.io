@@ -6,7 +6,6 @@ body {
 	height: 100%;
 	overflow: hidden;
 	position: fixed;
-	/* Prevents scrolling */
 	touch-action: none;
 	display: flex;
 }
@@ -60,25 +59,51 @@ h1 {
 	margin-inline: auto;
 }
 
+.arrow {
+	position: absolute;
+}
+
+#wildfireArrow {
+	top: 50%;
+	left: 100%;
+	transform: translate(-50%, -50%);
+}
+#wildfireText {
+	position: absolute;
+	top: 41.5%;
+	left: 95%;
+}
+
+.info {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255, 255, 255, 0.8);
+	scale: 0%;
+}
+
 /* Animations */
-@keyframes fadeIn {
+.grow {
+  animation-name: appear;
+  animation-duration: 250ms;
+  animation-fill-mode: forwards;
+}
+
+.shrink {
+  animation-name: appear;
+  animation-duration: 250ms;
+  animation-direction: reverse;
+}
+
+@keyframes appear {
 	from {
+		scale: 0%;
 		opacity: 0;
 	}
 	to {
+		scale: 75%;
 		opacity: 1;
-	}
-}
-
-@keyframes fillScreen {
-	from {
-		width: 0%;
-		height: 0%;
-	}
-	to {
-		width: 100%;
-		height: 100%;
-		top: 0;
-		left: 0;
 	}
 }
