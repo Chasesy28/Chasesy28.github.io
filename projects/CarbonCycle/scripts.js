@@ -8,6 +8,8 @@ const fossilFuelArrow = document.getElementById("fossilFuelArrow");
 const fossilFuelInfo = document.getElementById("fossilFuelInfo");
 const erosionArrow = document.getElementById("erosionArrow");
 const erosionInfo = document.getElementById("erosionInfo");
+const atmosphere = document.getElementById("atmosphere");
+const atmosphereInfo = document.getElementById("atmosphereInfo");
 
 function toggleInfo(object) {
   const isGrowing = object.classList.contains("grow");
@@ -35,8 +37,8 @@ function hideBigInfo(object) {
   object.classList.add("shrinkBig");
 }
 
-wildfireArrow.addEventListener("click", toggleBigInfo.bind(null, wildfireInfo));
-wildfireInfo.addEventListener("click", hideBigInfo.bind(null, wildfireInfo));
+wildfireArrow.addEventListener("click", toggleInfo.bind(null, wildfireInfo));
+wildfireInfo.addEventListener("click", hideInfo.bind(null, wildfireInfo));
 photosynthesisArrow.addEventListener("click", toggleInfo.bind(null, photosynthesisInfo));
 photosynthesisInfo.addEventListener("click", hideInfo.bind(null, photosynthesisInfo));
 absorptionArrow.addEventListener("click", toggleInfo.bind(null, absorptionInfo));
@@ -45,3 +47,5 @@ fossilFuelArrow.addEventListener("click", toggleInfo.bind(null, fossilFuelInfo))
 fossilFuelInfo.addEventListener("click", hideInfo.bind(null, fossilFuelInfo));
 erosionArrow.addEventListener("click", toggleInfo.bind(null, erosionInfo));
 erosionInfo.addEventListener("click", hideInfo.bind(null, erosionInfo));
+atmosphere.addEventListener("click", toggleBigInfo.bind(null, atmosphereInfo));
+atmosphereInfo.addEventListener("click", hideBigInfo.bind(null, atmosphereInfo));

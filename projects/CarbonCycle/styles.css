@@ -73,6 +73,14 @@ h1 {
 	left: 5%;
 }
 
+#summary {
+	position: absolute;
+	top: 50%;
+	left: 10px;
+	text-align: center;
+	width: 500px;
+}
+
 .arrow {
 	position: absolute;
 	top: 30px;
@@ -162,8 +170,8 @@ h1 {
 }
 
 #erosionArrowContainer {
-	top: 55%;
-	left: 25%;
+	top: 50%;
+	left: 30%;
 	transform: translate(-50%, -50%) rotate(35deg);
 }
 
@@ -178,13 +186,40 @@ h1 {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(144, 237, 255, 0.8);
+	background-color: rgba(144, 237, 255, 0.9);
 	scale: 0%;
 	z-index: 3;
 }
 
+.info p {
+	font-size: 28px;
+}
+
 #wildfireInfo {
-	background-color: rgba(144, 237, 255, 0.9);
+	background-color: rgba(144, 237, 255, 0.95);
+}
+
+#wildfireInfo p {
+	font-size: 30px;
+}
+
+#wildfireInfo img {
+	position: absolute;
+	top: 70%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+#atmosphereInfo p {
+	margin-top: 40%;
+}
+
+#atmosphereInfo img{
+	position: absolute;
+	top: 50%;
+	left: 58%;
+	transform: translate(-50%, -50%);
+	scale: 150%;
 }
 
 /* Animations */
