@@ -21,57 +21,87 @@ h1 {
 .sphere {
 	position: absolute;
 	width: 50%;
-	height: 45%;
-	background-color: rgba(0, 128, 0, 0.5);
+	height: 35%;
 	display: flex;
 	justify-content: center;
 	font-family: Arial, sans-serif;
-	text-align: center
+}
+
+.sphere > * {
+	margin: 0;
 }
 
 #atmosphere {
-	background-color: rgba(0, 0, 255, 0.5);
-	top: 7.5%;
-	left: 75%;
-	transform: translateX(-50%);
-	margin-inline: auto;
+	top: 0;
+	right: 0;
+	flex-direction: column;
+	align-items: flex-end;
 }
 
 #hydrosphere {
-	background-color: rgba(0, 255, 255, 0.5);
-	bottom: 2.5%;
-	left: 75%;
+	bottom: 0;
+	left: 50%;
 	transform: translateX(-50%);
-	margin-inline: auto;
+	flex-direction: column;
+	align-items: center;
 }
 
 #biosphere {
-	background-color: rgba(0, 255, 0, 0.5);
-	top: 7.5%;
-	left: 0;
-	margin-inline: auto;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	flex-direction: column;
+	align-items: center;
 }
 
 #lithosphere {
-	background-color: rgba(139, 69, 19, 0.5);
-	bottom: 2.5%;
+	top: 0;
 	left: 0;
-	margin-inline: auto;
+	flex-direction: column;
+	align-items: left;
 }
 
 .arrow {
 	position: absolute;
+	top: 30px;
+	left: 30px;
+	z-index: 2;
+	pointer-events: auto;
 }
 
-#wildfireArrow {
-	top: 50%;
-	left: 100%;
-	transform: translate(-50%, -50%);
-}
-#wildfireText {
+.arrowText {
 	position: absolute;
-	top: 41.5%;
-	left: 95%;
+	top: 50%;
+	left: 50%;
+	margin: 0;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+#wildfireArrowContainer {
+	position: absolute;
+	top: 25%;
+	left: 62%;
+	width: 210px;
+	height: 210px;
+	transform: translate(-50%, -50%) rotate(-20deg);
+	pointer-events: none;
+}
+
+#photosynthesisArrowContainer {
+	position: absolute;
+	top: 35%;
+	left: 62%;
+	width: 210px;
+	height: 210px;
+	transform: translate(-50%, -50%) rotate(160deg);
+	pointer-events: none;
+}
+
+#photosynthesisText {
+	transform: translate(-50%, -50%) rotate(-180deg);
+	font-size: 16px;
+	left: 47%;
 }
 
 .info {
