@@ -38,6 +38,12 @@ h1 {
 	align-items: flex-end;
 }
 
+#atmosphere h2 {
+	position: absolute;
+	top: 3%;
+	right: 15%;
+}
+
 #hydrosphere {
 	bottom: 0;
 	left: 50%;
@@ -59,6 +65,12 @@ h1 {
 	left: 0;
 	flex-direction: column;
 	align-items: left;
+}
+
+#lithosphere h2 {
+	position: absolute;
+	top: 3%;
+	left: 5%;
 }
 
 .arrow {
@@ -92,14 +104,18 @@ h1 {
 
 #wildfireArrowContainer {
 	top: 25%;
-	left: 62%;
-	transform: translate(-50%, -50%) rotate(-20deg);
+	left: 65%;
+	transform: translate(-50%, -50%) rotate(-15deg);
+}
+
+#wildfireArrow {
+	width: 300px;
 }
 
 #photosynthesisArrowContainer {
-	top: 35%;
-	left: 62%;
-	transform: translate(-50%, -50%) rotate(160deg);
+	top: 38%;
+	left: 65%;
+	transform: translate(-50%, -50%) rotate(155deg);
 }
 
 #photosynthesisText {
@@ -108,10 +124,18 @@ h1 {
 	left: 47%;
 }
 
+#photosynthesisArrow {
+	width: 350px;
+}
+
 #absorptionArrowContainer {
-	top: 60%;
-	left: 62%;
+	top: 55%;
+	left: 70%;
 	transform: translate(-50%, -50%) rotate(140deg);
+}
+
+#absorptionArrow {
+	width: 500px;
 }
 
 #absorptionText {
@@ -120,15 +144,32 @@ h1 {
 }
 
 #fossilFuelArrowContainer {
-	top: 70%;
-	left: 62%;
-	transform: translate(-50%, -50%) rotate(-20deg);
+	top: 13%;
+	left: 45%;
+	transform: translate(-50%, -50%);
+}
+
+#fossilFuelArrow {
+	width: 950px;
+	height: 100px;
 }
 
 #fossilFuelText {
 	transform: translate(-50%, -50%);
-	font-size: 16px;
+	font-size: 20px;
 	left: 47%;
+	width: 150px;
+}
+
+#erosionArrowContainer {
+	top: 55%;
+	left: 25%;
+	transform: translate(-50%, -50%) rotate(35deg);
+}
+
+#erosionArrow {
+	width: 600px;
+	height: 100px;
 }
 
 .info {
@@ -140,6 +181,10 @@ h1 {
 	background-color: rgba(144, 237, 255, 0.8);
 	scale: 0%;
 	z-index: 3;
+}
+
+#wildfireInfo {
+	background-color: rgba(144, 237, 255, 0.9);
 }
 
 /* Animations */
@@ -161,7 +206,30 @@ h1 {
 		opacity: 0;
 	}
 	to {
-		scale: 75%;
+		scale: 50%;
+		opacity: 1;
+	}
+}
+
+.growBig {
+	animation-name: appearBig;
+	animation-duration: 250ms;
+	animation-fill-mode: forwards;
+}
+
+.shrinkBig {
+	animation-name: appearBig;
+	animation-duration: 250ms;
+	animation-direction: reverse;
+}
+
+@keyframes appearBig {
+	from {
+		scale: 0%;
+		opacity: 0;
+	}
+	to {
+		scale: 90%;
 		opacity: 1;
 	}
 }
