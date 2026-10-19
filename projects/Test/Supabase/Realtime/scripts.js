@@ -36,3 +36,12 @@ myChannel.subscribe((status) => {
     payload: { message: 'Hi' },
   })
 })
+
+function sendMessage() {
+  alert('Sending message...')
+  myChannel.send({
+    type: 'broadcast',
+    event: 'shout',
+    payload: { message: 'Hi' },
+  })
+}
