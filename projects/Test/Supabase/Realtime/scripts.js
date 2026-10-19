@@ -9,7 +9,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 const myChannel = supabase.channel("test-channel");
 
 // Function to log any messages we receive
-function messageReceived(payload) {
+function messageReceived({ payload }) {
   alert(payload.message);
 }
 
