@@ -10,7 +10,7 @@ const myChannel = supabase.channel("test-channel");
 
 // Function to log any messages we receive
 function messageReceived(payload) {
-  alert(payload);
+  alert(payload.message);
 }
 
 // Subscribe to the Channel
@@ -38,21 +38,16 @@ myChannel.subscribe((status) => {
 });
 
 function sendMessage() {
-  alert("Sending message...");
   try {
     alert("Sending message...");
     myChannel.send({
       type: "broadcast",
       event: "shout",
-      payload: { message: "Hi" },
+      payload: { message: prompt("Enter your message:") },
     });
   } catch (error) {
     alert("Error sending message:", error);
   }
-}
-
-function send() {
-  alert("Sending message...");
 }
 
 document.getElementById("send").addEventListener("click", sendMessage);
