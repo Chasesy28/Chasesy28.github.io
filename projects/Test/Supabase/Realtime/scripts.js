@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const SUPABASE_URL = "https://yjxxckovsoyosbzdfxyp.supabase.co";
 const SUPABASE_KEY = "sb_publishable__WLTJ9oaxErRvSAwjUVfZg_F6j90iJm";
@@ -38,6 +38,7 @@ myChannel.subscribe((status) => {
 });
 
 function sendMessage() {
+  alert("Sending message...");
   try {
     alert("Sending message...");
     myChannel.send({
@@ -49,3 +50,9 @@ function sendMessage() {
     alert("Error sending message:", error);
   }
 }
+
+function send() {
+  alert("Sending message...");
+}
+
+document.getElementById("send").addEventListener("click", sendMessage);
