@@ -1,3 +1,8 @@
+const gameArea = document.getElementById("game-area");
+const ctx = gameArea.getContext("2d");
+
+let playerList = [];
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const SUPABASE_URL = "https://yjxxckovsoyosbzdfxyp.supabase.co";
@@ -17,12 +22,19 @@ myChannel
   });
 myChannel.on(
   "broadcast",
-  { event: "join" }, // Listen for "shout". Can be "*" to listen to all events
-  (payload) => newPlayer(payload),
+  { event: "join" },
+  (payload) => addNewPlayer(payload),
 );
 
-function newPlayer({ payload }) {
+function addNewPlayer({ payload }) {
+  playerList.push(payload.message);
   alert(payload.message + " has joined the channel!");
+}
+
+function updateOtherPlayer({ payload }) {
+  if (!playerList.includes(payload.message)) {
+    playerList.push(payload.message);
+  }
 }
 
 // Function to log any messages we receive
