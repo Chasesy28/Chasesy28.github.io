@@ -8,6 +8,23 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 // Join a room/topic. Can be anything except for 'realtime'.
 const myChannel = supabase.channel("test-channel");
 
+myChannel.subscribe();
+myChannel
+  .send({
+    type: "broadcast",
+    event: "join",
+    payload: { message: prompt("Enter your name:") },
+  });
+myChannel.on(
+  "broadcast",
+  { event: "join" }, // Listen for "shout". Can be "*" to listen to all events
+  (payload) => newPlayer(payload),
+);
+
+function newPlayer({ payload }) {
+  alert(payload.message + " has joined the channel!");
+}
+
 // Function to log any messages we receive
 function messageReceived({ payload }) {
   alert(payload.message);
