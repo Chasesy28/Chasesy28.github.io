@@ -9,7 +9,7 @@ body {
 	/* Prevents scrolling */
 	touch-action: none;
 	display: flex;
-	background-color: 101 101 101;
+	background-color: rgb(101, 101, 101);
 }
 
 .menu-overlay {

@@ -7,8 +7,13 @@
     <link rel="stylesheet" href="style.css"/>
   </head>
   <body>
-    <button id="send">Send Message</button>
-    <div id="game-area"></div>
-    <script type="module" src="scripts.js"></script>
+    <div id="start-screen">
+      <input type="text" id="username" placeholder="Enter your name" />
+      <input type="color" id="color" value="#ff0000" />
+      <button id="start-button">Start Game</button>
+    </div>
+    <canvas id="game-area"></canvas>
+    <script type="module" src="main.js"></script>
+    <script type="module" src="player.js"></script>
   </body>
 </html>
