@@ -41,7 +41,7 @@
     "typescript": "^7.0.2",
     "vitest": "^5.0.5",
     "vite": "^8.3.3",
-    "@vitest/coverage-v8": "^5.0.3",
+    "@vitest/coverage-v8": "^5.0.5",
     "jsdom": "^29.1.1"
   },
   "dependencies": {
