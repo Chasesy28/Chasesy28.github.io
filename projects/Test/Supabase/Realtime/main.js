@@ -29,7 +29,7 @@ startButton.addEventListener("click", () => {
   myChannel.send({
     type: "broadcast",
     event: "join",
-    payload: { message: usernameInput.value, color: colorInput.value },
+    payload: { message: usernameInput.value, color: colorInput.value, new: true },
   });
 });
 
@@ -42,11 +42,13 @@ myChannel.on(
 
 function addNewPlayer({ payload }) {
   alert(payload.message + " has joined the channel!");
-  myChannel.send({
-    type: "broadcast",
-    event: "join",
-    payload: { message: usernameInput.value, color: colorInput.value },
-  });
+  if (payload.new) {
+    myChannel.send({
+      type: "broadcast",
+      event: "join",
+      payload: { message: usernameInput.value, color: colorInput.value, new: false },
+    });
+  }
 }
 
 function updateOtherPlayer({ payload }) {
