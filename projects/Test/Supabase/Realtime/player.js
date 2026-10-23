@@ -8,13 +8,26 @@ class Player {
     this.sprintSpeed = 10;
   }
 
+  setName(name) {
+    this.name = name;
+  }
+
+  setColor(color) {
+    this.color = color;
+  }
+
+  setPosition(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
   draw(ctx) {
-    ctx.fillStyle = `rgb(${this.color[0]}, ${this.color[1]}, ${this.color[2]})`;
+    ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, 50, 50);
   }
 
-  move() {
-    const speed = controller.Control.pressed ? this.sprintSpeed : this.speed;
+  move(controller) {
+    const speed = controller["`"].pressed ? this.sprintSpeed : this.speed;
     let moveX = 0;
     let moveY = 0;
 

@@ -23,14 +23,19 @@ const usernameInput = document.getElementById("username");
 const colorInput = document.getElementById("color");
 const startButton = document.getElementById("start-button");
 
+const player = new Player(ctx, usernameInput.value, colorInput.value);
+
 startButton.addEventListener("click", () => {
   startScreen.style.display = "none";
   gameArea.style.display = "block";
   myChannel.send({
     type: "broadcast",
     event: "join",
-    payload: { message: usernameInput.value, color: colorInput.value, new: true },
+    payload: { message: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: true },
   });
+  player.setName(usernameInput.value);
+  player.setColor(colorInput.value);
+  gameLoop();
 });
 
 myChannel.subscribe();
@@ -39,6 +44,11 @@ myChannel.on(
   { event: "join" },
   (payload) => addNewPlayer(payload),
 );
+myChannel.on(
+  "broadcast",
+  { event: "update" },
+  (payload) => updateOtherPlayer(payload),
+)
 
 function addNewPlayer({ payload }) {
   alert(payload.message + " has joined the channel!");
@@ -46,9 +56,10 @@ function addNewPlayer({ payload }) {
     myChannel.send({
       type: "broadcast",
       event: "join",
-      payload: { message: usernameInput.value, color: colorInput.value, new: false },
+      payload: { message: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
     });
   }
+
 }
 
 function updateOtherPlayer({ payload }) {
@@ -64,15 +75,15 @@ const controller = {
   s: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
-  Control: { pressed: false },
+  "`": { pressed: false },
 };
 
 function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
+  player.draw(ctx);
+  player.move(controller);
   requestAnimationFrame(gameLoop);
 }
-
-gameLoop();
 
 window.document.addEventListener("keydown", function (e) {
   if (controller[e.key]) {
