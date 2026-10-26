@@ -53,6 +53,7 @@ myChannel.on(
 function addNewPlayer({ payload }) {
   alert(payload.username + " has joined the channel!");
   if (!playerList.find(p => p.username === payload.username)) {
+    alert("Adding new player: " + payload.username);
     playerList.push(new Player(ctx, payload.username, payload.color));
   }
   if (payload.new) {
