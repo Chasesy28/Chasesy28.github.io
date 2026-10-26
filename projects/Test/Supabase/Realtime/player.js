@@ -73,6 +73,14 @@ class Player {
       this.y = gameArea.height - this.size / 2 + this.size;
     }*/
   }
+
+  sendPositionUpdate(channel) {
+    channel.send({
+      type: "broadcast",
+      event: "update",
+      payload: { x: this.x, y: this.y },
+    });
+  }
 }
 
 export { Player };

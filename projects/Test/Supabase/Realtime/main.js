@@ -31,7 +31,7 @@ startButton.addEventListener("click", () => {
   myChannel.send({
     type: "broadcast",
     event: "join",
-    payload: { message: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: true },
+    payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: true },
   });
   player.setName(usernameInput.value);
   player.setColor(colorInput.value);
@@ -51,19 +51,22 @@ myChannel.on(
 )
 
 function addNewPlayer({ payload }) {
-  alert(payload.message + " has joined the channel!");
+  alert(payload.username + " has joined the channel!");
   if (payload.new) {
+    playerList.push(new Player(ctx, payload.username, payload.color));
     myChannel.send({
       type: "broadcast",
       event: "join",
-      payload: { message: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
+      payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
     });
   }
 
 }
 
 function updateOtherPlayer({ payload }) {
-
+  const otherPlayer = playerList.find(p => p.username === payload.username);
+  otherPlayer.x = payload.x;
+  otherPlayer.y = payload.y;
 }
 
 const controller = {
@@ -82,6 +85,10 @@ function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   player.draw(ctx);
   player.move(controller);
+  player.sendPositionUpdate(myChannel);
+  for (const otherPlayer of playerList) {
+    otherPlayer.draw(ctx);
+  }
   requestAnimationFrame(gameLoop);
 }
 
