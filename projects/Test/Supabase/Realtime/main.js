@@ -52,8 +52,10 @@ myChannel.on(
 
 function addNewPlayer({ payload }) {
   alert(payload.username + " has joined the channel!");
-  if (payload.new) {
+  if (!playerList.find(p => p.username === payload.username)) {
     playerList.push(new Player(ctx, payload.username, payload.color));
+  }
+  if (payload.new) {
     myChannel.send({
       type: "broadcast",
       event: "join",
