@@ -2,10 +2,14 @@ class Player {
   constructor(name, color) {
     this.name = name;
     this.color = color;
-    this.x = 0;
-    this.y = 0;
+    this.size = 50;
+    this.x = this.size / 2;
+    this.y = this.size / 2;
     this.speed = 5;
     this.sprintSpeed = 10;
+    this.knockbackVelocityX = 0;
+    this.knockbackVelocityY = 0;
+    this.knockbackResistance = 0.9;
   }
 
   setName(name) {
@@ -23,7 +27,7 @@ class Player {
 
   draw(ctx) {
     ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, 50, 50);
+    ctx.fillRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size);
   }
 
   move(controller) {

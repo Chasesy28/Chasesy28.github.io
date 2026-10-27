@@ -10,6 +10,7 @@ let playerList = [];
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { Player } from "./player.js";
+import { Projectile, ProjectileManager } from "./projectile.js";
 
 const SUPABASE_URL = "https://yjxxckovsoyosbzdfxyp.supabase.co";
 const SUPABASE_KEY = "sb_publishable__WLTJ9oaxErRvSAwjUVfZg_F6j90iJm";
@@ -24,6 +25,7 @@ const colorInput = document.getElementById("color");
 const startButton = document.getElementById("start-button");
 
 const player = new Player(ctx, usernameInput.value, colorInput.value);
+const projectileManager = new ProjectileManager();
 
 startButton.addEventListener("click", () => {
   startScreen.style.display = "none";
@@ -51,10 +53,8 @@ myChannel.on(
 )
 
 function addNewPlayer({ payload }) {
-  alert(payload.username + " has joined the channel!");
   if (!playerList.find(p => p.username === payload.username)) {
-    alert("Adding new player: " + payload.username);
-    playerList.push(new Player(ctx, payload.username, payload.color));
+    playerList.push(new Player(payload.username, payload.color));
   }
   if (payload.new) {
     myChannel.send({
