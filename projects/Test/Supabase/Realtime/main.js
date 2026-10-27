@@ -6,6 +6,10 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
+let mouseX;
+let mouseY;
+let mouseDown = false;
+
 let playerList = [];
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
@@ -105,4 +109,17 @@ window.document.addEventListener("keyup", function (e) {
   if (controller[e.key]) {
     controller[e.key].pressed = false;
   }
+});
+
+document.addEventListener("mousemove", function (event) {
+  mouseX = event.clientX;
+  mouseY = event.clientY;
+});
+
+document.addEventListener("mousedown", function (event) {
+  mouseDown = true;
+});
+
+document.addEventListener("mouseup", function (event) {
+  mouseDown = false;
 });
