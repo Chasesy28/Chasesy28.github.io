@@ -7,9 +7,7 @@ class Player {
     this.y = this.size / 2;
     this.speed = 5;
     this.sprintSpeed = 10;
-    this.knockbackVelocityX = 0;
-    this.knockbackVelocityY = 0;
-    this.knockbackResistance = 0.9;
+    this.timeSinceCalled = 0;
   }
 
   setName(name) {
@@ -53,29 +51,6 @@ class Player {
       this.x += (moveX / magnitude) * speed;
       this.y += (moveY / magnitude) * speed;
     }
-
-    /*this.x += this.knockbackVelocityX;
-    this.y += this.knockbackVelocityY;
-    this.knockbackVelocityX *= this.knockbackResistance;
-    this.knockbackVelocityY *= this.knockbackResistance;
-
-    if (Math.abs(this.knockbackVelocityX) < 0.05) {
-      this.knockbackVelocityX = 0;
-    }
-    if (Math.abs(this.knockbackVelocityY) < 0.05) {
-      this.knockbackVelocityY = 0;
-    }*/
-
-    /*if (this.x + this.size / 2 - this.size > gameArea.width) {
-      this.x = this.size / 2 - this.size;
-    } else if (this.x - this.size / 2 + this.size < 0) {
-      this.x = gameArea.width - this.size / 2 + this.size;
-    }
-    if (this.y + this.size / 2 - this.size > gameArea.height) {
-      this.y = this.size / 2 - this.size;
-    } else if (this.y - this.size / 2 + this.size < 0) {
-      this.y = gameArea.height - this.size / 2 + this.size;
-    }*/
   }
 
   sendPositionUpdate(channel) {

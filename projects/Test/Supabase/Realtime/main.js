@@ -74,6 +74,7 @@ function updateOtherPlayer({ payload }) {
   const otherPlayer = playerList.find(p => p.username === payload.username);
   otherPlayer.x = payload.x;
   otherPlayer.y = payload.y;
+  otherPlayer.timeSinceCalled = 0;
 }
 
 const controller = {
@@ -94,6 +95,10 @@ function gameLoop() {
   player.move(controller);
   player.sendPositionUpdate(myChannel);
   for (const otherPlayer of playerList) {
+    if (otherPlayer.timeSinceCalled > 180) {
+      playerList = playerList.filter(p => p !== otherPlayer);
+    }
+    otherPlayer.timeSinceCalled++;
     otherPlayer.draw(ctx);
   }
   requestAnimationFrame(gameLoop);
