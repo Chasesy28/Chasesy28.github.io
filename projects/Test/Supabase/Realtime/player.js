@@ -1,3 +1,5 @@
+import { Projectile } from "./projectile.js";
+
 class Player {
   constructor(name, color) {
     this.name = name;
@@ -57,8 +59,17 @@ class Player {
     channel.send({
       type: "broadcast",
       event: "update",
-      payload: { x: this.x, y: this.y },
+      payload: { username: this.name, x: this.x, y: this.y },
     });
+  }
+
+  fireProjectile(projectileManager, mouseX, mouseY) {
+    const angle = Math.atan2(mouseY - this.y, mouseX - this.x);
+    const projectileSpeed = 10;
+    const projectileVx = Math.cos(angle) * projectileSpeed;
+    const projectileVy = Math.sin(angle) * projectileSpeed;
+
+    projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.name));
   }
 }
 

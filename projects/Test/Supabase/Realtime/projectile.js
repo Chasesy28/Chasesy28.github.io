@@ -1,9 +1,12 @@
 class Projectile {
-  constructor(x, y, velocityX, velocityY) {
+  constructor(x, y, velocityX, velocityY, owner) {
     this.x = x;
     this.y = y;
     this.velocityX = velocityX;
     this.velocityY = velocityY;
+    this.id = Date.now();
+    this.owner = owner;
+    this.color = owner.color;
     this.size = 10;
     this.lifetime = 100;
     this.timeSinceCalled = 0;
@@ -30,11 +33,13 @@ class ProjectileManager {
         type: "broadcast",
         event: "projectile",
         payload: {
+          id: projectile.id,
           x: projectile.x,
           y: projectile.y,
           velocityX: projectile.velocityX,
           velocityY: projectile.velocityY,
           lifetime: projectile.lifetime,
+          owner: projectile.owner,
         },
       });
     }
@@ -42,22 +47,26 @@ class ProjectileManager {
 
   receiveProjectileUpdate(payload) {
     const existingProjectile = this.externalProjectile.find(
-      (p) =>
-        p.x === payload.x &&
-        p.y === payload.y &&
-        p.velocityX === payload.velocityX &&
-        p.velocityY === payload.velocityY
+      (p) => p.id === payload.id && p.owner === payload.owner
     );
 
-    if (!existingProjectile) {
+    if (existingProjectile) {
+      existingProjectile.x = payload.x;
+      existingProjectile.y = payload.y;
+      existingProjectile.velocityX = payload.velocityX;
+      existingProjectile.velocityY = payload.velocityY;
+      existingProjectile.lifetime = payload.lifetime;
+    } else {
       const newProjectile = new Projectile(
         payload.x,
         payload.y,
         payload.velocityX,
-        payload.velocityY
+        payload.velocityY,
+        payload.owner
       );
+      newProjectile.id = payload.id;
       newProjectile.lifetime = payload.lifetime;
-      this.externalProjectile.push(newProjectile);
+      this.addExternalProjectile(newProjectile);
     }
   }
 
@@ -67,17 +76,20 @@ class ProjectileManager {
       projectile.y += projectile.velocityY;
       projectile.lifetime--;
     }
+  }
+
+  filterProjectiles() {
     this.internalProjectiles = this.internalProjectiles.filter(p => p.lifetime > 0);
     this.externalProjectile = this.externalProjectile.filter(p => p.lifetime > 0);
   }
 
   drawProjectiles(ctx) {
     for (const projectile of this.internalProjectiles) {
-      ctx.fillStyle = "red";
+      ctx.fillStyle = projectile.color;
       ctx.fillRect(projectile.x - projectile.size / 2, projectile.y - projectile.size / 2, projectile.size, projectile.size);
     }
     for (const projectile of this.externalProjectile) {
-      ctx.fillStyle = "red";
+      ctx.fillStyle = projectile.color;
       ctx.fillRect(projectile.x - projectile.size / 2, projectile.y - projectile.size / 2, projectile.size, projectile.size);
     }
   }

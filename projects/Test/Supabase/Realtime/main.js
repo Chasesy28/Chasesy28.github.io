@@ -27,11 +27,15 @@ const startScreen = document.getElementById("start-screen");
 const usernameInput = document.getElementById("username");
 const colorInput = document.getElementById("color");
 const startButton = document.getElementById("start-button");
+let channelReady = false;
 
 const player = new Player(ctx, usernameInput.value, colorInput.value);
 const projectileManager = new ProjectileManager();
 
 startButton.addEventListener("click", () => {
+  if (!channelReady) {
+    return;
+  }
   startScreen.style.display = "none";
   gameArea.style.display = "block";
   myChannel.send({
@@ -44,7 +48,6 @@ startButton.addEventListener("click", () => {
   gameLoop();
 });
 
-myChannel.subscribe();
 myChannel.on(
   "broadcast",
   { event: "join" },
@@ -55,9 +58,18 @@ myChannel.on(
   { event: "update" },
   (payload) => updateOtherPlayer(payload),
 )
+myChannel.on(
+  "broadcast",
+  { event: "projectile" },
+  ({ payload }) => projectileManager.receiveProjectileUpdate(payload),
+);
+myChannel.subscribe((status) => {
+  channelReady = status === "SUBSCRIBED";
+  startButton.disabled = !channelReady;
+});
 
 function addNewPlayer({ payload }) {
-  if (!playerList.find(p => p.username === payload.username)) {
+  if (!playerList.find(p => p.name === payload.username)) {
     playerList.push(new Player(payload.username, payload.color));
   }
   if (payload.new) {
@@ -71,7 +83,10 @@ function addNewPlayer({ payload }) {
 }
 
 function updateOtherPlayer({ payload }) {
-  const otherPlayer = playerList.find(p => p.username === payload.username);
+  const otherPlayer = playerList.find(p => p.name === payload.username);
+  if (!otherPlayer) {
+    return;
+  }
   otherPlayer.x = payload.x;
   otherPlayer.y = payload.y;
   otherPlayer.timeSinceCalled = 0;
@@ -93,7 +108,11 @@ function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   player.draw(ctx);
   player.move(controller);
+  if (mouseDown) {
+    player.fireProjectile(projectileManager, mouseX, mouseY);
+  }
   player.sendPositionUpdate(myChannel);
+
   for (const otherPlayer of playerList) {
     if (otherPlayer.timeSinceCalled > 180) {
       playerList = playerList.filter(p => p !== otherPlayer);
@@ -101,6 +120,13 @@ function gameLoop() {
     otherPlayer.timeSinceCalled++;
     otherPlayer.draw(ctx);
   }
+
+  projectileManager.updateProjectiles();
+  projectileManager.sendProjectileUpdate(myChannel);
+  projectileManager.filterProjectiles();
+  projectileManager.drawProjectiles(ctx);
+
+
   requestAnimationFrame(gameLoop);
 }
 
