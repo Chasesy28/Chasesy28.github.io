@@ -108,6 +108,7 @@ function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   player.draw(ctx);
   player.move(controller);
+  player.cooldown--;
   if (mouseDown) {
     player.fireProjectile(projectileManager, mouseX, mouseY);
   }

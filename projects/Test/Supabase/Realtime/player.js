@@ -10,6 +10,7 @@ class Player {
     this.speed = 5;
     this.sprintSpeed = 10;
     this.timeSinceCalled = 0;
+    this.cooldown = 0;
   }
 
   setName(name) {
@@ -64,12 +65,15 @@ class Player {
   }
 
   fireProjectile(projectileManager, mouseX, mouseY) {
+    if (this.cooldown > 0) return;
+
     const angle = Math.atan2(mouseY - this.y, mouseX - this.x);
     const projectileSpeed = 10;
     const projectileVx = Math.cos(angle) * projectileSpeed;
     const projectileVy = Math.sin(angle) * projectileSpeed;
 
     projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.name));
+    this.cooldown = 10;
   }
 }
 

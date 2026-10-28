@@ -11,6 +11,11 @@ class Projectile {
     this.lifetime = 100;
     this.timeSinceCalled = 0;
   }
+
+  draw(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+  }
 }
 
 class ProjectileManager {
@@ -85,12 +90,10 @@ class ProjectileManager {
 
   drawProjectiles(ctx) {
     for (const projectile of this.internalProjectiles) {
-      ctx.fillStyle = projectile.color;
-      ctx.fillRect(projectile.x - projectile.size / 2, projectile.y - projectile.size / 2, projectile.size, projectile.size);
+      projectile.draw(ctx);
     }
     for (const projectile of this.externalProjectile) {
-      ctx.fillStyle = projectile.color;
-      ctx.fillRect(projectile.x - projectile.size / 2, projectile.y - projectile.size / 2, projectile.size, projectile.size);
+      projectile.draw(ctx);
     }
   }
 }
