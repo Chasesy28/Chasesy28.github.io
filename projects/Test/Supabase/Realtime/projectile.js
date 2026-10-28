@@ -86,6 +86,10 @@ class ProjectileManager {
   filterProjectiles() {
     this.internalProjectiles = this.internalProjectiles.filter(p => p.lifetime > 0);
     this.externalProjectile = this.externalProjectile.filter(p => p.lifetime > 0);
+    this.externalProjectile = this.externalProjectile.filter(p => p.timeSinceCalled < 180);
+    for (const projectile of this.externalProjectile) {
+      projectile.timeSinceCalled++;
+    }
   }
 
   drawProjectiles(ctx) {
