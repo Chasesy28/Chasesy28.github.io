@@ -11,6 +11,7 @@ class Player {
     this.sprintSpeed = 10;
     this.timeSinceCalled = 0;
     this.cooldown = 0;
+    this.health = 10;
   }
 
   setName(name) {
@@ -24,6 +25,14 @@ class Player {
   setPosition(x, y) {
     this.x = x;
     this.y = y;
+  }
+
+  takeDamage(damage) {
+    this.health -= damage;
+    if (this.health <= 0) {
+      this.health = 0;
+      close();
+    }
   }
 
   draw(ctx) {
@@ -72,7 +81,7 @@ class Player {
     const projectileVx = Math.cos(angle) * projectileSpeed;
     const projectileVy = Math.sin(angle) * projectileSpeed;
 
-    projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.name));
+    projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.name, this.color));
     this.cooldown = 10;
   }
 }

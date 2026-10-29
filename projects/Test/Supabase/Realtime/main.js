@@ -63,6 +63,11 @@ myChannel.on(
   { event: "projectile" },
   ({ payload }) => projectileManager.receiveProjectileUpdate(payload),
 );
+myChannel.on(
+  "broadcast",
+  { event: "damage" },
+  ({ payload }) => damage(payload),
+);
 myChannel.subscribe((status) => {
   channelReady = status === "SUBSCRIBED";
   startButton.disabled = !channelReady;
@@ -92,6 +97,12 @@ function updateOtherPlayer({ payload }) {
   otherPlayer.timeSinceCalled = 0;
 }
 
+function damage({ payload }) {
+  if (payload.username === player.name) {
+    player.takeDamage(payload.damage);
+  }
+}
+
 const controller = {
   W: { pressed: false },
   w: { pressed: false },
@@ -115,18 +126,18 @@ function gameLoop() {
   player.sendPositionUpdate(myChannel);
 
   for (const otherPlayer of playerList) {
-    if (otherPlayer.timeSinceCalled > 180) {
+    /*if (otherPlayer.timeSinceCalled > 180) {
       playerList = playerList.filter(p => p !== otherPlayer);
-    }
+    }*/
     otherPlayer.timeSinceCalled++;
     otherPlayer.draw(ctx);
+    projectileManager.collisionDetection(otherPlayer, myChannel);
   }
 
   projectileManager.updateProjectiles();
   projectileManager.sendProjectileUpdate(myChannel);
   projectileManager.filterProjectiles();
   projectileManager.drawProjectiles(ctx);
-
 
   requestAnimationFrame(gameLoop);
 }
