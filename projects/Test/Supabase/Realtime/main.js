@@ -99,6 +99,7 @@ function updateOtherPlayer({ payload }) {
 
 function damage({ payload }) {
   if (payload.username === player.name) {
+    alert("You have been hit!");
     player.takeDamage(payload.damage);
   }
 }
