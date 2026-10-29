@@ -126,9 +126,9 @@ function gameLoop() {
   player.sendPositionUpdate(myChannel);
 
   for (const otherPlayer of playerList) {
-    /*if (otherPlayer.timeSinceCalled > 180) {
+    if (otherPlayer.timeSinceCalled > 180) {
       playerList = playerList.filter(p => p !== otherPlayer);
-    }*/
+    }
     otherPlayer.timeSinceCalled++;
     otherPlayer.draw(ctx);
     projectileManager.collisionDetection(otherPlayer, myChannel);
