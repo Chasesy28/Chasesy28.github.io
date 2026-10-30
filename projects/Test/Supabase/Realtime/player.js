@@ -9,7 +9,6 @@ class Player {
     this.y = this.size / 2;
     this.speed = 5;
     this.sprintSpeed = 10;
-    this.timeSinceCalled = 0;
     this.cooldown = 0;
     this.health = 10;
   }
@@ -65,12 +64,13 @@ class Player {
     }
   }
 
-  sendPositionUpdate(channel) {
-    channel.send({
-      type: "broadcast",
-      event: "update",
-      payload: { username: this.name, x: this.x, y: this.y },
-    });
+  sendPositionUpdate() {
+    const message = {
+      username: this.name,
+      x: this.x,
+      y: this.y,
+    };
+    return [message];
   }
 
   fireProjectile(projectileManager, mouseX, mouseY) {

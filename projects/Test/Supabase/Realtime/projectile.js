@@ -32,23 +32,21 @@ class ProjectileManager {
     this.externalProjectiles.push(projectile);
   }
 
-  sendProjectileUpdate(channel) {
+  sendProjectileUpdate() {
+    const message = []
     for (const projectile of this.internalProjectiles) {
-      channel.send({
-        type: "broadcast",
-        event: "projectile",
-        payload: {
-          id: projectile.id,
-          x: projectile.x,
-          y: projectile.y,
-          velocityX: projectile.velocityX,
-          velocityY: projectile.velocityY,
-          lifetime: projectile.lifetime,
-          owner: projectile.owner,
-          color: projectile.color,
-        },
+      message.push({
+        id: projectile.id,
+        x: projectile.x,
+        y: projectile.y,
+        velocityX: projectile.velocityX,
+        velocityY: projectile.velocityY,
+        lifetime: projectile.lifetime,
+        owner: projectile.owner,
+        color: projectile.color,
       });
     }
+    return message;
   }
 
   receiveProjectileUpdate(payload) {

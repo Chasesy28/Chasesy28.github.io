@@ -57,7 +57,7 @@ myChannel.on(
   "broadcast",
   { event: "update" },
   (payload) => updateOtherPlayer(payload),
-)
+);
 myChannel.on(
   "broadcast",
   { event: "projectile" },
@@ -94,7 +94,6 @@ function updateOtherPlayer({ payload }) {
   }
   otherPlayer.x = payload.x;
   otherPlayer.y = payload.y;
-  otherPlayer.timeSinceCalled = 0;
 }
 
 function damage({ payload }) {
@@ -114,32 +113,40 @@ const controller = {
   s: { pressed: false },
   D: { pressed: false },
   d: { pressed: false },
+  g: { pressed: false },
   "`": { pressed: false },
 };
 
 function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
+  const message = [];
   player.draw(ctx);
   player.move(controller);
   player.cooldown--;
   if (mouseDown) {
     player.fireProjectile(projectileManager, mouseX, mouseY);
   }
-  player.sendPositionUpdate(myChannel);
+  message.push(player.sendPositionUpdate());
 
   for (const otherPlayer of playerList) {
-    if (otherPlayer.timeSinceCalled > 180) {
-      playerList = playerList.filter(p => p !== otherPlayer);
-    }
-    otherPlayer.timeSinceCalled++;
     otherPlayer.draw(ctx);
     projectileManager.collisionDetection(otherPlayer, myChannel);
   }
 
   projectileManager.updateProjectiles();
-  projectileManager.sendProjectileUpdate(myChannel);
+  message.push(projectileManager.sendProjectileUpdate());
   projectileManager.filterProjectiles();
   projectileManager.drawProjectiles(ctx);
+
+  if (controller.g.pressed) {
+    alert(JSON.stringify(message));
+  }
+
+  myChannel.send({
+    type: "broadcast",
+    event: "update",
+    payload: message,
+  });
 
   requestAnimationFrame(gameLoop);
 }
