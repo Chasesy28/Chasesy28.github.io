@@ -60,11 +60,6 @@ myChannel.on(
 );
 myChannel.on(
   "broadcast",
-  { event: "projectile" },
-  ({ payload }) => projectileManager.receiveProjectileUpdate(payload),
-);
-myChannel.on(
-  "broadcast",
   { event: "damage" },
   ({ payload }) => damage(payload),
 );
@@ -88,8 +83,10 @@ function addNewPlayer({ payload }) {
 }
 
 function processUpdates({ payload }) {
-  //alert(JSON.stringify(payload));
-  //payload[0].forEach(updateOtherPlayer);
+  // Player updates
+  payload[0].forEach(player => updateOtherPlayer({ payload: player }));
+  // Projectile updates
+  payload[1].forEach(projectile => projectileManager.receiveProjectileUpdate(projectile));
 }
 
 function updateOtherPlayer({ payload }) {
