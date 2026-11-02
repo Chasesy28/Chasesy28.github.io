@@ -28,15 +28,9 @@ class Player {
 
   takeDamage(damage) {
     this.health -= damage;
-    const color = this.color
-    this.color = "red";
-    setTimeout(() => {
-      this.color = color;
-    }, 5);
     if (this.health <= 0) {
-      alert("ded");
       this.health = 0;
-      close();
+      document.write("ded");
     }
   }
 
