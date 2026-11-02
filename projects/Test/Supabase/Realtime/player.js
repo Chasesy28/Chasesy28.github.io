@@ -28,6 +28,7 @@ class Player {
 
   takeDamage(damage) {
     this.health -= damage;
+    this.color = "red";
     if (this.health <= 0) {
       this.health = 0;
       close();
