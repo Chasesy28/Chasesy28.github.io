@@ -79,7 +79,6 @@ function addNewPlayer({ payload }) {
       payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
     });
   }
-
 }
 
 function processUpdates({ payload }) {
@@ -98,10 +97,8 @@ function updateOtherPlayer({ payload }) {
   otherPlayer.y = payload.y;
 }
 
-function damage({ payload }) {
-  alert("Hit!");
+function damage(payload) {
   if (payload.target === player.name) {
-    alert("You took damage!");
     player.takeDamage(payload.damage);
   }
 }
