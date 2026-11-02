@@ -56,7 +56,7 @@ myChannel.on(
 myChannel.on(
   "broadcast",
   { event: "update" },
-  (payload) => updateOtherPlayer(payload),
+  (payload) => processUpdates(payload),
 );
 myChannel.on(
   "broadcast",
@@ -85,6 +85,11 @@ function addNewPlayer({ payload }) {
     });
   }
 
+}
+
+function processUpdates({ payload }) {
+  //alert(JSON.stringify(payload));
+  //payload[0].forEach(updateOtherPlayer);
 }
 
 function updateOtherPlayer({ payload }) {
