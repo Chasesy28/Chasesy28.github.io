@@ -12,6 +12,8 @@ let mouseDown = false;
 
 let playerList = [];
 
+let frame = 0;
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { Player } from "./player.js";
 import { Projectile, ProjectileManager } from "./projectile.js";
@@ -141,11 +143,15 @@ function gameLoop() {
     alert(JSON.stringify(message));
   }
 
-  myChannel.send({
-    type: "broadcast",
-    event: "update",
-    payload: message,
-  });
+  if (frame % 4 === 0) {
+    myChannel.send({
+      type: "broadcast",
+      event: "update",
+      payload: message,
+    });
+  }
+
+  frame++;
 
   requestAnimationFrame(gameLoop);
 }
