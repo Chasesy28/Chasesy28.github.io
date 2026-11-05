@@ -88,6 +88,14 @@ function processUpdates({ payload }) {
   payload[0].forEach(player => updateOtherPlayer({ payload: player }));
   // Projectile updates
   payload[1].forEach(projectile => projectileManager.receiveProjectileUpdate(projectile));
+  // Collision updates
+  if (payload[2].owner == player.name) {
+    for (const projectile of projectileManager.internalProjectiles) {
+      if (projectile.id === payload[2].id) {
+        projectile.lifetime = 0;
+      }
+    }
+  }
 }
 
 function updateOtherPlayer({ payload }) {
@@ -131,8 +139,9 @@ function gameLoop() {
 
   for (const otherPlayer of playerList) {
     otherPlayer.draw(ctx);
-    projectileManager.collisionDetection(otherPlayer, myChannel);
   }
+
+  message.push(projectileManager.collisionDetection(player));
 
   projectileManager.updateProjectiles();
   message.push(projectileManager.sendProjectileUpdate());
