@@ -14,6 +14,8 @@ let playerList = [];
 
 let frame = 0;
 
+let inGame = false;
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { Player } from "./player.js";
 import { Projectile, ProjectileManager } from "./projectile.js";
@@ -38,6 +40,7 @@ startButton.addEventListener("click", () => {
   if (!channelReady) {
     return;
   }
+  inGame = true;
   startScreen.style.display = "none";
   gameArea.style.display = "block";
   myChannel.send({
@@ -48,6 +51,16 @@ startButton.addEventListener("click", () => {
   player.setName(usernameInput.value);
   player.setColor(colorInput.value);
   gameLoop();
+});
+
+document.addEventListener("beforeunload", () => {
+  if (inGame) {
+    myChannel.send({
+      type: "broadcast",
+      event: "leave",
+      payload: { username: player.name },
+    });
+  }
 });
 
 myChannel.on(
@@ -65,21 +78,31 @@ myChannel.on(
   { event: "damage" },
   ({ payload }) => damage(payload),
 );
+myChannel.on(
+  "broadcast",
+  { event: "leave" },
+  ({ payload }) => {
+    playerList = playerList.filter(p => p.name !== payload.username);
+    projectileManager.externalProjectiles = projectileManager.externalProjectiles.filter(p => p.owner !== payload.username);
+  },
+)
 myChannel.subscribe((status) => {
   channelReady = status === "SUBSCRIBED";
   startButton.disabled = !channelReady;
 });
 
 function addNewPlayer({ payload }) {
-  if (!playerList.find(p => p.name === payload.username)) {
-    playerList.push(new Player(payload.username, payload.color));
-  }
-  if (payload.new) {
-    myChannel.send({
-      type: "broadcast",
-      event: "join",
-      payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
-    });
+  if (inGame) {
+    if (!playerList.find(p => p.name === payload.username)) {
+      playerList.push(new Player(payload.username, payload.color));
+    }
+    if (payload.new) {
+      myChannel.send({
+        type: "broadcast",
+        event: "join",
+        payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
+      });
+    }
   }
 }
 
