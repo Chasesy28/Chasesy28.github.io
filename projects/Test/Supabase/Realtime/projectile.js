@@ -101,17 +101,21 @@ class ProjectileManager {
     }
   }
 
-  collisionDetection(player) {
-    for (const projectile of this.externalProjectiles) {
-      if (projectile.owner !== player) {
-        const dx = projectile.x - player.x;
-        const dy = projectile.y - player.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < (projectile.size / 2 + player.size / 2)) {
-          projectile.lifetime = 0;
-          player.damage(1);
-          return { id: projectile.id, owner: projectile.owner };
-        }
+  collisionDetection(player, channel) {
+    for (const projectile of this.internalProjectiles) {
+      const dx = projectile.x - player.x;
+      const dy = projectile.y - player.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < (projectile.size / 2 + player.size / 2)) {
+        projectile.lifetime = 0;
+        channel.send({
+          type: "broadcast",
+          event: "damage",
+          payload: {
+            target: player.name,
+            damage: 1,
+          },
+        });
       }
     }
   }
