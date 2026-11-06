@@ -6,6 +6,36 @@ gameArea.style.height = "100dvh";
 gameArea.width = gameArea.offsetWidth;
 gameArea.height = gameArea.offsetHeight;
 
+function canvasDimensions(canvas) {
+  canvas.style.width = "100dvw";
+  canvas.style.height = "100dvh";
+
+  // display:none canvases report 0 client size; keep a valid render size on resize.
+  const fallbackWidth = Math.floor(
+    window.visualViewport?.width || window.innerWidth || 1,
+  );
+  const fallbackHeight = Math.floor(
+    window.visualViewport?.height || window.innerHeight || 1,
+  );
+  const nextWidth = Math.max(1, canvas.clientWidth || fallbackWidth);
+  const nextHeight = Math.max(1, canvas.clientHeight || fallbackHeight);
+
+  if (canvas.width !== nextWidth) {
+    canvas.width = nextWidth;
+  }
+  if (canvas.height !== nextHeight) {
+    canvas.height = nextHeight;
+  }
+}
+
+canvasDimensions(gameArea);
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", () => canvasDimensions(gameArea));
+}
+window.addEventListener("resize", () => canvasDimensions(gameArea));
+window.addEventListener("orientationchange", () => canvasDimensions(gameArea));
+
 let mouseX;
 let mouseY;
 let mouseDown = false;
