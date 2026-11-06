@@ -147,7 +147,7 @@ function gameLoop() {
   ctx.clearRect(0, 0, gameArea.width, gameArea.height);
   const message = [];
   player.draw(ctx);
-  player.move(controller);
+  player.move(controller, gameArea);
   player.cooldown--;
   if (mouseDown) {
     player.fireProjectile(projectileManager, mouseX, mouseY);

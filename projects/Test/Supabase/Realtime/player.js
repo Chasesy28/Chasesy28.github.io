@@ -39,7 +39,7 @@ class Player {
     ctx.fillRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size);
   }
 
-  move(controller) {
+  move(controller, gameArea) {
     const speed = controller["`"].pressed ? this.sprintSpeed : this.speed;
     let moveX = 0;
     let moveY = 0;
@@ -61,6 +61,17 @@ class Player {
       const magnitude = Math.hypot(moveX, moveY);
       this.x += (moveX / magnitude) * speed;
       this.y += (moveY / magnitude) * speed;
+    }
+
+    if (this.x + this.size / 2 - this.size > gameArea.width) {
+      this.x = this.size / 2 - this.size;
+    } else if (this.x - this.size / 2 + this.size < 0) {
+      this.x = gameArea.width - this.size / 2 + this.size;
+    }
+    if (this.y + this.size / 2 - this.size > gameArea.height) {
+      this.y = this.size / 2 - this.size;
+    } else if (this.y - this.size / 2 + this.size < 0) {
+      this.y = gameArea.height - this.size / 2 + this.size;
     }
   }
 
