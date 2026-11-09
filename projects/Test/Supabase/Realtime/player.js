@@ -3,6 +3,7 @@ import { Projectile } from "./projectile.js";
 class Player {
   constructor(name, color) {
     this.name = name;
+    this.id = crypto.randomUUID();
     this.color = color;
     this.size = 50;
     this.x = this.size / 2;

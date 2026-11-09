@@ -55,31 +55,43 @@ const SUPABASE_KEY = "sb_publishable__WLTJ9oaxErRvSAwjUVfZg_F6j90iJm";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const myChannel = supabase.channel("test-channel");
-
 const startScreen = document.getElementById("start-screen");
 const usernameInput = document.getElementById("username");
 const colorInput = document.getElementById("color");
 const startButton = document.getElementById("start-button");
 let channelReady = false;
 
-const player = new Player(ctx, usernameInput.value, colorInput.value);
+const player = new Player(usernameInput.value, colorInput.value);
 const projectileManager = new ProjectileManager();
 
-startButton.addEventListener("click", () => {
+const myChannel = supabase.channel("test-channel", {
+  config: {
+    presence: {
+      key: player.id,
+    }
+  }
+});
+
+startButton.addEventListener("click", async () => {
   if (!channelReady) {
     return;
   }
+
   inGame = true;
   startScreen.style.display = "none";
   gameArea.style.display = "block";
-  myChannel.send({
-    type: "broadcast",
-    event: "join",
-    payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: true },
-  });
+
   player.setName(usernameInput.value);
   player.setColor(colorInput.value);
+
+  await myChannel.track({
+    username: player.name,
+    color: player.color,
+    x: player.x,
+    y: player.y,
+    status: "online",
+  })
+
   gameLoop();
 });
 
