@@ -87,31 +87,12 @@ startButton.addEventListener("click", async () => {
   await myChannel.track({
     username: player.name,
     color: player.color,
-    x: player.x,
-    y: player.y,
     status: "online",
   })
 
   gameLoop();
 });
 
-document.addEventListener("beforeunload", () => {
-  alert("You are leaving the game. Your progress will not be saved.");
-  if (inGame) {
-    alert("You are leaving the game. Your progress will not be saved.");
-    myChannel.send({
-      type: "broadcast",
-      event: "leave",
-      payload: { username: player.name },
-    });
-  }
-});
-
-myChannel.on(
-  "broadcast",
-  { event: "join" },
-  (payload) => addNewPlayer(payload),
-);
 myChannel.on(
   "broadcast",
   { event: "update" },
@@ -123,31 +104,70 @@ myChannel.on(
   ({ payload }) => damage(payload),
 );
 myChannel.on(
-  "broadcast",
-  { event: "leave" },
-  ({ payload }) => {
-    playerList = playerList.filter(p => p.name !== payload.username);
-    projectileManager.externalProjectiles = projectileManager.externalProjectiles.filter(p => p.owner !== payload.username);
+  "presence",
+  { event: "sync" }, () => {
+    syncPresencePlayers();
   },
 )
+myChannel.on(
+  "presence",
+  { event: "join" }, ({ key, newPresences }) => {
+    for (const presence of newPresences) {
+      addPresencePlayer(key, presence);
+    }
+  }
+);
+myChannel.on(
+  "presence",
+  { event: "leave" }, ({ key, leftPresences }) => {
+    playerList = playerList.filter(remotePlayer => remotePlayer.id !== key);
+    projectileManager.externalProjectiles = projectileManager.externalProjectiles.filter(p => p.ownerId !== key);
+  }
+);
 myChannel.subscribe((status) => {
   channelReady = status === "SUBSCRIBED";
   startButton.disabled = !channelReady;
 });
 
-function addNewPlayer({ payload }) {
-  if (inGame) {
-    if (!playerList.find(p => p.name === payload.username)) {
-      playerList.push(new Player(payload.username, payload.color));
-    }
-    if (payload.new) {
-      myChannel.send({
-        type: "broadcast",
-        event: "join",
-        payload: { username: usernameInput.value, color: colorInput.value, x: player.x, y: player.y, new: false },
-      });
-    }
+function addPresencePlayer(key, presence) {
+  if (key === player.id) {
+    return;
   }
+
+  const existingPlayer = playerList.find(remotePlayer => remotePlayer.id === key);
+
+  if (existingPlayer) {
+    existingPlayer.setName(presence.username);
+    existingPlayer.setColor(presence.color);
+    return;
+  }
+
+  const remotePlayer = new Player(presence.username, presence.color);
+  remotePlayer.id = key;
+  playerList.push(remotePlayer);
+}
+
+function syncPresencePlayers() {
+  const state = myChannel.presenceState();
+  const presentPlayerIds = new Set();
+
+  for (const [key, presences] of Object.entries(state)) {
+    if (key === player.id) {
+      continue;
+    }
+
+    const presence = presences[0];
+
+    if (!presence) {
+      continue;
+    }
+
+    presentPlayerIds.add(key);
+    addPresencePlayer(key, presence);
+  }
+
+  playerList = playerList.filter(remotePlayer => presentPlayerIds.has(remotePlayer.id));
+
 }
 
 function processUpdates({ payload }) {
@@ -158,7 +178,7 @@ function processUpdates({ payload }) {
 }
 
 function updateOtherPlayer({ payload }) {
-  const otherPlayer = playerList.find(p => p.name === payload.username);
+  const otherPlayer = playerList.find(p => p.id === payload.id);
   if (!otherPlayer) {
     return;
   }

@@ -1,11 +1,11 @@
 class Projectile {
-  constructor(x, y, velocityX, velocityY, owner, color) {
+  constructor(x, y, velocityX, velocityY, ownerId, color) {
     this.x = x;
     this.y = y;
     this.velocityX = velocityX;
     this.velocityY = velocityY;
+    this.ownerId = ownerId;
     this.id = Date.now();
-    this.owner = owner;
     this.color = color;
     this.size = 10;
     this.lifetime = 100;
@@ -42,7 +42,7 @@ class ProjectileManager {
         velocityX: projectile.velocityX,
         velocityY: projectile.velocityY,
         lifetime: projectile.lifetime,
-        owner: projectile.owner,
+        ownerId: projectile.ownerId,
         color: projectile.color,
       });
     }

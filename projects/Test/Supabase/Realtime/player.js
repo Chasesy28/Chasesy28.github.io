@@ -78,6 +78,7 @@ class Player {
 
   sendPositionUpdate() {
     const message = {
+      id: this.id,
       username: this.name,
       x: this.x,
       y: this.y,
@@ -93,7 +94,7 @@ class Player {
     const projectileVx = Math.cos(angle) * projectileSpeed;
     const projectileVy = Math.sin(angle) * projectileSpeed;
 
-    projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.name, this.color));
+    projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.id, this.color));
     this.cooldown = 10;
   }
 }
