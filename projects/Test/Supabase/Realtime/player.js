@@ -31,6 +31,7 @@ class Player {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size);
     ctx.font = "50px Arial";
+    ctx.textAlign = "center";
     let textWidth = ctx.measureText(this.name).width;
     while (textWidth > this.size*0.8) {
       ctx.font = `${parseInt(ctx.font) - 1}px Arial`;
