@@ -81,8 +81,8 @@ startButton.addEventListener("click", async () => {
   startScreen.style.display = "none";
   gameArea.style.display = "block";
 
-  player.setName(usernameInput.value);
-  player.setColor(colorInput.value);
+  player.name = usernameInput.value;
+  player.color = colorInput.value;
 
   await myChannel.track({
     username: player.name,
@@ -137,8 +137,8 @@ function addPresencePlayer(key, presence) {
   const existingPlayer = playerList.find(remotePlayer => remotePlayer.id === key);
 
   if (existingPlayer) {
-    existingPlayer.setName(presence.username);
-    existingPlayer.setColor(presence.color);
+    existingPlayer.name = presence.username;
+    existingPlayer.color = presence.color;
     return;
   }
 

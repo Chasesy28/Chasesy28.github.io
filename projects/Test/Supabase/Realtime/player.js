@@ -14,14 +14,6 @@ class Player {
     this.health = 10;
   }
 
-  setName(name) {
-    this.name = name;
-  }
-
-  setColor(color) {
-    this.color = color;
-  }
-
   setPosition(x, y) {
     this.x = x;
     this.y = y;
@@ -38,6 +30,13 @@ class Player {
   draw(ctx) {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size);
+    ctx.font = "50px Arial";
+    let textWidth = ctx.measureText(this.name).width;
+    while (textWidth > this.size*0.8) {
+      ctx.font = `${parseInt(ctx.font) - 1}px Arial`;
+      textWidth = ctx.measureText(this.name).width;
+    }
+    ctx.fillText(this.name, this.x - textWidth / 2, this.y - this.size / 2 - 10);
   }
 
   move(controller, gameArea) {
