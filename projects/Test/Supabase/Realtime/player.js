@@ -12,6 +12,7 @@ class Player {
     this.sprintSpeed = 10;
     this.cooldown = 0;
     this.health = 10;
+    this.dead = false;
   }
 
   setPosition(x, y) {
@@ -23,7 +24,7 @@ class Player {
     this.health -= damage;
     if (this.health <= 0) {
       this.health = 0;
-      document.write("ded");
+      this.dead = true;
     }
   }
 
@@ -31,7 +32,6 @@ class Player {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size);
     ctx.font = "50px Arial";
-    ctx.textAlign = "center";
     let textWidth = ctx.measureText(this.name).width;
     while (textWidth > this.size*0.8) {
       ctx.font = `${parseInt(ctx.font) - 1}px Arial`;
@@ -82,6 +82,7 @@ class Player {
       username: this.name,
       x: this.x,
       y: this.y,
+      dead: this.dead,
     };
     return [message];
   }

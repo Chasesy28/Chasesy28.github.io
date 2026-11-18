@@ -184,6 +184,7 @@ function updateOtherPlayer({ payload }) {
   }
   otherPlayer.x = payload.x;
   otherPlayer.y = payload.y;
+  otherPlayer.dead = payload.dead;
 }
 
 function damage(payload) {
@@ -217,8 +218,10 @@ function gameLoop() {
   message.push(player.sendPositionUpdate());
 
   for (const otherPlayer of playerList) {
-    otherPlayer.draw(ctx);
-    projectileManager.collisionDetection(otherPlayer, myChannel);
+    if (!otherPlayer.dead) {
+      otherPlayer.draw(ctx);
+      projectileManager.collisionDetection(otherPlayer, myChannel);
+    }
   }
 
   projectileManager.updateProjectiles();
