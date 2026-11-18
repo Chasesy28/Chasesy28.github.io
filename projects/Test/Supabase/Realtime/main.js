@@ -184,6 +184,7 @@ function updateOtherPlayer({ payload }) {
   }
   otherPlayer.x = payload.x;
   otherPlayer.y = payload.y;
+  otherPlayer.alpha = payload.alpha;
   otherPlayer.dead = payload.dead;
 }
 

@@ -23,7 +23,7 @@ class Player {
 
   takeDamage(damage) {
     this.health -= damage;
-    this.alpha = 0.5;
+    this.alpha = 0.25;
     setTimeout(() => {
       this.alpha = 1.0;
     }, 100);
@@ -89,6 +89,7 @@ class Player {
       username: this.name,
       x: this.x,
       y: this.y,
+      alpha: this.alpha,
       dead: this.dead,
     };
     return [message];
