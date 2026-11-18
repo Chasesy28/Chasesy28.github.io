@@ -13,6 +13,7 @@ class Player {
     this.cooldown = 0;
     this.health = 10;
     this.dead = false;
+    this.alpha = 1.0;
   }
 
   setPosition(x, y) {
@@ -22,6 +23,10 @@ class Player {
 
   takeDamage(damage) {
     this.health -= damage;
+    this.alpha = 0.5;
+    setTimeout(() => {
+      this.alpha = 1.0;
+    }, 100);
     if (this.health <= 0) {
       this.health = 0;
       this.dead = true;
@@ -29,8 +34,10 @@ class Player {
   }
 
   draw(ctx) {
+    ctx.globalAlpha = this.alpha;
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size);
+    ctx.globalAlpha = 1.0;
     ctx.font = "50px Arial";
     let textWidth = ctx.measureText(this.name).width;
     while (textWidth > this.size*0.8) {
@@ -64,15 +71,15 @@ class Player {
       this.y += (moveY / magnitude) * speed;
     }
 
-    if (this.x + this.size / 2 - this.size > gameArea.width) {
-      this.x = this.size / 2 - this.size;
-    } else if (this.x - this.size / 2 + this.size < 0) {
-      this.x = gameArea.width - this.size / 2 + this.size;
+    if (this.x + this.size / 2 > gameArea.width) {
+      this.x = gameArea.width - this.size / 2;
+    } else if (this.x - this.size / 2 < 0) {
+      this.x = this.size / 2;
     }
-    if (this.y + this.size / 2 - this.size > gameArea.height) {
-      this.y = this.size / 2 - this.size;
-    } else if (this.y - this.size / 2 + this.size < 0) {
-      this.y = gameArea.height - this.size / 2 + this.size;
+    if (this.y + this.size / 2 > gameArea.height) {
+      this.y = gameArea.height - this.size / 2;
+    } else if (this.y - this.size / 2 < 0) {
+      this.y = this.size / 2;
     }
   }
 

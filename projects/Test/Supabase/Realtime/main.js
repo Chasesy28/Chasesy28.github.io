@@ -64,7 +64,7 @@ let channelReady = false;
 const player = new Player(usernameInput.value, colorInput.value);
 const projectileManager = new ProjectileManager();
 
-const myChannel = supabase.channel("test-channel", {
+const myChannel = supabase.channel(prompt("Enter a channel name:"), {
   config: {
     presence: {
       key: player.id,
