@@ -81,6 +81,11 @@ class ProjectileManager {
       projectile.y += projectile.velocityY;
       projectile.lifetime--;
     }
+    for (const projectile of this.externalProjectiles) {
+      projectile.x += projectile.velocityX;
+      projectile.y += projectile.velocityY;
+      projectile.lifetime--;
+    }
   }
 
   filterProjectiles() {
@@ -102,22 +107,27 @@ class ProjectileManager {
   }
 
   collisionDetection(player, channel) {
-    for (const projectile of this.internalProjectiles) {
+    for (const projectile of this.externalProjectiles) {
       const dx = projectile.x - player.x;
       const dy = projectile.y - player.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       if (distance < (projectile.size / 2 + player.size / 2)) {
         projectile.lifetime = 0;
-        channel.send({
+        player.takeDamage(1);
+        this.externalProjectiles = this.externalProjectiles.filter(p => p.id !== projectile.id);
+        channel.sendProjectileUpdate({
           type: "broadcast",
-          event: "damage",
+          event: "projectileUpdate",
           payload: {
-            target: player.name,
-            damage: 1,
+            id: projectile.id,
           },
         });
       }
     }
+  }
+
+  filterProjectile(projectileId) {
+    this.externalProjectiles = this.externalProjectiles.filter(p => p.id !== projectileId);
   }
 }
 
