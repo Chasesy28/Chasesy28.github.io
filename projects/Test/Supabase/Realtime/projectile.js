@@ -59,7 +59,8 @@ class ProjectileManager {
       existingProjectile.y = payload.y;
       existingProjectile.velocityX = payload.velocityX;
       existingProjectile.velocityY = payload.velocityY;
-      existingProjectile.lifetime = payload.lifetime;
+      //Fix
+      if (payload.lifetime < existingProjectile.lifetime) existingProjectile.lifetime = payload.lifetime;
       existingProjectile.color = payload.color;
     } else {
       const newProjectile = new Projectile(
@@ -117,7 +118,7 @@ class ProjectileManager {
         this.externalProjectiles = this.externalProjectiles.filter(p => p.id !== projectile.id);
         channel.sendProjectileUpdate({
           type: "broadcast",
-          event: "projectileUpdate",
+          event: "removeProjectile",
           payload: {
             id: projectile.id,
           },

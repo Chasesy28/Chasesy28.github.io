@@ -98,8 +98,8 @@ myChannel.on(
 //Fix
 myChannel.on(
   "broadcast",
-  { event: "projectileUpdate" },
-  ({ payload }) => damage(payload),
+  { event: "removeProjectile" },
+  ({ payload }) => projectileManager.filterProjectile(payload),
 );
 myChannel.on(
   "presence",
