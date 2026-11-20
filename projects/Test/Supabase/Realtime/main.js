@@ -44,6 +44,8 @@ let playerList = [];
 
 let frame = 0;
 
+let inGame = false;
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 import { Player } from "./player.js";
 import { Projectile, ProjectileManager } from "./projectile.js";
@@ -75,6 +77,7 @@ startButton.addEventListener("click", async () => {
     return;
   }
 
+  inGame = true;
   startScreen.style.display = "none";
   gameArea.style.display = "block";
 
@@ -95,11 +98,11 @@ myChannel.on(
   { event: "update" },
   (payload) => processUpdates(payload),
 );
-//Fix
+
 myChannel.on(
   "broadcast",
-  { event: "removeProjectile" },
-  ({ payload }) => projectileManager.filterProjectile(payload),
+  { event: "damage" },
+  ({ payload }) => damage(payload),
 );
 myChannel.on(
   "presence",
