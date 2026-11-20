@@ -24,8 +24,8 @@ class ProjectileManager {
     this.externalProjectiles = [];
   }
 
-  addInternalProjectile(projectile) {
-    this.internalProjectiles.push(projectile);
+  addInternalProjectile(x, y, velocityX, velocityY, ownerId, color) {
+    this.internalProjectiles.push(new Projectile(x, y, velocityX, velocityY, ownerId, color));
   }
 
   addExternalProjectile(projectile) {

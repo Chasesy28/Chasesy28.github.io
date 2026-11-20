@@ -103,7 +103,7 @@ class Player {
     const projectileVx = Math.cos(angle) * projectileSpeed;
     const projectileVy = Math.sin(angle) * projectileSpeed;
 
-    projectileManager.addInternalProjectile(new Projectile(this.x, this.y, projectileVx, projectileVy, this.id, this.color));
+    projectileManager.addInternalProjectile(this.x, this.y, projectileVx, projectileVy, this.id, this.color);
     this.cooldown = 10;
   }
 }
