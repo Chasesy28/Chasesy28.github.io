@@ -1,5 +1,5 @@
-import { fillScreen, fillScreenOnResize, setBackgroundColor } from './canvas.js';
-import { rect, square, circle, semicircle, triangle } from './shapes.js';
+import { fillScreen, fillScreenOnResize, setBackgroundColor, rgba } from './canvas.js';
+import { rect, square, circle, semicircle, triangle, line } from './shapes.js';
 
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
@@ -14,7 +14,8 @@ function draw() {
   square(ctx, 300, 50, 100, "yellow");
   circle(ctx, 800, 300, 75, "green");
   semicircle(ctx, 600, 300, 75, "purple");
-  triangle(ctx, 400, 400, 120, 50, 35, 65, "orange");
+  triangle(ctx, 400, 400, 120, 50, 35, 65, rgba(255, 255, 0, 0.5));
+  line(ctx, 100, 100, 200, 200, "black", 2);
 
   requestAnimationFrame(draw);
 }

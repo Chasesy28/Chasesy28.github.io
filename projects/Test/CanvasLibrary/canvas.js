@@ -22,3 +22,7 @@ export function setBackgroundColor(ctx, color) {
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
+
+export function rgba(r, g, b, a) {
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
