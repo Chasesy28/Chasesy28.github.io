@@ -32,7 +32,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.3.0",
     "@vitest/coverage-v8": "^5.0.1",
-    "autoprefixer": "^10.6.2",
+    "autoprefixer": "^10.7.0",
     "http-server": "^14.1.1",
     "postcss": "^8.5.33",
     "playwright": "^1.65.1",
